@@ -9,7 +9,6 @@ use App\Models\Platform;
 use App\Models\Settlement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Subscription;
 use App\Models\Plan;
 
 class Dashboard extends Component
@@ -103,7 +102,7 @@ class Dashboard extends Component
 
         // Calculate referral earnings from settlements
         $this->referralEarnings = Settlement::where('user_id', $user->id)
-            ->where('type', 'referral_commission')
+            ->where('settlementable_type', 'App\Models\Referral')
             ->sum('amount');
     }
 

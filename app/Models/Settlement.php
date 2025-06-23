@@ -12,8 +12,8 @@ class Settlement extends Model
     protected $fillable = [
         'user_id',
         'amount',
-        'type',
-        'description',
+        'currency',
+        'status',
         'settlementable_id',
         'settlementable_type',
     ];

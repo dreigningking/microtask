@@ -64,10 +64,8 @@ class TaskWorkerObserver
                                 Settlement::create([
                                     'user_id' => $referral->referrer_id,
                                     'amount' => $commission,
-                                    'type' => 'referral_commission',
-                                    'description' => "Commission for {$worker->username}'s completion of task: {$taskWorker->task->title}",
-                                    'settlementable_id' => $taskWorker->id,
-                                    'settlementable_type' => TaskWorker::class,
+                                    'settlementable_id' => $referral->id,
+                                    'settlementable_type' => Referral::class,
                                 ]);
                             }
                         }

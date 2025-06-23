@@ -107,7 +107,8 @@ class ViewJob extends Component
             // Create settlement record
             $settlement = Settlement::create([
                 'user_id' => $worker->user_id,
-                'task_id' => $this->task->id,
+                'settlementable_id' => $this->task->id,
+                'settlementable_type' => get_class($this->task),
                 'amount' => $this->task->budget_per_person,
                 'currency' => $this->task->user->country->currency,
                 'status' => 'pending'
