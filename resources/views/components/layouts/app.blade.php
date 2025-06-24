@@ -31,7 +31,9 @@
         <div class="container mx-auto px-4 py-10">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
-                    <a href="/" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">logo</a>
+                    <a href="{{route('index')}}" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">
+                        <img src="{{asset('frontend/images/logo.png')}}" alt="" style="height:50px;">
+                    </a>
                     <p class="text-gray-300 mb-4">Connect with thousands of micro-jobs you can start completing today. Register now to earn money from your skills.</p>
                     <div class="flex space-x-4">
                         <a href="#" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
@@ -83,7 +85,7 @@
             </div>
             
             <div class="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-300 text-sm mb-4 md:mb-0">© 2025 logo. All rights reserved.</p>
+                <p class="text-gray-300 text-sm mb-4 md:mb-0">© 2025 Copyright. All rights reserved.</p>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-300 hover:text-white text-sm">Terms of Service</a>
                     <a href="#" class="text-gray-300 hover:text-white text-sm">Privacy Policy</a>

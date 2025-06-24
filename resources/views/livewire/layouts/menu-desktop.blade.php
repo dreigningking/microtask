@@ -1,6 +1,6 @@
 <header class="bg-primary text-white py-4 px-6 flex items-center justify-between shadow-md sticky top-0 z-50">
     <div class="flex items-center">
-        <a href="/" class="text-2xl font-['Pacifico'] text-white">
+        <a href="{{route('index')}}" class="text-2xl font-['Pacifico'] text-white">
             <img src="{{asset('frontend/images/logo.png')}}" alt="" style="height:50px;">
         </a>
     </div>

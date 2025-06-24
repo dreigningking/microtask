@@ -59,6 +59,35 @@ class Task extends Model
         return $this->hasMany(Settlement::class);
     }
 
+    public function scopeCompleted($query)
+    {
+        return $query->whereRaw('number_of_people <= (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND submitted_at IS NOT NULL)');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)
+                     ->where(function($q) {
+                         $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
+                     })
+                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND (submitted_at IS NOT NULL OR accepted_at IS NOT NULL))');
+    }
+
+    public function scopeListable($query, $countryId)
+    {
+        return $query->where('is_active', true)
+                     ->where('visibility', 'public')
+                     ->whereNotNull('approved_at')
+                     ->where(function($q) use ($countryId) {
+                         $q->whereNull('restricted_countries')
+                           ->orWhereJsonDoesntContain('restricted_countries', $countryId);
+                     })
+                     ->where(function($q) {
+                         $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
+                     })
+                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND (submitted_at IS NOT NULL OR accepted_at IS NOT NULL))');
+    }
+
     public function getStatusAttribute(){
         if (!$this->is_active) {
             return 'draft';

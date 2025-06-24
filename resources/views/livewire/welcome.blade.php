@@ -8,33 +8,33 @@
                 <p class="text-xl text-blue-100 mb-8">Connect with thousands of micro-jobs and start earning today. Registration is completely free!</p>
 
                 <!-- Search Bar -->
-                <div class="search-container bg-white rounded-lg p-2 flex flex-col md:flex-row shadow-lg mb-8">
+                <div class="search-container bg-white rounded-lg p-2 flex flex-col md:flex-row shadow-lg mb-8" wire:submit.prevent="searchJobs">
                     <div class="flex-1 flex items-center px-3 border-b md:border-b-0 md:border-r border-gray-200 py-2 md:py-0">
                         <div class="w-6 h-6 flex items-center justify-center text-gray-400 mr-2">
                             <i class="ri-search-line"></i>
                         </div>
-                        <input type="text" placeholder="Search for jobs..." class="w-full text-gray-700 text-sm">
+                        <input type="text" wire:model.defer="searchQuery" placeholder="Search for jobs..." class="w-full text-gray-700 text-sm">
                     </div>
                     <div class="flex items-center px-3 border-b md:border-b-0 md:border-r border-gray-200 py-2 md:py-0">
                         <div class="w-6 h-6 flex items-center justify-center text-gray-400 mr-2">
                             <i class="ri-filter-3-line"></i>
                         </div>
-                        <select id="platforms" class="w-full text-gray-700 bg-transparent pr-8 text-sm">
+                        <select id="platforms" wire:model.defer="searchPlatform" class="w-full text-gray-700 bg-transparent pr-8 text-sm">
                             <option value="">All Platforms</option>
-                            <option value="design">Design</option>
-                            <option value="writing">Writing</option>
-                            <option value="development">Development</option>
-                            <option value="marketing">Marketing</option>
-                            <option value="admin">Admin Support</option>
+                            @if($allPlatforms)
+                                @foreach($allPlatforms as $platform)
+                                    <option value="{{ $platform->id }}">{{ $platform->name }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
-                    <button class="bg-primary text-white px-6 py-2 rounded-button font-medium text-sm mt-2 md:mt-0 whitespace-nowrap">Search Jobs</button>
+                    <button type="submit" class="bg-primary text-white px-6 py-2 rounded-button font-medium text-sm mt-2 md:mt-0 whitespace-nowrap">Search Jobs</button>
                 </div>
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</button>
-                    <button class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Register Now</button>
+                    <a href="{{ route('post_job') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
+                    <a href="{{ route('register') }}" class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Register Now</a>
                 </div>
             </div>
         </div>
@@ -360,8 +360,8 @@
             </div>
 
             <div class="text-center mt-8">
-                <a href="#" class="inline-flex items-center text-primary font-medium hover:underline">
-                    <span>View All Jobs</span>
+                <a href="{{ route('explore') }}" class="inline-flex items-center text-primary font-medium hover:underline">
+                    <span>View All Jobses</span>
                     <div class="w-4 h-4 flex items-center justify-center ml-1">
                         <i class="ri-arrow-right-line"></i>
                     </div>
@@ -380,13 +380,13 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($popularPlatforms as $platform)
-                <div class="platform-card bg-white rounded-lg shadow-md p-6 text-center border border-gray-100">
+                <a href="{{ route('explore', ['selectedPlatforms' => [$platform['id']]]) }}" class="platform-card bg-white rounded-lg shadow-md p-6 text-center border border-gray-100 block">
                     <div class="w-16 h-16 flex items-center justify-center bg-{{ $platform['color'] }}-100 rounded-full mx-auto mb-4 overflow-hidden">
                         <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" class="w-full h-full object-cover">
                     </div>
                     <h3 class="font-semibold text-gray-800 mb-2">{{ $platform['name'] }}</h3>
                     <p class="text-sm text-gray-500">{{ $platform['jobs_count'] }} jobs available</p>
-                </div>
+                </a>
                 @endforeach
             </div>
         </div>
@@ -406,7 +406,7 @@
                     <div class="w-16 h-16 flex items-center justify-center bg-white bg-opacity-20 rounded-full mx-auto mb-4">
                         <i class="ri-user-line text-2xl"></i>
                     </div>
-                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="userCounter">0</h3>
+                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="userCounter">{{ number_format($registeredUsers) }}</h3>
                     <p class="text-blue-100">Registered Users</p>
                 </div>
 
@@ -415,7 +415,7 @@
                     <div class="w-16 h-16 flex items-center justify-center bg-white bg-opacity-20 rounded-full mx-auto mb-4">
                         <i class="ri-check-line text-2xl"></i>
                     </div>
-                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="completedCounter">0</h3>
+                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="completedCounter">{{ number_format($completedJobs) }}</h3>
                     <p class="text-blue-100">Completed Jobs</p>
                 </div>
 
@@ -424,7 +424,7 @@
                     <div class="w-16 h-16 flex items-center justify-center bg-white bg-opacity-20 rounded-full mx-auto mb-4">
                         <i class="ri-briefcase-4-line text-2xl"></i>
                     </div>
-                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="activeCounter">0</h3>
+                    <h3 class="text-4xl font-bold mb-2 stat-counter" id="activeCounter">{{ number_format($activeJobs) }}</h3>
                     <p class="text-blue-100">Active Jobs</p>
                 </div>
             </div>
@@ -472,7 +472,7 @@
             </div>
 
             <div class="text-center mt-12">
-                <button class="bg-primary text-white px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Get Started Now</button>
+                <a href="{{ route('register') }}" class="bg-primary text-white px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Get Started Now</a>
             </div>
         </div>
     </section>
@@ -559,8 +559,8 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Start Earning or Find Talent?</h2>
                 <p class="text-xl text-blue-100 mb-8">Join our community of freelancers and clients today. Registration is free and takes less than a minute.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</button>
-                    <button class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Find Work</button>
+                    <a href="{{ route('post_job') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
+                    <a href="{{ route('explore') }}" class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Find Work</a>
                 </div>
             </div>
         </div>
