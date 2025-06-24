@@ -6,6 +6,7 @@ use App\Http\Traits\HelperTrait;
 use App\Models\Referral;
 use App\Notifications\TaskInviteNonUserNotification;
 use App\Notifications\TaskInviteNotification;
+use App\Notifications\JobSubmissionNotification;
 use Carbon\Carbon;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
@@ -216,6 +217,9 @@ class ViewTask extends Component
         $this->taskWorker->submissions = $submissionOutput;
         $this->taskWorker->submitted_at = now();
         $this->taskWorker->save();
+
+        // Send job submission notification to task master
+        $this->task->user->notify(new JobSubmissionNotification($this->task, Auth::user()));
 
         session()->flash('message', 'Task submitted successfully!');
         return redirect()->route('my_tasks');

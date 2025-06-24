@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\GeoLocationTrait;
 use Illuminate\Auth\Events\Registered;
+use App\Notifications\WelcomeNotification;
 
 class Register extends Component
 {
@@ -45,6 +46,9 @@ class Register extends Component
         event(new Registered(($user = User::create($validated))));
 
         Auth::login($user);
+
+        // Send welcome notification
+        $user->notify(new WelcomeNotification($user));
 
         $this->redirect(route('dashboard', absolute: false), navigate: true);
     }
