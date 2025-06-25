@@ -128,6 +128,10 @@ class PostJob extends Component
         'requirements.required' => 'Please enter at least one required skill',
         'budget_per_person.required' => 'Please enter a budget per person',
         'files.*.max' => 'Each file must not exceed 10MB.',
+        'files.max' => 'Each file must not exceed 10MB.',
+        'files.0.max' => 'Each file must not exceed 10MB.',
+        'files.1.max' => 'Each file must not exceed 10MB.',
+        'files.2.max' => 'Each file must not exceed 10MB.',
         'files.*.mimes' => 'Only PDF, DOC, JPG, and PNG files are allowed.',
     ];
 

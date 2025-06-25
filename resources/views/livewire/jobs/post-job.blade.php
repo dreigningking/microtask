@@ -194,14 +194,16 @@
                                     <h4 class="text-sm font-medium text-gray-700 mb-2">Uploaded Files:</h4>
                                     <div class="flex flex-wrap gap-2">
                                         @foreach($files as $index => $file)
-                                        <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
-                                        <span class="truncate max-w-[150px]">{{ $file['name'] ?? 'Uploaded file' }}</span>
-                                            <button type="button" wire:click="removeFile({{ $index }})" class="ml-1 text-gray-500 hover:text-red-500 focus:outline-none">
-                                                <div class="w-4 h-4 flex items-center justify-center">
-                                                    <i class="ri-close-line"></i>
+                                            @if(is_array($file) && isset($file['name']))
+                                                <div class="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm">
+                                                    <span class="truncate max-w-[150px]">{{ $file['name'] ?? 'Uploaded file' }}</span>
+                                                    <button type="button" wire:click="removeFile({{ $index }})" class="ml-1 text-gray-500 hover:text-red-500 focus:outline-none">
+                                                        <div class="w-4 h-4 flex items-center justify-center">
+                                                            <i class="ri-close-line"></i>
+                                                        </div>
+                                                    </button>
                                                 </div>
-                                            </button>
-                                        </div>
+                                            @endif
                                         @endforeach
                                     </div>
                                 </div>

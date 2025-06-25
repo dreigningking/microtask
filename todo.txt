@@ -1,4 +1,4 @@
-There should be error message at the bottom on mobile view
+
 The template field should show col-12 on mobile view
 File upload should tell user that wrong type was upload
 File upload should tell you that the size is too large

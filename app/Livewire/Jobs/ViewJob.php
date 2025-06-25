@@ -231,5 +231,19 @@ class ViewJob extends Component
             'workers' => $workers
         ]);
     }
+
+    public function parseEmails($input)
+    {
+        // Split by comma, semicolon, or whitespace
+        $parts = preg_split('/[\s,;]+/', $input);
+        $emails = [];
+        foreach ($parts as $part) {
+            $email = trim($part);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $emails[] = strtolower($email);
+            }
+        }
+        return array_unique($emails);
+    }
 }
 
