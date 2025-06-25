@@ -132,6 +132,9 @@ class PostJob extends Component
     public $monitoring_fee = 0;
     public $enable_system_monitoring = false;
 
+    public $serviceUnavailable = false;
+    public $unavailableCountryName = null;
+
     public function getStepRules()
     {
         $rules = [];
@@ -186,13 +189,36 @@ class PostJob extends Component
         $this->restricted_countries = [];
         $this->platforms = Platform::where('is_active', true)->get();
         $this->templates = TaskTemplate::where('is_active', true)->get();
-        $approved_countries = CountrySetting::where('feature_rate','!=',null)->where('urgent_rate','!=',null)->get();
-        $this->countries = Country::whereIn('id',$approved_countries->pluck('country_id'))->orderBy('name')->get();
-        $this->countrySetting = $approved_countries->firstWhere('country_id', $this->location->country_id);
-        $this->featuredPrice = $this->countrySetting->feature_rate;
-        $this->urgentPrice = $this->countrySetting->urgent_rate;
-        $this->tax_rate = $this->countrySetting->tax_rate;
-        if ($this->countrySetting->transaction_charges) {
+
+        // Determine approved countries using Country model methods
+        $allCountries = Country::orderBy('name')->get();
+        $approvedCountries = collect();
+        foreach ($allCountries as $country) {
+            if (
+                $country->hasTransactionSettings() &&
+                $country->hasTaskSettings() &&
+                $country->hasPlanPrices() &&
+                $country->hasTemplatePrices()
+            ) {
+                $approvedCountries->push($country);
+            }
+        }
+        $this->countries = $approvedCountries;
+
+        // Set countrySetting for the user's/guest's country if available
+        $this->countrySetting = $this->location->country_id ? $approvedCountries->firstWhere('id', $this->location->country_id)?->setting : null;
+
+        // If user's/guest's country is not approved, set serviceUnavailable
+        if (!$approvedCountries->pluck('id')->contains($this->location->country_id)) {
+            $this->serviceUnavailable = true;
+            $this->unavailableCountryName = $this->location->country_name ?? 'your country';
+        }
+
+        // Set pricing and other settings if available
+        $this->featuredPrice = $this->countrySetting->feature_rate ?? 0;
+        $this->urgentPrice = $this->countrySetting->urgent_rate ?? 0;
+        $this->tax_rate = $this->countrySetting->tax_rate ?? 0;
+        if ($this->countrySetting && $this->countrySetting->transaction_charges) {
             $transactionCharges = $this->countrySetting->transaction_charges;
             $this->transactionPercentage = $transactionCharges['percentage'] ?? 0;
             $this->transactionFixed = $transactionCharges['fixed'] ?? 0;
