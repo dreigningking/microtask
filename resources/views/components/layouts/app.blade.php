@@ -3,14 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wonegig - Home</title>
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon.png') }}">
+    
+    <!-- Primary Meta Tags -->
+    <title>@yield('title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')</title>
+    <meta name="title" content="@yield('meta_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
+    <meta name="description" content="@yield('meta_description', 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'micro jobs, freelance, online work, earn money online, remote work, quick tasks, freelancing platform, work from home')">
+    <meta name="author" content="Wonegig">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('og_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
+    <meta property="og:description" content="@yield('og_description', 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities. Join our community of freelancers and clients worldwide.')">
+    <meta property="og:image" content="@yield('og_image', asset('frontend/images/og-image.png'))">
+    <meta property="og:site_name" content="Wonegig">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="@yield('twitter_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
+    <meta property="twitter:description" content="@yield('twitter_description', 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities.')">
+    <meta property="twitter:image" content="@yield('twitter_image', asset('frontend/images/og-image.png'))">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="msapplication-TileColor" content="#1e3a8a">
+    <meta name="application-name" content="Wonegig">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url()->current() }}">
+    
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Stylesheets -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <link rel="stylesheet" href="{{ asset('frontend/css/theme.css') }}">
     
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script>tailwind.config={theme:{extend:{colors:{primary:'#1e3a8a',secondary:'#3b82f6'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
     
     @livewireStyles
