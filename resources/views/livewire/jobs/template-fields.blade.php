@@ -2,12 +2,12 @@
 @if(count($templateFields) > 0)
     <div class="template-fields">
         <h3 class="text-lg font-semibold mb-4">Template Fields</h3>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             @foreach($templateFields as $field)
                 @php
                     $hasError = isset($validationErrors["templateData.{$field['name']}.value"]);
                 @endphp
-                <div class="mb-4">
+                <div class="mb-4 col-span-1">
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         {{ $field['title'] }}
                         @if($field['required'] ?? false)

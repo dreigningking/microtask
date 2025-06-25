@@ -207,6 +207,13 @@
                                 </div>
                                 @endif
                             </div>
+                            @if ($errors->has('files.*'))
+                                @foreach ($errors->get('files.*') as $messages)
+                                    @foreach ($messages as $message)
+                                        <span class="text-red-500 text-sm block">{{ $message }}</span>
+                                    @endforeach
+                                @endforeach
+                            @endif
                             @error('files.*') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
@@ -667,6 +674,19 @@
             </button>
         </div>
     </div>
+
+    <!-- Mobile-only error display below navigation buttons -->
+    @if ($errors->any())
+        <div class="block md:hidden mt-4">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <ul class="list-disc pl-5 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 </main>
 
 @push('styles')

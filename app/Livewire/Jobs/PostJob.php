@@ -117,6 +117,7 @@ class PostJob extends Component
         'email' => 'required|email|sometimes',
         'password' => 'required|sometimes',
         'terms' => 'accepted|sometimes',
+        'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png', // 10MB max, allowed types
     ];
 
     // Validation messages
@@ -126,6 +127,8 @@ class PostJob extends Component
         'description.required' => 'Please provide a job description',
         'requirements.required' => 'Please enter at least one required skill',
         'budget_per_person.required' => 'Please enter a budget per person',
+        'files.*.max' => 'Each file must not exceed 10MB.',
+        'files.*.mimes' => 'Only PDF, DOC, JPG, and PNG files are allowed.',
     ];
 
     public $min_budget_per_person = 0;
@@ -134,6 +137,8 @@ class PostJob extends Component
 
     public $serviceUnavailable = false;
     public $unavailableCountryName = null;
+
+    public static $allowedFileTypes = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
 
     public function getStepRules()
     {
@@ -252,6 +257,7 @@ class PostJob extends Component
 
     public function updatedFiles()
     {
+        $this->validateOnly('files.*');
         $processedFiles = [];
 
         foreach ($this->files as $file) {
@@ -335,7 +341,8 @@ class PostJob extends Component
 
     public function updateTotals()
     {
-        $this->expected_budget = $this->budget_per_person * $this->number_of_people;
+
+        $this->expected_budget = ($this->budget_per_person ?? 0) * $this->number_of_people;
         $baseAmount = $this->expected_budget;
         $this->featured_amount = $this->featured ? $this->featuredPrice * $this->featured_days : 0;
         $baseAmount += $this->featured_amount;
@@ -598,6 +605,13 @@ class PostJob extends Component
             return 'System-Automated (' . $this->currency_symbol . number_format($this->countrySetting->system_monitoring_cost ?? 0, 2) . ')';
         }
         return 'Self-Monitored (Free)';
+    }
+
+    public function updatedBudgetPerPerson($value)
+    {
+        if ($value === '' || !is_numeric($value)) {
+            $this->budget_per_person = 0;
+        }
     }
 
     public function render()

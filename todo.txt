@@ -5,4 +5,7 @@ File upload should tell you that the size is too large
 Server is restricting file size upload
 Template field validation not working
 
+on postjob, tor browser is not allowing reactivity.. template prices are not showing
+
+when budget per person is empty, its causing error
 
