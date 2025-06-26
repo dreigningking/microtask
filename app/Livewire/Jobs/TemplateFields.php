@@ -40,21 +40,20 @@ class TemplateFields extends Component
                     $this->templateFields = $taskFields;
                     // Initialize field values
                     foreach ($taskFields as $field) {
-                        if (isset($field->title)) {
-                            $this->templateData[$field->name] = [
+                        if (isset($field['title'])) {
+                            $this->templateData[$field['name']] = [
                                 'value' => '',
-                                'name' => $field->name,
-                                'required' => $field->required ?? false,
-                                'title' => $field->title,
-                                'type' => $field->type ?? 'text'
+                                'name' => $field['name'],
+                                'required' => $field['required'] ?? false,
+                                'title' => $field['title'],
+                                'type' => $field['type'] ?? 'text'
                             ];
                         }
                     }
                 }
             }
         }
-        
-        // Dispatch event to notify parent component
+        // Always dispatch the full templateData array, even if empty
         $this->dispatch('templateFieldsLoaded', $this->templateData);
     }
     

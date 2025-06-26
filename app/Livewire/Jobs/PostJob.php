@@ -332,6 +332,7 @@ class PostJob extends Component
      */
     public function handleTemplateFieldsLoaded($templateFieldValues)
     {
+        // Always set the full array, not just those with values
         $this->templateData = $templateFieldValues;
     }
     
