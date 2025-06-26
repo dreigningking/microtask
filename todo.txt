@@ -1,11 +1,12 @@
-
-The template field should show col-12 on mobile view
-File upload should tell user that wrong type was upload
-File upload should tell you that the size is too large
-Server is restricting file size upload
+Change server upload to 2mb
 Template field validation not working
-
 on postjob, tor browser is not allowing reactivity.. template prices are not showing
 
 when budget per person is empty, its causing error
+
+restrict users to number of task within an hour
+subscription effect on postjob, job worker, withdrawal
+change display for mobile
+test email service on localhost and server...
+mobile menu is not showing on mobile for guest
 

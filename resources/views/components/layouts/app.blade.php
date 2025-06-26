@@ -8,7 +8,6 @@
     <link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon.png') }}">
     
-    <!-- Primary Meta Tags -->
     <title>@yield('title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')</title>
     <meta name="title" content="@yield('meta_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
     <meta name="description" content="@yield('meta_description', 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide.')">

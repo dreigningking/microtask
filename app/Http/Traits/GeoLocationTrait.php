@@ -21,8 +21,8 @@ trait GeoLocationTrait
             'currency' => $country->currency,
             'currency_symbol' => $country->currency_symbol,
             'dial' => $country->phonecode,
-            'state_id' => $state->id,
-            'state' => $state->name,
+            'state_id' => $state ? $state->id : null,
+            'state' => $state ? $state->name : null,
             'city' => $result->city,
         ]);
     }
