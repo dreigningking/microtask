@@ -23,7 +23,8 @@ class Task extends Model
         'files' => 'array',
         'template_data' => 'array',
         'restricted_countries' => 'array',
-        'approved_at'=> 'datetime'
+        'approved_at'=> 'datetime',
+        'expiry_date'=> 'datetime'
     ];
 
     public function sluggable(): array
