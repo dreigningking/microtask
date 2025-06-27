@@ -109,6 +109,10 @@ class Subscriptions extends Component
 
     public function calculateTotal()
     {
+        if(!$this->selectedDuration){
+            $this->selectedDuration = 1;
+        }
+
         if ($this->selectedPlan) {
             $this->subtotal = $this->selectedPlan['monthly_price'] * $this->selectedDuration;
             $this->tax = $this->subtotal * ($this->tax_rate / 100);

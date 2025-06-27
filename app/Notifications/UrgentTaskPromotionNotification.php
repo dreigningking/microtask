@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Task;
 
-class UrgentTaskPromotionNotification extends Notification implements ShouldQueue
+class UrgentTaskPromotionNotification extends Notification
 {
     use Queueable;
 

@@ -1,7 +1,5 @@
 Change server upload to 2mb
 
-Template field validation not working
-
 restrict users to number of task within an hour
 subscription effect on postjob, job worker, withdrawal
 withdrawal maximum based on subscription
