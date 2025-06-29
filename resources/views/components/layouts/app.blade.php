@@ -125,13 +125,8 @@
                 </div>
             </div>
             
-            <div class="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-300 text-sm mb-4 md:mb-0">© 2025 Copyright. All rights reserved.</p>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-300 hover:text-white text-sm">Terms of Service</a>
-                    <a href="#" class="text-gray-300 hover:text-white text-sm">Privacy Policy</a>
-                    <a href="#" class="text-gray-300 hover:text-white text-sm">Cookie Policy</a>
-                </div>
+            <div class="border-t border-white/20 mt-8 pt-8 flex justify-center items-center">
+                <p class="text-gray-300 text-sm">© 2025 Copyright. All rights reserved.</p>
             </div>
         </div>
     </footer>
