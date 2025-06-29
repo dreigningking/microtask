@@ -1,0 +1,113 @@
+Wonegig — Terms & Conditions
+
+Read these Terms carefully. They form a legally binding agreement (“Agreement”) between Wonegig Technologies Inc. (“Wonegig,” “we,” “us,” “our”) and any individual or entity that visits, registers, or uses the Wonegig website, mobile apps, or related APIs (“you,” “User”). By accessing or using Wonegig, you confirm that you have read, understood, and agree to be bound by these Terms and by any policies referenced herein (Privacy Policy, Payment Terms, etc.). If you do not accept them, do not use the Services.
+
+1. Definitions
+Term	Meaning
+“Services”	The Wonegig platform, including web/mobile interfaces, escrow, messaging, and all associated features.
+“Client”	A User who posts a project or micro-gig and agrees to pay for deliverables.
+“Freelancer”	A User who offers to perform work and deliver services via Wonegig.
+“Project” / “Gig”	The task, job, or service listing created by a Client.
+“Escrow”	The secure holding account where Client funds are placed until Project milestones are completed.
+“Deliverables”	Work product a Freelancer is contractually obliged to provide.
+
+2. Eligibility
+Minimum age 18 years.
+You must have the legal capacity to form binding contracts.
+You must not be located in, or a resident of, jurisdictions subject to comprehensive trade sanctions (e.g., Cuba, Iran, North Korea, Syria, Crimea/Sevastopol, Donetsk & Luhansk regions).
+Wonegig reserves the right to verify identity (KYC/AML) and deny or terminate accounts that fail to pass verification.
+
+3. Account Registration & Security
+1.Provide accurate, current, and complete information.
+2.Maintain the confidentiality of credentials.
+3.Notify support@wonegig.com of any unauthorized use.
+4.You are responsible for all activity under your account, whether performed by you or by someone using your credentials.
+
+4. Independent Contractor Status
+No employment, partnership, or agency relationship is created between Client and Freelancer or between either party and Wonegig.
+Freelancers control how, when, and where work is performed, and are solely responsible for taxes, licenses, and compliance with applicable laws.
+
+5. Posting & Bidding
+Clients must provide a clear scope, timeline, and payment amount.
+Freelancers must supply truthful qualifications and bid in good faith.
+Misrepresentation or bid manipulation (e.g., fake accounts, “bid dumping”) is prohibited.
+
+6. Fees & Payments
+Platform Fee: 5 % (Client) and 10 % (Freelancer) unless otherwise stated in the Payment Terms.
+Escrow: Clients deposit the full project budget (or milestone amount) before work begins. Funds are released automatically on Client approval or after dispute resolution.
+Payouts: Made via supported payment channels; processing times vary by country.
+Chargebacks / Reversals: You are liable for costs arising from your payment disputes.
+
+7. Taxes
+Each User is responsible for determining and remitting any VAT, GST, sales tax, income tax, employment tax, or other governmental levies arising from payments made or received through Wonegig. Where legally required, Wonegig may withhold and remit taxes on your behalf (e.g., IRS Form 1099-K in the U.S., CRA reporting in Canada).
+
+8. User Content & Intellectual Property
+1.License to Wonegig: By uploading content (profiles, gig descriptions, messages, portfolios) you grant Wonegig a worldwide, non-exclusive, royalty-free license to host, use, display, and modify that content solely for platform operation and promotion.
+2.Deliverables IP: Ownership is transferred to the Client upon full payment unless the project listing states otherwise.
+3.Third-Party IP: Users must not upload content that infringes copyright, trademark, or other intellectual-property rights.
+4.DMCA / Notice-and-Takedown: Reports of infringement should be emailed to ip@wonegig.com.
+
+9. Ratings & Reviews
+Reviews must be honest, factual, and free of confidential information or hate speech.
+Coercing another User to leave positive or remove negative feedback is prohibited.
+Wonegig may remove reviews that violate these rules or applicable law.
+
+10. Prohibited Conduct
+You agree not to:
+1.Circumvent fees by taking payments off-platform.
+2.Post illegal, fraudulent, or exploitative content.
+3.Discriminate on the basis of race, religion, gender, etc.
+4.Upload malware or engage in phishing, DDoS, or scraping.
+5.Violate export-control laws or facilitate prohibited transactions.
+6.Use automated bots to harvest data or manipulate platform metrics.
+
+11. Dispute Resolution
+1.Self-Resolution: Parties should first attempt to resolve issues via the project chat.
+2.Escrow Mediation: If unresolved within 5 days, either party may request Wonegig mediation. Provide evidence (messages, files, timelines).
+3.Binding Arbitration (Last Resort):
+oForum: ICDR Canada (or JAMS for U.S. residents).
+oRules: Expedited or online arbitration; single arbitrator; English language.
+oOpt-Out: You may reject this clause by emailing arbitration-optout@wonegig.com within 30 days of account creation.
+Consumers in the EU/UK maintain statutory rights to alternative dispute-resolution (ADR) bodies; this clause does not waive mandatory protections.
+
+12. Termination & Suspension
+By User: Close your account anytime from Account → Settings.
+By Wonegig: We may suspend or terminate access for breach, fraud, or legal compliance.
+Effect: Outstanding escrows are frozen pending dispute review; surviving obligations (fees owed, IP transfer, confidentiality) remain in force.
+
+13. Disclaimers
+1.“As-Is” Services: Wonegig is provided without warranties of any kind, express or implied (merchantability, fitness for a particular purpose, non-infringement).
+2.Third-Party Content: We are not liable for accuracy or reliability of User-generated content.
+3.Platform Availability: We aim for 99.9 % uptime but do not guarantee uninterrupted access.
+
+14. Limitation of Liability
+To the maximum extent permitted by law, Wonegig’s total aggregate liability for any claim arising out of or relating to the Services shall not exceed the greater of (a) USD $200 or (b) the total platform fees you paid Wonegig in the 6 months preceding the event. Indirect, consequential, or punitive damages are excluded. Some jurisdictions do not allow such limitations; in those jurisdictions, liability is limited to the minimum extent permitted by law.
+
+15. Indemnification
+You agree to defend, indemnify, and hold harmless Wonegig, its officers, directors, employees, and agents from any claim, demand, loss, or damage (including legal fees) arising out of your (a) breach of these Terms, (b) misuse of the Services, or (c) violation of any law or third-party right.
+
+16. Governing Law
+User Location	Governing Law	Venue
+U.S. & Canada	Province of Manitoba, Canada	Courts of Winnipeg or ICDR/JAMS (arbitration)
+EU / EEA / UK	Irish law (non-exclusive)	Courts of Dublin or EU ADR
+Rest of World	Laws of England & Wales	Courts of London or ICDR
+Mandatory consumer protections under local law remain unaffected.
+
+17. Changes to These Terms
+We may amend these Terms to reflect new features, regulatory changes, or business needs.
+Notice: Material changes will be announced via email or in-platform banner 15 days before they take effect (or longer where required by law).
+Continued use after the effective date constitutes acceptance.
+
+18. Miscellaneous
+Severability: If any provision is unenforceable, the remainder remains in effect.
+No Waiver: Failure to enforce any right is not a waiver of future enforcement.
+Assignment: Wonegig may assign its rights without notice; Users may not assign without written consent.
+Force Majeure: Neither party is liable for delay or failure due to events beyond reasonable control (e.g., natural disaster, war, internet outage).
+Entire Agreement: These Terms, plus referenced policies, constitute the entire agreement between you and Wonegig, superseding all prior understandings.
+
+19. Contact
+Wonegig Technologies Inc.
+Attn: Legal Department
+[insert-physical-address]
+Email: legal@wonegig.com
+Phone: +1 204-[XXX-XXXX]

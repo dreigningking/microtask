@@ -2,50 +2,54 @@
 
 use App\Livewire\Explore;
 use App\Livewire\Welcome;
+use App\Livewire\AboutPage;
 use App\Livewire\Dashboard;
 use App\Livewire\TopEarners;
+use App\Livewire\ContactPage;
+use App\Livewire\Jobs\EditJob;
 use App\Livewire\Jobs\PostJob;
 use App\Livewire\Jobs\ViewJob;
 use App\Livewire\Transactions;
 use App\Livewire\Jobs\ListJobs;
 use App\Livewire\Subscriptions;
+use App\Livewire\Blog\BlogIndex;
 use App\Livewire\Tasks\ShowPage;
 use App\Livewire\Tasks\ViewTask;
+use App\Livewire\Blog\BlogSingle;
 use App\Livewire\Tasks\ListTasks;
 use App\Http\Traits\PaystackTrait;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Policies\Disclaimer;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Earnings\ListEarnings;
 use App\Livewire\Payments\UserPayments;
+use App\Livewire\Policies\PrivacyPolicy;
 use App\Livewire\Referrals\InviteesList;
 use App\Http\Controllers\PaymentController;
-use Illuminate\Support\Facades\Notification;
+use App\Livewire\Policies\DigitalMillenium;
+use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Notifications\ListNotifications;
-use App\Notifications\UrgentTaskPromotionNotification;
+use App\Livewire\Policies\PaymentDisputeChargebacks;
+
 
 Route::get('test',function(){
-    $promotion = \App\Models\TaskPromotion::find(8);
-        if (!$promotion) return 'no promotion';
-        $task = $promotion->task;
-        if (!$task) return 'no tasks';
-        $platformId = $task->platform_id;
-        $countryId = $task->user->country_id;
-
-        // Step 5: user_location
-        $userLocationIds = \App\Models\UserLocation::where('country_id', $countryId)->pluck('user_id')->toArray();
-        if (empty($userLocationIds)) return 'no location ids';
-        // Step 6: platform_user
-        $platformUserIds = \App\Models\PlatformUser::where('platform_id', $platformId)->pluck('user_id')->toArray();
-        if (empty($platformUserIds)) return 'no platform ids';
-        // Step 7: intersection
-        $notifyUserIds = array_values(array_intersect($userLocationIds, $platformUserIds));
-        if (empty($notifyUserIds)) return 'no user to notify';
-        // Step 8: notify
-        $users = \App\Models\User::whereIn('id', $notifyUserIds)->get();
-        Notification::send($users, new UrgentTaskPromotionNotification($task));
-    return 'done';
+    $task = \App\Models\Task::find(1);
+    dd($task->orderItem->order->payment);
 });
 Route::get('/', Welcome::class)->name('index');
+Route::get('about', AboutPage::class)->name('about');
+Route::get('contact', ContactPage::class)->name('contact');
+Route::get('blog', BlogIndex::class)->name('blog');
+Route::get('post', BlogSingle::class)->name('blog.show');
+Route::group(['as'=> 'legal.'],function(){
+    Route::get('disclaimer', Disclaimer::class)->name('disclaimer');
+    Route::get('privacy-policy', PrivacyPolicy::class)->name('privacy-policy');
+    Route::get('terms-and-conditions', TermsAndConditions::class)->name('terms-conditions');
+    Route::get('digital-millenium-copyright-act', DigitalMillenium::class)->name('dcma');
+    Route::get('payment-dispute-chargeback-protection-policy', PaymentDisputeChargebacks::class)->name('payment-chargeback');
+});
+
+
 Route::get('explore', Explore::class)->name('explore');
 Route::get('explore/{task}',ShowPage::class)->name('explore.task');
 Route::get('top-earners', TopEarners::class)->name('top_earners');
@@ -58,7 +62,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('my-jobs', ListJobs::class)->name('my_jobs');
     Route::get('my-jobs/{task}', ViewJob::class)->name('my_jobs.view');
-    Route::get('my-jobs/edit/{task}', PostJob::class)->name('my_jobs.edit');
+    Route::get('my-jobs/edit/{task}', EditJob::class)->name('my_jobs.edit');
     Route::get('my-earnings', ListEarnings::class)->name('my_earnings');
     Route::get('notifications', ListNotifications::class)->name('notifications');
     Route::get('dashboard', Dashboard::class)->name('dashboard');

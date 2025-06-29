@@ -11,4 +11,8 @@ class OrderItem extends Model
     public function orderable(){
         return $this->morphTo();
     }
+
+    public function order(){
+        return $this->belongsTo(Order::class);
+    }
 }

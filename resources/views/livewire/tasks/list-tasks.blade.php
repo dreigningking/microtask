@@ -57,8 +57,62 @@
             </div>
         </div>
 
-        <!-- Tasks Table -->
-        <div class="overflow-x-auto">
+        <!-- Tasks Cards (Mobile) / Table (Desktop) -->
+        <div class="block md:hidden">
+            <!-- Mobile Cards View -->
+            <div class="space-y-4">
+                @forelse($tasks as $taskWorker)
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $taskWorker->task->title }}</h3>
+                                <p class="text-sm text-gray-500">{{ $taskWorker->task->platform->name ?? 'N/A' }}</p>
+                            </div>
+                            <div class="ml-2">
+                                @if($taskWorker->accepted_at && !$taskWorker->submitted_at && !$taskWorker->completed_at && !$taskWorker->cancelled_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Accepted</span>
+                                @elseif($taskWorker->saved_at && !$taskWorker->accepted_at && !$taskWorker->submitted_at && !$taskWorker->completed_at && !$taskWorker->cancelled_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Saved</span>
+                                @elseif($taskWorker->submitted_at && !$taskWorker->completed_at && !$taskWorker->cancelled_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Submitted</span>
+                                @elseif($taskWorker->completed_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                @elseif($taskWorker->cancelled_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cancelled</span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Pending</span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Budget:</span>
+                                <span class="font-medium text-gray-900">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Signed Up:</span>
+                                <span class="font-medium text-gray-900">{{ $taskWorker->created_at->format('M d, Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <a href="{{ route('my_tasks.view', $taskWorker->task) }}" class="flex-1 text-center bg-primary text-white px-3 py-2 rounded-button hover:bg-primary/90 text-sm">
+                                <i class="ri-eye-line mr-1"></i> View
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="ri-task-line text-4xl mb-2"></i>
+                        <p>No tasks found</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>

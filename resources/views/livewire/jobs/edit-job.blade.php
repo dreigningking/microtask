@@ -47,7 +47,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Job Title <span class="text-red-500">*</span></label>
-                            <input type="text" id="title" wire:model="title" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="e.g. Social Media Content Writer" required>
+                            <input type="text" id="title" wire:model="title" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="e.g. Social Media Content Writer" required @if($canEditNone) readonly disabled @endif>
                             @error('title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div>
@@ -296,7 +296,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-3">Monitoring Type <span class="text-red-500">*</span></label>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="relative">
-                                    <input type="radio" id="selfMonitored" wire:model.live="monitoring_type" value="self_monitoring" class="peer absolute opacity-0 w-0 h-0" checked>
+                                    <input type="radio" id="selfMonitored" wire:model.live="monitoring_type" value="self_monitoring" class="peer absolute opacity-0 w-0 h-0" @if($canEditNone || $canEditSome) disabled @endif>
                                     <label for="selfMonitored" class="flex flex-col items-center p-4 border border-gray-300 rounded-button cursor-pointer hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5">
                                         <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                                             <div class="w-5 h-5 flex items-center justify-center text-primary">
@@ -308,7 +308,7 @@
                                     </label>
                                 </div>
                                 <div class="relative">
-                                    <input type="radio" id="adminMonitored" wire:model.live="monitoring_type" value="admin_monitoring" class="peer absolute opacity-0 w-0 h-0">
+                                    <input type="radio" id="adminMonitored" wire:model.live="monitoring_type" value="admin_monitoring" class="peer absolute opacity-0 w-0 h-0" @if($canEditNone || $canEditSome) disabled @endif>
                                     <label for="adminMonitored" class="flex flex-col items-center p-4 border border-gray-300 rounded-button cursor-pointer hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5">
                                         <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                                             <div class="w-5 h-5 flex items-center justify-center text-primary">
@@ -321,7 +321,7 @@
                                 </div>
                                 @if($enable_system_monitoring)
                                 <div class="relative">
-                                    <input type="radio" id="systemMonitored" wire:model.live="monitoring_type" value="system_monitoring" class="peer absolute opacity-0 w-0 h-0">
+                                    <input type="radio" id="systemMonitored" wire:model.live="monitoring_type" value="system_monitoring" class="peer absolute opacity-0 w-0 h-0" @if($canEditNone || $canEditSome) disabled @endif>
                                     <label for="systemMonitored" class="flex flex-col items-center p-4 border border-gray-300 rounded-button cursor-pointer hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5">
                                         <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                                             <div class="w-5 h-5 flex items-center justify-center text-primary">
@@ -374,7 +374,7 @@
                                     <div class="flex items-center px-4 py-2 rounded-l-button border border-r-0 border-gray-300 bg-gray-50">
                                         <span class="text-gray-700">{{ $currency_symbol }}</span>
                                     </div>
-                                    <input type="number" id="budget_per_person" wire:model="budget_per_person" wire:input="updateTotals" min="{{ $min_budget_per_person }}" step="0.01" class="w-40 rounded-r-button border-l-0 px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="0.00" required>
+                                    <input type="number" id="budget_per_person" wire:model="budget_per_person" wire:input="updateTotals" min="{{ $min_budget_per_person }}" step="0.01" class="w-40 rounded-r-button border-l-0 px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="0.00" required @if($canEditNone || $canEditSome) readonly disabled @endif>
                                 </div>
                                 @if($min_budget_per_person > 0)
                                     <div class="text-xs text-gray-500 mt-1">Minimum allowed: {{ $currency_symbol }}{{ number_format($min_budget_per_person, 2) }} per person (based on template & country)</div>
@@ -393,7 +393,7 @@
                                             <i class="ri-subtract-line"></i>
                                         </div>
                                     </button>
-                                    <input type="number" id="number_of_people" wire:model="number_of_people" wire:input="updateTotals" min="1" class="w-32 px-4 py-2 border-t border-b border-gray-300 text-center focus:ring-0 focus:border-gray-300 outline-none">
+                                    <input type="number" id="number_of_people" wire:model="number_of_people" wire:input="updateTotals" min="1" class="w-32 px-4 py-2 border-t border-b border-gray-300 text-center focus:ring-0 focus:border-gray-300 outline-none" @if($canEditNone || $canEditSome) readonly disabled @endif>
                                     <button type="button" wire:click="increasePeople" class="flex items-center justify-center w-10 h-10 rounded-r-button bg-gray-100 border border-gray-300 hover:bg-gray-200">
                                         <div class="w-5 h-5 flex items-center justify-center">
                                             <i class="ri-add-line"></i>
@@ -409,7 +409,7 @@
                             <!-- Featured Job Option - Inline Days -->
                             <div class="flex flex-wrap items-center gap-3 p-3 border border-gray-200 rounded-button">
                                 <div class="flex items-center min-w-[250px]">
-                                    <input id="featured" type="checkbox" wire:model="featured" wire:change="updateTotals" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <input id="featured" type="checkbox" wire:model="featured" wire:change="updateTotals" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" @if($canEditNone || $canEditSome) disabled @endif>
                                     <div class="ml-3">
                                         <label for="featured" class="block text-sm font-medium text-gray-700">Featured Job</label>
                                         <p class="text-xs text-gray-500">Display prominently in search results</p>
@@ -439,7 +439,7 @@
                             <!-- Urgent Badge Option - Remove duration dropdown, just show cost per number of people -->
                             <div class="flex flex-wrap items-center gap-3 p-3 border border-gray-200 rounded-button">
                                 <div class="flex items-center min-w-[250px]">
-                                    <input id="urgent" type="checkbox" wire:model="urgent" wire:change="updateTotals" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <input id="urgent" type="checkbox" wire:model="urgent" wire:change="updateTotals" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" @if($canEditNone || $canEditSome) disabled @endif>
                                     <div class="ml-3">
                                         <label for="urgent" class="block text-sm font-medium text-gray-700">Urgent Badge</label>
                                         <p class="text-xs text-gray-500">Add badge to attract immediate attention</p>
@@ -665,8 +665,8 @@
             </div>
         </button>
         <div class="flex space-x-4 ml-auto">
-            <button type="button" wire:click="saveAsDraft" class="{{ $currentStep == 2 || !$isLoggedIn ? 'hidden' : '' }} px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Save as Draft</button>
-            <button type="{{ $currentStep == 1 ? 'button' : 'submit' }}" wire:click="{{ $currentStep == 1 ? 'nextStep' : 'submitJob' }}" class="px-8 py-2 bg-primary text-white rounded-button hover:bg-primary/90 !rounded-button whitespace-nowrap">
+            <button type="button" wire:click="saveAsDraft" class="{{ $currentStep == 2 || !$isLoggedIn || $canEditNone ? 'hidden' : '' }} px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Save as Draft</button>
+            <button type="{{ $currentStep == 1 ? 'button' : 'submit' }}" wire:click="{{ $currentStep == 1 ? 'nextStep' : 'submitJob' }}" class="px-8 py-2 bg-primary text-white rounded-button hover:bg-primary/90 !rounded-button whitespace-nowrap" @if($canEditNone) disabled @endif>
                 <div class="flex items-center">
                     <span>{{ $currentStep == 1 ? 'Next Step' : ($isLoggedIn ? 'Proceed to Payment' : 'Login to Continue') }}</span>
                     <div class="w-5 h-5 flex items-center justify-center ml-1">
@@ -687,6 +687,13 @@
                     @endforeach
                 </ul>
             </div>
+        </div>
+    @endif
+
+    @if($canEditNone)
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6 mt-4" role="alert">
+            <strong class="font-bold">This job can no longer be edited.</strong>
+            <span class="block sm:inline">You cannot edit any fields because the job has been paid for and has at least one worker.</span>
         </div>
     @endif
 </main>

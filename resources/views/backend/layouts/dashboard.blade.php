@@ -54,7 +54,16 @@
                     </ul>
                 </li>
                 
-                
+                <li class="sidebar-item">
+                    <a href="#users" data-toggle="collapse" class="sidebar-link collapsed">
+                        <i class="align-middle mr-2 fas fa-fw fa-book"></i> <span class="align-middle">Blog Management</span>
+                    </a>
+                    <ul id="users" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.index') }}">All Posts</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.create') }}">Create Post</a></li>
+                    </ul>
+                </li>
+
                 <li class="sidebar-item">
                     <a href="#dashboards" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-cog"></i> 

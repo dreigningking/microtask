@@ -1,0 +1,75 @@
+Wonegig Payments, Disputes & Chargeback Protection Policy
+Effective Date: [insert-launch-date] Last updated: [insert-revision-date]
+Purpose. This Policy sets the rules for funding projects, approving deliverables, releasing payouts, filing disputes, and handling chargebacks on the Wonegig platform. It is legally binding on every Client, Freelancer, and Partner (“Users”) and is incorporated by reference into our Terms & Conditions.
+
+1 — Scope
+Applies to	Includes	Excludes
+All monetary transactions processed through Wonegig escrow or payout rails	Card payments, ACH/SEPA, local bank transfers, wallet top-ups, withdrawals	Direct off-platform payments (prohibited), third-party financing, crypto transfers
+
+2 — Key Definitions
+Term	Meaning
+Escrow	Segregated account that holds Client funds until Project milestones are approved or resolved through dispute procedures.
+Chargeback	A payment reversal initiated by a cardholder through their issuing bank under card-network rules (e.g., Visa, Mastercard).
+Dispute Window	The period ( 5 calendar days by default) after Freelancer marks a milestone as delivered for Client to accept or file a dispute.
+Release	The automated or manual transfer of escrowed funds to Freelancer’s available balance.
+Withdrawal Hold	A security period ( 7 days minimum) before released funds are eligible for external payout.
+
+3 — Funding & Escrow Workflow
+1.Upfront Funding – Client deposits 100 % of the agreed milestone budget into escrow before work commences.
+2.Verification – High-risk or large transactions may require enhanced KYC or two-factor authentication.
+3.Work Delivery – Freelancer submits deliverables and clicks “Mark as Delivered.”
+4.Client Review – Within the Dispute Window Client must either:
+a. Accept Work → escrow auto-releases; or
+b. Open Dispute → see § 5.
+5.Auto-Release – If Client takes no action by 23:59 UTC on the final day of the Dispute Window, funds auto-release to the Freelancer.
+
+4 — Withdrawals & Holdbacks
+Tier	Max single withdrawal	Hold period	Additional checks
+Tier 1 (new account < 30 days or < $1 000 total earnings)	$500	14 days	Mandatory ID + live selfie
+Tier 2 (≥ 30 days + KYC completed)	$5 000	7 days	Random audit
+Tier 3 (verified volume seller)	Custom	2 days	Dedicated risk monitoring
+We reserve the right to extend holds or require rolling reserves (up to 10 %) if account risk rises (high dispute rate, sudden volume spike, etc.).
+
+5 — Disputes & Mediation
+1.Initiate – Either party selects “Open Dispute” and uploads evidence (deliverables, chat logs, screenshots, or screen-recordings).
+2.Mediation (24–72 h) – Wonegig Risk Team reviews submissions, may request clarifications, and proposes a settlement.
+3.Binding Decision – If parties accept, escrow funds distribute accordingly.
+4.Escalation to Arbitration – If either party rejects the mediation result, the matter follows the Arbitration clause in the Terms & Conditions. Escrow stays frozen until final award.
+
+6 — Chargeback Management
+Step	Action
+1 — Alert	We notify the Freelancer and temporarily debit their Wonegig balance (or future earnings) for the chargeback amount + provisional fee.
+2 — Evidence	Freelancer has 3 business days to submit proof of work (files, timestamps, communications). Wonegig compiles platform data (IP logs, acceptance clicks, escrow confirmations).
+3 — Representment	Wonegig (via acquiring bank/processor) contests the chargeback.
+4 — Outcome	a. Win → funds and fee returned to Freelancer; Client may face account suspension.  b. Lose → chargeback stands; Client and Freelancer encouraged to mediate off-platform if additional remedy sought.
+Chargeback Fee: USD $25 per dispute plus any network-imposed fee. Assessed to the party responsible for the reversal once liability is determined.
+
+7 — Prohibited & High-Risk Behaviors
+Filing false or abusive chargebacks after accepting work.
+Requesting off-platform payment to avoid fees.
+Delivering plagiarized, non-functional, or AI-generated work without disclosure.
+Collusion between Client and Freelancer to defraud Wonegig (e.g., fake gigs).
+Consequences: Immediate account suspension, forfeiture of balances, recovery of losses via collections, and potential legal action.
+
+8 — Fraud & Risk Controls
+Control	How It Protects You
+3-D Secure & PSD2 SCA	Mitigates stolen-card fraud for EU/UK transactions.
+Velocity & Geo-IP checks	Flags anomalous spending or location spoofing.
+Device fingerprinting	Links multiple fraudulent accounts.
+Auto-reserve triggers	Withholds funds when dispute rate > 1 % of volume.
+Manual review queue	Senior analysts vet transactions above risk threshold.
+
+9 — Record-Keeping & Evidence Guidelines
+Keep all project communications inside Wonegig chat; external messages (email, WhatsApp) are not automatically stored and may weaken your case. Attach working files in native formats and maintain version history for at least 180 days after final payment.
+
+10 — Liability & Cost Recovery
+You authorize Wonegig to debit any balances, future earnings, or payment methods on file to recover chargeback amounts, mediation awards, or policy-violation fines.
+If insufficient, we may place the amount with a third-party collections agency and report delinquency to relevant credit bureaus, where permitted by law.
+
+11 — Policy Updates
+We may amend this Policy to reflect card-network rule changes or evolving risk conditions. Notice: At least 15 days before changes take effect, except for urgent updates required by law or payment-network mandate.
+
+12 — Contact
+Risk & Compliance Team – Wonegig Technologies Inc.
+Email: risk@wonegig.com Phone: +1 204-[xxx-xxxx]
+Postal: 201 Portage Ave., Suite 1800, Winnipeg, MB R3B 3K6, Canada

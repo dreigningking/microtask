@@ -21,7 +21,7 @@ use App\Http\Traits\GeoLocationTrait;
 use App\Http\Traits\PaymentTrait;
 use App\Models\Setting;
 
-class PostJob extends Component
+class EditJob extends Component
 {
     use WithFileUploads,GeoLocationTrait,PaymentTrait;
 
@@ -143,6 +143,12 @@ class PostJob extends Component
 
     public static $allowedFileTypes = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
 
+    public $isPaid = false;
+    public $hasWorkers = false;
+    public $canEditAll = false;
+    public $canEditSome = false;
+    public $canEditNone = false;
+
     public function getStepRules()
     {
         $rules = [];
@@ -186,7 +192,7 @@ class PostJob extends Component
         return $rules;
     }
 
-    public function mount()
+    public function mount(Task $task)
     {
         $this->isLoggedIn = Auth::check();
         $this->location = $this->getLocation();
@@ -247,6 +253,21 @@ class PostJob extends Component
         $this->enable_system_monitoring = (bool) Setting::getValue('enable_system_monitoring', false);
         $this->updateMonitoringFee();
         $this->updateTotals();
+
+        // Updated payment check logic
+        $orderItem = $task->orderItem; // hasOne or first() if hasMany
+        $order = $orderItem ? $orderItem->order : null;
+        $payment = $order ? $order->payment : null;
+        $this->isPaid = $payment && $payment->status === 'success';
+        $this->hasWorkers = $task->workers()->count() > 0;
+
+        if (!$this->isPaid) {
+            $this->canEditAll = true;
+        } elseif ($this->isPaid && !$this->hasWorkers) {
+            $this->canEditSome = true;
+        } elseif ($this->isPaid && $this->hasWorkers) {
+            $this->canEditNone = true;
+        }
     }
     
     // Add file removal method

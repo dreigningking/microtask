@@ -1,7 +1,7 @@
 <main class="container mx-auto px-4 py-6">
     <!-- Dashboard Header -->
     <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
-        <div class="flex justify-between items-center">
+        <div class="md:flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
             <div class="text-sm text-gray-600">Welcome back, <span class="font-semibold">{{ $userData->name }}</span></div>
         </div>
@@ -24,14 +24,14 @@
     <!-- Subscription Info (Worker) -->
     @if($activeView === 'tasks')
     <div class="bg-white p-4 rounded-lg shadow-sm mb-6 border-l-4 border-blue-500">
-        <div class="flex justify-between items-center">
+        <div class="md:flex justify-between items-center">
             @if ($workerSubscription)
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">Current Plan: <span class="text-blue-600">{{ $workerSubscription->plan->name }}</span></h2>
                     <p class="text-sm text-gray-500">Expires on: {{ \Carbon\Carbon::parse($workerSubscription->expires_at)->format('F d, Y') }}</p>
                 </div>
                 @if($workerUpgradeSuggestion)
-                <div class="text-right">
+                <div class="text-md-right mt-3 md:mt-0">
                     <a href="{{ route('subscriptions') }}" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90">Upgrade to {{ $workerUpgradeSuggestion->name }}</a>
                 </div>
                 @endif
@@ -41,7 +41,7 @@
                     <p class="text-sm text-gray-500">Choose a plan to start working on tasks.</p>
                 </div>
                 @if($workerUpgradeSuggestion)
-                <div class="text-right">
+                <div class="text-right mt-3 md:mt-0">
                     <a href="{{ route('subscriptions') }}" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90">Get {{ $workerUpgradeSuggestion->name }} Plan</a>
                 </div>
                 @endif
@@ -69,14 +69,14 @@
     <!-- Subscription Info (Task Master) -->
     @if($activeView === 'jobs')
     <div class="bg-white p-4 rounded-lg shadow-sm mb-6 border-l-4 border-green-500">
-        <div class="flex justify-between items-center">
+        <div class="md:flex justify-between items-center">
             @if ($taskmasterSubscription)
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">Current Plan: <span class="text-green-600">{{ $taskmasterSubscription->plan->name }}</span></h2>
                     <p class="text-sm text-gray-500">Expires on: {{ \Carbon\Carbon::parse($taskmasterSubscription->expires_at)->format('F d, Y') }}</p>
                 </div>
                 @if($taskmasterUpgradeSuggestion)
-                <div class="text-right">
+                <div class="text-md-right mt-3 md:mt-0">
                     <a href="{{ route('subscriptions') }}" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90">Upgrade to {{ $taskmasterUpgradeSuggestion->name }}</a>
                 </div>
                 @endif
@@ -86,7 +86,7 @@
                     <p class="text-sm text-gray-500">Choose a plan to start posting jobs.</p>
                 </div>
                 @if($taskmasterUpgradeSuggestion)
-                <div class="text-right">
+                <div class="text-md-right mt-3 md:mt-0">
                     <a href="{{ route('subscriptions') }}" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90">Get {{ $taskmasterUpgradeSuggestion->name }} Plan</a>
                 </div>
                 @endif

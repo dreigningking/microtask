@@ -11,6 +11,9 @@
                 </button>
             </div>
             <nav class="flex flex-col space-y-4">
+                @guest
+                <a wire:navigate href="{{ route('login') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('login')) bg-blue-800 @endif">Sign In</a>
+                @endguest
                 <a wire:navigate href="{{ route('index') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('/')) bg-blue-800 @endif">Home</a>
                 <a wire:navigate href="{{ route('explore') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('explore')) bg-blue-800 @endif">Explore</a>
                 <a wire:navigate href="{{ route('top_earners') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('top-earners')) bg-blue-800 @endif">Top Earners</a>
@@ -25,8 +28,6 @@
                     <a wire:navigate href="{{ route('invitees') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('invitees')) bg-blue-800 @endif">Invitees</a>
                     <a wire:navigate href="{{ route('profile') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('profile')) bg-blue-800 @endif">My Profile</a>
                     <a wire:click.prevent="logout" href="#" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded">Sign Out</a>
-                @else
-                    <a wire:navigate href="{{ route('login') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('login')) bg-blue-800 @endif">Sign In</a>
                 @endif
             </nav>
         </div>

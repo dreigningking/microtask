@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\OrderItem;
 use App\Models\Settlement;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -42,6 +43,10 @@ class Task extends Model
     public function workers()
     {
         return $this->hasMany(TaskWorker::class);   
+    }
+    public function orderItem()
+    {
+        return $this->morphOne(OrderItem::class,'orderable');   
     }
     public function template()
     {
@@ -111,5 +116,27 @@ class Task extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Determine if the task can be edited (all, some, or none)
+     * Returns 'all', 'some', or 'none'
+     */
+    public function getCanBeEditedAttribute()
+    {
+        $orderItem = $this->orderItem; // hasOne or first() if hasMany
+        $order = $orderItem ? $orderItem->order : null;
+        $payment = $order ? $order->payment : null;
+        $isPaid = $payment && $payment->status === 'success';
+        $hasWorkers = $this->workers()->count() > 0;
+
+        if (!$isPaid) {
+            return 'all';
+        } elseif ($isPaid && !$hasWorkers) {
+            return 'some';
+        } elseif ($isPaid && $hasWorkers) {
+            return 'none';
+        }
+        return 'all'; // Default fallback
     }
 }

@@ -51,8 +51,69 @@
             </div>
         </div>
 
-        <!-- Jobs Table -->
-        <div class="overflow-x-auto">
+        <!-- Jobs Cards (Mobile) / Table (Desktop) -->
+        <div class="block md:hidden">
+            <!-- Mobile Cards View -->
+            <div class="space-y-4">
+                @forelse($jobs as $job)
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $job->title }}</h3>
+                                <p class="text-sm text-gray-500">{{ $job->platform->name }}</p>
+                            </div>
+                            <div class="ml-2">
+                                @if(!$job->is_active)
+                                    <span class="badge badge-secondary">Draft</span>
+                                @elseif($job->workers->count() >= $job->number_of_people)
+                                    <span class="badge badge-warning">Completed</span>
+                                @elseif($job->workers->count() > 0)
+                                    <span class="badge badge-info">In Progress</span>
+                                @else
+                                    <span class="badge badge-success">Active</span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Budget:</span>
+                                <span class="font-medium text-gray-900">{{ $job->user->country->currency_symbol }}{{ number_format($job->expected_budget, 2) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Workers:</span>
+                                <span class="font-medium text-gray-900">{{ $job->workers->count() }}/{{ $job->number_of_people }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Submissions:</span>
+                                <span class="font-medium text-gray-900">{{ $job->workers->whereNotNull('submitted_at')->count() }}/{{ $job->workers->count() }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Posted:</span>
+                                <span class="font-medium text-gray-900">{{ $job->created_at->format('M d, Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <a href="{{ route('my_jobs.view', $job) }}" class="flex-1 text-center bg-primary text-white px-3 py-2 rounded-button hover:bg-primary/90 text-sm">
+                                <i class="ri-eye-line mr-1"></i> View
+                            </a>
+                            <a href="{{ route('my_jobs.edit', $job) }}" class="flex-1 text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-button hover:bg-gray-200 text-sm">
+                                <i class="ri-edit-line mr-1"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="ri-briefcase-4-line text-4xl mb-2"></i>
+                        <p>No jobs found</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>

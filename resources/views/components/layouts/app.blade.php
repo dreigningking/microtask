@@ -8,28 +8,28 @@
     <link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon.png') }}">
     
-    <title>@yield('title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')</title>
-    <meta name="title" content="@yield('meta_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
-    <meta name="description" content="@yield('meta_description', 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'micro jobs, freelance, online work, earn money online, remote work, quick tasks, freelancing platform, work from home')">
+    <title>{{ $title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online' }}</title>
+    <meta name="title" content="{{$meta_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta name="description" content="{{ $metaDescription ?? 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide'}}">
+    <meta name="keywords" content="{{ $meta_keywords ?? 'micro jobs, freelance, online work, earn money online, remote work, quick tasks, freelancing platform, work from home'}}">
     <meta name="author" content="Wonegig">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
-    <meta property="og:description" content="@yield('og_description', 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities. Join our community of freelancers and clients worldwide.')">
-    <meta property="og:image" content="@yield('og_image', asset('frontend/images/og-image.png'))">
+    <meta property="og:title" content="{{ $og_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta property="og:description" content="{{ $og_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities. Join our community of freelancers and clients worldwide.'}}">
+    <meta property="og:image" content="{{$og_image ?? asset('frontend/images/og-image.png')}}">
     <meta property="og:site_name" content="Wonegig">
     <meta property="og:locale" content="en_US">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('twitter_title', 'Wonegig - Micro-Jobs Platform | Earn Money Online')">
-    <meta property="twitter:description" content="@yield('twitter_description', 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities.')">
-    <meta property="twitter:image" content="@yield('twitter_image', asset('frontend/images/og-image.png'))">
+    <meta property="twitter:title" content="{{$twitter_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta property="twitter:description" content="{{$twitter_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities.'}}">
+    <meta property="twitter:image" content="{{ $twitter_image ?? asset('frontend/images/og-image.png')}}">
     
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#1e3a8a">
@@ -69,7 +69,7 @@
     <!-- Footer -->
     <footer class="bg-primary text-white mt-12">
         <div class="container mx-auto px-4 py-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div>
                     <a href="{{route('index')}}" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">
                         <img src="{{asset('frontend/images/logo.png')}}" alt="" style="height:50px;">
@@ -91,27 +91,28 @@
                     </div>
                 </div>
                 
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a wire:navigate href="{{ route('index') }}" class="text-gray-300 hover:text-white">Home</a></li>
-    
-                        <li><a wire:navigate href="{{ route('top_earners') }}" class="text-gray-300 hover:text-white">Top Earners</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Post a Job</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">How It Works</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Pricing</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white">Help Center</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Blog</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Community</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Success Stories</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">FAQ</a></li>
-                    </ul>
+                <div class="grid grid-cols-2 gap-4 ">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a wire:navigate href="{{ route('index') }}" class="text-gray-300 hover:text-white">Home</a></li>
+                            <li><a wire:navigate href="{{ route('top_earners') }}" class="text-gray-300 hover:text-white">Top Earners</a></li>
+                            <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-white">Blog</a></li>
+                            <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">About us</a></li>
+                            <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact us</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="{{ route('legal.dcma') }}" class="text-gray-300 hover:text-white">DMCA</a></li>
+                            <li><a href="{{ route('legal.disclaimer') }}" class="text-gray-300 hover:text-white">Disclaimer</a></li>
+                            <li><a href="{{ route('legal.privacy-policy') }}" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
+                            <li><a href="{{ route('legal.payment-chargeback') }}" class="text-gray-300 hover:text-white">Payment & Chargebacks</a></li>
+                            <li><a href="{{ route('legal.terms-conditions') }}" class="text-gray-300 hover:text-white">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <div>

@@ -1,0 +1,39 @@
+About Wonegig
+Who We Are
+Wonegig is a next-generation freelance and micro-gig marketplace that unites on-demand “quick tasks” with full-scale project work in one seamless ecosystem. We’re technologists, product builders and community advocates obsessed with creating a fair, secure and friction-free way for businesses to hire talent — and for skilled professionals to earn from anywhere.
+Our Mission
+Empower every creator, coder, designer and doer to turn skills into sustainable income, while giving businesses instant access to verified global talent.
+Why We Built Wonegig
+1.Fragmented marketplaces force users to juggle multiple platforms for small, fast gigs versus complex projects.
+2.Fee inflation erodes earnings and budgets.
+3.Trust gaps — late payments, ghosted clients, and low-quality work — still plague online work.
+Wonegig solves these pain points with single-dashboard convenience, bank-grade security, and a transparent fee model that keeps more money in everyone’s pocket.
+What Sets Us Apart
+Pillar	How It Works	Tangible Benefit
+Dual-Mode Marketplace	Micro tasks (minutes) and freelance projects (weeks) live side-by-side.	Hire or earn at any scope without switching platforms.
+Zero-Guesswork Pricing	Flat 5 % client fee, 10 % freelancer fee — no surprise surcharges.	Predictable costs, higher take-home pay.
+Escrow-Backed Payments	Funds are locked on project start and auto-released on approval.	Eliminates payment disputes; protects both parties.
+AI-Powered Talent Match	Machine-learning scores on skill, delivery history, and ratings.	30 % faster hiring decisions; higher task success rate.
+Enterprise-Grade Security	End-to-end encryption, PCI-DSS compliance, GDPR-aligned data practices, continuous penetration testing.	Peace of mind for corporate procurement and individual freelancers alike.
+Impact Commitment	1 % of every fee funds digital-skills scholarships in emerging markets.	Work that fuels global economic inclusion.
+
+How Wonegig Works
+1.Post or Browse – Create a micro-gig, list a long-term project, or browse curated task boards.
+2.Match in Minutes – Our algorithm surfaces best-fit talent or gigs based on live data points.
+3.Secure Escrow – Clients deposit project funds; freelancers start with confidence.
+4.Collaborate & Deliver – Built-in chat, milestone tracking, and file vault keep work moving.
+5.Rate & Re-Hire – Reputation scoring rewards reliability, making future matches even faster.
+Trust & Safety You Can Audit
+ISO 27001-aligned controls and 24/7 threat monitoring
+Two-factor authentication and IP/geo-fencing for every account
+Independent dispute-resolution panel with sub-48-hour rulings
+Our Values
+Transparency – Clear fees, clear processes, open communication.
+Excellence – Curated talent pool, continuous platform optimization.
+Inclusion – Access for freelancers in 120+ countries; localized payment gateways.
+Sustainability – Cloud infrastructure powered by 100 % renewable energy credits.
+
+Join the Movement
+Whether you’re a startup racing to prototype, a Fortune 500 optimizing cost-per-deliverable, or a digital nomad turning expertise into earnings, Wonegig is built for you.
+Ready to work without borders?
+👉 Create your free account at Wonegig.com and start in under 60 seconds.

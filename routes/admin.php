@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
@@ -63,6 +64,16 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
         Route::post('delete', [UserController::class, 'destroy'])->name('delete');
         Route::post('wallet', [UserController::class, 'wallet'])->name('wallet.toggle');
     });
+
+    Route::group(['prefix' => 'blog','as' => 'blog.'], function () {
+        Route::get('/', [BlogController::class, 'index'])->name('index');
+        Route::get('create', [BlogController::class, 'create'])->name('create');
+        Route::get('edit/{post}', [BlogController::class, 'edit'])->name('edit');
+        Route::post('store', [BlogController::class, 'store'])->name('store');
+        Route::post('update', [BlogController::class, 'update'])->name('update');
+        Route::post('delete', [BlogController::class, 'destroy'])->name('destroy');
+    });
+
     Route::group(['prefix' => 'settings','as' => 'settings.'], function () {
         Route::get('/', [SettingController::class, 'index'])->name('index');
         Route::post('core', [SettingController::class, 'saveCoreSettings'])->name('core.save');
@@ -101,5 +112,7 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
         Route::post('countries/verification-settings', [CountrySettingsController::class, 'saveVerificationSettings'])->name('countries.verification_settings');
         
     });
+
+
     
 });
