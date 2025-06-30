@@ -63,7 +63,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="template_id" class="block text-sm font-medium text-gray-700 mb-1">Task Template</label>
+                            <label for="template_id" class="block text-sm font-medium text-gray-700 mb-1">Task Template <span class="text-red-500">*</span></label>
                             <div class="relative" wire:ignore>
                                 <select id="template_id" class="w-full appearance-none px-4 py-2 pr-8 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none" required>
                                     <option value="" selected>Select a template</option>
@@ -740,11 +740,7 @@
 @push('scripts')
 <script src="{{asset('frontend/js/select2.min.js')}}"></script>
 <script>
-    // Wait for the document to be ready
-    $(document).ready(function(){
-        initializeSelect2();
-    });
-    
+    // Initialize Select2 function
     function initializeSelect2() {
         if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
             // Safely destroy existing Select2 instances first
@@ -768,7 +764,7 @@
                     placeholder: "Select countries to restrict",
                     allowClear: true,
                     width: '100%'
-                }).on('change', function(e) {
+                }).on('change select2:select select2:unselect', function(e) {
                     // Get selected data
                     let data = jQuery(this).val();
                     window.Livewire.dispatch('updateSelect2', {
@@ -784,7 +780,7 @@
                     placeholder: "Select a platform",
                     allowClear: true,
                     width: '100%'
-                }).on('change', function(e) {
+                }).on('change select2:select', function(e) {
                     // Get selected data
                     let data = jQuery(this).val();
                     window.Livewire.dispatch('updateSelect2', {
@@ -800,7 +796,7 @@
                     placeholder: "Select a template",
                     allowClear: true,
                     width: '100%'
-                }).on('change', function(e) {
+                }).on('change select2:select', function(e) {
                     // Get selected data
                     let data = jQuery(this).val();
                     window.Livewire.dispatch('updateSelect2', {
@@ -812,6 +808,25 @@
         }
     }
     
+    // Primary initialization on livewire:navigated (for wire:navigate)
+    document.addEventListener('livewire:navigated', function() {
+        // Wait for DOM to be fully ready
+        setTimeout(function() {
+            initializeSelect2();
+        }, 200);
+    });
+    
+    // Fallback initialization on document ready (for direct page loads)
+    $(document).ready(function(){
+        // Only initialize if not already handled by livewire:navigated
+        if (!window.select2Initialized) {
+            setTimeout(function() {
+                initializeSelect2();
+                window.select2Initialized = true;
+            }, 100);
+        }
+    });
+    
     // Listen for Livewire load event to reinitialize Select2 after component updates
     document.addEventListener('livewire:initialized', function() {
         // Small delay to ensure DOM is ready
@@ -822,14 +837,6 @@
     
     // Listen for Livewire updates to reinitialize Select2
     document.addEventListener('livewire:updated', function() {
-        // Small delay to ensure DOM is ready
-        setTimeout(function() {
-            initializeSelect2();
-        }, 100);
-    });
-    
-    // Listen for Livewire navigation to reinitialize Select2
-    document.addEventListener('livewire:navigated', function() {
         // Small delay to ensure DOM is ready
         setTimeout(function() {
             initializeSelect2();
