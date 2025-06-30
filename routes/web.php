@@ -30,11 +30,12 @@ use App\Livewire\Policies\DigitalMillenium;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
-
+use App\Notifications\WelcomeNotification;
 
 Route::get('test',function(){
-    $task = \App\Models\Task::find(1);
-    dd($task->orderItem->order->payment);
+    $user = \App\Models\User::find(2);
+    $user->notify(new WelcomeNotification());
+    return 'done';
 });
 Route::get('/', Welcome::class)->name('index');
 Route::get('about', AboutPage::class)->name('about');

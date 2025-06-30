@@ -191,16 +191,59 @@ class BlogController extends Controller
     }
 
     /**
-     * Get pending comments for moderation
+     * Display comments listing with filtering and moderation
      */
-    public function pendingComments()
+    public function comments()
     {
-        $comments = Comment::pending()
-            ->with(['blogPost', 'user'])
-            ->latest()
-            ->paginate(20);
+        $query = Comment::with(['blogPost', 'user', 'approvedBy'])
+            ->latest();
 
-        return view('backend.comments.pending', compact('comments'));
+        // Filter by status
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter by blog post
+        if (request('post')) {
+            $query->where('blog_post_id', request('post'));
+        }
+
+        // Search functionality
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('content', 'like', "%{$search}%")
+                  ->orWhere('guest_name', 'like', "%{$search}%")
+                  ->orWhere('guest_email', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                               ->orWhere('email', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('blogPost', function($postQuery) use ($search) {
+                      $postQuery->where('title', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $comments = $query->paginate(20);
+
+        // Get statistics
+        $totalComments = Comment::count();
+        $pendingCount = Comment::where('status', 'pending')->count();
+        $approvedCount = Comment::where('status', 'approved')->count();
+        $spamCount = Comment::where('status', 'spam')->count();
+
+        // Get all blog posts for filter dropdown
+        $posts = BlogPost::select('id', 'title')->orderBy('title')->get();
+
+        return view('backend.blog.comments', compact(
+            'comments', 
+            'totalComments', 
+            'pendingCount', 
+            'approvedCount', 
+            'spamCount',
+            'posts'
+        ));
     }
 
     /**
@@ -208,8 +251,16 @@ class BlogController extends Controller
      */
     public function approveComment(Request $request)
     {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id'
+        ]);
+
         $comment = Comment::findOrFail($request->comment_id);
-        $comment->approve();
+        $comment->update([
+            'status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => auth()->id()
+        ]);
 
         return back()->with('success', 'Comment approved successfully.');
     }
@@ -219,8 +270,16 @@ class BlogController extends Controller
      */
     public function rejectComment(Request $request)
     {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id'
+        ]);
+
         $comment = Comment::findOrFail($request->comment_id);
-        $comment->reject();
+        $comment->update([
+            'status' => 'rejected',
+            'approved_at' => null,
+            'approved_by' => null
+        ]);
 
         return back()->with('success', 'Comment rejected successfully.');
     }
@@ -230,8 +289,16 @@ class BlogController extends Controller
      */
     public function markCommentAsSpam(Request $request)
     {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id'
+        ]);
+
         $comment = Comment::findOrFail($request->comment_id);
-        $comment->markAsSpam();
+        $comment->update([
+            'status' => 'spam',
+            'approved_at' => null,
+            'approved_by' => null
+        ]);
 
         return back()->with('success', 'Comment marked as spam.');
     }
@@ -241,6 +308,10 @@ class BlogController extends Controller
      */
     public function deleteComment(Request $request)
     {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id'
+        ]);
+
         $comment = Comment::findOrFail($request->comment_id);
         $comment->delete();
 

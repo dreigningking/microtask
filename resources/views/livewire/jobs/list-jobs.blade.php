@@ -98,9 +98,11 @@
                             <a href="{{ route('my_jobs.view', $job) }}" class="flex-1 text-center bg-primary text-white px-3 py-2 rounded-button hover:bg-primary/90 text-sm">
                                 <i class="ri-eye-line mr-1"></i> View
                             </a>
-                            <a href="{{ route('my_jobs.edit', $job) }}" class="flex-1 text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-button hover:bg-gray-200 text-sm">
-                                <i class="ri-edit-line mr-1"></i> Edit
-                            </a>
+                            @if($job->can_be_edited !== 'none')
+                                <a href="{{ route('my_jobs.edit', $job) }}" class="flex-1 text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-button hover:bg-gray-200 text-sm">
+                                    <i class="ri-edit-line mr-1"></i> Edit
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -164,10 +166,12 @@
                                     <i class="ri-eye-line mr-1"></i>
                                     <span>View</span>
                                 </a>
-                                <a href="{{ route('my_jobs.edit', $job) }}" class="text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-button inline-flex items-center">
-                                    <i class="ri-edit-line mr-1"></i>
-                                    <span>Edit</span>
-                                </a>
+                                @if($job->can_be_edited !== 'none')
+                                    <a href="{{ route('my_jobs.edit', $job) }}" class="text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-button inline-flex items-center">
+                                        <i class="ri-edit-line mr-1"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty

@@ -72,6 +72,13 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
         Route::post('store', [BlogController::class, 'store'])->name('store');
         Route::post('update', [BlogController::class, 'update'])->name('update');
         Route::post('delete', [BlogController::class, 'destroy'])->name('destroy');
+        Route::group(['prefix' => 'comments','as' => 'comments.'], function () {
+            Route::get('/', [BlogController::class, 'comments'])->name('index');
+            Route::post('approve', [BlogController::class, 'approveComment'])->name('approve');
+            Route::post('reject', [BlogController::class, 'rejectComment'])->name('reject');
+            Route::post('spam', [BlogController::class, 'markCommentAsSpam'])->name('spam');
+            Route::post('delete', [BlogController::class, 'deleteComment'])->name('delete');
+        });
     });
 
     Route::group(['prefix' => 'settings','as' => 'settings.'], function () {

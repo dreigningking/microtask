@@ -6,9 +6,12 @@ subscription effect on
 - postjob, job worker, withdrawal
 withdrawal maximum based on subscription
 
+blog subscription
+admin role separation
+
+stephen - categories
 
 test email service on localhost and server...
-
 
 post job page select platform not working
 
@@ -16,6 +19,7 @@ edit post job
 
 in-app notification
 
-
-
+2factor
+verify email
+allow video upload
 

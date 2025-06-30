@@ -100,8 +100,9 @@
                 </div>
             </div>
         @endif 
-        <!-- <a wire:navigate href="{{ route('login') }}" class="bg-white text-primary px-4 py-2 rounded-button font-medium hover:bg-gray-100 whitespace-nowrap">Sign In</a> -->
-        
+        @guest
+        <a wire:navigate href="{{ route('login') }}" class="bg-white text-primary px-4 py-2 rounded-button font-medium hover:bg-gray-100 whitespace-nowrap hidden md:block">Sign In</a>
+        @endguest
         <button class="w-10 h-10 flex items-center justify-center md:hidden" id="mobileMenuButton">
             <i class="ri-menu-line text-white ri-lg"></i>
         </button>
