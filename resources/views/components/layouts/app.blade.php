@@ -96,10 +96,11 @@
                         <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
                         <ul class="space-y-2">
                             <li><a wire:navigate href="{{ route('index') }}" class="text-gray-300 hover:text-white">Home</a></li>
-                            <li><a wire:navigate href="{{ route('top_earners') }}" class="text-gray-300 hover:text-white">Top Earners</a></li>
-                            <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-white">Blog</a></li>
+                            
+                            <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-white">Our Blog</a></li>
                             <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">About us</a></li>
                             <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact us</a></li>
+                            <li><a wire:navigate href="{{ route('top_earners') }}" class="text-gray-300 hover:text-white">Top Earners</a></li>
                         </ul>
                     </div>
                     
@@ -109,8 +110,8 @@
                             <li><a href="{{ route('legal.dcma') }}" class="text-gray-300 hover:text-white">DMCA</a></li>
                             <li><a href="{{ route('legal.disclaimer') }}" class="text-gray-300 hover:text-white">Disclaimer</a></li>
                             <li><a href="{{ route('legal.privacy-policy') }}" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
-                            <li><a href="{{ route('legal.payment-chargeback') }}" class="text-gray-300 hover:text-white">Payment & Chargebacks</a></li>
                             <li><a href="{{ route('legal.terms-conditions') }}" class="text-gray-300 hover:text-white">Terms & Conditions</a></li>
+                            <li><a href="{{ route('legal.payment-chargeback') }}" class="text-gray-300 hover:text-white">Payment & Chargebacks</a></li>
                         </ul>
                     </div>
                 </div>

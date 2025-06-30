@@ -40,7 +40,7 @@ Route::get('/', Welcome::class)->name('index');
 Route::get('about', AboutPage::class)->name('about');
 Route::get('contact', ContactPage::class)->name('contact');
 Route::get('blog', BlogIndex::class)->name('blog');
-Route::get('post', BlogSingle::class)->name('blog.show');
+Route::get('blog/post/{post}', BlogSingle::class)->name('blog.show');
 Route::group(['as'=> 'legal.'],function(){
     Route::get('disclaimer', Disclaimer::class)->name('disclaimer');
     Route::get('privacy-policy', PrivacyPolicy::class)->name('privacy-policy');

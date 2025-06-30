@@ -13,7 +13,49 @@ return new class extends Migration
     {
         Schema::create('blog_posts', function (Blueprint $table) {
             $table->id();
+            
+            // Basic post information
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->text('excerpt')->nullable();
+            $table->longText('content');
+            
+            // Media and author
+            $table->string('featured_image')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            
+            // Publishing and status
+            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
+            $table->timestamp('published_at')->nullable();
+            
+            // SEO and meta fields
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
+            
+            // Engagement and analytics
+            $table->integer('views_count')->default(0);
+            
+            // Tags (JSON for flexibility)
+            $table->json('tags')->nullable();
+            
+            // Reading time and difficulty
+            $table->integer('reading_time')->nullable(); // in minutes
+            $table->enum('difficulty', ['beginner', 'intermediate', 'advanced'])->nullable();
+            
+            // Social sharing
+            $table->boolean('allow_comments')->default(true);
+            $table->boolean('featured')->default(false);
+            
+            // Timestamps
             $table->timestamps();
+            
+            // Indexes for performance
+            $table->index(['status', 'published_at']);
+            $table->index(['user_id', 'published_at']);
+            $table->index(['featured', 'published_at']);
+            $table->index('views_count');
+            $table->index('created_at');
         });
     }
 

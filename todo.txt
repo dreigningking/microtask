@@ -10,8 +10,6 @@ withdrawal maximum based on subscription
 test email service on localhost and server...
 
 
-about, contact, terms and conditions, privacy policy page
-
 post job page select platform not working
 
 edit post job

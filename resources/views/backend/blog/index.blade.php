@@ -3,9 +3,9 @@
 @section('main')
 <main class="content">
     <div class="container-fluid">
-        <div class="header mb-4">
+        <div class="header d-flex align-items-center mb-4">
             <h1 class="header-title">Blog Posts</h1>
-            <a href="{{ route('admin.blog.create') }}" class="btn btn-primary float-right">
+            <a href="{{ route('admin.blog.create') }}" class="btn btn-primary ml-auto">
                 <i class="ri-add-line"></i> New Post
             </a>
         </div>
@@ -27,29 +27,34 @@
                         @foreach($posts as $post)
                         <tr>
                             <td>
-                                <img src="{{ $post->featured_image ?? 'https://picsum.photos/seed/'.$post->id.'wonegig/80/50' }}" alt="Image" class="rounded" style="width:80px; height:50px; object-fit:cover;">
+                                <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="rounded" style="width:80px; height:50px; object-fit:cover;">
                             </td>
                             <td>
                                 <strong>{{ $post->title }}</strong>
+                                @if($post->featured)
+                                    <span class="badge bg-warning ms-2">Featured</span>
+                                @endif
                             </td>
                             <td>
                                 {{ Str::limit($post->excerpt, 60) }}
                             </td>
                             <td>
-                                {{ $post->author->name ?? 'Admin' }}
+                                {{ $post->author_name }}
                             </td>
                             <td>
-                                {{ $post->published_at ? $post->published_at->format('M d, Y') : '-' }}
+                                {{ $post->formatted_published_date }}
                             </td>
                             <td>
-                                @if($post->is_published)
+                                @if($post->status === 'published')
                                     <span class="badge bg-success">Published</span>
-                                @else
+                                @elseif($post->status === 'draft')
                                     <span class="badge bg-secondary">Draft</span>
+                                @elseif($post->status === 'archived')
+                                    <span class="badge bg-dark">Archived</span>
                                 @endif
                             </td>
                             <td class="text-right">
-                                <a href="{{ route('admin.blog.edit', $post->id) }}" class="btn btn-sm btn-warning"><i class="ri-edit-line"></i> Edit</a>
+                                <a href="{{ route('admin.blog.edit', $post) }}" class="btn btn-sm btn-warning"><i class="ri-edit-line"></i> Edit</a>
                                 <form action="{{ route('admin.blog.destroy') }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this post?')">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $post->id }}">
