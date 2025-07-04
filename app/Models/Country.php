@@ -32,7 +32,7 @@ class Country extends Model
 
     protected $connection = 'sqlite_countries';
     protected $table = 'countries'; // adjust table name if different
-    // public $appends = ['active'];
+    public $appends = ['status'];
 
     public function getRouteKeyName(){
         return 'iso2';
@@ -142,5 +142,15 @@ class Country extends Model
             return false;
         }
         return true;
+    }
+
+    public function getStatusAttribute(){
+        // if($this->hasBankingSettings() && $this->hasTransactionSettings() && $this->hasTaskSettings() && $this->hasPlanPrices() && $this->hasTemplatePrices() && $this->hasNotificationEmails() && $this->hasVerificationSettings()){
+        //     return true;
+        // }
+        if($this->hasBankingSettings() && $this->hasTransactionSettings() && $this->hasTaskSettings()  && $this->hasNotificationEmails() && $this->hasVerificationSettings()){
+            return true;
+        }
+        return false;
     }
 }

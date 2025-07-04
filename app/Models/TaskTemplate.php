@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\Platform;
+use App\Models\CountryPrice;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class TaskTemplate extends Model
 {
@@ -44,12 +46,9 @@ class TaskTemplate extends Model
         return $this->belongsTo(Platform::class);
     }
 
-    public function getCountryPrice($country_id)
+    public function prices(): MorphMany
     {
-        $price = \App\Models\CountryPrice::where('country_id', $country_id)
-            ->where('priceable_type', self::class)
-            ->where('priceable_id', $this->id)
-            ->first();
-        return $price ? (float) $price->amount : null;
+        return $this->morphMany(CountryPrice::class, 'priceable');
     }
+
 }

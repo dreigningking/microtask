@@ -45,6 +45,7 @@ class SettingController extends Controller
             'enable_2fa' => 'boolean',
             'allow_public_profile' => 'boolean',
             'free_user_task_limit' => 'integer|min:1',
+            'taskmaster_review_timeline' => 'integer|min:1',
         ];
         $data = $request->validate($fields);
         foreach ($fields as $name => $type) {

@@ -25,7 +25,7 @@
                             @break
                             
                         @case('textarea')
-                            <textarea class="w-full px-4 py-2 border-none focus:ring-0 outline-none {{ $hasError ? 'border-red-500' : '' }}"
+                            <textarea class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none {{ $hasError ? 'border-red-500' : '' }}"
                                       wire:model="templateData.{{ $field['name'] }}.value"
                                       wire:change="updateField('{{ $field['name'] }}', $event.target.value)"
                                       @if($field['required'] ?? false) required @endif></textarea>

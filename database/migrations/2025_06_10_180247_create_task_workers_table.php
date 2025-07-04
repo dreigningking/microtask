@@ -18,14 +18,6 @@ return new class extends Migration
             $table->timestamp('saved_at')->nullable();
             $table->timestamp('accepted_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
-            $table->timestamp('submitted_at')->nullable();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamp('disputed_at')->nullable();
-            $table->timestamp('resolved_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
-            $table->json('submissions')->nullable();
-            $table->text('review')->nullable();
-            $table->integer('rating')->nullable();
             $table->timestamps();
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

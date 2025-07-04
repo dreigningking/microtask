@@ -33,8 +33,10 @@ use App\Livewire\Policies\PaymentDisputeChargebacks;
 use App\Notifications\WelcomeNotification;
 
 Route::get('test',function(){
-    $user = \App\Models\User::find(2);
-    $user->notify(new WelcomeNotification());
+    $country = \App\Models\Country::find(161);
+    dd($country->status);
+    // $template = \App\Models\TaskTemplate::find(1);
+    // dd($template->prices->firstWhere('country_id',$country->id));
     return 'done';
 });
 Route::get('/', Welcome::class)->name('index');

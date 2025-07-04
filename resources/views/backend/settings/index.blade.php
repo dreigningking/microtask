@@ -66,6 +66,13 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label for="taskmasterReviewTimeline">Taskmaster Review Timeline (hours)</label>
+                                                <input type="number" class="form-control" id="taskmasterReviewTimeline" name="taskmaster_review_timeline" min="1" value="{{ optional($settings->where('name','taskmaster_review_timeline')->first())->value ?? 24 }}">
+                                                <small class="form-text text-muted">Number of hours a taskmaster has to review a submission before admin takes over.</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <div class="form-group form-switch m-3">
                                                 <input type="hidden" name="enable_2fa" value="0">
                                                 <input class="form-check-input" type="checkbox" id="enable2FA" name="enable_2fa" value="1" {{ optional($settings->where('name','enable_2fa')->first())->value == 1 ? 'checked' : '' }}>

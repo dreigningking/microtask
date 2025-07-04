@@ -44,7 +44,7 @@ class Subscriptions extends Component
         $this->activeSubscriptionPlanIds = $user->activeSubscriptions()->pluck('plan_id')->toArray();
 
         $this->plans = Plan::where('is_active', true)->get()->map(function ($plan) {
-            $monthly_price = $plan->getCountryPrice($this->location->country_id);
+            $monthly_price = $plan->prices->firstWhere('country_id',$this->location->country_id)->amount;
             if ($monthly_price === null) {
                 return null;
             }

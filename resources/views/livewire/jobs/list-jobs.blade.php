@@ -167,10 +167,10 @@
                                     <span>View</span>
                                 </a>
                                 @if($job->can_be_edited !== 'none')
-                                    <a href="{{ route('my_jobs.edit', $job) }}" class="text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-button inline-flex items-center">
-                                        <i class="ri-edit-line mr-1"></i>
-                                        <span>Edit</span>
-                                    </a>
+                                <a href="{{ route('my_jobs.edit', $job) }}" class="text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-button inline-flex items-center">
+                                    <i class="ri-edit-line mr-1"></i>
+                                    <span>Edit</span>
+                                </a>
                                 @endif
                             </td>
                         </tr>

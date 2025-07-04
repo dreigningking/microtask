@@ -6,9 +6,10 @@ use App\Models\Task;
 use App\Models\Order;
 use App\Models\Country;
 use App\Models\Payment;
+use App\Models\Setting;
 use Livewire\Component;
-use App\Models\Platform;
 use App\Models\Location;
+use App\Models\Platform;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
@@ -16,10 +17,10 @@ use App\Models\TaskTemplate;
 use App\Models\TaskPromotion;
 use Livewire\WithFileUploads;
 use App\Models\CountrySetting;
+use App\Http\Traits\PaymentTrait;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
-use App\Http\Traits\PaymentTrait;
-use App\Models\Setting;
+use App\Livewire\Jobs\TemplateFields;
 
 class PostJob extends Component
 {
@@ -28,7 +29,7 @@ class PostJob extends Component
     // Step tracking
     public $isLoggedIn = false;
     public $currentStep = 1;
-    public $totalSteps = 2;
+    public $totalSteps = 4;
     
     // Data collections
     public $platforms;
@@ -50,7 +51,6 @@ class PostJob extends Component
     
     // Job Description
     public $description;
-    public $files = [];
     public $requirements = [];
     public $visibility = 'public';
     public $expiry_date;
@@ -116,7 +116,6 @@ class PostJob extends Component
         'email' => 'required|email|sometimes',
         'password' => 'required|sometimes',
         'terms' => 'accepted|sometimes',
-        'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png', // 10MB max, allowed types
     ];
 
     // Validation messages
@@ -126,12 +125,6 @@ class PostJob extends Component
         'description.required' => 'Please provide a job description',
         'requirements.required' => 'Please enter at least one required skill',
         'budget_per_person.required' => 'Please enter a budget per person',
-        'files.*.max' => 'Each file must not exceed 10MB.',
-        'files.max' => 'Each file must not exceed 10MB.',
-        'files.0.max' => 'Each file must not exceed 10MB.',
-        'files.1.max' => 'Each file must not exceed 10MB.',
-        'files.2.max' => 'Each file must not exceed 10MB.',
-        'files.*.mimes' => 'Only PDF, DOC, JPG, and PNG files are allowed.',
     ];
 
     public $min_budget_per_person = 0;
@@ -146,31 +139,39 @@ class PostJob extends Component
     public function getStepRules()
     {
         $rules = [];
-        
         if ($this->currentStep == 1) {
+            // Step 1: Template selection (must select a template only)
+            $rules = [
+                'template_id' => 'required',
+            ];
+        } elseif ($this->currentStep == 2) {
+            // Step 2: Job details
             $rules = [
                 'title' => 'required|min:5',
-                'platform_id' => 'required',
-                'expected_completion_minutes' => 'required|numeric|min:1',
                 'description' => 'required|min:20',
+                'expected_completion_minutes' => 'required|numeric|min:1',
                 'requirements' => 'nullable|array',
-                'budget_per_person' => 'required|numeric|min:' . $this->min_budget_per_person,
-                'number_of_people' => 'required|numeric|min:1',
-                'monitoring_type' => 'required',
-                'visibility' => 'required|in:public,private',
             ];
-
             // Add validation rules for required template fields
             if (!empty($this->templateData)) {
                 foreach ($this->templateData as $key => $field) {
                     if ($field['required'] ?? false) {
                         $rules["templateData.{$key}.value"] = 'required';
-                        // Add custom message for this field
                         $this->messages["templateData.{$key}.value.required"] = "The {$field['title']} field is required";
                     }
                 }
             }
-        } elseif ($this->currentStep == 2) {
+        } elseif ($this->currentStep == 3) {
+            // Step 3: Budget, expiry, monitoring, etc.
+            $rules = [
+                'expiry_date' => 'nullable|date|after:today',
+                'budget_per_person' => 'required|numeric|min:' . $this->min_budget_per_person,
+                'number_of_people' => 'required|numeric|min:1',
+                'monitoring_type' => 'required',
+                'visibility' => 'required|in:public,private',
+            ];
+        } elseif ($this->currentStep == 4) {
+            // Step 4: Login or review/confirmation
             if (!Auth::check()) {
                 $rules = [
                     'email' => 'required|email',
@@ -182,7 +183,6 @@ class PostJob extends Component
                 ];
             }
         }
-        
         return $rules;
     }
 
@@ -193,29 +193,22 @@ class PostJob extends Component
         $this->currency = $this->location->currency;
         $this->currency_symbol = $this->location->currency_symbol;
         $this->requirements = [];
-        $this->files = [];
-        $this->restricted_countries = [];
         $this->platforms = Platform::where('is_active', true)->get();
-        $this->templates = TaskTemplate::where('is_active', true)->get();
-
+        $this->templates = TaskTemplate::where('is_active', true)
+            ->whereHas('prices', function($q) {
+                $q->where('country_id', $this->location->country_id);
+            })->get();
         // Determine approved countries using Country model methods
         $allCountries = Country::orderBy('name')->get();
         $approvedCountries = collect();
         foreach ($allCountries as $country) {
-            if (
-                $country->hasTransactionSettings() &&
-                $country->hasTaskSettings() &&
-                $country->hasPlanPrices() &&
-                $country->hasTemplatePrices()
-            ) {
+            if ($country->status) {
                 $approvedCountries->push($country);
             }
         }
         $this->countries = $approvedCountries;
-
         // Set countrySetting for the user's/guest's country if available
         $this->countrySetting = $this->location->country_id ? $approvedCountries->firstWhere('id', $this->location->country_id)?->setting : null;
-
         // If user's/guest's country is not approved, set serviceUnavailable
         if (!$approvedCountries->pluck('id')->contains($this->location->country_id)) {
             $this->serviceUnavailable = true;
@@ -223,8 +216,10 @@ class PostJob extends Component
         }
 
         // Set pricing and other settings if available
-        $this->featuredPrice = $this->countrySetting->feature_rate ?? 0;
-        $this->urgentPrice = $this->countrySetting->urgent_rate ?? 0;
+        $this->featured = $this->hasFeaturedInSubscription();
+        $this->urgent = $this->hasUrgentInSubscription();
+        $this->featuredPrice = $this->hasFeaturedInSubscription() ? 0 : ($this->countrySetting->feature_rate ?? 0);
+        $this->urgentPrice = $this->hasUrgentInSubscription() ? 0 : ($this->countrySetting->urgent_rate ?? 0);
         $this->tax_rate = $this->countrySetting->tax_rate ?? 0;
         if ($this->countrySetting && $this->countrySetting->transaction_charges) {
             $transactionCharges = $this->countrySetting->transaction_charges;
@@ -236,7 +231,7 @@ class PostJob extends Component
         if ($this->template_id) {
             $template = TaskTemplate::find($this->template_id);
             if ($template) {
-                $this->min_budget_per_person = $template->getCountryPrice($this->location->country_id);
+                $this->min_budget_per_person = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
             }
         }
         // Set budget_per_person and expected_budget to minimum on first visit
@@ -249,50 +244,29 @@ class PostJob extends Component
         $this->updateTotals();
     }
     
-    // Add file removal method
-    public function removeFile($index)
-    {
-        if (isset($this->files[$index])) {
-            unset($this->files[$index]);
-            $this->files = array_values($this->files);
-        }
-    }
-
-    public function updatedFiles()
-    {
-        $this->validateOnly('files.*');
-        $processedFiles = [];
-
-        foreach ($this->files as $file) {
-            if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                $path = $file->store('task-files', 'public');
-                $processedFiles[] = [
-                    'name' => $file->getClientOriginalName(),
-                    'path' => 'storage/' . $path,
-                    'size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType()
-                ];
-            } elseif (is_array($file) && isset($file['name'])) {
-                // Already processed file info, keep it
-                $processedFiles[] = $file;
-            }
-        }
-
-        $this->files = $processedFiles;
-    }
-
     public function nextStep()
     {
         try {
             $this->validate($this->getStepRules());
-            
-            if ($this->currentStep == 1) {
-                $this->currentStep = 2;
-            } elseif ($this->currentStep == 2) {
-                $this->submit();
+            if ($this->currentStep < $this->totalSteps) {
+                $this->currentStep++;
+                if($this->currentStep == 2){
+                    $this->dispatch('step2-shown');
+                }
+            } elseif ($this->currentStep == $this->totalSteps) {
+                // On step 4, if not logged in, handle login
+                if (!Auth::check()) {
+                    $this->login();
+                    // If login successful, stay on step 4 and show review/confirmation
+                    if (Auth::check()) {
+                        $this->isLoggedIn = true;
+                        // No increment, stay on step 4
+                    }
+                } else {
+                    $this->submitJob();
+                }
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Dispatch validation errors to the child component
             $this->dispatch('validationErrors', $e->validator->errors()->toArray());
             throw $e;
         }
@@ -302,6 +276,9 @@ class PostJob extends Component
     {
         if ($this->currentStep > 1) {
             $this->currentStep--;
+            if($this->currentStep == 2){
+                $this->dispatch('step2-shown');
+            }
         }
     }
     
@@ -309,20 +286,8 @@ class PostJob extends Component
     {
         if($element == 'restricted_countries'){
             $this->restricted_countries = $data;
-        }elseif($element == 'platform_id'){
-            $this->platform_id = $data;
-        }elseif($element == 'template_id'){
-            $this->template_id = $data;
-            $template = TaskTemplate::find($data);
-            if ($template) {
-                $this->description = $template->description ?? $this->description;
-                $this->min_budget_per_person = $template->getCountryPrice($this->location->country_id);
-                if ($this->budget_per_person < $this->min_budget_per_person) {
-                    $this->budget_per_person = $this->min_budget_per_person;
-                }
-                $this->updateTotals();
-            }
-            $this->dispatch('templateSelected', $this->template_id);
+        }elseif($element == 'requirements'){
+            $this->requirements = $data;
         }
     }
     
@@ -345,19 +310,23 @@ class PostJob extends Component
 
     public function updateTotals()
     {
-
+        $this->featuredPrice = $this->hasFeaturedInSubscription() ? 0 : ($this->countrySetting->feature_rate ?? 0);
+        $this->urgentPrice = $this->hasUrgentInSubscription() ? 0 : ($this->countrySetting->urgent_rate ?? 0);
         $this->expected_budget = ($this->budget_per_person ?? 0) * $this->number_of_people;
         $baseAmount = $this->expected_budget;
-        $this->featured_amount = $this->featured ? $this->featuredPrice * $this->featured_days : 0;
+        $this->featured_amount = $this->featured ? ($this->featuredPrice * $this->featured_days) : 0;
         $baseAmount += $this->featured_amount;
-        $this->urgent_amount = $this->urgent ? $this->urgentPrice * $this->number_of_people : 0;
+        $this->urgent_amount = $this->urgent ? ($this->urgentPrice * $this->number_of_people) : 0;
         $baseAmount += $this->urgent_amount;
-        // Monitoring fee
+        // Monitoring fee (per person for admin/system, 0 for self)
         $this->monitoring_fee = 0;
+        $people = ($this->number_of_people && $this->number_of_people > 0) ? $this->number_of_people : 1;
         if ($this->monitoring_type === 'admin_monitoring') {
-            $this->monitoring_fee = $this->countrySetting->admin_monitoring_cost ?? 0;
+            $this->monitoring_fee = ($this->countrySetting->admin_monitoring_cost ?? 0) * $people;
         } elseif ($this->monitoring_type === 'system_monitoring') {
-            $this->monitoring_fee = $this->countrySetting->system_monitoring_cost ?? 0;
+            $this->monitoring_fee = ($this->countrySetting->system_monitoring_cost ?? 0) * $people;
+        } else {
+            $this->monitoring_fee = 0;
         }
         $baseAmount += $this->monitoring_fee;
         $this->serviceFee = $this->calculateServiceFee($baseAmount);
@@ -458,13 +427,12 @@ class PostJob extends Component
 
         $task = new Task();
         $task->user_id = Auth::id();
-        $task->template_id = $this->template_id ?? 1;
-        $task->platform_id = $this->platform_id;
+        $task->template_id = $this->template_id;
+        $task->platform_id = TaskTemplate::find($this->platform_id)->platform_id;
         $task->title = $this->title;
         $task->description = $this->description;
         $task->expected_completion_minutes = $minutes;
         $task->expected_budget = $this->expected_budget;
-        $task->files = $this->files;
         $task->requirements = $this->requirements;
         $task->number_of_people = $this->number_of_people;
         $task->visibility = $this->visibility;
@@ -510,12 +478,11 @@ class PostJob extends Component
         $task = new Task();
         $task->user_id = Auth::id();
         $task->template_id = $this->template_id ?? 1; // Default template if none selected
-        $task->platform_id = $this->platform_id;
+        $task->platform_id = TaskTemplate::find($this->platform_id)->platform_id;
         $task->title = $this->title;
         $task->description = $this->description;
         $task->expected_completion_minutes = $minutes;
         $task->expected_budget = $this->expected_budget;
-        $task->files = $this->files; // Files are already processed in updatedFiles()
         $task->requirements = $this->requirements;
         $task->number_of_people = $this->number_of_people;
         $task->visibility = $this->visibility;
@@ -599,34 +566,23 @@ class PostJob extends Component
      */
     public function login()
     {
-        
         $this->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
-
         $remember = $this->remember ?? false;
-        
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $remember)) {
-            // Successfully logged in
             $this->reset(['password']);
-            
-            // Dispatch event for menu components to update
             $this->isLoggedIn = true;
             $this->dispatch('UserHasLoggedIn');
-            
         } else {
-            // Login failed
             session()->flash('error', 'Invalid credentials. Please try again.');
-            
-            // Add validation error
             $this->addError('email', 'These credentials do not match our records.');
         }
     }
 
     public function updatedMonitoringType($value)
     {
-        $this->updateMonitoringFee();
         $this->updateTotals();
     }
 
@@ -652,13 +608,71 @@ class PostJob extends Component
 
     public function updatedBudgetPerPerson($value)
     {
-        if ($value === '' || !is_numeric($value)) {
-            $this->budget_per_person = 0;
+        if ($value === '' || !is_numeric($value) || $value < $this->min_budget_per_person) {
+            $this->budget_per_person = $this->min_budget_per_person;
         }
+        $this->updateTotals();
+    }
+
+    public function updatedNumberOfPeople($value)
+    {
+        if ($value === '' || !is_numeric($value) || $value < 1) {
+            $this->number_of_people = 1;
+        }
+        $this->updateTotals();
+    }
+
+    public function updatedFeaturedDays($value)
+    {
+        if ($value === '' || !is_numeric($value) || $value < 1) {
+            $this->featured_days = 1;
+        }
+        $this->updateTotals();
     }
 
     public function render()
     {
         return view('livewire.jobs.post-job');
+    }
+
+    public function selectTemplate($templateId)
+    {
+        $this->template_id = $templateId;
+        $template = TaskTemplate::find($templateId);
+        if ($template) {
+            //$this->platform_id = $template->platform_id; // Set platform_id from template
+            $this->description = $template->description ?? $this->description;
+            $this->min_budget_per_person = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
+            if ($this->budget_per_person < $this->min_budget_per_person) {
+                $this->budget_per_person = $this->min_budget_per_person;
+            }
+            $this->updateTotals();
+        }
+        \Log::info('dispatching event with template_id: ' . $this->template_id);
+        $this->dispatch('templateSelected', templateId:$this->template_id);
+    }
+
+    public function hasFeaturedInSubscription()
+    {
+        if (!Auth::check()) return false;
+        $subs = Auth::user()->activeSubscriptions()->get();
+        foreach ($subs as $sub) {
+            if (in_array('featured', $sub->features ?? [])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function hasUrgentInSubscription()
+    {
+        if (!Auth::check()) return false;
+        $subs = Auth::user()->activeSubscriptions()->get();
+        foreach ($subs as $sub) {
+            if (in_array('urgent', $sub->features ?? [])) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -214,7 +214,7 @@
                                                             <small class="text-muted">Current rate: {{ $country->currency_symbol }}{{ number_format($exchangeRate, 1) }} . Markup is applied as a percentage.</small>
                                                         </div>
 
-
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,110 +237,110 @@
                                 <form action="{{ route('admin.settings.countries.transactions') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4">Transaction Charges</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="mb-4">Transaction Charges</h5>
 
-                                                    <div class="mb-3">
-                                                        <div class="row mb-2">
-                                                            <div class="col-md-5">
-                                                                <div class="input-group">
-                                                                    <input type="number" class="form-control" name="transaction_percentage" value="{{ isset($settings->transaction_charges['percentage']) ? $settings->transaction_charges['percentage'] : 2 }}" step="0.01">
-                                                                    <span class="input-group-text">%</span>
-                                                                </div>
-
+                                                <div class="mb-3">
+                                                    <div class="row mb-2">
+                                                        <div class="col-md-5">
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control" name="transaction_percentage" value="{{ isset($settings->transaction_charges['percentage']) ? $settings->transaction_charges['percentage'] : 2 }}" step="0.01">
+                                                                <span class="input-group-text">%</span>
                                                             </div>
-                                                            <div class="col-md-7">
-                                                                <div class="input-group">
-                                                                    <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                                    <input type="number" class="form-control" name="transaction_fixed" value="{{ isset($settings->transaction_charges['fixed']) ? $settings->transaction_charges['fixed'] : 100 }}" step="0.01">
-                                                                    <span class="input-group-text">Fixed</span>
-                                                                </div>
+
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                                <input type="number" class="form-control" name="transaction_fixed" value="{{ isset($settings->transaction_charges['fixed']) ? $settings->transaction_charges['fixed'] : 100 }}" step="0.01">
+                                                                <span class="input-group-text">Fixed</span>
                                                             </div>
                                                         </div>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="transaction_cap" value="{{ isset($settings->transaction_charges['cap']) ? $settings->transaction_charges['cap'] : 2000 }}" step="0.01">
-                                                            <span class="input-group-text">Cap</span>
-                                                        </div>
                                                     </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Select Payment Gateway</label>
-                                                        <select class="form-control" name="gateway">
-                                                            <option value="">None</option>
-                                                            <option value="stripe" {{ $settings->gateway == 'stripe' ? 'selected' : '' }}>Stripe</option>
-                                                            <option value="paypal" {{ $settings->gateway == 'paypal' ? 'selected' : '' }}>PayPal</option>
-                                                            <option value="adyen" {{ $settings->gateway == 'adyen' ? 'selected' : '' }}>Adyen</option>
-                                                            <option value="square" {{ $settings->gateway == 'square' ? 'selected' : '' }}>Square</option>
-                                                            <option value="checkout" {{ $settings->gateway == 'checkout' ? 'selected' : '' }}>Checkout.com</option>
-                                                            <option value="mollie" {{ $settings->gateway == 'mollie' ? 'selected' : '' }}>Mollie</option>
-                                                            <option value="wise" {{ $settings->gateway == 'wise' ? 'selected' : '' }}>Wise</option>
-                                                            <option value="gocardless" {{ $settings->gateway == 'gocardless' ? 'selected' : '' }}>GoCardless</option>
-                                                            <option value="paystack" {{ $settings->gateway == 'paystack' ? 'selected' : '' }}>Paystack</option>
-                                                            <option value="flutterwave" {{ $settings->gateway == 'flutterwave' ? 'selected' : '' }}>Flutterwave</option>
-                                                            <option value="interswitch" {{ $settings->gateway == 'interswitch' ? 'selected' : '' }}>Interswitch</option>
-                                                            <option value="okra" {{ $settings->gateway == 'okra' ? 'selected' : '' }}>Okra</option>
-                                                            <option value="paga" {{ $settings->gateway == 'paga' ? 'selected' : '' }}>Paga</option>
-                                                            <option value="cellulant" {{ $settings->gateway == 'cellulant' ? 'selected' : '' }}>Cellulant</option>
-                                                            <option value="dpo" {{ $settings->gateway == 'dpo' ? 'selected' : '' }}>DPO Group</option>
-                                                            <option value="kuda" {{ $settings->gateway == 'kuda' ? 'selected' : '' }}>Kuda</option>
-                                                            <option value="chipper" {{ $settings->gateway == 'chipper' ? 'selected' : '' }}>Chipper Cash</option>
-                                                            <option value="opay" {{ $settings->gateway == 'opay' ? 'selected' : '' }}>OPay</option>
-                                                            <option value="palmpay" {{ $settings->gateway == 'palmpay' ? 'selected' : '' }}>PalmPay</option>
-                                                            <option value="mfs" {{ $settings->gateway == 'mfs' ? 'selected' : '' }}>MFS Africa</option>
-                                                            <option value="plaid" {{ $settings->gateway == 'plaid' ? 'selected' : '' }}>Plaid</option>
-                                                            <option value="truelayer" {{ $settings->gateway == 'truelayer' ? 'selected' : '' }}>TrueLayer</option>
-                                                            <option value="tink" {{ $settings->gateway == 'tink' ? 'selected' : '' }}>Tink</option>
-                                                            <option value="nordigen" {{ $settings->gateway == 'nordigen' ? 'selected' : '' }}>Nordigen</option>
-                                                            <option value="belvo" {{ $settings->gateway == 'belvo' ? 'selected' : '' }}>Belvo</option>
-                                                            <option value="akoya" {{ $settings->gateway == 'akoya' ? 'selected' : '' }}>Akoya</option>
-                                                            <option value="mono" {{ $settings->gateway == 'mono' ? 'selected' : '' }}>Mono</option>
-                                                            <option value="mpesa" {{ $settings->gateway == 'mpesa' ? 'selected' : '' }}>M-Pesa</option>
-                                                            <option value="mtn" {{ $settings->gateway == 'mtn' ? 'selected' : '' }}>MTN Mobile Money</option>
-                                                            <option value="airtel" {{ $settings->gateway == 'airtel' ? 'selected' : '' }}>Airtel Money</option>
-                                                            <option value="orange" {{ $settings->gateway == 'orange' ? 'selected' : '' }}>Orange Money</option>
-                                                            <option value="gcash" {{ $settings->gateway == 'gcash' ? 'selected' : '' }}>GCash</option>
-                                                            <option value="paytm" {{ $settings->gateway == 'paytm' ? 'selected' : '' }}>Paytm</option>
-                                                            <option value="wave" {{ $settings->gateway == 'wave' ? 'selected' : '' }}>Wave</option>
-                                                        </select>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="transaction_cap" value="{{ isset($settings->transaction_charges['cap']) ? $settings->transaction_charges['cap'] : 2000 }}" step="0.01">
+                                                        <span class="input-group-text">Cap</span>
                                                     </div>
-
-
                                                 </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Select Payment Gateway</label>
+                                                    <select class="form-control" name="gateway">
+                                                        <option value="">None</option>
+                                                        <option value="stripe" {{ $settings->gateway == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                                                        <option value="paypal" {{ $settings->gateway == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                                                        <option value="adyen" {{ $settings->gateway == 'adyen' ? 'selected' : '' }}>Adyen</option>
+                                                        <option value="square" {{ $settings->gateway == 'square' ? 'selected' : '' }}>Square</option>
+                                                        <option value="checkout" {{ $settings->gateway == 'checkout' ? 'selected' : '' }}>Checkout.com</option>
+                                                        <option value="mollie" {{ $settings->gateway == 'mollie' ? 'selected' : '' }}>Mollie</option>
+                                                        <option value="wise" {{ $settings->gateway == 'wise' ? 'selected' : '' }}>Wise</option>
+                                                        <option value="gocardless" {{ $settings->gateway == 'gocardless' ? 'selected' : '' }}>GoCardless</option>
+                                                        <option value="paystack" {{ $settings->gateway == 'paystack' ? 'selected' : '' }}>Paystack</option>
+                                                        <option value="flutterwave" {{ $settings->gateway == 'flutterwave' ? 'selected' : '' }}>Flutterwave</option>
+                                                        <option value="interswitch" {{ $settings->gateway == 'interswitch' ? 'selected' : '' }}>Interswitch</option>
+                                                        <option value="okra" {{ $settings->gateway == 'okra' ? 'selected' : '' }}>Okra</option>
+                                                        <option value="paga" {{ $settings->gateway == 'paga' ? 'selected' : '' }}>Paga</option>
+                                                        <option value="cellulant" {{ $settings->gateway == 'cellulant' ? 'selected' : '' }}>Cellulant</option>
+                                                        <option value="dpo" {{ $settings->gateway == 'dpo' ? 'selected' : '' }}>DPO Group</option>
+                                                        <option value="kuda" {{ $settings->gateway == 'kuda' ? 'selected' : '' }}>Kuda</option>
+                                                        <option value="chipper" {{ $settings->gateway == 'chipper' ? 'selected' : '' }}>Chipper Cash</option>
+                                                        <option value="opay" {{ $settings->gateway == 'opay' ? 'selected' : '' }}>OPay</option>
+                                                        <option value="palmpay" {{ $settings->gateway == 'palmpay' ? 'selected' : '' }}>PalmPay</option>
+                                                        <option value="mfs" {{ $settings->gateway == 'mfs' ? 'selected' : '' }}>MFS Africa</option>
+                                                        <option value="plaid" {{ $settings->gateway == 'plaid' ? 'selected' : '' }}>Plaid</option>
+                                                        <option value="truelayer" {{ $settings->gateway == 'truelayer' ? 'selected' : '' }}>TrueLayer</option>
+                                                        <option value="tink" {{ $settings->gateway == 'tink' ? 'selected' : '' }}>Tink</option>
+                                                        <option value="nordigen" {{ $settings->gateway == 'nordigen' ? 'selected' : '' }}>Nordigen</option>
+                                                        <option value="belvo" {{ $settings->gateway == 'belvo' ? 'selected' : '' }}>Belvo</option>
+                                                        <option value="akoya" {{ $settings->gateway == 'akoya' ? 'selected' : '' }}>Akoya</option>
+                                                        <option value="mono" {{ $settings->gateway == 'mono' ? 'selected' : '' }}>Mono</option>
+                                                        <option value="mpesa" {{ $settings->gateway == 'mpesa' ? 'selected' : '' }}>M-Pesa</option>
+                                                        <option value="mtn" {{ $settings->gateway == 'mtn' ? 'selected' : '' }}>MTN Mobile Money</option>
+                                                        <option value="airtel" {{ $settings->gateway == 'airtel' ? 'selected' : '' }}>Airtel Money</option>
+                                                        <option value="orange" {{ $settings->gateway == 'orange' ? 'selected' : '' }}>Orange Money</option>
+                                                        <option value="gcash" {{ $settings->gateway == 'gcash' ? 'selected' : '' }}>GCash</option>
+                                                        <option value="paytm" {{ $settings->gateway == 'paytm' ? 'selected' : '' }}>Paytm</option>
+                                                        <option value="wave" {{ $settings->gateway == 'wave' ? 'selected' : '' }}>Wave</option>
+                                                    </select>
+                                                </div>
+
+
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4">Withdrawal Settings</h5>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="mb-4">Withdrawal Settings</h5>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Withdrawal Charges</label>
-                                                        <div class="row">
-                                                            <div class="col-md-5">
-                                                                <div class="input-group mb-2">
-                                                                    <input type="number" class="form-control" name="withdrawal_percentage" value="{{ isset($settings->withdrawal_charges['percentage']) ? $settings->withdrawal_charges['percentage'] : 1 }}" step="0.01">
-                                                                    <span class="input-group-text">%</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-7">
-                                                                <div class="input-group mb-2">
-                                                                    <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                                    <input type="number" class="form-control" name="withdrawal_fixed" value="{{ isset($settings->withdrawal_charges['fixed']) ? $settings->withdrawal_charges['fixed'] : 50 }}" step="0.01">
-                                                                    <span class="input-group-text">Fixed</span>
-                                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Withdrawal Charges</label>
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                            <div class="input-group mb-2">
+                                                                <input type="number" class="form-control" name="withdrawal_percentage" value="{{ isset($settings->withdrawal_charges['percentage']) ? $settings->withdrawal_charges['percentage'] : 1 }}" step="0.01">
+                                                                <span class="input-group-text">%</span>
                                                             </div>
                                                         </div>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="withdrawal_cap" value="{{ isset($settings->withdrawal_charges['cap']) ? $settings->withdrawal_charges['cap'] : 1000 }}" step="0.01">
-                                                            <span class="input-group-text">Cap</span>
+                                                        <div class="col-md-7">
+                                                            <div class="input-group mb-2">
+                                                                <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                                <input type="number" class="form-control" name="withdrawal_fixed" value="{{ isset($settings->withdrawal_charges['fixed']) ? $settings->withdrawal_charges['fixed'] : 50 }}" step="0.01">
+                                                                <span class="input-group-text">Fixed</span>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="withdrawal_cap" value="{{ isset($settings->withdrawal_charges['cap']) ? $settings->withdrawal_charges['cap'] : 1000 }}" step="0.01">
+                                                        <span class="input-group-text">Cap</span>
+                                                    </div>
+                                                </div>
 
                                                     <div class="mb-3">
                                                         <label class="form-label">Minimum Withdrawal</label>
@@ -358,48 +358,48 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Wallet Status</label>
-                                                        <div class="d-flex">
-                                                            <div class="form-check mr-auto">
-                                                                <input class="form-check-input" type="radio" name="wallet_status" id="enable_wallets" value="enabled" {{ old('wallet_status', $settings->wallet_status) == 'enabled' ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="enable_wallets">
-                                                                    Enable Wallets
-                                                                </label>
-                                                            </div>
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="radio" name="wallet_status" id="disable_wallets" value="disabled" {{ old('wallet_status', $settings->wallet_status) == 'disabled' ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="disable_wallets">
-                                                                    Freeze Wallets
-                                                                </label>
-                                                            </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Wallet Status</label>
+                                                    <div class="d-flex">
+                                                        <div class="form-check mr-auto">
+                                                            <input class="form-check-input" type="radio" name="wallet_status" id="enable_wallets" value="enabled" {{ old('wallet_status', $settings->wallet_status) == 'enabled' ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="enable_wallets">
+                                                                Enable Wallets
+                                                            </label>
                                                         </div>
-                                                        <small class="text-muted">Control whether users can access their wallets in this country</small>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="wallet_status" id="disable_wallets" value="disabled" {{ old('wallet_status', $settings->wallet_status) == 'disabled' ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="disable_wallets">
+                                                                Freeze Wallets
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">Control whether users can access their wallets in this country</small>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Payout Method</label>
+                                                    <select class="form-control" name="payout_method">
+                                                        <option value="manual" {{ $settings->payout_method == 'manual' ? 'selected' : '' }}>Manual</option>
+                                                        <option value="gateway" {{ $settings->payout_method == 'gateway' ? 'selected' : '' }}>Gateway</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="weekend_payout" name="weekend_payout" {{ old('weekend_payout', $settings->weekend_payout) ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="weekend_payout">Weekend Payout</label>
                                                     </div>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Payout Method</label>
-                                                        <select class="form-control" name="payout_method">
-                                                            <option value="manual" {{ $settings->payout_method == 'manual' ? 'selected' : '' }}>Manual</option>
-                                                            <option value="gateway" {{ $settings->payout_method == 'gateway' ? 'selected' : '' }}>Gateway</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="mb-4">
-                                                        <div class="form-check form-switch mb-2">
-                                                            <input class="form-check-input" type="checkbox" id="weekend_payout" name="weekend_payout" {{ old('weekend_payout', $settings->weekend_payout) ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="weekend_payout">Weekend Payout</label>
-                                                        </div>
-
-                                                        <div class="form-check form-switch">
-                                                            <input class="form-check-input" type="checkbox" id="holiday_payout" name="holiday_payout" {{ old('holiday_payout', $settings->holiday_payout) ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="holiday_payout">Holiday Payout</label>
-                                                        </div>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="holiday_payout" name="holiday_payout" {{ old('holiday_payout', $settings->holiday_payout) ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="holiday_payout">Holiday Payout</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                                     <div class="mt-4 d-flex justify-content-between align-items-center">
                                         <div></div>
                                         <div>
@@ -420,94 +420,94 @@
                                 <form action="{{ route('admin.settings.countries.tasks') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4">Promotional Rates</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="mb-4">Promotional Rates</h5>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Feature Rate per day</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="feature_rate" value="{{ old('feature_rate', $settings->feature_rate) }}" step="0.01">
-                                                        </div>
-                                                        <small class="text-muted">Cost to feature a job posting per day</small>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Feature Rate per day</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="feature_rate" value="{{ old('feature_rate', $settings->feature_rate) }}" step="0.01">
                                                     </div>
+                                                    <small class="text-muted">Cost to feature a job posting per day</small>
+                                                </div>
 
-                                                    <div class="mb-3">
+                                                <div class="mb-3">
                                                         <label class="form-label">Urgency Rate per email </label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="urgent_rate" value="{{ old('urgent_rate', $settings->urgent_rate) }}" step="0.01">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="urgent_rate" value="{{ old('urgent_rate', $settings->urgent_rate) }}" step="0.01">
                                                         </div>
                                                         <small class="text-muted">Cost to send urgent email per recipient</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4">Monitoring Costs</h5>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Admin Monitoring Cost</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="admin_monitoring_cost" value="{{ old('admin_monitoring_cost', $settings->admin_monitoring_cost) }}" step="0.01">
-                                                        </div>
-                                                        <small class="text-muted">Cost for admin-monitored tasks</small>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label">System Monitoring Cost</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="system_monitoring_cost" value="{{ old('system_monitoring_cost', $settings->system_monitoring_cost) }}" step="0.01">
-                                                        </div>
-                                                        <small class="text-muted">Cost for system-automated monitoring</small>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="row mt-4">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4">Commission Settings</h5>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="mb-4">Monitoring Costs</h5>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Invitee Commission Percentage</label>
-                                                        <div class="input-group">
-                                                            <input type="number" class="form-control" name="invitee_commission_percentage" value="{{ old('invitee_commission_percentage', $settings->invitee_commission_percentage) }}" step="0.01" min="0" max="100">
-                                                            <span class="input-group-text">%</span>
-                                                        </div>
-                                                        <small class="text-muted">Percentage commission for invited workers</small>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Admin Monitoring Cost</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="admin_monitoring_cost" value="{{ old('admin_monitoring_cost', $settings->admin_monitoring_cost) }}" step="0.01">
                                                     </div>
+                                                    <small class="text-muted">Cost for admin-monitored tasks</small>
+                                                </div>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Referral Earnings Percentage</label>
-                                                        <div class="input-group">
-                                                            <input type="number" class="form-control" name="referral_earnings_percentage" value="{{ old('referral_earnings_percentage', $settings->referral_earnings_percentage) }}" step="0.01" min="0" max="100">
-                                                            <span class="input-group-text">%</span>
-                                                        </div>
-                                                        <small class="text-muted">Percentage earnings for successful referrals</small>
+                                                <div class="mb-3">
+                                                    <label class="form-label">System Monitoring Cost</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                        <input type="number" class="form-control" name="system_monitoring_cost" value="{{ old('system_monitoring_cost', $settings->system_monitoring_cost) }}" step="0.01">
                                                     </div>
+                                                    <small class="text-muted">Cost for system-automated monitoring</small>
                                                 </div>
                                             </div>
                                         </div>
-
-
                                     </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="mb-4">Commission Settings</h5>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Invitee Commission Percentage</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" name="invitee_commission_percentage" value="{{ old('invitee_commission_percentage', $settings->invitee_commission_percentage) }}" step="0.01" min="0" max="100">
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                    <small class="text-muted">Percentage commission for invited workers</small>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Referral Earnings Percentage</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" name="referral_earnings_percentage" value="{{ old('referral_earnings_percentage', $settings->referral_earnings_percentage) }}" step="0.01" min="0" max="100">
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                    <small class="text-muted">Percentage earnings for successful referrals</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    
+                                </div>
                                     <div class="mt-4 d-flex justify-content-between align-items-center">
                                         <div></div>
                                         <div>
-                                            <button type="submit" class="btn btn-primary">Save Task Settings</button>
-                                        </div>
+                                    <button type="submit" class="btn btn-primary">Save Task Settings</button>
+                                </div>
                                     </div>
                                 </form>
                             </div>
@@ -523,57 +523,57 @@
                                 <form action="{{ route('admin.settings.countries.plan_prices') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
-
+                                    
                                     @if($plans->count() > 0)
-                                    <div class="row">
-                                        @foreach($plans as $plan)
-                                        <div class="col-md-6 col-lg-4 mb-4">
-                                            <div class="card h-100">
-                                                <div class="card-header">
-                                                    <h6 class="card-title mb-0">{{ $plan->name }}</h6>
-                                                    <small class="text-muted">{{ ucfirst($plan->type) }} Plan</small>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p class="card-text text-muted small mb-3">
-                                                        {{ Str::limit($plan->description, 100) }}
-                                                    </p>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Plan Price</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number"
-                                                                class="form-control"
-                                                                name="plan_prices[{{ $plan->id }}]"
-                                                                value="{{ old('plan_prices.' . $plan->id, isset($countryPricesByKey[App\Models\Plan::class][$plan->id]) ? $countryPricesByKey[App\Models\Plan::class][$plan->id]->amount : '') }}"
-                                                                step="0.01"
-                                                                min="0"
-                                                                placeholder="0.00">
+                                        <div class="row">
+                                            @foreach($plans as $plan)
+                                                <div class="col-md-6 col-lg-4 mb-4">
+                                                    <div class="card h-100">
+                                                        <div class="card-header">
+                                                            <h6 class="card-title mb-0">{{ $plan->name }}</h6>
+                                                            <small class="text-muted">{{ ucfirst($plan->type) }} Plan</small>
                                                         </div>
-                                                        <small class="text-muted">Set the price for this plan in {{ $country->currency_symbol }}</small>
+                                                        <div class="card-body">
+                                                            <p class="card-text text-muted small mb-3">
+                                                                {{ Str::limit($plan->description, 100) }}
+                                                            </p>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Plan Price</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                                    <input type="number" 
+                                                                           class="form-control" 
+                                                                           name="plan_prices[{{ $plan->id }}]" 
+                                                                           value="{{ old('plan_prices.' . $plan->id, isset($countryPricesByKey[App\Models\Plan::class][$plan->id]) ? $countryPricesByKey[App\Models\Plan::class][$plan->id]->amount : '') }}" 
+                                                                           step="0.01" 
+                                                                           min="0"
+                                                                           placeholder="0.00">
+                                                                </div>
+                                                                <small class="text-muted">Set the price for this plan in {{ $country->currency_symbol }}</small>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="mt-4 d-flex justify-content-between align-items-center">
+                                            <div class="text-muted small">
+                                                <i class="fas fa-info-circle"></i> 
+                                                {{ $plans->count() }} active plan(s) found
+                                            </div>
+                                            <div>
+                                                <button type="submit" class="btn btn-primary">Save Subscription Settings</button>
+                                                <a href="{{ route('admin.settings.countries') }}" class="btn btn-secondary ms-2">Cancel</a>
                                             </div>
                                         </div>
-                                        @endforeach
-                                    </div>
-                                    <div class="mt-4 d-flex justify-content-between align-items-center">
-                                        <div class="text-muted small">
-                                            <i class="fas fa-info-circle"></i>
-                                            {{ $plans->count() }} active plan(s) found
-                                        </div>
-                                        <div>
-                                            <button type="submit" class="btn btn-primary">Save Subscription Settings</button>
-                                            <a href="{{ route('admin.settings.countries') }}" class="btn btn-secondary ms-2">Cancel</a>
-                                        </div>
-                                    </div>
                                     @else
-                                    <div class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                            <p>No active subscription plans found.</p>
-                                            <p class="small">Create subscription plans first to configure pricing.</p>
+                                        <div class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                                <p>No active subscription plans found.</p>
+                                                <p class="small">Create subscription plans first to configure pricing.</p>
+                                            </div>
                                         </div>
-                                    </div>
                                     @endif
                                 </form>
                             </div>
@@ -589,67 +589,67 @@
                                 <form action="{{ route('admin.settings.countries.template_prices') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
-
+                                    
                                     @if($templates->count() > 0)
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th style="width: 40%">Template Name</th>
-                                                    <th style="width: 35%">Description</th>
-                                                    <th style="width: 25%">Minimum Budget ({{ $country->currency_symbol }})</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($templates as $template)
-                                                <tr>
-                                                    <td>
-                                                        <strong>{{ $template->name }}</strong>
-                                                        <div class="small text-muted">
-                                                            {{ count($template->task_fields) }} task fields, {{ count($template->submission_fields) }} submission fields
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="text-muted small">
-                                                            {{ Str::limit($template->description, 80) }}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="input-group input-group-md">
-                                                            <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number"
-                                                                class="form-control"
-                                                                name="template_prices[{{ $template->id }}]"
-                                                                value="{{ old('template_prices.' . $template->id, isset($countryPricesByKey[App\Models\TaskTemplate::class][$template->id]) ? $countryPricesByKey[App\Models\TaskTemplate::class][$template->id]->amount : '') }}"
-                                                                step="0.01"
-                                                                min="0"
-                                                                placeholder="0.00">
-                                                        </div>
-                                                        <small class="text-muted">Minimum allowed budget</small>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="mt-4 d-flex justify-content-between align-items-center">
-                                        <div class="text-muted small">
-                                            <i class="fas fa-info-circle"></i>
-                                            {{ $templates->count() }} active template(s) found
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width: 40%">Template Name</th>
+                                                        <th style="width: 35%">Description</th>
+                                                        <th style="width: 25%">Minimum Budget ({{ $country->currency_symbol }})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($templates as $template)
+                                                        <tr>
+                                                            <td>
+                                                                <strong>{{ $template->name }}</strong>
+                                                                <div class="small text-muted">
+                                                                    {{ count($template->task_fields) }} task fields, {{ count($template->submission_fields) }} submission fields
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="text-muted small">
+                                                                    {{ Str::limit($template->description, 80) }}
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group input-group-md">
+                                                                    <span class="input-group-text">{{ $country->currency_symbol }}</span>
+                                                                    <input type="number" 
+                                                                           class="form-control" 
+                                                                           name="template_prices[{{ $template->id }}]" 
+                                                                           value="{{ old('template_prices.' . $template->id, isset($countryPricesByKey[App\Models\TaskTemplate::class][$template->id]) ? $countryPricesByKey[App\Models\TaskTemplate::class][$template->id]->amount : '') }}" 
+                                                                           step="0.01" 
+                                                                           min="0"
+                                                                           placeholder="0.00">
+                                                                </div>
+                                                                <small class="text-muted">Minimum allowed budget</small>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
                                         </div>
-                                        <div>
-                                            <button type="submit" class="btn btn-primary">Save Template Settings</button>
-                                            <a href="{{ route('admin.settings.countries') }}" class="btn btn-secondary ms-2">Cancel</a>
+                                        <div class="mt-4 d-flex justify-content-between align-items-center">
+                                            <div class="text-muted small">
+                                                <i class="fas fa-info-circle"></i> 
+                                                {{ $templates->count() }} active template(s) found
+                                            </div>
+                                            <div>
+                                                <button type="submit" class="btn btn-primary">Save Template Settings</button>
+                                                <a href="{{ route('admin.settings.countries') }}" class="btn btn-secondary ms-2">Cancel</a>
+                                            </div>
                                         </div>
-                                    </div>
                                     @else
-                                    <div class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                            <p>No active task templates found.</p>
-                                            <p class="small">Create task templates first to configure minimum budgets.</p>
+                                        <div class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                                <p>No active task templates found.</p>
+                                                <p class="small">Create task templates first to configure minimum budgets.</p>
+                                            </div>
                                         </div>
-                                    </div>
                                     @endif
                                 </form>
                             </div>

@@ -61,7 +61,7 @@
                     <ul id="users" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.index') }}">All Posts</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.create') }}">Create Post</a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.comments') }}">Comments</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.comments.index') }}">Comments</a></li>
                     </ul>
                 </li>
 

@@ -2,27 +2,34 @@
 
 namespace App\Livewire\Jobs;
 
-use App\Models\TaskTemplate;
-use Illuminate\Support\Str;
 use Livewire\Component;
+use Illuminate\Support\Str;
+use App\Models\TaskTemplate;
+use Livewire\Attributes\On; 
+use Livewire\WithFileUploads;
+
+use function Illuminate\Log\log;
 
 class TemplateFields extends Component
 {
+    use WithFileUploads;
+
     public $templateId;
     public $templateFields = [];
     public $templateData = [];
     public $validationErrors = [];
     
     protected $listeners = [
-        'templateSelected' => 'loadTemplateFields',
         'validationErrors' => 'handleValidationErrors'
     ];
     
     /**
      * Load fields from the selected template
      */
+    #[On('templateSelected')] 
     public function loadTemplateFields($templateId)
     {
+        \Log::info($templateId);
         $this->templateId = $templateId;
         
         // Reset template fields
@@ -40,6 +47,7 @@ class TemplateFields extends Component
                     $this->templateFields = $taskFields;
                     // Initialize field values
                     foreach ($taskFields as $field) {
+                        log($field);
                         if (isset($field['title'])) {
                             $this->templateData[$field['name']] = [
                                 'value' => '',
@@ -83,6 +91,20 @@ class TemplateFields extends Component
         $this->validationErrors = $errors;
     }
     
+    public function mount()
+    {
+        if ($this->templateId) {
+            $this->loadTemplateFields($this->templateId);
+        }
+    }
+
+    public function updatedTemplateId()
+    {
+        if ($this->templateId) {
+            $this->loadTemplateFields($this->templateId);
+        }
+    }
+
     public function render()
     {
         return view('livewire.jobs.template-fields');

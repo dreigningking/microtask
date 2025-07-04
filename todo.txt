@@ -1,25 +1,94 @@
-Change server upload to 2mb
+restrict countries
+user verify email
+two factor
 
+JOBS
+Write step by step instructions in description - DONE
+add monitoring fee if self-monitoring is chosen.. 
+    inform user that they will get refund if no admin intervention was used
+save draft
+edit draft if not yet paid
+Featured Jobs - identify places to show featured jobs"
+Urgent jobs - count the number of emails to send"
+task template  file field - allow video, file, image upload
+Submit
+Admin approve or disapprove job
+Job Approved Notification
+Reviews - worker review"
+Taskmaster flag submission so we can check those
+Users can use money in their wallet to buy subscription
+
+
+
+
+
+
+
+
+
+
+
+WORKER
 restrict users to number of task within an hour
+subscription effect on - job worker, 
+subscription effect on withdrawal - withdrawal maximum based on subscription
+Reviews - task master review"
+Worker can Report a task: Is there something wrong with this campaign? If the link is broken, instructions don't make sense, instructions take longer than 2 hours to complete, or anything else is wrong with this campaign click the report a problem button below:
+Withdraw - Restrict Withdrawal to only verified account"
+workers can follow task masters
+workers can see list of people he is following - and view active jobs
+worker subscription - add feature to receive notification from people you follow
+Users can click don't show on a task
+users can save task
 
-subscription effect on 
-- postjob, job worker, withdrawal
-withdrawal maximum based on subscription
+Dispute
+Dispute Notification
 
-blog subscription
-admin role separation
+TASKMASTER
 
-stephen - categories
 
-test email service on localhost and server...
+ 
+Support
+Support Notification
 
-post job page select platform not working
 
-edit post job
+PROFILE
+User is verified when all the required ids have been submitted and mark verified
+Country Settings - Allow countries that are not configured to signup but restrict from withdrawal"
 
+JOBS
+
+
+BADGES
+number of dispute cases ongoing can give you a badge
+number of dispute cases can give you a badge
+number of failure to pay on time can give you a badge
+number of bad submissions can give you a badge
+
+ADMIN
+Admin Permissions - Separate admins by their roles and permissions and effect their permissions "
+Admin user limit by Country - Should I do it?"
+Admin dashboard
+Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
+admin can create task, and assign to user
+Admin message to all via notification
+add to admin settings: timeline to review job after submission
+
+FEATURES
+Logs of activities e.g accepted terms
+Referrals - 
+automatic verifications ?
+payouts require approval ? 
+can verifications expire?
+System Monitoring - Implement system monitoring strategies"
+Google adsense
 in-app notification
-
+Top Earners
+Subscription Expiry Notification
+blog subscription
 2factor
 verify email
-allow video upload
-
+vpn block
+remove these databases: dispute, task, task worker. rerun migration
+Add Raffle Draw
+Change server upload to 2mb

@@ -202,18 +202,16 @@ class EditJob extends Component
         $this->files = [];
         $this->restricted_countries = [];
         $this->platforms = Platform::where('is_active', true)->get();
-        $this->templates = TaskTemplate::where('is_active', true)->get();
+        $this->templates = TaskTemplate::where('is_active', true)
+            ->whereHas('prices', function($q) {
+                $q->where('country_id', $this->location->country_id);
+            })->get();
 
         // Determine approved countries using Country model methods
         $allCountries = Country::orderBy('name')->get();
         $approvedCountries = collect();
         foreach ($allCountries as $country) {
-            if (
-                $country->hasTransactionSettings() &&
-                $country->hasTaskSettings() &&
-                $country->hasPlanPrices() &&
-                $country->hasTemplatePrices()
-            ) {
+            if ($country->status) {
                 $approvedCountries->push($country);
             }
         }
@@ -242,7 +240,7 @@ class EditJob extends Component
         if ($this->template_id) {
             $template = TaskTemplate::find($this->template_id);
             if ($template) {
-                $this->min_budget_per_person = $template->getCountryPrice($this->location->country_id);
+                $this->min_budget_per_person = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
             }
         }
         // Set budget_per_person and expected_budget to minimum on first visit
@@ -337,7 +335,7 @@ class EditJob extends Component
             $template = TaskTemplate::find($data);
             if ($template) {
                 $this->description = $template->description ?? $this->description;
-                $this->min_budget_per_person = $template->getCountryPrice($this->location->country_id);
+                $this->min_budget_per_person = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
                 if ($this->budget_per_person < $this->min_budget_per_person) {
                     $this->budget_per_person = $this->min_budget_per_person;
                 }

@@ -6,6 +6,7 @@ use App\Models\CountryPrice;
 use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Plan extends Model
 {
@@ -24,12 +25,10 @@ class Plan extends Model
         return $this->hasMany(Subscription::class);
     }
 
-    public function getCountryPrice($country_id)
+    public function prices(): MorphMany
     {
-        $price = CountryPrice::where('country_id', $country_id)
-            ->where('priceable_type', self::class)
-            ->where('priceable_id', $this->id)
-            ->first();
-        return $price ? (float) $price->amount : null;
+        return $this->morphMany(CountryPrice::class, 'priceable');
     }
+
+    
 }
