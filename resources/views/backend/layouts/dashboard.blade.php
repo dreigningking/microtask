@@ -23,6 +23,7 @@
                         <span class="align-middle">Dashboard</span>
                     </a>
                 </li>
+                @if(auth()->user()->hasPermission('task_management'))
                 <li class="sidebar-item">
                     <a href="#tasks" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-check-square"></i> <span class="align-middle">Tasks</span>
@@ -32,7 +33,8 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.promotions') }}">Task Promotions</a></li>
                     </ul>
                 </li>
-
+                @endif
+                @if(auth()->user()->hasPermission('finance_management'))
                 <li class="sidebar-item">
                     <a href="#finance" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-credit-card"></i> <span class="align-middle">Finance</span>
@@ -44,6 +46,8 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.withdrawals.index') }}">Withdrawals</a></li>
                     </ul>
                 </li>
+                @endif
+                @if(auth()->user()->hasPermission('user_management'))
                 <li class="sidebar-item">
                     <a href="#users" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-users"></i> <span class="align-middle">User Management</span>
@@ -53,7 +57,8 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.users.verifications') }}">Verifications</a></li>
                     </ul>
                 </li>
-                
+                @endif
+                @if(auth()->user()->hasPermission('blog_management'))
                 <li class="sidebar-item">
                     <a href="#users" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-book"></i> <span class="align-middle">Blog Management</span>
@@ -64,20 +69,26 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.comments.index') }}">Comments</a></li>
                     </ul>
                 </li>
-
+                @endif
+                @if(auth()->user()->hasPermission('system_settings') || auth()->user()->hasPermission('country_settings'))
                 <li class="sidebar-item">
                     <a href="#dashboards" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-cog"></i> 
                         <span class="align-middle">Settings</span>
                     </a>
                     <ul id="dashboards" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
+                        @if(auth()->user()->hasPermission('system_settings') )
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.index') }}">General</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.plans') }}">Plans</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.platforms') }}">Platforms</a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.templates') }}">Templates</a></li>                       
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.templates') }}">Templates</a></li>  
+                        @endif   
+                        @if(auth()->user()->hasPermission('country_settings'))                  
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.countries') }}">Countries</a></li>
+                        @endif
                     </ul>
                 </li>
+                @endif
             </ul>
         </div>
     </nav>

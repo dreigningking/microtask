@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('document_type');
+            $table->string('document_name')->nullable();
             $table->string('file_path');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('remarks')->nullable();

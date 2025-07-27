@@ -31,7 +31,7 @@ class JobSubmissionNotification extends Notification
             ->subject('A Worker Has Submitted a Job')
             ->greeting('Hello ' . $notifiable->name . ',')
             ->line($this->worker->name . ' has submitted their work for your task: "' . $this->task->title . '".')
-            ->action('Review Submission', url(route('my_jobs.view', $this->task)))
+            ->action('Review Submission', url(route('jobs.view', $this->task)))
             ->line('Please review the submission and take the appropriate action.');
     }
 } 

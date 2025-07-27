@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Models\TaskPromotion;
 use Illuminate\Http\Request;
+use App\Models\TaskPromotion;
+use App\Notifications\JobApprovedNotification;
 
 
 class TaskController extends Controller
@@ -44,6 +45,7 @@ class TaskController extends Controller
         $task->approved_at = now();
         $task->approved_by = auth()->id();
         $task->save();
+        $task->user->notify(new JobApprovedNotification($task));
         return back()->with('success', 'Task approved successfully.');
     }
 

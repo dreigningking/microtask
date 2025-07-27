@@ -11,8 +11,8 @@
 	<meta name="author" content="Wonegig">
 
 	<title>Wonegig - @yield('title')</title>
-	<link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon.png') }}">
+	<link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon1.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon1.png') }}">
 	<link href="{{ asset('backend/css/modern.css') }}" rel="stylesheet">
 	@stack('styles')
 </head>

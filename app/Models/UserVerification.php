@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserVerification extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mysql';
     protected $fillable = [
         'user_id',
         'document_type',
+        'document_name',
         'file_path',
         'status',
         'remarks',

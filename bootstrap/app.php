@@ -2,9 +2,12 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
+use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\LocationMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\Ensure2FAIsVerifiedMiddleware;
+use App\Http\Middleware\EmailHasBeenVerifiedMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,10 +16,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectUsersTo(fn (Request $request) =>
-            $request->user() && $request->user()->role == 'admin' ? route('admin.dashboard') : route('dashboard')
-        );
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->user() && $request->user()->role === 'admin') {
+                return route('admin.dashboard');
+            }
+            return route('dashboard');
+        });
         $middleware->append(LocationMiddleware::class);
+        $middleware->alias([
+            'email_verified' => EmailHasBeenVerifiedMiddleware::class,
+            'two_factor' => Ensure2FAIsVerifiedMiddleware::class,
+            'permission' => CheckPermission::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -313,3 +313,8 @@ body {
         scroll-snap-align: start;
     }
 } 
+
+#dashboard-main.ml-64 { margin-left: 16rem; }
+@media (max-width: 1024px) {
+    #dashboard-main.ml-64 { margin-left: 0; }
+}

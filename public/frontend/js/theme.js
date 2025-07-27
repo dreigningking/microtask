@@ -329,6 +329,37 @@ function initializeWonegigTheme() {
         // Placeholder for coupon code logic
     }
 
+    // DASHBOARD SIDEBAR TOGGLE
+    function setupDashboardSidebarToggle() {
+        window.toggleDashboardSidebar = function() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboard-main');
+            if (!sidebar || !main) return;
+            if (window.innerWidth < 1024) {
+                // Mobile: slide in/out as overlay
+                sidebar.classList.toggle('-translate-x-full');
+            } else {
+                // Desktop: push/rescale main content
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    main.classList.add('ml-64');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    main.classList.remove('ml-64');
+                }
+            }
+        };
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboard-main');
+            if (!sidebar || !main) return;
+            if (window.innerWidth < 1024) {
+                sidebar.classList.add('-translate-x-full');
+                main.classList.remove('ml-64');
+            }
+        });
+    }
+
     // Call all setup functions
     setupRangeSliders();
     setupMobileToggles();
@@ -347,6 +378,7 @@ function initializeWonegigTheme() {
     setupCardFormat();
     setupMonitoringType();
     setupCouponCode();
+    setupDashboardSidebarToggle();
 }
 
 // Use only livewire:navigated for both initial load and navigation

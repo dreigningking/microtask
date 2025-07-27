@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Livewire\Auth\ForgotPassword;
-use App\Livewire\Auth\ResetPassword;
-use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
-use Livewire\Livewire;
 use Tests\TestCase;
+use App\Models\User;
+use Livewire\Livewire;
+use App\Livewire\Auth\ResetPassword;
+use App\Livewire\Auth\ForgotPassword;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 class PasswordResetTest extends TestCase
 {

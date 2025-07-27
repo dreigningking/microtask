@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Ixudra\Curl\Facades\Curl;
 
+use App\Models\CountrySetting;
 use App\Http\Traits\GeoLocationTrait;
 
 class LocationMiddleware
@@ -20,9 +21,19 @@ class LocationMiddleware
         if(!cache('visitors') || cache('visitors') == null || cache('visitors') == [] || !in_array($ip,cache('visitors'))){
             $result = Curl::to("https://api.ipdata.co/".$ip."?api-key=".config('services.ipdata'))->asJsonResponse()->get();    
             if($result){
-                $this->saveLocation($ip,$result);
-                $visitors[] = $ip;
-                cache(['visitors'=> $visitors]);       
+                $country = $this->getCountry($result->country_code);
+                if ($country) {
+                    $hasSetting = CountrySetting::where('country_id', $country->id)->exists();
+                    if ($hasSetting) {
+                        $this->saveLocation($ip,$result);
+                        $visitors[] = $ip;
+                        cache(['visitors'=> $visitors]);
+                    } else {
+                        abort(503, 'Service unavailable in your country.');
+                    }
+                } else {
+                    abort(503, 'Service unavailable in your country.');
+                }
             }
         }
         return $next($request);

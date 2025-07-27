@@ -7,7 +7,7 @@
             <div class="col-sm-10 col-md-8 col-lg-6 mx-auto d-table h-100">
                 <div class="d-table-cell align-middle">
                     <div class="text-center my-4">
-                        <img src="{{ asset('frontend/images/logo1.png') }}" alt="Linda Miller" class="img-fluid rounded-circle" width="132" height="132" />
+                        <img src="{{ asset('frontend/images/logo2.png') }}" alt="Linda Miller" class="img-fluid rounded-circle" width="132" height="132" />
                     </div>  
 
                     <div class="card">

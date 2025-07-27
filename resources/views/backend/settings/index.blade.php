@@ -67,16 +67,16 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group mb-3">
-                                                <label for="taskmasterReviewTimeline">Taskmaster Review Timeline (hours)</label>
-                                                <input type="number" class="form-control" id="taskmasterReviewTimeline" name="taskmaster_review_timeline" min="1" value="{{ optional($settings->where('name','taskmaster_review_timeline')->first())->value ?? 24 }}">
+                                                <label for="submissionReviewDeadline">Submission Review Deadline (hours)</label>
+                                                <input type="number" class="form-control" id="submissionReviewDeadline" name="submission_review_deadline" min="1" value="{{ optional($settings->where('name','submission_review_deadline')->first())->value ?? 24 }}">
                                                 <small class="form-text text-muted">Number of hours a taskmaster has to review a submission before admin takes over.</small>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group form-switch m-3">
-                                                <input type="hidden" name="enable_2fa" value="0">
-                                                <input class="form-check-input" type="checkbox" id="enable2FA" name="enable_2fa" value="1" {{ optional($settings->where('name','enable_2fa')->first())->value == 1 ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="enable2FA">Enable Two-Factor Authentication (2FA)</label>
+                                                <input type="hidden" name="enforce_2fa" value="0">
+                                                <input class="form-check-input" type="checkbox" id="enforce2FA" name="enforce_2fa" value="1" {{ optional($settings->where('name','enforce_2fa')->first())->value == 1 ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="enforce2FA">Enforce Two-Factor Authentication (2FA) for all users</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -119,7 +119,7 @@
                                                 <td>{{ $role->name }}</td>
                                                 <td>
                                                     @foreach($role->permissions as $perm)
-                                                        <span class="badge badge-info">{{ $perm->name }}</span>
+                                                    <span class="badge badge-info">{{ $perm->name }}</span>
                                                     @endforeach
                                                 </td>
                                                 <td>
@@ -221,26 +221,26 @@
                         </div>
                         @endforeach
                     </div>
-                    
+
                     <!-- Email Notifications Tab -->
                     <div class="tab-pane fade" id="notifications" role="tabpanel">
                         <div class="card mb-4">
                             <div class="card-body">
                                 <form action="{{route('admin.settings.notifications.save')}}" method="post">@csrf
                                     @php
-                                        // Get saved settings for notifications
-                                        $emailNotifications = [];
-                                        $webNotifications = [];
-                                        if(isset($settings)) {
-                                            $emailSetting = $settings->where('name', 'email_notifications')->first();
-                                            $webSetting = $settings->where('name', 'web_notifications')->first();
-                                            if($emailSetting && $emailSetting->value) {
-                                                $emailNotifications = json_decode($emailSetting->value, true) ?? [];
-                                            }
-                                            if($webSetting && $webSetting->value) {
-                                                $webNotifications = json_decode($webSetting->value, true) ?? [];
-                                            }
-                                        }
+                                    // Get saved settings for notifications
+                                    $emailNotifications = [];
+                                    $webNotifications = [];
+                                    if(isset($settings)) {
+                                    $emailSetting = $settings->where('name', 'email_notifications')->first();
+                                    $webSetting = $settings->where('name', 'web_notifications')->first();
+                                    if($emailSetting && $emailSetting->value) {
+                                    $emailNotifications = json_decode($emailSetting->value, true) ?? [];
+                                    }
+                                    if($webSetting && $webSetting->value) {
+                                    $webNotifications = json_decode($webSetting->value, true) ?? [];
+                                    }
+                                    }
                                     @endphp
                                     <div class="row">
                                         <div class="col-md-6">
@@ -282,7 +282,7 @@
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-primary">Save Email Notification Settings</button>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -312,18 +312,18 @@
                                                 <td>
                                                     {{ $user->name }}
                                                     @if(isset($user->is_active) && !$user->is_active)
-                                                        <span class="badge badge-danger ml-1">Inactive</span>
+                                                    <span class="badge badge-danger ml-1">Inactive</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $user->email }}</td>
                                                 <td>{{ $user->first_role->name ?? '-' }}</td>
                                                 <td>
                                                     @if($user->first_role && $user->first_role->id == 1)
-                                                        Global
+                                                    Global
                                                     @elseif($user->country)
-                                                        {{ $user->country->name }}
+                                                    {{ $user->country->name }}
                                                     @else
-                                                        -
+                                                    -
                                                     @endif
                                                 </td>
                                                 <td>
@@ -367,7 +367,7 @@
                                                 <select class="form-control" id="addStaffRole" name="role_id" required>
                                                     <option value="">Select Role</option>
                                                     @foreach($roles as $role)
-                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -379,7 +379,7 @@
                                                 <label for="addStaffCountry">Country</label>
                                                 <select class="form-control" id="addStaffCountry" name="country_id">
                                                     @foreach($countries as $country)
-                                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -425,7 +425,7 @@
                                                 <select class="form-control" id="editStaffRole{{ $user->id }}" name="role_id" required>
                                                     <option value="">Select Role</option>
                                                     @foreach($roles as $role)
-                                                        <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                                    <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -436,9 +436,9 @@
                                             <div class="form-group">
                                                 <label for="editStaffCountry{{ $user->id }}">Country</label>
                                                 <select class="form-control" id="editStaffCountry{{ $user->id }}" name="country_id">
-                                                    
+
                                                     @foreach($countries as $country)
-                                                        <option value="{{ $country->id }}" {{ $user->country_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                    <option value="{{ $country->id }}" {{ $user->country_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

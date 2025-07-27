@@ -50,6 +50,11 @@ class NotifyUrgentTaskPromotion implements ShouldQueue
         // Step 7: intersection
         $notifyUserIds = array_values(array_intersect($userLocationIds, $platformUserIds));
         if (empty($notifyUserIds)) return;
+
+        // Step 7b: Limit to number_of_people
+        $limit = (int) ($task->number_of_people ?? 1);
+        $notifyUserIds = array_slice($notifyUserIds, 0, $limit);
+        
         // Step 8: notify
         $users = User::whereIn('id', $notifyUserIds)->get();
         Notification::send($users, new UrgentTaskPromotionNotification($task));

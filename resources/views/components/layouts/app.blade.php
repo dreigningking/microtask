@@ -1,140 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('frontend/images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('frontend/images/favicon.png') }}">
-    
-    <title>{{ $title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online' }}</title>
-    <meta name="title" content="{{$meta_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
-    <meta name="description" content="{{ $metaDescription ?? 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide'}}">
-    <meta name="keywords" content="{{ $meta_keywords ?? 'micro jobs, freelance, online work, earn money online, remote work, quick tasks, freelancing platform, work from home'}}">
-    <meta name="author" content="Wonegig">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $og_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
-    <meta property="og:description" content="{{ $og_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities. Join our community of freelancers and clients worldwide.'}}">
-    <meta property="og:image" content="{{$og_image ?? asset('frontend/images/og-image.png')}}">
-    <meta property="og:site_name" content="Wonegig">
-    <meta property="og:locale" content="en_US">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{$twitter_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
-    <meta property="twitter:description" content="{{$twitter_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities.'}}">
-    <meta property="twitter:image" content="{{ $twitter_image ?? asset('frontend/images/og-image.png')}}">
-    
-    <!-- Additional Meta Tags -->
-    <meta name="theme-color" content="#1e3a8a">
-    <meta name="msapplication-TileColor" content="#1e3a8a">
-    <meta name="application-name" content="Wonegig">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ url()->current() }}">
-    
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
-    <!-- Stylesheets -->
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-    <link rel="stylesheet" href="{{ asset('frontend/css/theme.css') }}">
-    
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <script>tailwind.config={theme:{extend:{colors:{primary:'#1e3a8a',secondary:'#3b82f6'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-    
-    @livewireStyles
-    @stack('styles')
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Wonegig Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{asset('frontend/vendors/feather/feather.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/css/vendor.bundle.base.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/font-awesome/css/font-awesome.min.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/mdi/css/materialdesignicons.min.css')}}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('frontend/js/select.dataTables.min.css')}}">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{asset('frontend/css/variables.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/dashboard-overrides.css')}}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{{asset('frontend/images/favicon1.png')}}" />
 </head>
-<body class="bg-gray-50">
-    <!-- Mobile Sidebar -->
-    @livewire('layouts.menu-mobile')
 
-    <!-- Header -->
-    @livewire('layouts.menu-desktop')
-
-    <!-- Main Content -->
-    {{ $slot }}
-
-    <!-- Footer -->
-    <footer class="bg-primary text-white mt-12">
-        <div class="container mx-auto px-4 py-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div>
-                    <a href="{{route('index')}}" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">
-                        <img src="{{asset('frontend/images/logo.png')}}" alt="" style="height:50px;">
-                    </a>
-                    <p class="text-gray-300 mb-4">Connect with thousands of micro-jobs you can start completing today. Register now to earn money from your skills.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
-                            <i class="ri-facebook-fill text-white"></i>
-                        </a>
-                        <a href="#" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
-                            <i class="ri-twitter-fill text-white"></i>
-                        </a>
-                        <a href="#" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
-                            <i class="ri-instagram-fill text-white"></i>
-                        </a>
-                        <a href="#" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
-                            <i class="ri-linkedin-fill text-white"></i>
-                        </a>
-                    </div>
-                </div>
+<body>
+    <div class="container-scroller">
+        
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
                 
-                <div class="grid grid-cols-2 gap-4 ">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                        <ul class="space-y-2">
-                            <li><a wire:navigate href="{{ route('index') }}" class="text-gray-300 hover:text-white">Home</a></li>
-                            
-                            <li><a href="{{ route('blog') }}" class="text-gray-300 hover:text-white">Our Blog</a></li>
-                            <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">About us</a></li>
-                            <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact us</a></li>
-                            <li><a wire:navigate href="{{ route('top_earners') }}" class="text-gray-300 hover:text-white">Top Earners</a></li>
-                        </ul>
-                    </div>
+                <a class="navbar-brand brand-logo me-5" href="{{route('index')}}">
+                    <img src="{{asset('frontend/images/logo2.png')}}" alt="Wonegig" style="height:50px;">
                     
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Resources</h3>
-                        <ul class="space-y-2">
-                            <li><a href="{{ route('legal.dcma') }}" class="text-gray-300 hover:text-white">DMCA</a></li>
-                            <li><a href="{{ route('legal.disclaimer') }}" class="text-gray-300 hover:text-white">Disclaimer</a></li>
-                            <li><a href="{{ route('legal.privacy-policy') }}" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
-                            <li><a href="{{ route('legal.terms-conditions') }}" class="text-gray-300 hover:text-white">Terms & Conditions</a></li>
-                            <li><a href="{{ route('legal.payment-chargeback') }}" class="text-gray-300 hover:text-white">Payment & Chargebacks</a></li>
-                        </ul>
+                </a>
+                <a class="navbar-brand brand-logo-mini" href="{{route('index')}}">
+                    <img src="{{asset('frontend/images/favicon1.png')}}" alt="logo" />
+                </a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+                <ul class="navbar-nav mr-lg-2">
+                    <li class="nav-item nav-search d-none d-lg-block border rounded">
+                        <div class="input-group">
+                            <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                                <span class="input-group-text" id="search">
+                                    <i class="icon-search"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
+                        </div>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="btn btn-outline-primary" href="#">Post Job</a>
+                    </li> -->
+                </ul>
+                <ul class="navbar-nav navbar-nav-right">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
+                            <i class="icon-bell mx-0"></i>
+                            <span class="count"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center">
+                                <p class="mb-0 font-weight-normal float-left">Notifications</p>
+                                <a href="{{ route('notifications') }}" class="btn btn-outline-primary btn-sm float-right">View All</a>
+                            </div>
+                            <a class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-success">
+                                        <i class="ti-info-alt mx-0"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <h6 class="preview-subject font-weight-normal">Application Error</h6>
+                                    <p class="font-weight-light small-text mb-0 text-muted"> Just now </p>
+                                </div>
+                            </a>
+                            <a class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-warning">
+                                        <i class="ti-settings mx-0"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <h6 class="preview-subject font-weight-normal">Settings</h6>
+                                    <p class="font-weight-light small-text mb-0 text-muted"> Private message </p>
+                                </div>
+                            </a>
+                            <a class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-info">
+                                        <i class="ti-user mx-0"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <h6 class="preview-subject font-weight-normal">New user registration</h6>
+                                    <p class="font-weight-light small-text mb-0 text-muted"> 2 days ago </p>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
+                            <img src="{{asset('frontend/images/faces/face28.jpg')}}" alt="profile" />
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            <a class="dropdown-item" href="{{ route('profile') }}">
+                                <i class="ti-settings text-primary"></i> Profile </a>
+                            <a class="dropdown-item" href="{{ route('subscriptions') }}">
+                                <i class="ti-settings text-primary"></i> Subscription </a>
+                            <a href="#" class="dropdown-item" wire:click.prevent="logout">
+                                <i class="ti-power-off text-primary"></i> Logout </a>
+                        </div>
+                    </li>
+                    <li class="nav-item nav-settings d-none d-lg-flex">
+                        <a class="nav-link" href="#">
+                            <i class="icon-ellipsis"></i>
+                        </a>
+                    </li>
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_sidebar.html -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar" style="background-color: var(--dark-purple);">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
+                            <i class="icon-grid menu-icon"></i>
+                            <span class="menu-title">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+                            <i class="icon-columns menu-icon"></i>
+                            <span class="menu-title">Jobs</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="auth">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.create')}}"> New Job </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Ongoing Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Completed Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Drafts </a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
+                            <i class="icon-layout menu-icon"></i>
+                            <span class="menu-title">Tasks</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="error">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href=""> Saved Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Ongoing Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Submitted Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Completed Tasks </a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('earnings') }}">
+                            <i class="icon-bar-graph menu-icon"></i>
+                            <span class="menu-title">Earnings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('payments') }}">
+                            <i class="icon-paper menu-icon"></i>
+                            <span class="menu-title">Transactions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('invitees') }}">
+                            <i class="icon-head menu-icon"></i>
+                            <span class="menu-title">Invites</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('support') }}">
+                            <i class="mdi mdi-comment-account-outline menu-icon fs-5"></i>
+                            <span class="menu-title">Support</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+            <!-- partial -->
+            <div class="main-panel">
+                {{ $slot }}
+                <!-- content-wrapper ends -->
+                <!-- partial:partials/_footer.html -->
+                <footer class="footer">
+                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2023. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
+                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ms-1"></i></span>
                     </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Subscribe</h3>
-                    <p class="text-gray-300 mb-4">Get the latest jobs and updates delivered to your inbox.</p>
-                    <form class="flex flex-col space-y-2">
-                        <input type="email" placeholder="Your email address" class="px-4 py-2 rounded-button text-gray-800 border-none focus:outline-none focus:ring-2 focus:ring-white">
-                        <button type="submit" class="bg-white text-primary px-4 py-2 rounded-button hover:bg-gray-100 whitespace-nowrap">Subscribe</button>
-                    </form>
-                </div>
+                </footer>
+                <!-- partial -->
             </div>
-            
-            <div class="border-t border-white/20 mt-8 pt-8 flex justify-center items-center">
-                <p class="text-gray-300 text-sm">© 2025 Copyright. All rights reserved.</p>
-            </div>
+            <!-- main-panel ends -->
         </div>
-    </footer>
-    @livewireScripts
-    
-    <script src="{{ asset('frontend/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('frontend/js/theme.js') }}"></script>
-    @stack('scripts')
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{{asset('frontend/vendors/js/vendor.bundle.base.js')}}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="{{asset('frontend/vendors/chart.js/chart.umd.js')}}"></script>
+    <script src="{{asset('frontend/vendors/datatables.net/jquery.dataTables.js')}}"></script>
+    <script src="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.js')}}"></script>
+    <script src="{{asset('frontend/js/dataTables.select.min.js')}}"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="{{asset('frontend/js/off-canvas.js')}}"></script>
+    <script src="{{asset('frontend/js/template.js')}}"></script>
+    <script src="{{asset('frontend/js/settings.js')}}"></script>
+    <script src="{{asset('frontend/js/todolist.js')}}"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="{{asset('frontend/js/jquery.cookie.js')}}" type="text/javascript"></script>
+    <script src="{{asset('frontend/js/dashboard.js')}}"></script>
+    <!-- <script src="{{asset('frontend/js/Chart.roundedBarCharts.js')}}"></script> -->
+    <!-- End custom js for this page-->
 </body>
+
 </html>

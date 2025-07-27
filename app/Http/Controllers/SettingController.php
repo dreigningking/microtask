@@ -42,10 +42,10 @@ class SettingController extends Controller
             'freeze_wallets_globally' => 'boolean',
             'allow_wallet_funds_exchange' => 'boolean',
             'job_invite_expiry' => 'integer|min:1',
-            'enable_2fa' => 'boolean',
+            'enforce_2fa' => 'boolean',
             'allow_public_profile' => 'boolean',
             'free_user_task_limit' => 'integer|min:1',
-            'taskmaster_review_timeline' => 'integer|min:1',
+            'submission_review_deadline' => 'integer|min:1',
         ];
         $data = $request->validate($fields);
         foreach ($fields as $name => $type) {

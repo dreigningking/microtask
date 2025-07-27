@@ -50,12 +50,12 @@ class PaymentController extends Controller
         foreach($payment->order->items as $item){           
             if($item->orderable_type == 'App\Models\Task'){
                 //send emails to all those subscribed
-                $redirectTo = route('my_jobs.view',$item->orderable);
+                $redirectTo = route('jobs.view',$item->orderable);
             }
             if($item->orderable_type == 'App\Models\TaskPromotion'){
                 $item->orderable->start_at = now();
                 $item->orderable->save();
-                $redirectTo = route('my_jobs.view',$item->orderable->task);
+                $redirectTo = route('jobs.view',$item->orderable->task);
             }
             if($item->orderable_type == 'App\Models\Subscription'){
                 $subscription = $item->orderable;

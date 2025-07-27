@@ -36,6 +36,10 @@ class Task extends Model
             ]
         ];
     }
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -63,6 +67,16 @@ class Task extends Model
 
     public function settlements(){
         return $this->hasMany(Settlement::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(TaskReport::class);
+    }
+
+    public function hiddenByUsers()
+    {
+        return $this->belongsToMany(User::class, 'task_hidden');
     }
 
     public function scopeCompleted($query)
@@ -124,19 +138,11 @@ class Task extends Model
      */
     public function getCanBeEditedAttribute()
     {
-        $orderItem = $this->orderItem; // hasOne or first() if hasMany
+        $orderItem = $this->orderItem;
         $order = $orderItem ? $orderItem->order : null;
         $payment = $order ? $order->payment : null;
         $isPaid = $payment && $payment->status === 'success';
-        $hasWorkers = $this->workers()->count() > 0;
 
-        if (!$isPaid) {
-            return 'all';
-        } elseif ($isPaid && !$hasWorkers) {
-            return 'some';
-        } elseif ($isPaid && $hasWorkers) {
-            return 'none';
-        }
-        return 'all'; // Default fallback
+        return !$isPaid;
     }
 }
