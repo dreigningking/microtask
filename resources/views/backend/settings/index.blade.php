@@ -86,8 +86,23 @@
                                                 <small class="form-text text-muted">Number of tasks a free user can do within an hour.</small>
                                             </div>
                                         </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group mb-3">
+                                                <label for="freeUserTaskLimit">Blog Categories</label>
+                                                <select name="blog_categories[]" class="form-control select2" data-tags="true" data-placeholder="Add or Remove Categories" multiple>
+                                                    @if($settings->where('name','blog_categories')->first())
+                                                        @foreach(json_decode($settings->where('name','blog_categories')->first()->value) as $category)
+                                                            <option value="{{ $category }}" selected>{{ $category }}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <small class="form-text text-muted">Select the categories that will be displayed in the blog.</small>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="row mt-3">
+
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-primary w-100">Save Core Settings</button>
                                         </div>
@@ -464,3 +479,11 @@
     </div>
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
+@endpush

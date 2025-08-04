@@ -6,6 +6,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EarningController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
@@ -80,6 +81,22 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
             Route::post('reject', [BlogController::class, 'rejectComment'])->name('reject');
             Route::post('spam', [BlogController::class, 'markCommentAsSpam'])->name('spam');
             Route::post('delete', [BlogController::class, 'deleteComment'])->name('delete');
+        });
+    });
+
+    Route::group(['prefix' => 'support','as' => 'support.','middleware' => ['permission:support_management']], function () {
+        Route::group(['prefix' => 'tickets','as' => 'tickets.'], function () {
+            Route::get('/', [TicketController::class, 'index'])->name('index');
+            Route::get('view/{ticket}', [TicketController::class, 'show'])->name('show');
+            Route::get('pending', [TicketController::class, 'pending'])->name('pending');
+            Route::get('open', [TicketController::class, 'open'])->name('open');
+            Route::get('closed', [TicketController::class, 'closed'])->name('closed');
+        });
+        Route::group(['prefix' => 'disputes','as' => 'disputes.'], function () {
+            Route::get('/', [TicketController::class, 'disputes'])->name('index');
+            Route::get('pending', [TicketController::class, 'disputes_pending'])->name('pending');
+            Route::get('open', [TicketController::class, 'disputes_open'])->name('open');
+            Route::get('closed', [TicketController::class, 'disputes_closed'])->name('closed');
         });
     });
 

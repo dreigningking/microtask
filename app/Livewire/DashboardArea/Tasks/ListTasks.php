@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\TaskWorker;
 use App\Models\Task;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Auth;
 
 
 class ListTasks extends Component
@@ -25,7 +26,25 @@ class ListTasks extends Component
 
     public function mount()
     {
-        // Any initial setup if needed
+        // Set status based on the current route
+        $routeName = request()->route()->getName();
+        switch ($routeName) {
+            case 'tasks.ongoing':
+                $this->status = 'accepted';
+                break;
+            case 'tasks.completed':
+                $this->status = 'completed';
+                break;
+            case 'tasks.submitted':
+                $this->status = 'submitted';
+                break;
+            case 'tasks.saved':
+                $this->status = 'saved';
+                break;
+            default:
+                $this->status = 'all';
+                break;
+        }
     }
 
     public function updatedSearch()
@@ -55,7 +74,7 @@ class ListTasks extends Component
 
     public function getTasksQuery()
     {
-        $query = TaskWorker::where('user_id', auth()->id())
+        $query = TaskWorker::where('user_id', Auth::id())
                            ->with(['task.user.country', 'task.platform', 'task.template']);
 
         if ($this->search) {
@@ -110,12 +129,12 @@ class ListTasks extends Component
         $tasks = $this->getTasksQuery()->paginate(10);
 
         // Get stats
-        $totalTasks = TaskWorker::where('user_id', auth()->id())->count();
-        $acceptedTasks = TaskWorker::where('user_id', auth()->id())->whereNotNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $savedTasks = TaskWorker::where('user_id', auth()->id())->whereNotNull('saved_at')->whereNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $submittedTasks = TaskWorker::where('user_id', auth()->id())->whereNotNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $completedTasks = TaskWorker::where('user_id', auth()->id())->whereNotNull('completed_at')->count();
-        $cancelledTasks = TaskWorker::where('user_id', auth()->id())->whereNotNull('cancelled_at')->count();
+        $totalTasks = TaskWorker::where('user_id', Auth::id())->count();
+        $acceptedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
+        $savedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('saved_at')->whereNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
+        $submittedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
+        $completedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('completed_at')->count();
+        $cancelledTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('cancelled_at')->count();
 
         $stats = [
             'total' => $totalTasks,

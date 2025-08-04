@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\TaskWorker;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Auth;
 
 
 class ListJobs extends Component
@@ -27,12 +28,29 @@ class ListJobs extends Component
 
     public function mount()
     {
+        // Set status based on the current route
+        $routeName = request()->route()->getName();
+        switch ($routeName) {
+            case 'jobs.ongoing':
+                $this->status = 'in_progress';
+                break;
+            case 'jobs.completed':
+                $this->status = 'completed';
+                break;
+            case 'jobs.drafts':
+                $this->status = 'drafts';
+                break;
+            default:
+                $this->status = 'all';
+                break;
+        }
+        
         $this->loadStats();
     }
 
     public function loadStats()
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         
         // Get all tasks for the user
         $tasks = Task::where('user_id', $userId)->get();
@@ -44,11 +62,12 @@ class ListJobs extends Component
             $query->where('is_active',true);
         })->where('completed_at',null)->whereNotNull('accepted_at')->distinct('task_id')->count();
         
-        // Calculate in progress and completed tasks
+        // Calculate completed tasks
+        $this->stats['completed'] = 0;
         foreach ($tasks as $task) {
             $workerCount = TaskWorker::where('task_id', $task->id)->count();
             
-            if ($workerCount >= $task->number_of_people) {
+            if ($workerCount >= $task->number_of_people && $task->is_active) {
                 $this->stats['completed']++;
             }
             
@@ -62,7 +81,7 @@ class ListJobs extends Component
 
     public function getJobsQuery()
     {
-        $query = Task::where('user_id', auth()->id())
+        $query = Task::where('user_id', Auth::id())
             ->when($this->search, function($q) {
                 $q->where('title', 'like', '%' . $this->search . '%');
             })
@@ -79,11 +98,7 @@ class ListJobs extends Component
                         break;
                     case 'completed':
                         $q->where('is_active', true)
-                          ->whereHas('workers', function($q) {
-                              $q->whereNotNull('completed_at')
-                                ->groupBy('task_id')
-                                ->havingRaw('COUNT(*) >= tasks.number_of_people');
-                          });
+                          ->whereRaw('(SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id) >= tasks.number_of_people');
                         break;
                     case 'drafts':
                         $q->where('is_active', false);

@@ -16,6 +16,34 @@
             </nav>
         </div>
 
+        @php
+            // Calculate monitoring status
+            
+            $submissions = $task->submissions ?? collect();
+            $needsAdminReview = 0;
+            $escalatedSubmissions = 0;
+            $adminReviewFee = 0;
+            
+            if ($task->monitoring_type === 'admin_monitoring') {
+                // All submissions need admin review
+                $needsAdminReview = $submissions->where('reviewed_at', null)->count();
+                $adminReviewFee = $submissions->count() * ($task->country->admin_monitoring_cost ?? 10);
+            } elseif ($task->monitoring_type === 'self_monitoring') {
+                // Only escalated submissions need admin review
+                $deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
+                $escalatedSubmissions = $submissions->filter(function($submission) use ($deadlineHours) {
+                    if ($submission->reviewed_at) return false;
+                    $expectedReviewTime = $submission->created_at->addHours($deadlineHours);
+                    return now()->isAfter($expectedReviewTime);
+                })->count();
+                $needsAdminReview = $escalatedSubmissions;
+                $adminReviewFee = $escalatedSubmissions * ($task->country->admin_monitoring_cost ?? 10);
+            }
+            
+            $totalPaidFee = $task->admin_monitoring_fee ?? 0;
+            $refundAmount = $totalPaidFee - $adminReviewFee;
+        @endphp
+
         <!-- Task Status Card -->
         <div class="row mb-4">
             <div class="col-md-12">

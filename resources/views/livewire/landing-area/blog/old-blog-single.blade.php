@@ -90,7 +90,7 @@
         <div class="container mx-auto px-4 max-w-3xl">
             <h3 class="text-xl font-bold text-primary mb-6">Comments ({{ $post->comments_count }})</h3>
             
-            @livewire('blog.blog-comments', ['post' => $post])
+            @livewire('dashboard-area.blog.blog-comments', ['post' => $post])
         </div>
     </section>
     @endif

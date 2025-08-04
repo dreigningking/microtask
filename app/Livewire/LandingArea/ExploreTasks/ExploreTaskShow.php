@@ -9,7 +9,7 @@ use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 
-#[Layout('components.layouts.landing-layout')]
+#[Layout('components.layouts.landing')]
 class ExploreTaskShow extends Component
 {
     use GeoLocationTrait;

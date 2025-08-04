@@ -27,14 +27,13 @@
 
 <body>
     <div class="container-scroller">
-        
+
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-                
+
                 <a class="navbar-brand brand-logo me-5" href="{{route('index')}}">
                     <img src="{{asset('frontend/images/logo2.png')}}" alt="Wonegig" style="height:50px;">
-                    
                 </a>
                 <a class="navbar-brand brand-logo-mini" href="{{route('index')}}">
                     <img src="{{asset('frontend/images/favicon1.png')}}" alt="logo" />
@@ -114,7 +113,7 @@
                                 <i class="ti-settings text-primary"></i> Profile </a>
                             <a class="dropdown-item" href="{{ route('subscriptions') }}">
                                 <i class="ti-settings text-primary"></i> Subscription </a>
-                            <a href="#" class="dropdown-item" wire:click.prevent="logout">
+                            <a href="{{ route('logout') }}" class="dropdown-item" wire:click.prevent="logout">
                                 <i class="ti-power-off text-primary"></i> Logout </a>
                         </div>
                     </li>
@@ -140,9 +139,9 @@
                             <span class="menu-title">Dashboard</span>
                         </a>
                     </li>
-                    
-                    
-                    
+
+
+
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                             <i class="icon-columns menu-icon"></i>
@@ -152,9 +151,9 @@
                         <div class="collapse" id="auth">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item"> <a class="nav-link" href="{{route('jobs.create')}}"> New Job </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Ongoing Jobs </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Completed Jobs </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.index')}}"> Drafts </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.ongoing')}}"> Ongoing Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.completed')}}"> Completed Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.drafts')}}"> Drafts </a></li>
                             </ul>
                         </div>
                     </li>
@@ -166,21 +165,30 @@
                         </a>
                         <div class="collapse" id="error">
                             <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"> <a class="nav-link" href=""> Saved Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Ongoing Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Submitted Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> Completed Tasks </a></li>
-                            </ul>
-                        </div>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.ongoing') }}"> Ongoing Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.completed') }}"> Completed Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.submitted') }}"> Submitted Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.saved') }}"> Saved Tasks </a></li>
+                    </ul>
+                </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('earnings') }}">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#earnings" aria-expanded="false" aria-controls="earnings">
                             <i class="icon-bar-graph menu-icon"></i>
                             <span class="menu-title">Earnings</span>
+                            <i class="menu-arrow"></i>
                         </a>
+                        <div class="collapse" id="earnings">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.settlements') }}"> Settlements </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.withdrawals') }}"> Withdrawals </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.exchanges') }}"> Exchanges </a></li>
+                    </ul>
+                </div>
                     </li>
+                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('payments') }}">
+                        <a class="nav-link" href="{{ route('transactions') }}">
                             <i class="icon-paper menu-icon"></i>
                             <span class="menu-title">Transactions</span>
                         </a>
@@ -197,7 +205,7 @@
                             <span class="menu-title">Support</span>
                         </a>
                     </li>
-                    
+
                 </ul>
             </nav>
             <!-- partial -->
@@ -209,7 +217,7 @@
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2023. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
                         <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ms-1"></i></span>
-                    </div>
+                </div>
                 </footer>
                 <!-- partial -->
             </div>

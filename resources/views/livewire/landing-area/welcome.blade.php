@@ -122,7 +122,7 @@
             <div class="row">
                 @foreach($tasks as $task)
                     <div class="col-lg-6">
-                        @livewire('tasks.single-task-grid', ['task' => $task])
+                        @livewire('dashboard-area.tasks.single-task-grid', ['task' => $task])
                 </div>
                 @endforeach
                 <!-- Job 1 --> 

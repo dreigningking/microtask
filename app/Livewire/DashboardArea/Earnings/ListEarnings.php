@@ -76,6 +76,21 @@ class ListEarnings extends Component
 
     public function mount()
     {
+        // Set active tab based on the current route
+        $routeName = request()->route()->getName();
+        switch ($routeName) {
+            case 'earnings.withdrawals':
+                $this->activeTab = 'withdrawals';
+                break;
+            case 'earnings.exchanges':
+                $this->activeTab = 'exchanges';
+                break;
+            case 'earnings.settlements':
+            default:
+                $this->activeTab = 'settlements';
+                break;
+        }
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $this->toCurrency = $user->country->currency;

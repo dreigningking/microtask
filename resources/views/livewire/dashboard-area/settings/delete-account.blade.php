@@ -1,35 +1,71 @@
 <div>
-    {{-- To attain knowledge, add things every day; To attain wisdom, subtract things every day. --}}
-    <button wire:click="confirmDeletion" class="inline-flex items-center justify-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:border-red-700 focus:ring ring-red-300 disabled:opacity-25 transition ease-in-out duration-150">
-        Delete Account
-    </button>
+    <div class="alert alert-danger" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="ri-error-warning-line me-2"></i>
+            <div>
+                <h6 class="alert-heading mb-1">Danger Zone</h6>
+                <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h6 class="card-title mb-0">
+                <i class="ri-delete-bin-line me-2"></i>Delete Account
+            </h6>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">
+                Permanently delete your account and all of its data. This action cannot be undone.
+            </p>
+            
+            <button wire:click="confirmDeletion" class="btn btn-danger">
+                <i class="ri-delete-bin-line me-1"></i>Delete Account
+            </button>
+        </div>
+    </div>
 
     @if($confirming)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                <h2 class="text-lg font-medium text-gray-900">
-                    Are you sure you want to delete your account?
-                </h2>
+        <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title text-danger">
+                            <i class="ri-error-warning-line me-2"></i>Confirm Account Deletion
+                        </h5>
+                        <button type="button" class="btn-close" wire:click="$set('confirming', false)"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="ri-alert-line me-2"></i>
+                            <strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.
+                        </div>
+                        
+                        <p class="mb-3">
+                            Please enter your password to confirm you would like to permanently delete your account.
+                        </p>
 
-                <p class="mt-2 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.
-                </p>
-
-                <div class="mt-4">
-                    <input wire:model.defer="password" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="Password">
-                    @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="mt-6 flex justify-end">
-                    <button wire:click="$set('confirming', false)" class="mr-4 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring ring-blue-200 disabled:opacity-25 transition ease-in-out duration-150">
-                        Cancel
-                    </button>
-
-                    <button wire:click="deleteAccount" class="inline-flex items-center justify-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:border-red-700 focus:ring ring-red-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        Delete Account
-                    </button>
+                        <div class="mb-3">
+                            <label for="delete_password" class="form-label">Password</label>
+                            <input wire:model.defer="password" type="password" 
+                                   id="delete_password" 
+                                   class="form-control" 
+                                   placeholder="Enter your password">
+                            @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="$set('confirming', false)">
+                            <i class="ri-close-line me-1"></i>Cancel
+                        </button>
+                        <button type="button" class="btn btn-danger" wire:click="deleteAccount">
+                            <i class="ri-delete-bin-line me-1"></i>Delete Account
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="modal-backdrop fade show"></div>
     @endif
 </div>

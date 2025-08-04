@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Tasks;
+namespace App\Livewire\DashboardArea\Tasks;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -124,7 +124,7 @@ class SavedTasks extends Component
             'cancelled' => $cancelledTasks,
         ];
 
-        return view('livewire.tasks.list-tasks', [
+        return view('livewire.dashboard-area.tasks.list-tasks', [
             'tasks' => $tasks,
             'stats' => $stats,
         ]);

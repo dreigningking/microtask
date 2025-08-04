@@ -3,6 +3,7 @@
 use App\Livewire\LandingArea\Welcome;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\LandingArea\AboutPage;
+use App\Http\Controllers\HomeController;
 use App\Livewire\LandingArea\TopEarners;
 use App\Livewire\DashboardArea\Dashboard;
 use App\Livewire\LandingArea\ContactPage;
@@ -23,7 +24,6 @@ use App\Livewire\DashboardArea\Settings\Profile;
 use App\Livewire\LandingArea\Policies\Disclaimer;
 use App\Livewire\LandingArea\Policies\PrivacyPolicy;
 use App\Livewire\DashboardArea\Earnings\ListEarnings;
-use App\Livewire\DashboardArea\Payments\UserPayments;
 use App\Livewire\DashboardArea\Referrals\InviteesList;
 use App\Livewire\LandingArea\Policies\DigitalMillenium;
 use App\Livewire\LandingArea\Policies\TermsAndConditions;
@@ -58,6 +58,9 @@ Route::group(['middleware' => 'auth'], function () {
         /* Task Master */
         Route::group(['prefix' => 'jobs','as'=>'jobs.'], function () {
             Route::get('/', ListJobs::class)->name('index');
+            Route::get('ongoing', ListJobs::class)->name('ongoing');
+            Route::get('completed', ListJobs::class)->name('completed');
+            Route::get('drafts', ListJobs::class)->name('drafts');
             Route::get('view/{task}', ViewJob::class)->name('view');
             Route::get('create', PostJob::class)->name('create');
             Route::get('edit/{task}', EditJob::class)->name('edit');
@@ -66,20 +69,29 @@ Route::group(['middleware' => 'auth'], function () {
         /* Task Worker */
         Route::group(['prefix' => 'tasks','as'=>'tasks.'], function () {
             Route::get('/', ListTasks::class)->name('index');
+            Route::get('ongoing', ListTasks::class)->name('ongoing');
+            Route::get('completed', ListTasks::class)->name('completed');
+            Route::get('submitted', ListTasks::class)->name('submitted');
+            Route::get('saved', ListTasks::class)->name('saved');
             Route::get('view/{task}', ViewTask::class)->name('view');
         });
+        /* Earnings */
+        Route::group(['prefix' => 'earnings','as'=>'earnings.'], function () {
+            Route::get('settlements', ListEarnings::class)->name('settlements');
+            Route::get('withdrawals', ListEarnings::class)->name('withdrawals');
+            Route::get('exchanges', ListEarnings::class)->name('exchanges');
+        });
 
-        Route::get('earnings', ListEarnings::class)->name('earnings');
 
         /* General */
         Route::get('notifications', ListNotifications::class)->name('notifications');
         Route::get('dashboard', Dashboard::class)->name('dashboard');
         Route::get('profile', Profile::class)->name('profile');
         Route::get('invitees',InviteesList::class)->name('invitees');
-        Route::get('payments',UserPayments::class)->name('payments');
+        Route::get('transactions', Transactions::class)->name('transactions');
         Route::get('payment/callback',[PaymentController::class,'paymentcallback'])->name('payment.callback');
         Route::get('subscriptions', Subscriptions::class)->name('subscriptions');
-        Route::get('transactions', Transactions::class)->name('transactions');
+        
         Route::get('support', Tickets::class)->name('support');
     });
 });
@@ -88,4 +100,4 @@ Route::group(['middleware' => 'auth'], function () {
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');

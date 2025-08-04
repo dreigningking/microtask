@@ -83,7 +83,7 @@
                         </div>
                         
                         <!-- Template Fields Component -->
-                @livewire('jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
+                @livewire('dashboard-area.jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
                     </div>
                 </div>
 

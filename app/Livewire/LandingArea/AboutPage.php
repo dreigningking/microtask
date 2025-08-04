@@ -5,7 +5,7 @@ namespace App\Livewire\LandingArea;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing-layout')]
+#[Layout('components.layouts.landing')]
 class AboutPage extends Component
 {
     public string $title = 'About Us | Wonegig';

@@ -36,7 +36,7 @@ class ViewTask extends Component
     public function mount($task)
     {
         $this->task = $task->load(['user.country', 'platform', 'template', 'workers']);
-        $this->taskWorker = $this->task->workers->firstWhere('user_id', auth()->id());
+        $this->taskWorker = $this->task->workers->firstWhere('user_id', Auth::id());
         
         // Initialize submission fields if they exist in the template
         if ($this->task->template && $this->task->template->submission_fields) {
@@ -132,7 +132,7 @@ class ViewTask extends Component
 
         foreach ($existingUsers as $user) {
             Referral::create([
-                'referrer_id' => auth()->id(),
+                'referrer_id' => Auth::id(),
                 'email' => $user->email,
                 'task_id' => $this->task->id,
                 'status' => 'invited',
@@ -144,7 +144,7 @@ class ViewTask extends Component
 
         foreach ($toInvite as $email) {
             Referral::create([
-                'referrer_id' => auth()->id(),
+                'referrer_id' => Auth::id(),
                 'email' => $email,
                 'task_id' => $this->task->id,
                 'status' => 'invited',
@@ -234,7 +234,7 @@ class ViewTask extends Component
 
     public function render()
     {
-        return view('livewire.tasks.view-task', [
+        return view('livewire.dashboard-area.tasks.view-task', [
             'existingSubmissions' => $this->taskWorker ? $this->taskWorker->submissions : [],
         ]);
     }

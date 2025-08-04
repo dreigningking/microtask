@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Tasks;
+namespace App\Livewire\DashboardArea\Tasks;
 
 use App\Models\Task;
 use App\Models\TaskReport;
@@ -69,6 +69,6 @@ class ReportTask extends Component
 
     public function render()
     {
-        return view('livewire.tasks.report-task');
+        return view('livewire.dashboard-area.tasks.report-task');
     }
 } 

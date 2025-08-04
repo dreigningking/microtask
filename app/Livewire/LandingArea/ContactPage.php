@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing-layout')]
+#[Layout('components.layouts.landing')]
 class ContactPage extends Component
 {
     public string $pageTitle = 'Contact Us | Wonegig';

@@ -1,29 +1,33 @@
-<div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Identity & Address Verification</h3>
+<div>
+<h5 class="mb-4">Identity & Address Verification</h5>
 
-    @if (session('status') === 'verification-submitted')
-        <div class="mb-4 text-sm text-green-600 dark:text-green-400 p-4 bg-green-50 dark:bg-green-900/50 rounded-md border border-green-200 dark:border-green-700">
-            Verification document submitted successfully. It is now pending review.
+@if (session('status') === 'verification-submitted')
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="ri-check-line me-2"></i>Verification document submitted successfully. It is now pending review.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@forelse($verificationRequirements as $category => $req)
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="card-title mb-0">{{ $category }}</h6>
         </div>
-    @endif
-
-    @forelse($verificationRequirements as $category => $req)
-        <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ $category }}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        <div class="card-body">
+            <p class="text-muted mb-4">
                 You are required to submit {{ $req['mode'] === 'all' ? 'all of the following' : 'at least one of the following' }} documents.
             </p>
 
-            <div class="space-y-4">
+            <div class="row g-3">
                 @foreach($req['docs'] as $docName)
                     @php
                         $verification = $userVerifications[$docName] ?? null;
                         $status = $verification->status ?? 'not_submitted';
                         $statusClasses = [
-                            'not_submitted' => 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600',
-                            'pending' => 'bg-yellow-50 dark:bg-yellow-900/50 border-yellow-400 dark:border-yellow-600',
-                            'approved' => 'bg-green-50 dark:bg-green-900/50 border-green-500 dark:border-green-600',
-                            'rejected' => 'bg-red-50 dark:bg-red-900/50 border-red-400 dark:border-red-600',
+                            'not_submitted' => 'border-secondary',
+                            'pending' => 'border-warning',
+                            'approved' => 'border-success',
+                            'rejected' => 'border-danger',
                         ];
                         $statusText = [
                             'not_submitted' => 'Not Submitted',
@@ -31,75 +35,99 @@
                             'approved' => 'Approved',
                             'rejected' => 'Rejected',
                         ];
+                        $statusBadgeClasses = [
+                            'not_submitted' => 'bg-secondary',
+                            'pending' => 'bg-warning',
+                            'approved' => 'bg-success',
+                            'rejected' => 'bg-danger',
+                        ];
                     @endphp
-                    <div class="border-l-4 p-4 {{ $statusClasses[$status] }}">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-<div>
-                                <h5 class="font-medium text-gray-800 dark:text-white">
-                                    {{ \Illuminate\Support\Str::title(str_replace('_', ' ', $docName)) }}
-                                    <span class="text-xs text-gray-500 ml-2">({{ $documentType = array_search($docName, $req['docs']) !== false ? $category : '' }})</span>
-                                </h5>
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full {{ ['approved' => 'text-green-600 bg-green-200 dark:bg-green-700 dark:text-green-200', 'pending' => 'text-yellow-600 bg-yellow-200 dark:bg-yellow-700 dark:text-yellow-200', 'rejected' => 'text-red-600 bg-red-200 dark:bg-red-700 dark:text-red-200', 'not_submitted' => 'text-gray-600 bg-gray-200 dark:bg-gray-600 dark:text-gray-300'][$status] }}">
-                                    {{ $statusText[$status] }}
-                                </span>
-                            </div>
-                            @if($status !== 'approved')
-                                <div class="mt-4 md:mt-0">
-                                    <form wire:submit.prevent="saveVerification('{{ $docName }}')">
-                                        <div class="flex items-center space-x-2">
-                                            <input type="file" wire:model="uploads.{{ $docName }}" id="{{ $docName }}_upload" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 dark:file:bg-primary/20 dark:file:text-white dark:hover:file:bg-primary/30"/>
-                                            <button type="submit" class="px-3 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/90" wire:loading.attr="disabled" wire:target="uploads.{{ $docName }}">
-                                                <span wire:loading.remove wire:target="uploads.{{ $docName }}">Submit</span>
-                                                <span wire:loading wire:target="uploads.{{ $docName }}">Uploading...</span>
-                                            </button>
+                    <div class="col-12">
+                        <div class="card {{ $statusClasses[$status] }} border-start border-4">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h6 class="card-title mb-1">
+                                            {{ \Illuminate\Support\Str::title(str_replace('_', ' ', $docName)) }}
+                                            <small class="text-muted">({{ $category }})</small>
+                                        </h6>
+                                        <span class="badge {{ $statusBadgeClasses[$status] }}">
+                                            {{ $statusText[$status] }}
+                                        </span>
+                                    </div>
+                                    @if($status !== 'approved')
+                                        <div class="col-md-6">
+                                            <form wire:submit.prevent="saveVerification('{{ $docName }}')">
+                                                <div class="d-flex gap-2">
+                                                    <input type="file" wire:model="uploads.{{ $docName }}" 
+                                                           id="{{ $docName }}_upload" 
+                                                           class="form-control form-control-sm">
+                                                    <button type="submit" class="btn btn-primary btn-sm" 
+                                                            wire:loading.attr="disabled" 
+                                                            wire:target="uploads.{{ $docName }}">
+                                                        <span wire:loading.remove wire:target="uploads.{{ $docName }}">
+                                                            <i class="ri-upload-line me-1"></i>Submit
+                                                        </span>
+                                                        <span wire:loading wire:target="uploads.{{ $docName }}">
+                                                            <i class="ri-loader-4-line me-1"></i>Uploading...
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Accepted file types: JPG, PNG, PDF. Max size: 2MB.</small>
+                                                @error('uploads.' . $docName) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                            </form>
                                         </div>
-                                        <p class="text-xs text-gray-500 mt-1 dark:text-gray-400">Accepted file types: JPG, PNG, PDF. Max size: 2MB.</p>
-                                        @error('uploads.' . $docName) <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                                    </form>
+                                    @endif
                                 </div>
-                            @endif
+
+                                @if ($uploads[$docName] ?? false)
+                                    <div class="mt-3">
+                                        <small class="text-muted">Preview:</small>
+                                        @if (str_starts_with($uploads[$docName]->getMimeType(), 'image/'))
+                                            <img src="{{ $uploads[$docName]->temporaryUrl() }}" class="img-thumbnail mt-2" style="max-height: 100px;">
+                                        @else
+                                            <div class="d-flex align-items-center gap-2 p-2 bg-light rounded mt-2">
+                                                <i class="ri-file-line text-muted"></i>
+                                                <span class="small">{{ $uploads[$docName]->getClientOriginalName() }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @elseif ($verification && $verification->file_path)
+                                    <div class="mt-3">
+                                        <small class="text-muted">Submitted Document:</small>
+                                        @php
+                                            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+                                            $fileExtension = strtolower(pathinfo($verification->file_path, PATHINFO_EXTENSION));
+                                        @endphp
+                                        @if(in_array($fileExtension, $imageExtensions))
+                                            <img src="{{ Storage::url($verification->file_path) }}" class="img-thumbnail mt-2" style="max-height: 100px;">
+                                        @else
+                                            <div class="d-flex align-items-center gap-2 p-2 bg-light rounded mt-2">
+                                                <i class="ri-file-line text-muted"></i>
+                                                <a href="{{ Storage::url($verification->file_path) }}" target="_blank" class="text-decoration-none">
+                                                    {{ basename($verification->file_path) }}
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                @if ($status === 'rejected' && $verification->remarks)
+                                    <div class="alert alert-danger mt-3 mb-0">
+                                        <strong>Reason:</strong> {{ $verification->remarks }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-
-                        @if ($uploads[$docName] ?? false)
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Preview:</p>
-                                @if (str_starts_with($uploads[$docName]->getMimeType(), 'image/'))
-                                    <img src="{{ $uploads[$docName]->temporaryUrl() }}" class="h-20 rounded-md mt-1">
-                                @else
-                                    <div class="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-md mt-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ $uploads[$docName]->getClientOriginalName() }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        @elseif ($verification && $verification->file_path)
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Submitted Document:</p>
-                                @php
-                                    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
-                                    $fileExtension = strtolower(pathinfo($verification->file_path, PATHINFO_EXTENSION));
-                                @endphp
-                                @if(in_array($fileExtension, $imageExtensions))
-                                    <img src="{{ Storage::url($verification->file_path) }}" class="h-20 rounded-md mt-1">
-                                @else
-                                    <div class="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-md mt-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                        <a href="{{ Storage::url($verification->file_path) }}" target="_blank" class="text-sm text-primary hover:underline">{{ basename($verification->file_path) }}</a>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
-
-                        @if ($status === 'rejected' && $verification->remarks)
-                            <div class="mt-2 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/50 p-3 rounded-md">
-                                <strong>Reason:</strong> {{ $verification->remarks }}
-                            </div>
-                        @endif
                     </div>
                 @endforeach
             </div>
         </div>
-    @empty
-        <p class="text-center text-gray-500 dark:text-gray-400">No verification requirements are currently set for your country.</p>
-    @endforelse
+    </div>
+@empty
+    <div class="text-center py-5">
+        <i class="ri-shield-check-line display-4 text-muted mb-3"></i>
+        <p class="text-muted">No verification requirements are currently set for your country.</p>
+    </div>
+@endforelse
 </div>

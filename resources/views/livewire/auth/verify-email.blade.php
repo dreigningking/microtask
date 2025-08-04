@@ -1,74 +1,171 @@
-<main class="container mx-auto px-4 py-12">
-    <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <div class="text-center mb-8">
-                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ri-mail-check-line text-primary text-3xl"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-800">Verify Your Email</h1>
-                <p class="text-gray-600 mt-2">We need to verify your email address to continue.</p>
-            </div>
-
-            <div class="mt-4 flex flex-col gap-6">
-                <p class="text-center text-gray-700">
-                    We will send a verification code to your email address:
-                    <span class="font-semibold">{{ $user->email }}</span>
-                </p>
-                <div class="flex justify-center mb-2">
-                    <button class="text-sm text-primary underline" wire:click="$set('showEditEmail', true)">Edit email</button>
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Logo and Header -->
+                <div class="text-center my-4">
+                    <h2 class="fw-bold text-dark mb-2">Verify Your Email</h2>
+                    <p class="text-muted">We need to verify your email address to continue.</p>
                 </div>
 
-                @if ($otp_response)
-                    <div class="bg-green-50 border-l-4 border-green-400 p-4 text-green-700 text-center mb-2">
-                        {{ $otp_response }}
-                    </div>
-                @endif
-                @if ($otp_error)
-                    <div class="bg-red-50 border-l-4 border-red-400 p-4 text-red-700 text-center mb-2">
-                        {{ $otp_error }}
-                    </div>
-                @endif
+                <!-- Verify Email Form -->
+                <div class="card shadow border-0" style="border-radius: 1rem;">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <p class="text-muted">
+                                We will send a verification code to your email address:
+                                <span class="fw-semibold text-dark">{{ $user->email }}</span>
+                            </p>
+                            <div class="mt-2">
+                                <button class="btn btn-link text-primary p-0" wire:click="$set('showEditEmail', true)">
+                                    Edit email
+                                </button>
+                            </div>
+                        </div>
 
-                @if (! $showCodeInput)
-                    <div class="flex flex-col items-center gap-3">
-                        <button type="button" class="w-full bg-primary text-white py-2 px-4 rounded-button hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" wire:click="otp_send">
-                            Get Verification Code
-                        </button>
-                        @if (session()->has('otp_sent'))
-                            <button type="button" class="w-full mt-2 bg-secondary text-white py-2 px-4 rounded-button hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors" wire:click="$set('showCodeInput', true)">
-                                I've received the code
-                            </button>
+                        @if ($otp_response)
+                            <div class="alert alert-success mb-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span>{{ $otp_response }}</span>
+                                </div>
+                            </div>
+                        @endif
+                        @if ($otp_error)
+                            <div class="alert alert-danger mb-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span>{{ $otp_error }}</span>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if (! $showCodeInput)
+                            <div class="d-flex flex-column align-items-center gap-3">
+                                <button type="button" 
+                                        class="btn btn-primary w-100 py-3 fw-semibold" 
+                                        wire:click="otp_send">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Get Verification Code
+                                </button>
+                                @if (session()->has('otp_sent'))
+                                    <button type="button" 
+                                            class="btn btn-secondary w-100 py-3 fw-semibold" 
+                                            wire:click="$set('showCodeInput', true)">
+                                        <i class="fas fa-check me-2"></i>
+                                        I've received the code
+                                    </button>
+                                @endif
+                            </div>
+                        @else
+                            <div class="d-flex flex-column align-items-center gap-3">
+                                <div class="w-100">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           placeholder="Enter verification code" 
+                                           wire:model="code">
+                                </div>
+                                <button type="button" 
+                                        class="btn btn-primary w-100 py-3 fw-semibold" 
+                                        wire:click="otp_verify">
+                                    <i class="fas fa-check me-2"></i>
+                                    Validate Code
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-link text-primary" 
+                                        wire:click="otp_send">
+                                    <i class="fas fa-redo me-1"></i>
+                                    Resend code
+                                </button>
+                            </div>
                         @endif
                     </div>
-                @else
-                    <div class="flex flex-col items-center gap-3">
-                        <input type="text" class="form-control w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="Enter verification code" wire:model="code">
-                        <button type="button" class="w-full bg-primary text-white py-2 px-4 rounded-button hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" wire:click="otp_verify">
-                            Validate Code
-                        </button>
-                        <button type="button" class="text-sm text-primary underline mt-2" wire:click="otp_send">
-                            Resend code
-                        </button>
-                    </div>
-                @endif
-            </div>
-        </div>
+                </div>
 
-        @if ($showEditEmail)
-            <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-                <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
-                    <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600" wire:click="$set('showEditEmail', false)">&times;</button>
-                    <h2 class="text-lg font-bold mb-4">Edit Email Address</h2>
-                    <input type="email" class="form-control w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none mb-3" wire:model="email">
-                    @error('email')
-                        <div class="text-red-500 text-sm mb-2">{{ $message }}</div>
-                    @enderror
-                    <div class="flex justify-end gap-2">
-                        <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-button" wire:click="$set('showEditEmail', false)">Cancel</button>
-                        <button class="bg-primary text-white px-4 py-2 rounded-button" wire:click.prevent="saveEmail">Save</button>
-                    </div>
+                <!-- Additional Info -->
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        Having trouble? 
+                        <a wire:navigate 
+                           href="{{ route('login') }}" 
+                           class="text-decoration-none text-primary">
+                            Contact support
+                        </a>
+                    </p>
                 </div>
             </div>
-        @endif
+        </div>
     </div>
-</main>
+</div>
+
+<!-- Edit Email Modal -->
+@if ($showEditEmail)
+    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Email Address</h5>
+                    <button type="button" class="btn-close" wire:click="$set('showEditEmail', false)"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" 
+                               id="email" 
+                               class="form-control" 
+                               wire:model="email">
+                        @error('email')
+                            <div class="text-danger small mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            wire:click="$set('showEditEmail', false)">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            wire:click.prevent="saveEmail">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
+
+@push('styles')
+<style>
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
+}
+
+
+/* Animation for page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.min-vh-100 {
+    animation: fadeInUp 0.6s ease-out;
+}
+</style>
+@endpush

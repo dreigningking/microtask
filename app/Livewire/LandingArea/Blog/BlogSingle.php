@@ -2,11 +2,12 @@
 
 namespace App\Livewire\LandingArea\Blog;
 
-use App\Models\BlogPost;
+use App\Models\Setting;
 use Livewire\Component;
+use App\Models\BlogPost;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing-layout')]
+#[Layout('components.layouts.landing')]
 class BlogSingle extends Component
 {
     public $slug;
@@ -14,11 +15,12 @@ class BlogSingle extends Component
     public $title;
     public $meta_title;
     public $meta_description;
+    public $categories;
 
     public function mount(BlogPost $post)
     {
         $this->post = $post;
-        
+        $this->categories = json_decode(Setting::where('name', 'blog_categories')->first()->value);
         if (!$this->post) {
             abort(404);
         }

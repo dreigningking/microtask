@@ -75,6 +75,16 @@
                                 </div>
                                 @error('featured_image') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
                             </div>
+
+                            <div class="mb-4">
+                                <label class="form-label font-semibold">Category</label>
+                                <select name="category" class="form-control">
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category }}" {{ old('category', $post->category) == $category ? 'selected' : '' }}>{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             
                             <div class="mb-4">
                                 <label class="form-label font-semibold">Tags</label>

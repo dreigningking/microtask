@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Tasks;
+namespace App\Livewire\DashboardArea\Tasks;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +51,6 @@ class SingleTaskList extends Component
     
     public function render()
     {
-        return view('livewire.tasks.single-task-list');
+        return view('livewire.dashboard-area.tasks.single-task-list');
     }
 }

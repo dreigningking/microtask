@@ -10,7 +10,6 @@ use App\Models\Settlement;
 use App\Models\TaskWorker;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
-use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;

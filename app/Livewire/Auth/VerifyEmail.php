@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\OTPNotification;
 use Illuminate\Support\Facades\Session;
 
-
+#[Layout('components.layouts.landing')]
 class VerifyEmail extends Component
 {
     

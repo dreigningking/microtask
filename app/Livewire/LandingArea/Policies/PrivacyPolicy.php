@@ -5,7 +5,7 @@ namespace App\Livewire\LandingArea\Policies;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing-layout')]
+#[Layout('components.layouts.landing')]
 class PrivacyPolicy extends Component
 {
     public $title = 'Privacy Policy | Wonegig';

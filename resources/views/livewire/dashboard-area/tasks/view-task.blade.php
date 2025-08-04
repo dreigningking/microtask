@@ -1,274 +1,454 @@
-<main class="container mx-auto px-4 py-6">
+<div class="content-wrapper">
     @if ($taskWorker && $taskWorker->task)
-    <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-        <!-- Task Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-            <h1 class="text-2xl font-bold text-gray-800 mb-2 sm:mb-0">{{ $taskWorker->task->title }}</h1>
-            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                {{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}
-            </span>
+    <!-- Header -->
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h4 mb-0">{{ $taskWorker->task->title }}</h1>
+                <p class="text-muted mb-0">Posted {{ $taskWorker->task->created_at->diffForHumans() }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                @if($taskWorker->completed_at)
+                <span class="badge bg-success">Completed</span>
+                @elseif($taskWorker->submitted_at)
+                <span class="badge bg-warning">Submitted</span>
+                @elseif($taskWorker->accepted_at)
+                <span class="badge bg-primary">In Progress</span>
+                @elseif($taskWorker->saved_at)
+                <span class="badge bg-info">Saved</span>
+                @else
+                <span class="badge bg-secondary">Pending</span>
+                @endif
+                <span class="badge bg-success fs-6">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</span>
+            </div>
+        </div>
         </div>
 
-        <!-- Task Meta -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-y-2 gap-x-4 text-gray-600 text-sm mb-6">
-            <span class="flex items-center gap-1">
-                <i class="ri-building-line"></i>
-                <span>{{ $taskWorker->task->user->username }}</span>
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Task Status</h6>
+                        <span class="bg-primary bg-opacity-10 rounded-circle p-2">
+                            @if($taskWorker->completed_at)
+                            <i class="ri-check-double-line text-success"></i>
+                            @elseif($taskWorker->submitted_at)
+                            <i class="ri-send-plane-line text-warning"></i>
+                            @elseif($taskWorker->accepted_at)
+                            <i class="ri-time-line text-primary"></i>
+                            @else
+                            <i class="ri-clock-line text-secondary"></i>
+                            @endif
             </span>
-            <span class="flex items-center gap-1">
-                <i class="ri-task-line"></i>
-                <span>{{ $taskWorker->task->template->name ?? 'N/A' }}</span>
-            </span>
-            <span class="flex items-center gap-1">
-                <i class="ri-time-line"></i>
-                <span>{{ $requiredTime }} estimated time</span>
-            </span>
-            <span class="flex items-center gap-1">
-                <i class="ri-folders-line"></i>
-                <span>Platform: {{ $taskWorker->task->platform->name ?? 'N/A' }}</span>
-            </span>
+                    </div>
+                    <h3 class="fw-bold mb-0">
+                        @if($taskWorker->completed_at)
+                        Completed
+                        @elseif($taskWorker->submitted_at)
+                        Submitted
+                        @elseif($taskWorker->accepted_at)
+                        In Progress
+                        @elseif($taskWorker->saved_at)
+                        Saved
+                        @else
+                        Pending
+                        @endif
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Budget</h6>
+                        <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-money-dollar-circle-line text-success"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Time Required</h6>
+                        <span class="bg-info bg-opacity-10 rounded-circle p-2"><i class="ri-time-line text-info"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ $requiredTime }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">People Remaining</h6>
+                        <span class="bg-warning bg-opacity-10 rounded-circle p-2"><i class="ri-user-line text-warning"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">
             @php
                 $acceptedWorkersCount = $taskWorker->task->workers->whereNotNull('accepted_at')->count();
                 $peopleRemaining = $taskWorker->task->number_of_people - $acceptedWorkersCount;
             @endphp
-            <span class="flex items-center gap-1">
-                <i class="ri-user-line"></i>
-                <span>People Remaining: {{ $peopleRemaining > 0 ? $peopleRemaining : 'None' }}</span>
-            </span>
+                        {{ $peopleRemaining > 0 ? $peopleRemaining : 'None' }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Task Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Description</h6>
+                        <p class="mb-0">{{ $taskWorker->task->description }}</p>
         </div>
 
-        
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Task Creator</h6>
+                            <p class="fw-semibold mb-0">{{ $taskWorker->task->user->username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Platform</h6>
+                            <p class="fw-semibold mb-0">{{ $taskWorker->task->platform->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Template</h6>
+                            <p class="fw-semibold mb-0">{{ $taskWorker->task->template->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Expected Time</h6>
+                            <p class="fw-semibold mb-0">{{ $requiredTime }}</p>
+                        </div>
+                    </div>
 
-        <!-- Job Description -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Job Description</h3>
-            <div class="text-gray-600 whitespace-pre-line">{{ $taskWorker->task->description }}</div>
-        </div>
-
-        <!-- Files -->
-        @if (!empty($taskWorker->task->files) && count($taskWorker->task->files) > 0)
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Attached Files</h3>
-            <div class="space-y-2">
-                
+                    @if($taskWorker->task->files)
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Attached Files</h6>
+                        <div class="row g-2">
+                            @foreach($taskWorker->task->files as $file)
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-3 border rounded">
+                                    <div class="me-3">
+                                        @if(str_starts_with($file['mime_type'], 'image/'))
+                                        <i class="ri-image-line text-primary fs-4"></i>
+                                        @elseif(str_starts_with($file['mime_type'], 'application/pdf'))
+                                        <i class="ri-file-pdf-line text-danger fs-4"></i>
+                                        @elseif(str_starts_with($file['mime_type'], 'application/msword') || str_starts_with($file['mime_type'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))
+                                        <i class="ri-file-word-line text-primary fs-4"></i>
+                                        @elseif(str_starts_with($file['mime_type'], 'application/vnd.ms-excel') || str_starts_with($file['mime_type'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+                                        <i class="ri-file-excel-line text-success fs-4"></i>
+                                        @else
+                                        <i class="ri-file-line text-muted fs-4"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <a href="{{ asset($file['path']) }}" target="_blank" class="text-decoration-none fw-medium">
+                                            {{ $file['name'] }}
+                                        </a>
+                                        <div class="text-muted small">{{ number_format($file['size'] / 1024, 2) }} KB</div>
+                                    </div>
+                                    <a href="{{ asset($file['path']) }}" target="_blank" class="text-muted">
+                                        <i class="ri-download-line"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
             </div>
         </div>
         @endif
 
-        <!-- Requirements -->
-        @if (!empty($taskWorker->task->requirements) && count($taskWorker->task->requirements) > 0)
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Additional Requirements</h3>
-            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    @if($taskWorker->task->requirements)
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Requirements</h6>
+                        <ul class="list-unstyled mb-0">
                 @foreach($taskWorker->task->requirements as $requirement)
-                    <li>{{ $requirement }}</li>
+                            <li class="mb-2">
+                                <i class="ri-check-line text-success me-2"></i>
+                                {{ $requirement }}
+                            </li>
                 @endforeach
             </ul>
         </div>
         @endif
+                </div>
+            </div>
 
-        <!-- Submission Fields -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Submission Requirements</h3>
+            <!-- Submission Form -->
             @if (!empty($submissionFields))
-                <form wire:submit="submitTask" class="grid grid-cols-3 gap-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Submission Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <form wire:submit="submitTask">
+                        <div class="row g-3">
                     @foreach($submissionFields as $index => $field)
-                    <div class="mb-4">
-                        <label for="submission-field-{{ $index }}" class="block text-sm font-medium text-gray-700 mb-1">{{ $field['title'] }}</label>
+                            <div class="col-12">
+                                <label for="submission-field-{{ $index }}" class="form-label">{{ $field['title'] }}</label>
                         
                         @if ($field['type'] === 'text')
-                            <input type="text" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="text" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'textarea')
-                            <textarea id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror"></textarea>
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <textarea id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" rows="4" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror"></textarea>
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'number')
-                            <input type="number" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="number" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'email')
-                            <input type="email" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="email" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'url')
-                            <input type="url" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="url" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'date')
-                            <input type="date" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="date" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'time')
-                            <input type="time" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <input type="time" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'select')
-                            <select id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('submittedData.' . $field['name']) border-red-500 @enderror">
+                                <select id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-select @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 <option value="">Select {{ $field['title'] }}</option>
                                 @foreach($field['options'] ?? [] as $option)
                                     <option value="{{ $option }}">{{ $option }}</option>
                                 @endforeach
                             </select>
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'checkbox')
-                            <div class="mt-1">
+                                <div class="mt-2">
                                 @foreach($field['options'] ?? [] as $option)
-                                    <div class="flex items-center">
+                                    <div class="form-check">
                                         <input type="checkbox" 
                                                id="submission-field-{{ $index }}-{{ Str::slug($option) }}" 
                                                wire:model="submittedData.{{ $field['name'] }}" 
                                                value="{{ $option }}"
-                                               class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                                        <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="ml-2 block text-sm text-gray-900">{{ $option }}</label>
+                                            class="form-check-input @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                        <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="form-check-label">{{ $option }}</label>
                                     </div>
                                 @endforeach
                             </div>
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'radio')
-                            <div class="mt-1">
+                                <div class="mt-2">
                                 @foreach($field['options'] ?? [] as $option)
-                                    <div class="flex items-center">
+                                    <div class="form-check">
                                         <input type="radio" 
                                                id="submission-field-{{ $index }}-{{ Str::slug($option) }}" 
                                                wire:model="submittedData.{{ $field['name'] }}" 
                                                value="{{ $option }}"
-                                               class="h-4 w-4 border-gray-300 text-primary focus:ring-primary @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                                        <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="ml-2 block text-sm text-gray-900">{{ $option }}</label>
+                                            class="form-check-input @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                        <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="form-check-label">{{ $option }}</label>
                                     </div>
                                 @endforeach
                             </div>
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'file')
                             @if(isset($existingSubmissions[$field['name']]))
                                 <div class="mb-2">
-                                    <a href="{{ asset($existingSubmissions[$field['name']]) }}" target="_blank" class="text-primary hover:underline">
-                                        <i class="ri-file-line mr-1"></i>View Current File
+                                    <a href="{{ asset($existingSubmissions[$field['name']]) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="ri-file-line me-1"></i>View Current File
                                     </a>
                                 </div>
                             @endif
                             <input type="file" 
                                    id="submission-field-{{ $index }}" 
                                    wire:model.live="submittedData.{{ $field['name'] }}" 
-                                   class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 @error('submittedData.' . $field['name']) border-red-500 @enderror">
-                            @error('submittedData.' . $field['name']) <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
+                                @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @endif
                         @if (isset($field['description']))
-                            <p class="mt-2 text-sm text-gray-500">{{ $field['description'] }}</p>
+                                <div class="form-text">{{ $field['description'] }}</div>
                         @endif
                     </div>
                     @endforeach
-                    <div class="col-span-3">
-                        <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
-                            Submit Task
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="ri-send-plane-line me-1"></i> Submit Task
                         </button>
+                            </div>
                     </div>
                 </form>
+                </div>
+            </div>
             @else
-                <p class="text-gray-600">No specific submission requirements provided for this task template.</p>
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <i class="ri-file-text-line display-4 text-muted mb-3"></i>
+                    <h5 class="text-muted">No Submission Requirements</h5>
+                    <p class="text-muted">No specific submission requirements provided for this task template.</p>
+                </div>
+            </div>
             @endif
         </div>
 
-        <!-- Invite People to do task -->
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Task Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            @if($taskWorker->completed_at)
+                            <span class="badge bg-success fs-6">Completed</span>
+                            @elseif($taskWorker->submitted_at)
+                            <span class="badge bg-warning fs-6">Submitted</span>
+                            @elseif($taskWorker->accepted_at)
+                            <span class="badge bg-primary fs-6">In Progress</span>
+                            @elseif($taskWorker->saved_at)
+                            <span class="badge bg-info fs-6">Saved</span>
+                            @else
+                            <span class="badge bg-secondary fs-6">Pending</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted">Accepted</small>
+                            <div class="fw-semibold">{{ $taskWorker->accepted_at ? $taskWorker->accepted_at->format('M d, Y') : 'Not accepted' }}</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Submitted</small>
+                            <div class="fw-semibold">{{ $taskWorker->submitted_at ? $taskWorker->submitted_at->format('M d, Y') : 'Not submitted' }}</div>
+                        </div>
+                        @if($taskWorker->completed_at)
+                        <div class="col-6">
+                            <small class="text-muted">Completed</small>
+                            <div class="fw-semibold">{{ $taskWorker->completed_at->format('M d, Y') }}</div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invite People -->
         @if ($peopleRemaining > 0)
-        <div class="mb-6 p-4 bg-yellow-50 rounded-lg text-center">
-            <h3 class="font-semibold text-yellow-800 mb-2">Want to help others earn?</h3>
-            <p class="text-yellow-700 mb-4">There are still {{ $peopleRemaining }} spots left for this task. Share it with your friends and earn a commission when they complete it!</p>
-            <button wire:click="openInviteModal" class="bg-yellow-600 text-white px-4 py-2 rounded-button hover:bg-yellow-700 whitespace-nowrap">
-                <i class="ri-share-line mr-2"></i> Invite People to do Task
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Invite People</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning mb-3">
+                        <h6 class="alert-heading">Want to help others earn?</h6>
+                        <p class="mb-0">There are still {{ $peopleRemaining }} spots left for this task. Share it with your friends and earn a commission when they complete it!</p>
+                    </div>
+                    <button wire:click="openInviteModal" class="btn btn-warning w-100">
+                        <i class="ri-share-line me-1"></i> Invite People to do Task
             </button>
+                </div>
         </div>
         @endif
 
         <!-- Action Buttons -->
-        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
             @if ($taskWorker->submitted_at)
-                <button wire:click="editSubmission" class="flex-1 bg-blue-500 text-white py-3 px-4 rounded-button hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    <i class="ri-edit-line mr-2"></i> Edit Submission
+                        <button wire:click="editSubmission" class="btn btn-primary">
+                            <i class="ri-edit-line me-1"></i> Edit Submission
                 </button>
-                <button wire:click="messageTaskMaster" class="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-button hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors">
-                    <i class="ri-message-line mr-2"></i> Message Task Master
+                        <button wire:click="messageTaskMaster" class="btn btn-outline-secondary">
+                            <i class="ri-message-line me-1"></i> Message Task Master
                 </button>
-                <button wire:click="raiseDispute" class="flex-1 bg-red-500 text-white py-3 px-4 rounded-button hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
-                    <i class="ri-alert-line mr-2"></i> Raise Dispute
+                        <button wire:click="raiseDispute" class="btn btn-outline-danger">
+                            <i class="ri-alert-line me-1"></i> Raise Dispute
                 </button>
             @elseif ($taskWorker->completed_at)
-                <button wire:click="reviewTask" class="w-full bg-green-500 text-white py-3 px-4 rounded-button hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                    <i class="ri-star-line mr-2"></i> Review Task
+                        <button wire:click="reviewTask" class="btn btn-success">
+                            <i class="ri-star-line me-1"></i> Review Task
                 </button>
             @endif
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
 
         @if (session()->has('message'))
-            <div class="mt-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('message') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
-    </div>
-    @else
-    <div class="text-center py-12 bg-white rounded-lg shadow-sm">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Task Not Found or Accessible</h2>
-        <p class="text-gray-600">The task you are trying to view does not exist or you do not have permission to view it.</p>
-        <a href="{{ route('tasks.index') }}" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-            Go to My Tasks
-        </a>
+    @if (session()->has('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
+    @else
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="ri-error-warning-line display-4 text-muted mb-3"></i>
+            <h4 class="text-muted mb-2">Task Not Found or Accessible</h4>
+            <p class="text-muted mb-4">The task you are trying to view does not exist or you do not have permission to view it.</p>
+            <a href="{{ route('tasks.index') }}" class="btn btn-primary">
+                <i class="ri-arrow-left-line me-1"></i> Go to My Tasks
+            </a>
+        </div>
+    </div>
+    @endif
     <!-- Invite Modal -->
-    <div x-data="{ show: @entangle('showInviteModal') }" 
-         x-show="show" 
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
-         aria-labelledby="modal-title" 
-         role="dialog" 
-         aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="show" 
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-                 aria-hidden="true"></div>
-
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                Invite People to do Task
-                            </h3>
-                            <div class="mt-4 space-y-4">
-                                <div>
-                                    <label for="inviteEmail" class="block text-sm font-medium text-gray-700">Email Addresses</label>
-                                    <textarea id="inviteEmail" wire:model.live="inviteEmail" rows="3" placeholder="Enter one or more emails, separated by commas or new lines" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary outline-none"></textarea>
-                                    @error('inviteEmail') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inviteModalLabel">Invite People to do Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="inviteEmail" class="form-label">Email Addresses</label>
+                        <textarea id="inviteEmail" wire:model.live="inviteEmail" rows="3" placeholder="Enter one or more emails, separated by commas or new lines" class="form-control"></textarea>
+                        @error('inviteEmail') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                     @if($inviteSummary)
-                                        <div class="mt-2 text-sm text-gray-600 bg-gray-50 rounded p-2">
+                        <div class="alert alert-info mt-2 mb-0">
                                             {{ $inviteSummary }}
                                         </div>
                                     @endif
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" wire:click="inviteUser" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
-                        Send Invitation
-                    </button>
-                    <button type="button" wire:click="closeInviteModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 sm:mt-0 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" wire:click="inviteUser" class="btn btn-primary">Send Invitation</button>
                 </div>
             </div>
         </div>
     </div>
-</main>
+
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('openInviteModal', () => {
+            new bootstrap.Modal(document.getElementById('inviteModal')).show();
+        });
+
+        Livewire.on('closeInviteModal', () => {
+            bootstrap.Modal.getInstance(document.getElementById('inviteModal')).hide();
+        });
+    });
+</script>
+@endpush

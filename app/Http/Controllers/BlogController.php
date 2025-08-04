@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BlogPost;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Comment;
+use App\Models\Setting;
+use App\Models\BlogPost;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
@@ -16,7 +17,8 @@ class BlogController extends Controller
     public function index()
     {
         $posts = BlogPost::latest()->paginate(12);
-        return view('backend.blog.index', compact('posts'));
+        $categories = json_decode(Setting::getValue('blog_categories'));
+        return view('backend.blog.index', compact('posts', 'categories'));
     }
 
     /**
@@ -24,7 +26,8 @@ class BlogController extends Controller
      */
     public function create()
     {
-        return view('backend.blog.create');
+        $categories = json_decode(Setting::getValue('blog_categories'));
+        return view('backend.blog.create', compact('categories'));
     }
 
     /**
@@ -43,6 +46,7 @@ class BlogController extends Controller
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:255',
             'tags' => 'nullable|string|max:500',
+            'category' => 'nullable|string|max:500',
             'featured' => 'boolean',
             'allow_comments' => 'boolean',
         ]);
@@ -108,7 +112,8 @@ class BlogController extends Controller
      */
     public function edit(BlogPost $post)
     {
-        return view('backend.blog.edit', compact('post'));
+        $categories = json_decode(Setting::getValue('blog_categories'));
+        return view('backend.blog.edit', compact('post', 'categories'));
     }
 
     /**
@@ -129,6 +134,7 @@ class BlogController extends Controller
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:255',
             'tags' => 'nullable|string|max:500',
+            'category' => 'nullable|string|max:500',
             'featured' => 'boolean',
             'allow_comments' => 'boolean',
         ]);

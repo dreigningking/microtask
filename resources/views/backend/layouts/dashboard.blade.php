@@ -60,13 +60,24 @@
                 @endif
                 @if(auth()->user()->hasPermission('blog_management'))
                 <li class="sidebar-item">
-                    <a href="#users" data-toggle="collapse" class="sidebar-link collapsed">
+                    <a href="#blog" data-toggle="collapse" class="sidebar-link collapsed">
                         <i class="align-middle mr-2 fas fa-fw fa-book"></i> <span class="align-middle">Blog Management</span>
                     </a>
-                    <ul id="users" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
+                    <ul id="blog" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.index') }}">All Posts</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.create') }}">Create Post</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.blog.comments.index') }}">Comments</a></li>
+                    </ul>
+                </li>
+                @endif
+                @if(auth()->user()->hasPermission('support_management'))
+                <li class="sidebar-item">
+                    <a href="#support" data-toggle="collapse" class="sidebar-link collapsed">
+                        <i class="align-middle mr-2 fas fa-fw fa-headset"></i> <span class="align-middle">Support Management</span>
+                    </a>
+                    <ul id="support" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.support.tickets.index') }}">Tickets</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.support.disputes.index') }}">Disputes</a></li>
                     </ul>
                 </li>
                 @endif

@@ -22,7 +22,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-primary);
     font-weight: var(--font-semibold);
-    color: var(--text-primary);
+    /* color: var(--text-primary); */
 }
 
 .navbar {
@@ -351,7 +351,7 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
-    text-align: center;
+    text-align: left;
     box-shadow: var(--shadow-sm);
     transition: var(--transition-normal);
     border: 1px solid var(--border-gray);
@@ -544,7 +544,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-sm);
-    position: relative;
+            position: relative;
     border: 1px solid var(--border-gray);
 }
 
@@ -572,7 +572,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .client-avatar {
     width: 50px;
-    height: 50px;
+            height: 50px;
     border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--purple-gradient-start) 0%, var(--purple-gradient-end) 100%);
     display: flex;
@@ -736,14 +736,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .timeline {
-    position: relative;
+            position: relative;
     padding-left: var(--spacing-xl);
-}
-
+        }
+        
 .timeline:before {
-    content: '';
-    position: absolute;
-    left: 0;
+            content: '';
+            position: absolute;
+            left: 0;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -796,7 +796,7 @@ h1, h2, h3, h4, h5, h6 {
 .resource-card {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
-    overflow: hidden;
+            overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: var(--transition-normal);
     border: 1px solid var(--border-gray);
@@ -819,7 +819,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .resource-category {
-    display: inline-block;
+            display: inline-block;
     padding: var(--spacing-xs) var(--spacing-sm);
     background: var(--primary-purple);
     color: var(--text-white);
@@ -858,9 +858,9 @@ h1, h2, h3, h4, h5, h6 {
     height: 60px;
     background: linear-gradient(135deg, var(--purple-gradient-start) 0%, var(--purple-gradient-end) 100%);
     border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
     margin: 0 auto var(--spacing-md);
     color: var(--text-white);
     font-size: var(--text-xl);
@@ -872,7 +872,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tabs-nav .nav-link {
-    border: none;
+            border: none;
     background: none;
     color: var(--text-secondary);
     font-weight: var(--font-medium);
@@ -961,7 +961,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .article-content h2:after {
     content: '';
-    display: block;
+                display: block;
     width: 40px;
     height: 2px;
     background: var(--primary-purple);
@@ -994,7 +994,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebar-title:after {
     content: '';
-    display: block;
+                display: block;
     width: 30px;
     height: 2px;
     background: var(--primary-purple);
@@ -1016,7 +1016,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-full);
     margin: 0 auto var(--spacing-md);
     background: linear-gradient(135deg, var(--purple-gradient-start) 0%, var(--purple-gradient-end) 100%);
-    display: flex;
+            display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-white);
@@ -1060,9 +1060,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .comment:last-child {
     border-bottom: none;
-    margin-bottom: 0;
-}
-
+            margin-bottom: 0;
+        }
+        
 .comment-avatar {
     width: 50px;
     height: 50px;

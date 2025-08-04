@@ -133,7 +133,7 @@
                 <!-- Job Listings -->
                 @if($tasks->count() > 0)
                     @foreach($tasks as $task)
-                        @livewire('tasks.single-task-list', ['task' => $task], key('task-'.$task->id))
+                        @livewire('dashboard-area.tasks.single-task-list', ['task' => $task], key('task-'.$task->id))
                     @endforeach
                 @else
                     <div class="text-center text-muted py-5">
@@ -232,7 +232,7 @@
     @endif
 
     <!-- Report Task Component -->
-    @livewire('tasks.report-task')
+    @livewire('dashboard-area.tasks.report-task')
 </div>
 
 @push('styles')

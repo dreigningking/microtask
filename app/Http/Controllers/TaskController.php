@@ -15,7 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::where('is_active', 1)->orderBy('id', 'desc')->get();
+        $tasks = Task::where('is_active', 1)->orderBy('id', 'desc')->paginate(4);
         return view('backend.tasks.list', compact('tasks'));
     }
 

@@ -2,14 +2,42 @@
     <!-- Header -->
     <div class="card mb-4">
         <div class="card-body d-flex justify-content-between align-items-center">
-            <h1 class="h4 mb-0">My Jobs</h1>
+            <div>
+                <h1 class="h4 mb-0">
+                    @switch($status)
+                        @case('in_progress')
+                            Ongoing Jobs
+                            @break
+                        @case('completed')
+                            Completed Jobs
+                            @break
+                        @case('drafts')
+                            Draft Jobs
+                            @break
+                        @default
+                            My Jobs
+                    @endswitch
+                </h1>
+                <p class="text-muted mb-0">
+                    @switch($status)
+                        @case('in_progress')
+                            Jobs that are currently being worked on by your team
+                            @break
+                        @case('completed')
+                            Jobs that have been successfully completed
+                            @break
+                        @case('drafts')
+                            Jobs that are saved but not yet published
+                            @break
+                        @default
+                            Manage all your posted jobs in one place
+                    @endswitch
+                </p>
+            </div>
             <a href="{{ route('jobs.create') }}" class="btn btn-primary d-flex align-items-center">
                 <i class="ri-add-line me-1"></i>
                 <span>Post New Job</span>
             </a>
-        </div>
-        <div class="card-footer bg-white border-0">
-            <p class="mb-0 text-muted">Manage all your posted jobs in one place</p>
         </div>
     </div>
 
@@ -20,21 +48,18 @@
                 <!-- Status Tabs -->
                 <div class="col-md-8 mb-2 mb-md-0">
                     <div class="btn-group" role="group">
-                        <button wire:click="$set('status', 'all')" type="button" class="btn btn-sm {{ $status === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                        <a href="{{ route('jobs.index') }}" class="btn btn-sm {{ $status === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
                             All Jobs ({{ $stats['total'] }})
-                        </button>
-                        <button wire:click="$set('status', 'active')" type="button" class="btn btn-sm {{ $status === 'active' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                            Active ({{ $stats['active'] }})
-                        </button>
-                        <button wire:click="$set('status', 'in_progress')" type="button" class="btn btn-sm {{ $status === 'in_progress' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                            In Progress ({{ $stats['in_progress'] }})
-                        </button>
-                        <button wire:click="$set('status', 'completed')" type="button" class="btn btn-sm {{ $status === 'completed' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                        </a>
+                        <a href="{{ route('jobs.ongoing') }}" class="btn btn-sm {{ $status === 'in_progress' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                            Ongoing ({{ $stats['in_progress'] }})
+                        </a>
+                        <a href="{{ route('jobs.completed') }}" class="btn btn-sm {{ $status === 'completed' ? 'btn-primary' : 'btn-outline-secondary' }}">
                             Completed ({{ $stats['completed'] }})
-                        </button>
-                        <button wire:click="$set('status', 'drafts')" type="button" class="btn btn-sm {{ $status === 'drafts' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                        </a>
+                        <a href="{{ route('jobs.drafts') }}" class="btn btn-sm {{ $status === 'drafts' ? 'btn-primary' : 'btn-outline-secondary' }}">
                             Drafts ({{ $stats['drafts'] }})
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <!-- Search -->

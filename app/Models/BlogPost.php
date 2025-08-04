@@ -28,6 +28,7 @@ class BlogPost extends Model
         'meta_keywords',
         'views_count',
         'tags',
+        'category',
         'reading_time',
         'difficulty',
         'allow_comments',

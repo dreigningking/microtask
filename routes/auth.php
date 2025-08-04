@@ -24,4 +24,4 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', ConfirmPassword::class)->name('password.confirm');
 });
 
-Route::post('logout', Logout::class)->name('logout');
+Route::get('logout', Logout::class)->name('logout');

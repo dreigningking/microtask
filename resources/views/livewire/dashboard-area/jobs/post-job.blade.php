@@ -169,7 +169,7 @@
                             </div>
                         </div>
         <div class="mt-4">
-            @livewire('jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
+            @livewire('dashboard-area.jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
                                     </div>
         <div wire:ignore class="mt-4">
             <label for="requirements" class="form-label fw-medium text-gray-700 mb-1">Required Tools <span class="text-danger">*</span></label>

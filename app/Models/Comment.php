@@ -12,28 +12,11 @@ class Comment extends Model
 {
     use HasFactory, HasMentions;
 
-    protected $fillable = [
-        'content',
-        'user_id',
-        'blog_post_id',
-        'guest_name',
-        'guest_email',
-        'mentions',
-        'status',
-        'is_featured',
-        'approved_at',
-        'approved_by',
-        'likes_count',
-        'user_agent',
-        'ip_address',
-    ];
+    protected $fillable = ['user_id','commentable_id','commentable_type','body','attachments','is_flag'];
+    protected $casts = ['attachments'=> 'array'];
 
-    protected $casts = [
-        'mentions' => 'array',
-        'is_featured' => 'boolean',
-        'approved_at' => 'datetime',
-        'likes_count' => 'integer',
-    ];
+    protected $touches = ['commentable']; // name of the relationship method
+
 
     // Relationships
     public function user(): BelongsTo
@@ -41,57 +24,7 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function blogPost(): BelongsTo
-    {
-        return $this->belongsTo(BlogPost::class);
-    }
-
-    public function approvedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    // Accessors
-    public function getCommenterNameAttribute(): string
-    {
-        return $this->user ? $this->user->name : $this->guest_name;
-    }
-
-    public function getCommenterEmailAttribute(): string
-    {
-        return $this->user ? $this->user->email : $this->guest_email;
-    }
-
-    public function getIsApprovedAttribute(): bool
-    {
-        return $this->status === 'approved';
-    }
-
-    public function getIsPendingAttribute(): bool
-    {
-        return $this->status === 'pending';
-    }
-
-    public function getIsSpamAttribute(): bool
-    {
-        return $this->status === 'spam';
-    }
-
-    public function getIsRejectedAttribute(): bool
-    {
-        return $this->status === 'rejected';
-    }
-
-    public function getFormattedContentAttribute(): string
-    {
-        return $this->formatContentWithMentions();
-    }
-
-    public function getTimeAgoAttribute(): string
-    {
-        return $this->created_at->diffForHumans();
-    }
-
+    
     // Scopes
     public function scopeApproved($query)
     {
@@ -207,4 +140,13 @@ class Comment extends Model
             }
         });
     }
+
+    
+
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
+
+
 }

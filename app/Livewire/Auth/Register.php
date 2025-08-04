@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\GeoLocationTrait;
 use Illuminate\Auth\Events\Registered;
 use App\Notifications\WelcomeNotification;
+use Livewire\Attributes\Layout;
 
+#[Layout('components.layouts.landing')]
 class Register extends Component
 {
     use GeoLocationTrait;

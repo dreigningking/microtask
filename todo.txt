@@ -28,10 +28,18 @@ Featured Jobs - identify places to show featured jobs"
 
 Submit
 
-Task master invites users by emails to job
+
 ------------------------------------------------
+TASK
+
 user search for job & filter job -DONE
 users not logged in cannot take job - DONE
+
+Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
+admin can create task, and assign to user
+Task master invites users by emails to job
+
+
 Users can click don't show on a task
 users can save task
 user must agree to work conditions first time he wants to take job
@@ -91,15 +99,9 @@ worker subscription - add feature to receive notification from people you follow
 ------------------------------------
 Support
 Support Notification
+Admin Support 
 ----------------------------------------------------
-ADMIN
 
-Admin user limit by Country
-Admin dashboard
-Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
-admin can create task, and assign to user
-Admin message to all via notification
------------------------------------------------------
 BADGES
 number of dispute cases ongoing can give you a badge
 number of dispute cases can give you a badge
@@ -108,10 +110,16 @@ number of bad submissions can give you a badge
 ----------------------------------------------------
 FEATURES
 Logs of activities e.g accepted terms
+
 Referrals - 
+
+
 automatic verifications ?
-payouts require approval ? 
 can verifications expire?
+
+
+payouts require approval ? 
+
 System Monitoring - Implement system monitoring strategies"
 Google adsense
 Job templates should show platform image
@@ -121,3 +129,13 @@ vpn block
 remove these databases: dispute, task, task worker. rerun migration
 Add Raffle Draw
 Change server upload to 2mb
+
+
+-----------------------------------------------------
+Roles
+
+Admin user limit by Country
+-------------------------------------------------------
+Admin dashboard
+
+Admin message to all via notification

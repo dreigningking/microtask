@@ -46,6 +46,7 @@ class SettingController extends Controller
             'allow_public_profile' => 'boolean',
             'free_user_task_limit' => 'integer|min:1',
             'submission_review_deadline' => 'integer|min:1',
+            'blog_categories' => 'array',
         ];
         $data = $request->validate($fields);
         foreach ($fields as $name => $type) {
@@ -60,7 +61,6 @@ class SettingController extends Controller
             if (is_array($value)) {
                 $value = json_encode($value);
             }
-
             Setting::setValue($name, $value);
         }
         return back()->with('success', 'Core settings saved successfully.');

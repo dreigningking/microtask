@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Tasks;
+namespace App\Livewire\DashboardArea\Tasks;
 
 use Livewire\Component;
 
@@ -15,6 +15,6 @@ class SingleTaskGrid extends Component
 
     public function render()
     {
-        return view('livewire.tasks.single-task-grid');
+        return view('livewire.dashboard-area.tasks.single-task-grid');
     }
 }

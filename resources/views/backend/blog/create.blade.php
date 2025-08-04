@@ -70,6 +70,15 @@
                             </div>
 
                             <div class="mb-4">
+                                <label class="form-label font-semibold">Category</label>
+                                <select name="category" class="form-control">
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category }}">{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-4">
                                 <label class="form-label font-semibold">Tags</label>
                                 <input type="text" name="tags" class="form-control" value="{{ old('tags') }}" placeholder="tag1, tag2, tag3">
                                 <small class="text-muted">Separate tags with commas</small>

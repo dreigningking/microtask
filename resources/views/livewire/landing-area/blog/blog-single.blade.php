@@ -1,20 +1,406 @@
+@push('styles')
+<style>
+.article-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 4rem 0;
+}
+
+.article-category {
+    display: inline-block;
+    background: #0d6efd;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+}
+
+.article-title {
+    color: white;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.article-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* Basic Article Content Styles */
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin: 2rem 0 1rem 0;
+}
+
+.article-content h1 { font-size: 2.5rem; }
+.article-content h2 { font-size: 2rem; }
+.article-content h3 { font-size: 1.75rem; }
+.article-content h4 { font-size: 1.5rem; }
+.article-content h5 { font-size: 1.25rem; }
+.article-content h6 { font-size: 1.1rem; }
+
+.article-content p {
+    margin-bottom: 1.5rem;
+}
+
+.article-content img {
+    border-radius: 0.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    height: auto;
+}
+
+.article-content blockquote {
+    background: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.article-content li {
+    margin-bottom: 0.5rem;
+}
+
+.article-content table {
+    margin: 2rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.article-content .alert {
+    border-radius: 0.5rem;
+    border: none;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+/* Author Card */
+.author-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    margin: 3rem 0;
+}
+
+.author-avatar-lg {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.author-avatar-lg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.social-links {
+    margin-top: 1rem;
+}
+
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: white;
+    text-decoration: none;
+    margin-right: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.social-links a:hover {
+    background: #0b5ed7;
+    color: white;
+}
+
+/* Comments Section */
+.comments-section {
+    margin: 3rem 0;
+}
+
+.comment {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-meta {
+    margin-bottom: 0.5rem;
+}
+
+.comment-meta h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.comment-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.comment-reply {
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.comment-reply:hover {
+    text-decoration: underline;
+}
+
+.comment-form {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 0.5rem;
+}
+
+/* Sidebar Styles */
+.sidebar-card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.job-card-sidebar {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.job-card-sidebar:last-child {
+    border-bottom: none;
+}
+
+.job-card-sidebar h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.job-type {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.job-type.fulltime {
+    background: #d4edda;
+    color: #155724;
+}
+
+.job-type.freelance {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.job-type.parttime {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Related Articles */
+.article-card {
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.article-card:hover {
+    transform: translateY(-3px);
+}
+
+.article-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.article-body {
+    padding: 1.5rem;
+}
+
+.resource-category {
+    display: inline-block;
+    background: #e9ecef;
+    color: #6c757d;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+
+.article-body h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.article-body p {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .article-hero {
+        min-height: 50vh;
+        padding: 3rem 0;
+    }
+    
+    .article-title {
+        font-size: 2rem;
+    }
+    
+    .article-meta {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .author-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .comment {
+        flex-direction: column;
+    }
+    
+    .article-content h1 { font-size: 2rem; }
+    .article-content h2 { font-size: 1.75rem; }
+    .article-content h3 { font-size: 1.5rem; }
+    .article-content h4 { font-size: 1.25rem; }
+    .article-content h5 { font-size: 1.1rem; }
+    .article-content h6 { font-size: 1rem; }
+}
+</style>
+@endpush
 <div>
-    <section class="article-hero">
+    <section class="article-hero" @if($post->featured_image) style="background:url({{ Storage::url($post->featured_image) }});background-size: cover;
+    background-position: center;
+    background-attachment: fixed;" @endif>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
-                    <span class="article-category">Resume Tips</span>
-                    <h1 class="article-title">10 Resume Mistakes That Are Costing You Interviews</h1>
+                    <span class="article-category">{{ $post->category ?? 'Uncategorized' }}</span>
+                    <h1 class="article-title">{{ $post->title }}</h1>
 
-                    <div class="article-meta justify-content-center">
-                        <div class="article-author">
+                    <div class="article-meta d-flex align-items-center justify-content-center">
+                        <div class="article-author mb-0">
                             <div class="author-avatar">
-                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Author">
+                                <img src="{{ $post->user->image }}" alt="Author">
                             </div>
-                            <span>By Jennifer Wilson</span>
+                            <span>By {{ $post->user->name }}</span>
                         </div>
-                        <div class="article-date">
-                            <i class="far fa-clock me-2"></i> October 15, 2023 • 8 min read
+                        <div class="article-date d-flex align-items-center text-white">
+                            <i class="far fa-clock me-2 "></i> {{ $post->published_at->format('F d, Y') }} • {{ $post->reading_time }} min read
                         </div>
                     </div>
                 </div>
@@ -25,172 +411,27 @@
     <!-- Main Content -->
     <div class="container my-5">
         <div class="row">
-    <!-- Article Content -->
+            <!-- Article Content -->
             <div class="col-lg-8">
                 <div class="article-content">
-                    <p class="lead">Your resume is your first impression on potential employers. Yet, many qualified candidates make simple mistakes that immediately disqualify them from consideration. Avoid these common pitfalls to ensure your resume gets you the interviews you deserve.</p>
-
-                    <img src="https://images.unsplash.com/photo-1586282391129-76a6df230234?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Resume on desk" class="img-fluid">
-
-                    <h2>1. Typos and Grammatical Errors</h2>
-                    <p>This might seem obvious, but it's the most common resume mistake. A single typo can make you appear careless. According to a recent survey, <strong>76% of hiring managers</strong> will dismiss a resume immediately if they spot spelling errors.</p>
-
-                    <p><strong>Solution:</strong> Use spellcheck, but don't rely on it completely. Read your resume backwards to catch errors, and have at least two other people proofread it.</p>
-
-                    <h2>2. Generic Objective Statements</h2>
-                    <p>The outdated "Seeking a challenging position..." opening wastes valuable space. Hiring managers want to know what you can do for them, not what you want from them.</p>
-
-                    <p><strong>Solution:</strong> Replace with a professional summary that highlights your key skills and achievements relevant to the position. For example:</p>
-
-                    <blockquote>
-                        "Digital Marketing Manager with 5+ years of experience in developing and executing successful social media campaigns that increased engagement by 150% and generated $500K+ in revenue."
-                </blockquote>
-
-                    <h2>3. Listing Responsibilities Instead of Achievements</h2>
-                    <p>Simply listing your job duties tells employers nothing about your actual performance. They want to see results.</p>
-
-                    <p><strong>Solution:</strong> Focus on accomplishments using the PAR (Problem-Action-Result) method:</p>
-
-                    <ul>
-                        <li><strong>Problem:</strong> Declining customer retention rates</li>
-                        <li><strong>Action:</strong> Developed and implemented new customer loyalty program</li>
-                        <li><strong>Result:</strong> Increased retention by 27% in 6 months</li>
-                    </ul>
-
-                    <h2>4. Including Irrelevant Information</h2>
-                    <p>Your high school achievements or unrelated hobbies from 15 years ago clutter your resume and distract from your relevant qualifications.</p>
-
-                    <p><strong>Solution:</strong> Only include information that:</p>
-                    <ol>
-                        <li>Demonstrates qualifications for the specific job</li>
-                        <li>Shows career progression</li>
-                        <li>Highlights significant achievements</li>
-                    </ol>
-
-                    <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Interview preparation" class="img-fluid">
-
-                    <h2>5. Using Passive Language</h2>
-                    <p>Phrases like "responsible for" or "duties included" are weak and unmemorable. They don't convey your actual impact.</p>
-
-                    <p><strong>Solution:</strong> Use strong action verbs that demonstrate initiative and achievement:</p>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul>
-                                <li>Spearheaded</li>
-                                <li>Optimized</li>
-                                <li>Transformed</li>
-                                <li>Generated</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul>
-                                <li>Engineered</li>
-                                <li>Pioneered</li>
-                                <li>Accelerated</li>
-                                <li>Architected</li>
-                            </ul>
-            </div>
-        </div>
-
-                    <h2>6. Poor Formatting and Design</h2>
-                    <p>Overly creative designs, tiny fonts, or inconsistent formatting can make your resume difficult to read. Remember that many resumes are first scanned by Applicant Tracking Systems (ATS).</p>
-
-                    <p><strong>Solution:</strong> Follow these formatting guidelines:</p>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Element</th>
-                                <th>Recommendation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Font</td>
-                                <td>Arial, Calibri, or Helvetica (10-12pt)</td>
-                            </tr>
-                            <tr>
-                                <td>Length</td>
-                                <td>1 page for &lt;10 years experience, 2 pages for more</td>
-                            </tr>
-                            <tr>
-                                <td>Margins</td>
-                                <td>0.5-1 inch on all sides</td>
-                            </tr>
-                            <tr>
-                                <td>File Format</td>
-                                <td>PDF for most cases, Word when specified</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h2>7. Missing Keywords</h2>
-                    <p>With over 90% of companies using ATS, missing relevant keywords means your resume may never be seen by human eyes.</p>
-
-                    <p><strong>Solution:</strong> Analyze the job description and incorporate key terms naturally throughout your resume. For example:</p>
-
-                    <p>If the job requires "project management," include specific projects you've managed and the outcomes.</p>
-
-                    <h2>8. Unexplained Employment Gaps</h2>
-                    <p>Gaps raise questions, but failing to address them is worse than having them.</p>
-
-                    <p><strong>Solution:</strong> Be prepared to explain gaps in your cover letter or interview. On your resume, you can:</p>
-                    <ul>
-                        <li>Use years only for employment dates (2020-2022 vs. Jan 2020-Dec 2022)</li>
-                        <li>Group contract or freelance work under "Consulting"</li>
-                        <li>Include relevant activities during gaps (volunteering, courses, etc.)</li>
-                    </ul>
-
-                    <h2>9. Including References</h2>
-                    <p>"References available upon request" wastes space and is assumed. Providing references without being asked can annoy hiring managers.</p>
-
-                    <p><strong>Solution:</strong> Remove this line entirely. Prepare a separate reference sheet to provide when requested.</p>
-
-                    <h2>10. Failing to Customize</h2>
-                    <p>Sending the same generic resume to every employer is a missed opportunity to demonstrate your fit for the specific role.</p>
-
-                    <p><strong>Solution:</strong> Tailor your resume for each application by:</p>
-                    <ol>
-                        <li>Prioritizing relevant experience</li>
-                        <li>Incorporating keywords from the job description</li>
-                        <li>Highlighting achievements most relevant to the position</li>
-                    </ol>
-
-                    <div class="alert alert-primary mt-4">
-                        <h5><i class="fas fa-lightbulb me-2"></i>Pro Tip:</h5>
-                        <p>Create a "master resume" with all your experience and accomplishments, then create tailored versions for different job types by selecting the most relevant content.</p>
-                    </div>
-
-                    <h2>Final Thoughts</h2>
-                    <p>Your resume is your personal marketing document. By avoiding these common mistakes, you'll create a powerful resume that showcases your true value and gets you in the door for interviews.</p>
-
-                    <p>Remember to <strong>quantify achievements</strong> whenever possible, <strong>focus on results</strong> rather than responsibilities, and <strong>tailor your resume</strong> for each application. With these strategies, you'll stand out in today's competitive job market.</p>
-
-                    <div class="share-buttons">
-                        <p class="me-3">Share this article:</p>
-                        <a href="#" class="share-button share-facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="share-button share-twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="share-button share-linkedin"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="share-button share-link"><i class="fas fa-link"></i></a>
-                    </div>
+                    {!! $post->content !!}
                 </div>
 
                 <!-- Author Bio -->
-                <div class="author-card">
-                    <div class="author-avatar-lg">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Jennifer Wilson">
-            </div>
-                    <div>
-                        <h4>Jennifer Wilson</h4>
-                        <p class="text-primary">Senior Career Advisor at Wonegig</p>
-                        <p>Jennifer has over 12 years of experience in career coaching and recruitment. She has helped thousands of job seekers improve their resumes and land their dream jobs. Jennifer is a certified professional resume writer and regularly conducts workshops on career development.</p>
-                        <div class="social-links">
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fas fa-globe"></i></a>
-        </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-globe"></i></a>
                     </div>
+                    @if(!empty($post->tags))
+                        <div class="article-tags">
+                            <span class="text-muted">Tags:</span>
+                            @foreach($post->tags as $tag)
+                                <button class="btn btn-sm btn-outline-primary me-1">{{ trim(ucfirst($tag)) }}</button>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Comments Section -->
@@ -251,8 +492,8 @@
                             </div>
                             <p>Excellent advice, especially about quantifying achievements. I used to list responsibilities, but after adding metrics to my resume, recruiters are much more interested in my background.</p>
                             <a href="#" class="comment-reply">Reply</a>
-            </div>
-        </div>
+                        </div>
+                    </div>
 
                     <!-- Comment Form -->
                     <div class="mt-5">

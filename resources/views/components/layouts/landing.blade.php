@@ -81,7 +81,7 @@
                 </ul>
                 <div class="d-flex">
                     @guest
-                    <a href="#" class="btn btn-outline-primary me-2 pt-2">Log In</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary me-2 pt-2">Log In</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
                     @else
                     <a href="{{ route('dashboard') }}" class="btn btn-primary">Dashboard</a>
