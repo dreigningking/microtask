@@ -47,7 +47,7 @@ class TemplateFields extends Component
                     $this->templateFields = $taskFields;
                     // Initialize field values
                     foreach ($taskFields as $field) {
-                        log($field);
+                        \Log::info($field);
                         if (isset($field['title'])) {
                             $this->templateData[$field['name']] = [
                                 'value' => '',

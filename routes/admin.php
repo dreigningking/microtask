@@ -15,15 +15,6 @@ use App\Http\Controllers\CountrySettingsController;
 
 Route::group(['prefix' => 'admin','as'=> 'admin.'], function () {
     Auth::routes();
-    // Route::view('dashboard', 'backend.dashboard')->name('dashboard');
-    // Route::view('users', 'backend.users')->name('users');
-    // Route::view('jobs', 'backend.jobs')->name('jobs');
-    // // Route::view('tasks', 'backend.tasks')->name('tasks');
-    // Route::view('earnings', 'backend.earnings')->name('earnings');
-    // Route::view('withdrawals', 'backend.withdrawals')->name('withdrawals');
-    // Route::view('notifications', 'backend.notifications')->name('notifications');
-    // Route::view('profile', 'backend.profile')->name('profile');
-    // Route::view('settings', 'backend.settings')->name('settings');
 });
 
 Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], function () {

@@ -1,13 +1,4 @@
-restrict countries - DONE
-user verify email - DONE
-Remove skills - DONE
-Write step by step instructions in description - DONE
-task template  file field - allow video, file, image upload - DONE
-Let people do profile settings - enable 2fa - DONE
-Urgent jobs - count the number of emails to send" - DONE
-Admin approve or disapprove job - DONE
-Job Approved Notification --DONE
-two factor page - DONE
+
 subscription effect on withdrawal - withdrawal maximum based on subscription - DONE 
 add monitoring fee if self-monitoring is chosen.. DONE
 Withdraw - Restrict Withdrawal to only verified account -DONE

@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{{asset('frontend/css/dashboard-overrides.css')}}">
     <!-- endinject -->
     <link rel="shortcut icon" href="{{asset('frontend/images/favicon1.png')}}" />
+    @livewireStyles
+    @stack('styles')
 </head>
 
 <body>
@@ -234,18 +236,13 @@
     <script src="{{asset('frontend/vendors/datatables.net/jquery.dataTables.js')}}"></script>
     <script src="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.js')}}"></script>
     <script src="{{asset('frontend/js/dataTables.select.min.js')}}"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="{{asset('frontend/js/off-canvas.js')}}"></script>
-    <script src="{{asset('frontend/js/template.js')}}"></script>
-    <script src="{{asset('frontend/js/settings.js')}}"></script>
-    <script src="{{asset('frontend/js/todolist.js')}}"></script>
+
     <!-- endinject -->
     <!-- Custom js for this page-->
-    <script src="{{asset('frontend/js/jquery.cookie.js')}}" type="text/javascript"></script>
-    <script src="{{asset('frontend/js/dashboard.js')}}"></script>
-    <!-- <script src="{{asset('frontend/js/Chart.roundedBarCharts.js')}}"></script> -->
-    <!-- End custom js for this page-->
+    <script src="{{asset('frontend/js/jquery.min.js')}}" type="text/javascript"></script>
+    
+    @livewireScripts
+    @stack('scripts')
 </body>
 
 </html>
