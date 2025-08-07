@@ -139,7 +139,7 @@ class ViewJob extends Component
         }
 
         // Check for existing, unexpired invitations for this specific task
-        $unexpiredEmails = \App\Models\Referral::where('task_id', $this->task->id)
+        $unexpiredEmails = Referral::where('task_id', $this->task->id)
             ->whereIn('email', $emails)
             ->where('expire_at', '>', now())
             ->pluck('email')
@@ -178,7 +178,7 @@ class ViewJob extends Component
 
         // Notify non-users
         foreach ($toInvite as $email) {
-            \App\Models\Referral::create([
+            Referral::create([
                 'referrer_id' => Auth::id(),
                 'email' => $email,
                 'task_id' => $this->task->id,

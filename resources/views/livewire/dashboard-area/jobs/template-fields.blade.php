@@ -198,11 +198,38 @@
                         <input type="file"
                             accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp4,.mov,.avi,.wmv,.mkv"
                                 class="form-control {{ $hasError ? 'is-invalid' : '' }}"
-                                wire:model="templateData.{{ $field['name'] }}.value"
+                                wire:change="updateField('{{ $field['name'] }}', $event.target.files[0])"
                                 @if($field['required'] ?? false) required @endif>
-                            @if(isset($templateData[$field['name']]['value']) && is_string($templateData[$field['name']]['value']) && Str::startsWith($templateData[$field['name']]['value'], 'storage/'))
-                            <a href="{{ asset($templateData[$field['name']]['value']) }}" target="_blank" class="text-primary text-decoration-underline small mt-1 d-inline-block">View Uploaded File</a>
+                        
+                        @if(isset($templateData[$field['name']]['value']) && is_string($templateData[$field['name']]['value']) && Str::startsWith($templateData[$field['name']]['value'], 'storage/'))
+                        <div class="mt-2">
+                            @php
+                                $filePath = $templateData[$field['name']]['value'];
+                                $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                                $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']);
+                            @endphp
+                            
+                            @if($isImage)
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <img src="{{ asset($filePath) }}" alt="Uploaded image" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <a href="{{ asset($filePath) }}" target="_blank" class="text-primary text-decoration-underline small d-block">View Image</a>
+                                    <small class="text-muted">{{ basename($filePath) }}</small>
+                                </div>
+                            </div>
+                            @else
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="ri-file-line text-muted fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <a href="{{ asset($filePath) }}" target="_blank" class="text-primary text-decoration-underline small d-block">View File</a>
+                                    <small class="text-muted">{{ basename($filePath) }}</small>
+                                </div>
+                            </div>
                             @endif
+                        </div>
+                        @endif
                     </div>
                     @break
                 @endswitch

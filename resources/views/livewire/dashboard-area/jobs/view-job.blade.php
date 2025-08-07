@@ -8,13 +8,13 @@
             </div>
             <div class="d-flex gap-2">
                 @if(!$task->is_active)
-                <span class="badge bg-secondary">Draft</span>
+                <button class="btn btn-secondary">Draft</button>
                 @elseif($task->workers->count() >= $task->number_of_people)
-                <span class="badge bg-warning">Completed</span>
+                <button class="btn btn-warning">Completed</button>
                 @elseif($task->workers->count() > 0)
-                <span class="badge bg-info">In Progress</span>
+                <button class="btn btn-info">In Progress</button>
                 @else
-                <span class="badge bg-success">Active</span>
+                <button class="bg-success bg-gradient border-0 text-white rounded" disabled>Active</button>
                 @endif
                 <a href="{{ route('jobs.edit', $task) }}" class="btn btn-outline-secondary">
                     <i class="ri-edit-line me-1"></i> Edit Job

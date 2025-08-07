@@ -29,7 +29,7 @@ class TemplateFields extends Component
     #[On('templateSelected')] 
     public function loadTemplateFields($templateId)
     {
-        \Log::info($templateId);
+        Log::info($templateId);
         $this->templateId = $templateId;
         
         // Reset template fields
@@ -47,7 +47,7 @@ class TemplateFields extends Component
                     $this->templateFields = $taskFields;
                     // Initialize field values
                     foreach ($taskFields as $field) {
-                        \Log::info($field);
+                        Log::info($field);
                         if (isset($field['title'])) {
                             $this->templateData[$field['name']] = [
                                 'value' => '',
@@ -73,6 +73,12 @@ class TemplateFields extends Component
         if (isset($this->templateData[$key])) {
             // Handle file upload
             if (is_object($value) && method_exists($value, 'getClientOriginalName')) {
+                Log::info("File upload detected for field: {$key}", [
+                    'original_name' => $value->getClientOriginalName(),
+                    'size' => $value->getSize(),
+                    'mime_type' => $value->getMimeType()
+                ]);
+                
                 // Validate file type and size
                 $this->validate([
                     "templateData.$key.value" => 'file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,mp4,mov,avi,wmv,mkv'
@@ -82,6 +88,11 @@ class TemplateFields extends Component
                 // Store file
                 $path = $value->store('tasks/template-fields', 'public');
                 $this->templateData[$key]['value'] = 'storage/' . $path;
+                
+                Log::info("File stored successfully", [
+                    'path' => $this->templateData[$key]['value'],
+                    'field_key' => $key
+                ]);
             } else {
                 $this->templateData[$key]['value'] = $value;
             }
@@ -92,6 +103,11 @@ class TemplateFields extends Component
             }
 
             // Dispatch event to notify parent component
+            Log::info("Dispatching templateFieldUpdated with data:", [
+                'key' => $key,
+                'value' => $this->templateData[$key]['value'],
+                'full_template_data' => $this->templateData
+            ]);
             $this->dispatch('templateFieldUpdated', $key, $this->templateData[$key]['value'], $this->templateData);
         }
     }

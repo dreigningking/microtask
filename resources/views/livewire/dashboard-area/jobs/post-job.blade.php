@@ -77,11 +77,11 @@
                 <input type="radio" class="btn-check" name="platform_filter" id="platform_all" wire:model="platform_id" value="" autocomplete="off" {{ !$platform_id ? 'checked' : '' }}>
                 <label class="btn btn-outline-primary btn-sm" for="platform_all">All</label>
                 
-                @foreach($platforms as $platform)
+        @foreach($platforms as $platform)
                 <input type="radio" class="btn-check" name="platform_filter" id="platform_{{ $platform->id }}" wire:model="platform_id" value="{{ $platform->id }}" autocomplete="off" {{ $platform_id == $platform->id ? 'checked' : '' }}>
                 <label class="btn btn-outline-primary btn-sm" for="platform_{{ $platform->id }}">{{ $platform->name }}</label>
-                @endforeach
-            </div>
+        @endforeach
+    </div>
         </div>
     </div>
     
@@ -95,21 +95,21 @@
                 <div class="card-body d-flex flex-column">
                     <!-- Template Header -->
                     <div class="d-flex align-items-center mb-3">
-                        @if($template->image_url)
-                        <img src="{{ $template->image_url }}" alt="{{ $template->name }}" class="rounded me-3" style="width:48px;height:48px;object-fit:cover;">
-                        @else
-                        <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;">
-                            <i class="ri-file-list-2-line text-secondary fs-3"></i>
-                        </div>
-                        @endif
+                    @if($template->image_url)
+                    <img src="{{ $template->image_url }}" alt="{{ $template->name }}" class="rounded me-3" style="width:48px;height:48px;object-fit:cover;">
+                    @else
+                    <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;">
+                        <i class="ri-file-list-2-line text-secondary fs-3"></i>
+                    </div>
+                    @endif
                         <div class="flex-grow-1">
-                            <h6 class="fw-semibold mb-1">{{ $template->name }}</h6>
+                        <h6 class="fw-semibold mb-1">{{ $template->name }}</h6>
                             <span class="badge bg-secondary">{{ $template->platform->name ?? '' }}</span>
-                        </div>
+                    </div>
                         @if($template_id == $template->id)
                         <div class="ms-2">
                             <i class="ri-check-circle-fill text-primary fs-4"></i>
-                        </div>
+                </div>
                         @endif
                     </div>
                     
@@ -172,25 +172,25 @@
                 </h5>
             </div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
+        <div class="row g-3">
+            <div class="col-md-6">
                         <label for="title" class="form-label fw-medium mb-1">Job Title <span class="text-danger">*</span></label>
-                        <input type="text" id="title" wire:model="title" class="form-control {{ $errors->has('title') ? 'is-invalid' : '' }}" placeholder="e.g. Create content for social media" required>
+                <input type="text" id="title" wire:model="title" class="form-control {{ $errors->has('title') ? 'is-invalid' : '' }}" placeholder="e.g. Create content for social media" required>
                         @error('title') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                         <label for="expected_completion_minutes" class="form-label fw-medium mb-1">Expected Completion Time <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="number" id="expected_completion_minutes" wire:model="expected_completion_minutes" min="1" class="form-control {{ $errors->has('expected_completion_minutes') ? 'is-invalid' : '' }}" placeholder="e.g. 3" required>
                             <select id="time_unit" wire:model="time_unit" class="form-select {{ $errors->has('time_unit') ? 'is-invalid' : '' }}" style="max-width: 120px;">
-                                <option value="minutes" selected>Minutes</option>
-                                <option value="hours">Hours</option>
-                                <option value="days">Days</option>
-                                <option value="weeks">Weeks</option>
-                            </select>
-                        </div>
+                            <option value="minutes" selected>Minutes</option>
+                            <option value="hours">Hours</option>
+                            <option value="days">Days</option>
+                            <option value="weeks">Weeks</option>
+                        </select>
+                            </div>
                         @error('expected_completion_minutes') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -205,13 +205,13 @@
             </div>
             <div class="card-body">
                 <label for="description-editor" class="form-label fw-medium mb-1">Write step by step instructions on what to do<span class="text-danger">*</span></label>
-                <div class="linenumbered-textarea">
-                    <div class="line-numbers"></div>
+            <div class="linenumbered-textarea">
+                <div class="line-numbers"></div>
                     <textarea id="description-editor" rows="4" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" placeholder="Provide a detailed description of the job. Include specific tasks, goals, and any special instructions." required>{{ $description }}</textarea>
-                    <input type="hidden" wire:model="description" id="description-hidden">
-                </div>
-                @error('description') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                <input type="hidden" wire:model="description" id="description-hidden">
             </div>
+                @error('description') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+        </div>
         </div>
         
         <!-- Template Fields -->
@@ -223,8 +223,8 @@
                 </h5>
             </div>
             <div class="card-body">
-                @livewire('dashboard-area.jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
-            </div>
+            @livewire('dashboard-area.jobs.template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
+        </div>
         </div>
         
         <!-- Requirements -->
@@ -238,15 +238,15 @@
             <div class="card-body">
                 <div wire:ignore>
                     <label for="requirements" class="form-label fw-medium mb-1">Required Tools <span class="text-danger">*</span></label>
-                    <select id="requirements" class="form-control select2 {{ $errors->has('requirements') ? 'is-invalid' : '' }}" multiple>
-                        @foreach($requirements as $tool)
-                        <option value="{{ $tool }}" selected>{{ $tool }}</option>
-                        @endforeach
-                    </select>
+                <select id="requirements" class="form-control select2 {{ $errors->has('requirements') ? 'is-invalid' : '' }}" multiple>
+                    @foreach($requirements as $tool)
+                    <option value="{{ $tool }}" selected>{{ $tool }}</option>
+                    @endforeach
+                </select>
                     <div class="form-text">Add tools or software required for this job</div>
                     @error('requirements') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                </div>
             </div>
+        </div>
         </div>
         
         <!-- Restricted Countries -->
@@ -260,14 +260,14 @@
             <div class="card-body">
                 <p class="text-muted mb-3">Optionally, you can restrict workers from specific countries from applying to this job.</p>
                 <div wire:ignore>
-                    <select id="restricted_countries" class="form-control select2 {{ $errors->has('restricted_countries') ? 'is-invalid' : '' }}" multiple>
-                        @foreach($countries as $country)
-                        <option value="{{ $country->id }}">{{ $country->name }}</option>
-                        @endforeach
-                    </select>
+                <select id="restricted_countries" class="form-control select2 {{ $errors->has('restricted_countries') ? 'is-invalid' : '' }}" multiple>
+                    @foreach($countries as $country)
+                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
                     @error('restricted_countries') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                </div>
             </div>
+        </div>
         </div>
         
         <!-- Step Actions -->
@@ -302,24 +302,27 @@
             </div>
             <div class="card-body">
                 <label class="form-label fw-medium mb-3">Monitoring Type <span class="text-danger">*</span></label>
-                <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
                         <div class="monitoring-option">
                             <input type="radio" id="selfMonitored" wire:model="monitoring_type" wire:change="updateTotals" value="self_monitoring" class="btn-check" {{ $monitoring_type === 'self_monitoring' ? 'checked' : '' }}>
-                            <label for="selfMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 border-2 {{ $monitoring_type === 'self_monitoring' ? 'active' : '' }}">
+                            <label for="selfMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 {{ $monitoring_type === 'self_monitoring' ? 'active' : '' }}">
                                 <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-2">
                                     <i class="ri-user-settings-line text-primary fs-4"></i>
                                 </div>
                                 <span class="fw-semibold mb-1">Self-Monitored</span>
                                 <span class="small text-muted text-center">You'll review and approve all work</span>
-                                <span class="badge bg-success mt-2">Free</span>
+                                <span class="badge bg-warning mt-2">{{ $currency_symbol }}{{ number_format($countrySetting->admin_monitoring_cost ?? 0, 2) }}</span>
+                                <small class="text-success mt-1">
+                                    <i class="ri-refund-line me-1"></i>Refunded if no admin intervention needed
+                                </small>
                             </label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="monitoring-option">
                             <input type="radio" id="adminMonitored" wire:model="monitoring_type" wire:change="updateTotals" value="admin_monitoring" class="btn-check" {{ $monitoring_type === 'admin_monitoring' ? 'checked' : '' }}>
-                            <label for="adminMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 border-2 {{ $monitoring_type === 'admin_monitoring' ? 'active' : '' }}">
+                            <label for="adminMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 {{ $monitoring_type === 'admin_monitoring' ? 'active' : '' }}">
                                 <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-2">
                                     <i class="ri-admin-line text-primary fs-4"></i>
                                 </div>
@@ -333,7 +336,7 @@
                     <div class="col-md-4">
                         <div class="monitoring-option">
                             <input type="radio" id="systemMonitored" wire:model="monitoring_type" wire:change="updateTotals" value="system_monitoring" class="btn-check" {{ $monitoring_type === 'system_monitoring' ? 'checked' : '' }}>
-                            <label for="systemMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 border-2 {{ $monitoring_type === 'system_monitoring' ? 'active' : '' }}">
+                            <label for="systemMonitored" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3 {{ $monitoring_type === 'system_monitoring' ? 'active' : '' }}">
                                 <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-2">
                                     <i class="ri-robot-2-line text-primary fs-4"></i>
                                 </div>
@@ -358,11 +361,11 @@
             </div>
             <div class="card-body">
                 <div class="row g-4">
-                    <!-- Budget & Capacity Column -->
-                    <div class="col-md-6">
+                <!-- Budget & Capacity Column -->
+                <div class="col-md-6">
                         <h6 class="fw-semibold mb-3">Budget & Capacity</h6>
                         
-                        <!-- Budget Per Person -->
+                    <!-- Budget Per Person -->
                         <div class="mb-3">
                             <label for="budget_per_person" class="form-label fw-medium mb-1">Budget Per Person <span class="text-danger">*</span></label>
                             <div class="input-group">
@@ -375,28 +378,28 @@
                         <!-- Number of People -->
                         <div class="mb-3">
                             <label for="number_of_people" class="form-label fw-medium mb-1">Number of People <span class="text-danger">*</span></label>
-                            <div class="input-group" style="max-width: 200px;">
+                            <div class="input-group" style="max-width: 250px;">
                                 <button type="button" wire:click="decreasePeople" class="btn btn-outline-secondary">
-                                    <i class="ri-subtract-line"></i>
-                                </button>
+                                    <i class="fa fa-minus"></i>
+                            </button>
                                 <input type="number" id="number_of_people" wire:model="number_of_people" wire:input="updateTotals" min="1" class="form-control text-center" style="width: 80px;">
                                 <button type="button" wire:click="increasePeople" class="btn btn-outline-secondary">
-                                    <i class="ri-add-line"></i>
-                                </button>
-                            </div>
-                            @error('number_of_people') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                    <i class="fa fa-plus"></i>
+                            </button>
                         </div>
+                            @error('number_of_people') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                    </div>
                         
-                        <!-- Expiry Date -->
+                    <!-- Expiry Date -->
                         <div class="mb-3">
                             <label for="expiry_date" class="form-label fw-medium mb-1">Job Expiry Date</label>
-                            <input type="date" id="expiry_date" wire:model="expiry_date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}">
+                        <input type="date" id="expiry_date" wire:model="expiry_date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}">
                             @error('expiry_date') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                        </div>
                     </div>
+                </div>
                     
-                    <!-- Promotion Options Column -->
-                    <div class="col-md-6">
+                <!-- Promotion Options Column -->
+                <div class="col-md-6">
                         <h6 class="fw-semibold mb-3">Promotion Options</h6>
                         
                         <!-- Featured Job Option -->
@@ -404,27 +407,27 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-start">
                                     <div class="form-check me-3">
-                                        <input id="featured" type="checkbox" wire:model="featured" wire:change="updateTotals" class="form-check-input">
+                                        <input id="featured" type="checkbox" wire:model="featured" wire:change="updateTotals" class="form-check-input ms-0">
                                         <label for="featured" class="form-check-label fw-medium">Featured Job</label>
-                                    </div>
+                            </div>
                                     <div class="flex-grow-1">
                                         <p class="small text-muted mb-2">Display prominently in search results</p>
-                                        @if($featured)
+                        @if($featured)
                                         <div class="d-flex align-items-center">
                                             <input type="number" wire:model="featured_days" wire:input="updateTotals" min="1" class="form-control form-control-sm" style="width: 80px;" placeholder="Days">
-                                            <span class="small text-muted ms-2">days</span>
-                                        </div>
-                                        @endif
+                            <span class="small text-muted ms-2">days</span>
+                        </div>
+                        @endif
                                         <small class="text-muted">
-                                            @if($featuredPrice == 0)
+                            @if($featuredPrice == 0)
                                             <i class="ri-check-line text-success me-1"></i>Included in your subscription
-                                            @else
+                            @else
                                             <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($featuredPrice, 2) }} per day
-                                            @endif
+                            @endif
                                         </small>
-                                    </div>
-                                </div>
+                    </div>
                             </div>
+                        </div>
                         </div>
                         
                         <!-- Urgent Badge Option -->
@@ -438,15 +441,15 @@
                                     <div class="flex-grow-1">
                                         <p class="small text-muted mb-2">Add badge to attract immediate attention</p>
                                         <small class="text-muted">
-                                            @if($urgentPrice == 0)
+                            @if($urgentPrice == 0)
                                             <i class="ri-check-line text-success me-1"></i>Included in your subscription
-                                            @else
+                            @else
                                             <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($urgentPrice, 2) }} per person
-                                            @endif
+                            @endif
                                         </small>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
+            </div>
                         </div>
                     </div>
                 </div>
@@ -468,10 +471,10 @@
                         <div class="text-center p-3 bg-light rounded">
                             <h6 class="text-muted mb-1">Total Budget</h6>
                             <div class="fw-bold text-primary fs-3">
-                                {{ $currency_symbol }} {{ number_format($total, 2) }}
-                            </div>
-                            <p class="small text-muted mb-0">For {{ $number_of_people }} person{{ $number_of_people > 1 ? 's' : '' }}</p>
+                            {{ $currency_symbol }} {{ number_format($total, 2) }}
                         </div>
+                            <p class="small text-muted mb-0">For {{ $number_of_people }} person{{ $number_of_people > 1 ? 's' : '' }}</p>
+                    </div>
                     </div>
                     
                     <!-- Pricing Breakdown -->
@@ -547,19 +550,19 @@
         </div>
         
         <!-- Step Actions -->
-        <div class="d-flex justify-content-between mt-4 border-top border-light pt-3">
-            <button type="button" wire:click="previousStep" class="btn btn-outline-secondary px-4">
+            <div class="d-flex justify-content-between mt-4 border-top border-light pt-3">
+                <button type="button" wire:click="previousStep" class="btn btn-outline-secondary px-4">
                 <i class="ri-arrow-left-line me-1"></i>
                 <span>Back</span>
-            </button>
-            <div class="d-flex gap-2">
-                @if($template_id && $isLoggedIn)
-                <button type="button" wire:click="saveAsDraft" class="btn btn-outline-primary px-4">Save Draft</button>
-                @endif
-                <button type="submit" class="btn btn-primary px-4">
+                </button>
+                <div class="d-flex gap-2">
+                    @if($template_id && $isLoggedIn)
+                    <button type="button" wire:click="saveAsDraft" class="btn btn-outline-primary px-4">Save Draft</button>
+                    @endif
+                    <button type="submit" class="btn btn-primary px-4">
                     <span>Next Step</span>
                     <i class="ri-arrow-right-line ms-1"></i>
-                </button>
+                    </button>
             </div>
         </div>
     </form>
@@ -593,12 +596,12 @@
                         <!-- Detailed Breakdown -->
                         <div class="col-md-6">
                             <h6 class="fw-semibold mb-3">Cost Breakdown</h6>
-                            <div class="d-flex flex-column gap-2">
+                        <div class="d-flex flex-column gap-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Job Budget:</span>
-                                    <span class="fw-medium">{{ $currency_symbol }} {{ number_format($expected_budget, 2) }}</span>
-                                </div>
-                                @if($featured)
+                                <span class="fw-medium">{{ $currency_symbol }} {{ number_format($expected_budget, 2) }}</span>
+                            </div>
+                            @if($featured)
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Featured Job ({{ $featured_days }} day{{ $featured_days > 1 ? 's' : '' }}):</span>
                                     <span class="fw-medium">
@@ -608,9 +611,9 @@
                                         {{ $currency_symbol }} {{ number_format($featuredPrice * $featured_days, 2) }}
                                         @endif
                                     </span>
-                                </div>
-                                @endif
-                                @if($urgent)
+                            </div>
+                            @endif
+                            @if($urgent)
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Urgent Badge ({{ $number_of_people }} people):</span>
                                     <span class="fw-medium">
@@ -620,40 +623,40 @@
                                         {{ $currency_symbol }} {{ number_format($urgentPrice * $number_of_people, 2) }}
                                         @endif
                                     </span>
-                                </div>
-                                @endif
+                            </div>
+                            @endif
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Platform Service Charge:</span>
-                                    <span class="fw-medium">{{ $currency_symbol }} {{ number_format($serviceFee, 2) }}</span>
-                                </div>
-                                @if($monitoring_fee > 0)
+                                <span class="fw-medium">{{ $currency_symbol }} {{ number_format($serviceFee, 2) }}</span>
+                            </div>
+                            @if($monitoring_fee > 0)
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Monitoring Fee:</span>
-                                    <span class="fw-medium">{{ $currency_symbol }} {{ number_format($monitoring_fee, 2) }}</span>
-                                </div>
-                                @if($showSelfMonitoringRefundNote)
+                                <span class="fw-medium">{{ $currency_symbol }} {{ number_format($monitoring_fee, 2) }}</span>
+                            </div>
+                            @if($showSelfMonitoringRefundNote)
                                 <div class="small text-primary mt-1 ms-2">
                                     <i class="ri-information-line me-1"></i>This fee will be refunded if no admin intervention is required
                                 </div>
-                                @endif
-                                @endif
+                            @endif
+                            @endif
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">Subtotal:</span>
                                     <span class="fw-bold text-primary">{{ $currency_symbol }} {{ number_format($subtotal, 2) }}</span>
-                                </div>
+                            </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Tax ({{ $tax_rate }}%):</span>
-                                    <span class="fw-medium">{{ $currency_symbol }} {{ number_format($tax, 2) }}</span>
-                                </div>
+                                <span class="fw-medium">{{ $currency_symbol }} {{ number_format($tax, 2) }}</span>
+                            </div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">Total:</span>
                                     <span class="fw-bold text-primary fs-5">{{ $currency_symbol }} {{ number_format($total, 2) }}</span>
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -693,7 +696,7 @@
                 </div>
             </div>
 
-            @if(!$isLoggedIn)
+                @if(!$isLoggedIn)
             <!-- Login Form -->
             <div class="card mb-4 border-warning">
                 <div class="card-header bg-warning bg-opacity-10 border-warning">
@@ -701,7 +704,7 @@
                         <i class="ri-user-line me-2"></i>
                         Login Required
                     </h5>
-                </div>
+                        </div>
                 <div class="card-body">
                     <p class="text-muted mb-4">Please login to continue with your job posting.</p>
                     <form wire:submit.prevent="nextStep" class="row g-3">
@@ -712,7 +715,7 @@
                                     <i class="ri-mail-line"></i>
                                 </span>
                                 <input type="email" id="email" wire:model="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="Enter your email" required>
-                            </div>
+                        </div>
                             @error('email') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6">
@@ -726,13 +729,13 @@
                             @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between">
                                 <div class="form-check">
                                     <input type="checkbox" id="remember" wire:model="remember" class="form-check-input">
                                     <label for="remember" class="form-check-label small text-muted">Remember me</label>
-                                </div>
-                                <a href="{{ route('password.request') }}" class="small text-primary text-decoration-underline">Forgot password?</a>
                             </div>
+                            <a href="{{ route('password.request') }}" class="small text-primary text-decoration-underline">Forgot password?</a>
+                        </div>
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
@@ -745,9 +748,9 @@
                         <span class="small text-muted">Don't have an account?</span>
                         <a href="{{ route('register') }}" class="small text-primary fw-semibold text-decoration-underline ms-1">Register here</a>
                     </div>
+                    </div>
                 </div>
-            </div>
-            @else
+                @else
             <!-- Terms & Conditions -->
             <div class="card mb-4 border-info">
                 <div class="card-header bg-info bg-opacity-10 border-info">
@@ -755,7 +758,7 @@
                         <i class="ri-file-text-line me-2"></i>
                         Terms & Conditions
                     </h5>
-                </div>
+                        </div>
                 <div class="card-body">
                     <form wire:submit.prevent="nextStep">
                         <div class="form-check">
@@ -780,14 +783,14 @@
             <div class="d-flex justify-content-between mt-4">
                 <button type="button" wire:click="previousStep" class="btn btn-outline-secondary px-4">
                     <i class="ri-arrow-left-line me-1"></i>
-                    <span>Back</span>
+                        <span>Back</span>
                 </button>
             </div>
         </div>
-    @endif
+        @endif
 
-    @endif
-</div>
+        @endif
+    </div>
 
 @push('styles')
 <link href="{{asset('frontend/css/select2.min.css')}}" rel="stylesheet" />
@@ -874,14 +877,16 @@
     
     .monitoring-option .btn {
         transition: all 0.2s ease;
-        border: 2px solid #e9ecef;
+        border: 1px solid #e9ecef;
         min-height: 140px;
+        background-color: transparent;
     }
     
     .monitoring-option .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #0d6efd;
+        border-color: #0d6efd !important;
+        background-color: transparent !important;
+        transform: none;
+        box-shadow: none;
     }
     
     .monitoring-option .btn-check:checked + .btn {
@@ -943,7 +948,7 @@
     .card.border-success .card-header {
         background-color: rgba(25, 135, 84, 0.1) !important;
     }
-    
+
     /* Select2 Custom Styling */
     .select2-container .select2-selection--single {
         height: 40px !important;
@@ -972,16 +977,16 @@
     }
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        /* background-color: rgba(13, 110, 253, 0.1);
-        border-color: rgba(13, 110, 253, 0.2); */
-        font-size: 14px;
+    /* background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.2); */
+    font-size: 14px;
         border-radius: 9999px;
         padding: 2px 8px;
         margin-top: 4px;
     }
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #0d6efd;
+    color: #0d6efd;
         margin-right: 5px;
         border: none !important;
     }
@@ -1013,62 +1018,60 @@
         box-shadow: none;
         border: none;
         outline: none;
-    }
+        }
 </style>
 @endpush
 
 @push('scripts')
-<script src="{{asset('frontend/js/select2.min.js')}}"></script>
-<script src="{{ asset('frontend/js/textarea-linenumbers.js') }}"></script>
-<script>
+    <script src="{{asset('frontend/js/select2.min.js')}}"></script>
+    <script src="{{ asset('frontend/js/textarea-linenumbers.js') }}"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
     
-    Livewire.on('step2-shown', function() {
-        console.log('step2-shown');
-        setTimeout(initializeSelect2, 100);
-        setTimeout(initLineNumberedTextareas, 100);
-        
-    });
+        Livewire.on('step2-shown', function() {
+            setTimeout(initializeSelect2, 100);
+            setTimeout(initLineNumberedTextareas, 100);
+        });
 
-    function initializeSelect2() {
-        if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
-            if (jQuery('#requirements').length) {
-                if (jQuery('#requirements').hasClass('select2-hidden-accessible')) {
-                    jQuery('#requirements').select2('destroy');
-                }
-                jQuery('#requirements').select2({
-                    placeholder: "Select tools required",
-                    allowClear: true,
-                    tags: true,
-                    width: '100%'
-                }).on('change', function(e) {
-                    // Get selected data
-                    let data = jQuery(this).val();
-                    window.Livewire.dispatch('updateSelect2', {
-                        data: data,
-                        element: 'requirements'
+        function initializeSelect2() {
+            if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
+                if (jQuery('#requirements').length) {
+                    if (jQuery('#requirements').hasClass('select2-hidden-accessible')) {
+                        jQuery('#requirements').select2('destroy');
+                    }
+                    jQuery('#requirements').select2({
+                        placeholder: "Select tools required",
+                        allowClear: true,
+                        tags: true,
+                        width: '100%'
+                    }).on('change', function(e) {
+                        // Get selected data
+                        let data = jQuery(this).val();
+                        window.Livewire.dispatch('updateSelect2', {
+                            data: data,
+                            element: 'requirements'
+                        });
                     });
-                });
-            }
-            if (jQuery('#restricted_countries').length) {
-                if (jQuery('#restricted_countries').hasClass('select2-hidden-accessible')) {
-                    jQuery('#restricted_countries').select2('destroy');
                 }
-                jQuery('#restricted_countries').select2({
-                    placeholder: "Select countries to restrict",
-                    allowClear: true,
-                    width: '100%'
-                }).on('change', function(e) {
-                    // Get selected data
-                    let data = jQuery(this).val();
-                    window.Livewire.dispatch('updateSelect2', {
-                        data: data,
-                        element: 'restricted_countries'
+                if (jQuery('#restricted_countries').length) {
+                    if (jQuery('#restricted_countries').hasClass('select2-hidden-accessible')) {
+                        jQuery('#restricted_countries').select2('destroy');
+                    }
+                    jQuery('#restricted_countries').select2({
+                        placeholder: "Select countries to restrict",
+                        allowClear: true,
+                        width: '100%'
+                    }).on('change', function(e) {
+                        // Get selected data
+                        let data = jQuery(this).val();
+                        window.Livewire.dispatch('updateSelect2', {
+                            data: data,
+                            element: 'restricted_countries'
+                        });
                     });
-                });
+                }
             }
         }
-    }
     
     function initLineNumberedTextareas() {
         if (typeof window.initLineNumberedTextareas === 'function') {
@@ -1076,5 +1079,5 @@
         }
     }
 })
-</script>
-@endpush
+    </script>
+    @endpush

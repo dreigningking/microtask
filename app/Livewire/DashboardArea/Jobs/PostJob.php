@@ -156,9 +156,26 @@ class PostJob extends Component
             ];
             // Add validation rules for required template fields
             if (!empty($this->templateData)) {
+                Log::info("Template data for validation:", $this->templateData);
                 foreach ($this->templateData as $key => $field) {
                     if ($field['required'] ?? false) {
-                        $rules["templateData.{$key}.value"] = 'required';
+                        // For file fields, check if a file path exists
+                        if (isset($field['type']) && $field['type'] === 'file') {
+                            // Don't add validation rule for file fields, we'll check manually
+                            Log::info("File field detected: {$key}", [
+                                'field_type' => $field['type'],
+                                'field_value' => $field['value'],
+                                'is_empty' => empty($field['value']),
+                                'field_structure' => $field
+                            ]);
+                        } else {
+                            $rules["templateData.{$key}.value"] = 'required';
+                            Log::info("Added regular validation rule for field: {$key}", [
+                                'field_type' => $field['type'] ?? 'unknown',
+                                'field_value' => $field['value'],
+                                'is_empty' => empty($field['value'])
+                            ]);
+                        }
                         $this->messages["templateData.{$key}.value.required"] = "The {$field['title']} field is required";
                     }
                 }
@@ -250,7 +267,32 @@ class PostJob extends Component
     {
         
         try {
-            $this->validate($this->getStepRules());
+            Log::info("Starting nextStep validation for step: " . $this->currentStep);
+            $rules = $this->getStepRules();
+            Log::info("Validation rules:", $rules);
+            Log::info("Current template data:", $this->templateData);
+            
+            // Manual validation for file fields
+            if ($this->currentStep == 2 && !empty($this->templateData)) {
+                foreach ($this->templateData as $key => $field) {
+                    if (($field['required'] ?? false) && isset($field['type']) && $field['type'] === 'file') {
+                        if (empty($field['value'])) {
+                            Log::error("File field validation failed for: {$key}", [
+                                'field' => $field,
+                                'value' => $field['value']
+                            ]);
+                            $this->addError("templateData.{$key}.value", "The {$field['title']} field is required");
+                        } else {
+                            Log::info("File field validation passed for: {$key}", [
+                                'field' => $field,
+                                'value' => $field['value']
+                            ]);
+                        }
+                    }
+                }
+            }
+            
+            $this->validate($rules);
             if ($this->currentStep < $this->totalSteps) {
                 $this->currentStep++;
                 if($this->currentStep == 2){
@@ -270,6 +312,11 @@ class PostJob extends Component
                 }
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error("Validation failed:", [
+                'errors' => $e->validator->errors()->toArray(),
+                'step' => $this->currentStep,
+                'template_data' => $this->templateData
+            ]);
             $this->dispatch('validationErrors', $e->validator->errors()->toArray());
             throw $e;
         }
@@ -308,6 +355,11 @@ class PostJob extends Component
      */
     public function handleTemplateFieldUpdated($key, $value, $allValues)
     {
+        Log::info("Received templateFieldUpdated event:", [
+            'key' => $key,
+            'value' => $value,
+            'allValues' => $allValues
+        ]);
         $this->templateData = $allValues;
     }
 
@@ -485,7 +537,7 @@ class PostJob extends Component
         $task = new Task();
         $task->user_id = Auth::id();
         $task->template_id = $this->template_id ?? 1; // Default template if none selected
-        $task->platform_id = TaskTemplate::find($this->platform_id)->platform_id;
+        $task->platform_id = TaskTemplate::find($this->template_id)->platform_id;
         $task->title = $this->title;
         $task->description = $this->description;
         $task->expected_completion_minutes = $minutes;

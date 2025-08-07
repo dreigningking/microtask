@@ -137,6 +137,7 @@ class EditJob extends Component
     public $canEditAll = false;
     public $canEditSome = false;
     public $canEditNone = false;
+    public $canEdit = false; // New property to track if job can be edited
 
     public function mount(Task $task)
     {
@@ -248,13 +249,14 @@ class EditJob extends Component
         // Check if task has workers
         $this->hasWorkers = $this->task->workers()->count() > 0;
 
-        // Determine edit permissions
+        // Determine edit permissions - jobs can only be edited if not paid for
         if (!$this->isPaid) {
             $this->canEditAll = true;
-        } elseif ($this->isPaid && !$this->hasWorkers) {
-            $this->canEditSome = true;
-        } elseif ($this->isPaid && $this->hasWorkers) {
+            $this->canEdit = true; // Job is editable
+        } else {
+            // Job has been paid for, cannot be edited
             $this->canEditNone = true;
+            $this->canEdit = false; // Job is not editable
         }
     }
     
@@ -409,6 +411,12 @@ class EditJob extends Component
     
     public function submitJob()
     {
+        // Check if job can be edited
+        if (!$this->canEdit) {
+            session()->flash('error', 'This job has been paid for and cannot be modified.');
+            return;
+        }
+        
         $this->validate();
         
         // Convert time units to minutes
@@ -442,6 +450,8 @@ class EditJob extends Component
         
         // Handle promotions - only create new ones if they don't exist
         $this->handlePromotions();
+        
+        session()->flash('success', 'Job updated successfully! Redirecting to payment...');
         
         // Create order and payment
         $order = Order::create(['user_id' => Auth::id()]);

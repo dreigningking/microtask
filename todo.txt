@@ -1,13 +1,4 @@
-
-subscription effect on withdrawal - withdrawal maximum based on subscription - DONE 
-add monitoring fee if self-monitoring is chosen.. DONE
-Withdraw - Restrict Withdrawal to only verified account -DONE
-Disallow withdrawal when wallet is frozen - DONE
-Disallow withdrawal when country wallets is frozen - DONE
-Admin Permissions - Separate admins by their roles and permissions and effect their permissions- DONE
-save draft -DONE
-edit draft if not yet paid - DONE
---------------------------------------------------------
+-----------------------------------------------------
 PROFILE
 
 notification settings logic. 
