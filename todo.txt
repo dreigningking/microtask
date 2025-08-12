@@ -1,52 +1,62 @@
------------------------------------------------------
-PROFILE
+----------------------------------------------- 
+Notifications
+---------------------------------------------
+Blog Subscription Notification 24hours after post creation
+Job Approved
+JobInvite
+UrgentJob Notification
+JobSubmission
+Late Subsubmission Review Notification
+Disbursement Notification if admin initiated it
+Task Submission Reviewed Notification
+EarningNotification
+SupportReplyNotification
+Verification Result
+Withdrawal Complete 
+Exchange Complete 
+DisputeNotificationTask
+DisputeNotificationJob
+Subscription Expiring/Expiry
+-------ADMIN----------
+TaskReportNotification
+Withdrawal Request 
+Support Notification - new, closed, 
+SupportEscalation
+Verification Request
+DisputeNotification
 
-notification settings logic. 
+-----------------------------------------------------
+User
+-----------------------------------------------------
+Submit Task one time & multiple times
+Job templates should show platform image
+vpn block
+Logs of activities e.g accepted terms
+
+if user country is restricted from taking job, don't show saving & start..
+if user is banned from taking new tasks, don't show saving & start
+
+Worker can Report a task: 
+Is there something wrong with this campaign? If the link is broken, 
+instructions don't make sense, instructions take longer than 2 hours to complete, 
+or anything else is wrong with this campaign click the report a problem button below
+
+start job - check user's job start limit within the hour i.e number of ongoing jobs vs subscription limit
+start job records user as worker
+submit job - check user's job submit limit within the hour i.e number of ongoing jobs vs subscription limit
 
 JOBS
 refund taskmaster the admin-monitoring fee is no intervention was found
 
 Featured Jobs - identify places to show featured jobs"
-
-Submit
-
-
-------------------------------------------------
-TASK
-
-user search for job & filter job -DONE
-users not logged in cannot take job - DONE
-
-Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
-admin can create task, and assign to user
-Task master invites users by emails to job
+Remove Follower Feature  (workers can follow task masters) because it conflicts with Urgent Promotion{
+    worker subscription - add feature to receive notification from people you follow
+}
 
 
-Users can click don't show on a task
-users can save task
-user must agree to work conditions first time he wants to take job
-    if user country is restricted from taking job, don't show saving & start..
-    if user is banned from taking new tasks, don't show saving & start
-Worker can Report a task: 
-    Is there something wrong with this campaign? If the link is broken, 
-    instructions don't make sense, instructions take longer than 2 hours to complete, 
-    or anything else is wrong with this campaign click the report a problem button below
-start job - check user's job start limit within the hour i.e number of ongoing jobs vs subscription limit
-start job records user as worker
-submit job - check user's job submit limit within the hour i.e number of ongoing jobs vs subscription limit
-edit submission
-----------------------------------------------
-
-
-
-Buy Subscription
-Users can use money in their wallet to buy subscription - DONE
-subscription expiry notification
-renew/change subscription
-link to subscription page
------------------------------------------------ 
-after job submission - taskmaster
-job submission notification
+---------------------------------------------------------
+REVIEW
+-------------------------------
 - task master review submission
     - marks submission good 
         - reviews submission/worker
@@ -61,7 +71,6 @@ job submission notification
             AdminToUserNotification
     - Task master: minutes on submission & request something in addition to submission
 
----------------------------------------------------------
 after job submission review - worker
 
 - worker reviews task & taskmaster
@@ -72,52 +81,41 @@ after job submission review - worker
 - admin verdict is executed 
     - pay worker and mark submission good
     - mark submission bad & flag worker 
----------------------------------------------------------------
 
-Follower
-workers can follow task masters
-workers can see list of people he is following - and view active jobs
-worker subscription - add feature to receive notification from people you follow
-------------------------------------
-Support
-Support Notification
-Admin Support 
-----------------------------------------------------
+-----------------------------------------------------
+Guest
+-----------------------------------------------------
+Home page search for jobs - locations
+Top Earners
+blog subscription
+
+-------------------------------------------------------
+ADMIN
+---------------------------------------------------
+Admin dashboard - Show pending tasks
+Admin message to all via notification
+Admin user limit by Country
+Admin support 
+Roles slugs
+Ban user from user
+Blog send notification to subscribers and users
+remove these databases: dispute, task, task worker. rerun migration
+Change server upload to 2mb
+payouts require approval ? 
+admin can create task, and assign to user
+Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
+
+----------------------------------------------
+New FEATURES
+----------------------------------------------
+Add Raffle Draw
+Google adsense
+System Monitoring - Implement system monitoring strategies"
+automatic verifications ?
+can verifications expire?
 
 BADGES
 number of dispute cases ongoing can give you a badge
 number of dispute cases can give you a badge
 number of failure to pay on time can give you a badge
 number of bad submissions can give you a badge
-----------------------------------------------------
-FEATURES
-Logs of activities e.g accepted terms
-
-Referrals - 
-
-
-automatic verifications ?
-can verifications expire?
-
-
-payouts require approval ? 
-
-System Monitoring - Implement system monitoring strategies"
-Google adsense
-Job templates should show platform image
-Top Earners
-blog subscription
-vpn block
-remove these databases: dispute, task, task worker. rerun migration
-Add Raffle Draw
-Change server upload to 2mb
-
-
------------------------------------------------------
-Roles
-
-Admin user limit by Country
--------------------------------------------------------
-Admin dashboard
-
-Admin message to all via notification

@@ -22,6 +22,7 @@ use App\Livewire\DashboardArea\Support\Tickets;
 use App\Livewire\DashboardArea\Tasks\ListTasks;
 use App\Livewire\DashboardArea\Settings\Profile;
 use App\Livewire\LandingArea\Policies\Disclaimer;
+use App\Livewire\DashboardArea\Support\TicketView;
 use App\Livewire\LandingArea\Policies\PrivacyPolicy;
 use App\Livewire\DashboardArea\Earnings\ListEarnings;
 use App\Livewire\DashboardArea\Referrals\InviteesList;
@@ -93,6 +94,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('subscriptions', Subscriptions::class)->name('subscriptions');
         
         Route::get('support', Tickets::class)->name('support');
+        Route::get('support/ticket/{ticket}', TicketView::class)->name('support.ticket');
     });
 });
 

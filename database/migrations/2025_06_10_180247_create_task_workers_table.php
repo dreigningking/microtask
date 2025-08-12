@@ -17,7 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->timestamp('saved_at')->nullable();
             $table->timestamp('accepted_at')->nullable();
-            $table->timestamp('cancelled_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
+            $table->text('task_review')->nullable();
+            $table->integer('task_rating')->nullable();
             $table->timestamps();
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

@@ -1,6 +1,5 @@
 <div class="container py-5">
     <div class="row">
-        <!-- Main Content -->
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
@@ -73,7 +72,6 @@
             </div>
         </div>
 
-        <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Action Card -->
             <div class="card shadow-sm border-0 mb-4">
@@ -176,14 +174,44 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h4 class="h6 fw-semibold mb-1">{{ $task->user->name }}</h4>
+                            <h4 class="h6 fw-semibold mb-1">{{ $task->user->username }}</h4>
                             <div class="small text-muted">
                                 Member since {{ $task->user->created_at->format('M Y') }}
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Action Buttons -->
+                    @auth
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex gap-2">
+                            @if($isHidden)
+                            <button 
+                                wire:click="unhideTask({{ $task->id }})" 
+                                class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-eye me-1"></i>
+                                Unhide Task
+                            </button>
+                            @else
+                            <button 
+                                wire:click="hideTask({{ $task->id }})" 
+                                class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-eye-slash me-1"></i>
+                                Hide Task
+                            </button>
+                            @endif
+                            <button 
+                                wire:click="reportTask({{ $task->id }})" 
+                                class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-flag me-1"></i>
+                                Report
+                            </button>
+                        </div>
+                    </div>
+                    @endauth
                 </div>
             </div>
         </div>
     </div>
-</div> 
+    @livewire('dashboard-area.tasks.report-task') 
+</div>

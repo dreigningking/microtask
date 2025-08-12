@@ -22,7 +22,6 @@ class ViewJob extends Component
     use WithFileUploads, WithPagination;
 
     public Task $task;
-    public $showInviteModal = false;
     public $showSubmissionModal = false;
     public $showWorkerDetailsModal = false;
     public $showDisburseConfirmModal = false;
@@ -47,17 +46,6 @@ class ViewJob extends Component
     public function updatingSearch()
     {
         $this->resetPage();
-    }
-
-    public function openInviteModal()
-    {
-        $this->showInviteModal = true;
-    }
-
-    public function closeInviteModal()
-    {
-        $this->showInviteModal = false;
-        $this->reset(['inviteEmail', 'inviteSummary']);
     }
 
     public function viewSubmission($workerId)
@@ -104,7 +92,10 @@ class ViewJob extends Component
     {
         $worker = TaskWorker::with('user')->find($workerId);
         
-        if ($worker && $worker->submitted_at && !$worker->paid_at) {
+        // Check if worker has completed submissions
+        $completedSubmission = $worker->taskSubmissions()->whereNotNull('completed_at')->whereNull('paid_at')->first();
+        
+        if ($worker && $completedSubmission) {
             // Create settlement record
             $settlement = Settlement::create([
                 'user_id' => $worker->user_id,
@@ -115,9 +106,9 @@ class ViewJob extends Component
                 'status' => 'pending'
             ]);
 
-            // Mark as paid
-            $worker->paid_at = now();
-            $worker->save();
+            // Mark submission as paid
+            $completedSubmission->paid_at = now();
+            $completedSubmission->save();
             
             // TODO: Implement actual payment processing logic here
             
@@ -215,12 +206,21 @@ class ViewJob extends Component
 
     public function render()
     {
+        // Get invitees statistics
+        $invitees = Referral::where('task_id', $this->task->id)->get();
+        $totalInvitees = $invitees->count();
+        $acceptedInvitees = $invitees->where('status', 'accepted')->count();
+        $pendingInvitees = $invitees->where('status', 'invited')->count();
+        
         $stats = [
             'total_workers' => $this->task->workers->count(),
-            'submissions' => $this->task->workers->whereNotNull('submitted_at')->count(),
-            'completed' => $this->task->workers->whereNotNull('completed_at')->count(),
-            'amount_disbursed' => $this->task->workers->whereNotNull('paid_at')->sum('task.budget_per_person'),
-            'total_budget' => $this->task->budget_per_person * $this->task->number_of_people
+            'submissions' => $this->task->taskSubmissions->count(),
+            'completed' => $this->task->taskSubmissions->whereNotNull('completed_at')->count(),
+            'amount_disbursed' => $this->task->taskSubmissions->whereNotNull('paid_at')->sum('task.budget_per_person'),
+            'total_budget' => $this->task->budget_per_person * $this->task->number_of_people,
+            'total_invitees' => $totalInvitees,
+            'accepted_invitees' => $acceptedInvitees,
+            'pending_invitees' => $pendingInvitees
         ];
 
         $workers = $this->getWorkersQuery()

@@ -4,7 +4,12 @@
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h4 mb-0">{{ $task->title }}</h1>
-                <p class="text-muted mb-0">Posted {{ $task->created_at->diffForHumans() }}</p>
+                <div class="d-flex align-items-center gap-3 text-muted">
+                    <span><i class="fa fa-clock me-1"></i>Posted {{ $task->created_at->diffForHumans() }}</span>
+                    @if($task->expiry_date)
+                    <span><i class="fa fa-calendar me-1"></i>Expires {{ $task->expiry_date->diffForHumans() }}</span>
+                    @endif
+                </div>
             </div>
             <div class="d-flex gap-2">
                 @if(!$task->is_active)
@@ -73,6 +78,54 @@
             </div>
         </div>
     </div>
+
+    <!-- Invitees Stats Cards -->
+    @if($stats['total_invitees'] > 0)
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <h5 class="mb-3">
+                <i class="ri-user-add-line me-2 text-primary"></i>
+                Invitees Statistics
+            </h5>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Total Invitees</h6>
+                        <span class="bg-primary bg-opacity-10 rounded-circle p-2"><i class="ri-user-add-line text-primary"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ $stats['total_invitees'] }}</h3>
+                    <small class="text-muted">Total invitations sent</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Accepted Invitations</h6>
+                        <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-check-line text-success"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ $stats['accepted_invitees'] }}</h3>
+                    <small class="text-muted">{{ $stats['total_invitees'] > 0 ? round(($stats['accepted_invitees'] / $stats['total_invitees']) * 100, 1) : 0 }}% acceptance rate</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Pending Invitations</h6>
+                        <span class="bg-warning bg-opacity-10 rounded-circle p-2"><i class="ri-time-line text-warning"></i></span>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ $stats['pending_invitees'] }}</h3>
+                    <small class="text-muted">Awaiting response</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="row">
         <!-- Main Content -->
@@ -229,7 +282,7 @@
                     <h5 class="card-title mb-0">Invite Workers</h5>
                 </div>
                 <div class="card-body">
-                    <button wire:click="openInviteModal" class="btn btn-primary w-100">
+                    <button data-bs-toggle="modal" data-bs-target="#inviteModal" class="btn btn-primary w-100">
                         <i class="ri-user-add-line me-1"></i> Invite Worker
                     </button>
                 </div>
@@ -267,6 +320,23 @@
                                 <small class="text-muted">Paid Out</small>
                             </div>
                         </div>
+                        @if($stats['total_invitees'] > 0)
+                        <div class="col-12">
+                            <hr class="my-2">
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="fw-bold text-primary mb-1">{{ $stats['total_invitees'] }}</h4>
+                                <small class="text-muted">Invitees</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="fw-bold text-success mb-1">{{ $stats['accepted_invitees'] }}</h4>
+                                <small class="text-muted">Accepted</small>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -376,9 +446,102 @@
         </div>
     </div>
 
+    <!-- Invitees List -->
+    @if($stats['total_invitees'] > 0)
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="ri-user-add-line me-2 text-primary"></i>
+                Invitees List
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Invited By</th>
+                            <th>Invited Date</th>
+                            <th>Expires</th>
+                            {{-- <th>Actions</th> --}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($task->referrals as $referral)
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="ri-mail-line text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ $referral->email }}</div>
+                                        @if($referral->invitee)
+                                        <div class="text-muted small">{{ $referral->invitee->username }}</div>
+                                        @else
+                                        <div class="text-muted small">Not registered yet</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if($referral->status === 'accepted')
+                                <span class="badge bg-success">Accepted</span>
+                                @elseif($referral->status === 'invited')
+                                <span class="badge bg-warning">Pending</span>
+                                @else
+                                <span class="badge bg-secondary">{{ ucfirst($referral->status) }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    @if($referral->referrer)
+                                    <img class="rounded-circle me-2" src="{{ $referral->referrer->image }}" alt="{{ $referral->referrer->username }}" width="24" height="24">
+                                    <span class="small">{{ $referral->referrer->username }}</span>
+                                    @else
+                                    <span class="text-muted small">System</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">{{ $referral->created_at->format('M d, Y H:i') }}</div>
+                            </td>
+                            <td>
+                                @if($referral->expire_at)
+                                <div class="text-muted small">
+                                    @if($referral->expire_at->isPast())
+                                    <span class="text-danger">Expired</span>
+                                    @else
+                                    {{ $referral->expire_at->diffForHumans() }}
+                                    @endif
+                                </div>
+                                @else
+                                <span class="text-muted small">No expiry</span>
+                                @endif
+                            </td>
+                            {{-- <td>
+                                @if($referral->invitee && $referral->invitee->taskWorkers->where('task_id', $task->id)->count() > 0)
+                                <span class="badge bg-info">Working</span>
+                                @elseif($referral->status === 'invited' && $referral->expire_at && $referral->expire_at->isFuture())
+                                <span class="badge bg-warning">Active</span>
+                                @else
+                                <span class="text-muted small">-</span>
+                                @endif
+                            </td> --}}
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Invite Modal -->
     <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="inviteModalLabel">Invite Worker</h5>
@@ -389,16 +552,22 @@
                         <label for="inviteEmail" class="form-label">Email Addresses</label>
                         <textarea id="inviteEmail" wire:model="inviteEmail" rows="3" placeholder="Enter one or more emails, separated by commas or new lines" class="form-control"></textarea>
                         @error('inviteEmail') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                    @if($inviteSummary)
+                        @if($inviteSummary)
                         <div class="alert alert-info mt-2 mb-0">
-                                            {{ $inviteSummary }}
-                                        </div>
-                                    @endif
+                                {{ $inviteSummary }}
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" wire:click="inviteUser" class="btn btn-primary">Send Invitation</button>
+                    <button type="button" wire:click="inviteUser" wire:loading.attr="disabled" wire:target="inviteUser" class="btn btn-primary">
+                        <span wire:loading.remove wire:target="inviteUser">Send Invitation</span>
+                        <span wire:loading wire:target="inviteUser">
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Sending...
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -406,7 +575,7 @@
 
     <!-- Disburse Confirmation Modal -->
     <div class="modal fade" id="disburseModal" tabindex="-1" aria-labelledby="disburseModalLabel" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="disburseModalLabel">Confirm Payment Disbursement</h5>

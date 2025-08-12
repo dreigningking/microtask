@@ -186,7 +186,7 @@
             </div>
 
             <!-- Submission Form -->
-            @if (!empty($submissionFields))
+            @if (!empty($submissionFields) && $taskWorker && $taskWorker->accepted_at)
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Submission Requirements</h5>
@@ -256,13 +256,6 @@
                             </div>
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                         @elseif ($field['type'] === 'file')
-                            @if(isset($existingSubmissions[$field['name']]))
-                                <div class="mb-2">
-                                    <a href="{{ asset($existingSubmissions[$field['name']]) }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                        <i class="ri-file-line me-1"></i>View Current File
-                                    </a>
-                                </div>
-                            @endif
                             <input type="file" 
                                    id="submission-field-{{ $index }}" 
                                    wire:model.live="submittedData.{{ $field['name'] }}" 
@@ -283,6 +276,17 @@
                 </form>
                 </div>
             </div>
+            @elseif (!empty($submissionFields) && (!$taskWorker || !$taskWorker->accepted_at))
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <i class="ri-lock-line display-4 text-muted mb-3"></i>
+                    <h5 class="text-muted">Start Task to Submit</h5>
+                    <p class="text-muted">You need to start this task before you can submit your work.</p>
+                    <button wire:click="startTask" class="btn btn-primary">
+                        <i class="ri-play-line me-1"></i> Start Task
+                    </button>
+                </div>
+            </div>
             @else
             <div class="card mb-4">
                 <div class="card-body text-center">
@@ -293,6 +297,132 @@
             </div>
             @endif
         </div>
+
+        <!-- Submission History -->
+        @if($taskWorker && $submissions->count() > 0)
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-history-line me-2 text-primary"></i>
+                    Submission History
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Submission #</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($submissions as $index => $submission)
+                            <tr>
+                                <td>
+                                    <div class="fw-medium">Submission {{ $submissions->count() - $index }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">{{ $submission->created_at->format('M d, Y H:i') }}</div>
+                                </td>
+                                <td>
+                                    @if($submission->completed_at)
+                                        <span class="badge bg-success">Completed</span>
+                                    @elseif($submission->disputed_at)
+                                        @if($submission->resolved_at)
+                                            <span class="badge bg-info">Dispute Resolved</span>
+                                        @else
+                                            <span class="badge bg-warning">Disputed</span>
+                                        @endif
+                                    @elseif($submission->paid_at)
+                                        <span class="badge bg-primary">Paid</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $submission->status }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewSubmission({{ $submission->id }})">
+                                        <i class="ri-eye-line me-1"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Task Review Section -->
+        @if($taskWorker && $taskWorker->completed_at)
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-star-line me-2 text-warning"></i>
+                    Task Review
+                </h5>
+            </div>
+            <div class="card-body">
+                @if($taskWorker->task_rating && $taskWorker->task_review)
+                    <!-- Existing Review -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $taskWorker->task_rating)
+                                        <i class="ri-star-fill text-warning"></i>
+                                    @else
+                                        <i class="ri-star-line text-muted"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="fw-medium">{{ $taskWorker->task_rating }}/5 stars</span>
+                        </div>
+                        <p class="mb-0">{{ $taskWorker->task_review }}</p>
+                        <small class="text-muted">Reviewed on {{ $taskWorker->updated_at->format('M d, Y') }}</small>
+                    </div>
+                @else
+                    <!-- Review Form -->
+                    <form wire:submit="reviewTask">
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <div class="d-flex align-items-center">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <button type="button" 
+                                            class="btn btn-link p-0 me-1" 
+                                            wire:click="setRating({{ $i }})">
+                                        @if($i <= $taskRating)
+                                            <i class="ri-star-fill text-warning fs-4"></i>
+                                        @else
+                                            <i class="ri-star-line text-muted fs-4"></i>
+                                        @endif
+                                    </button>
+                                @endfor
+                                <span class="ms-2 fw-medium">{{ $taskRating }}/5 stars</span>
+                            </div>
+                            @error('taskRating') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskReview" class="form-label">Review</label>
+                            <textarea id="taskReview" 
+                                      wire:model="taskReview" 
+                                      rows="4" 
+                                      class="form-control @error('taskReview') is-invalid @enderror"
+                                      placeholder="Share your experience with this task..."></textarea>
+                            @error('taskReview') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="ri-send-plane-line me-1"></i> Submit Review
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+        @endif
 
         <!-- Sidebar -->
         <div class="col-lg-4">
@@ -362,21 +492,32 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-            @if ($taskWorker->submitted_at)
-                        <button wire:click="editSubmission" class="btn btn-primary">
-                            <i class="ri-edit-line me-1"></i> Edit Submission
-                </button>
-                        <button wire:click="messageTaskMaster" class="btn btn-outline-secondary">
-                            <i class="ri-message-line me-1"></i> Message Task Master
-                </button>
-                        <button wire:click="raiseDispute" class="btn btn-outline-danger">
-                            <i class="ri-alert-line me-1"></i> Raise Dispute
-                </button>
-            @elseif ($taskWorker->completed_at)
-                        <button wire:click="reviewTask" class="btn btn-success">
-                            <i class="ri-star-line me-1"></i> Review Task
-                </button>
-            @endif
+                        @if (!$taskWorker || !$taskWorker->accepted_at)
+                            <!-- User hasn't started the task yet -->
+                            <button wire:click="startTask" class="btn btn-primary">
+                                <i class="ri-play-line me-1"></i> Start Task
+                            </button>
+                        @elseif ($taskWorker->rejected_at)
+                            <!-- Worker has been rejected -->
+                            <div class="alert alert-danger mb-0">
+                                <i class="ri-error-warning-line me-1"></i>
+                                You have been rejected from this task and cannot submit work.
+                            </div>
+                        @elseif ($taskWorker->completed_at)
+                            <!-- Task has been completed -->
+                            <button wire:click="reviewTask" class="btn btn-success">
+                                <i class="ri-star-line me-1"></i> Review Task
+                            </button>
+                        @else
+                            <!-- Task is in progress -->
+                            <button wire:click="cancelTask" class="btn btn-outline-danger" 
+                                    onclick="return confirm('Are you sure you want to cancel this task? All submissions will be deleted.')">
+                                <i class="ri-close-line me-1"></i> Cancel Task
+                            </button>
+                            <button wire:click="messageTaskMaster" class="btn btn-outline-secondary">
+                                <i class="ri-message-line me-1"></i> Message Task Master
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>

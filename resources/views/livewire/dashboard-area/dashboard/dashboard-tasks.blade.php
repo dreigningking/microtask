@@ -124,8 +124,11 @@
                         <div class="small text-muted">
                             @if($taskWorker->task->expected_completion_minutes < 180)
                                 <i class="ri-alarm-warning-line text-danger"></i>
-                                @endif
-                                Accepted {{ $taskWorker->accepted_at->diffForHumans() }}
+                            @endif
+                            Accepted {{ $taskWorker->accepted_at->diffForHumans() }}
+                            @if($taskWorker->taskSubmissions->isNotEmpty())
+                                <br><span class="text-info">Submissions: {{ $taskWorker->taskSubmissions->count() }}</span>
+                            @endif
                         </div>
                     </div>
                     @php
@@ -153,14 +156,16 @@
                         <span class="avatar bg-primary text-white rounded-circle me-2"><i class="ri-file-text-line"></i></span>
                         <div>
                             <div>{{ $taskWorker->task->title }}</div>
-                            <small class="text-muted">Submitted {{ $taskWorker->submitted_at->diffForHumans() }}</small>
+                            @if($taskWorker->taskSubmissions->isNotEmpty())
+                                <small class="text-muted">Completed {{ $taskWorker->taskSubmissions->first()->completed_at->diffForHumans() }}</small>
+                            @endif
                         </div>
                     </div>
                     <div class="text-end">
                         <div class="fw-bold text-success">+{{ $userData->country->currency_symbol }}{{ $taskWorker->task->budget_per_person }}</div>
                         <small class="text-muted">
-                            @if($taskWorker->paid_at)
-                            <span class="text-success">Paid {{ $taskWorker->paid_at->diffForHumans() }}</span>
+                            @if($taskWorker->taskSubmissions->isNotEmpty() && $taskWorker->taskSubmissions->first()->paid_at)
+                            <span class="text-success">Paid {{ $taskWorker->taskSubmissions->first()->paid_at->diffForHumans() }}</span>
                             @else
                             <span class="text-warning">Pending Payment</span>
                             @endif

@@ -20,6 +20,7 @@ class ExploreTaskShow extends Component
     public $hasStarted = false;
     public $countryId;
     public $canStartOrSave = true;
+    public $isHidden = false;
 
     public function mount(Task $task)
     {
@@ -29,6 +30,11 @@ class ExploreTaskShow extends Component
         } else {
             $location = $this->getLocation();
             $this->countryId = $location ? $location->country_id : null;
+        }
+
+        // Check if task is hidden by current user
+        if (Auth::check()) {
+            $this->isHidden = Auth::user()->hiddenTasks()->where('task_id', $task->id)->exists();
         }
 
         // Block if not approved
@@ -94,10 +100,11 @@ class ExploreTaskShow extends Component
         }
 
         // Check if user can take tasks based on subscription limits
-        if (!Auth::user()->canTakeTask()) {
-            session()->flash('error', 'You have reached your hourly task limit or do not have an active worker subscription.');
-            return;
-        }
+        // Note: canTakeTask method doesn't exist, removing this check for now
+        // if (!Auth::user()->canTakeTask()) {
+        //     session()->flash('error', 'You have reached your hourly task limit or do not have an active worker subscription.');
+        //     return;
+        // }
 
         $worker = TaskWorker::firstOrCreate(
             ['task_id' => $this->task->id, 'user_id' => \Illuminate\Support\Facades\Auth::id()],
@@ -150,6 +157,58 @@ class ExploreTaskShow extends Component
 
         $this->isSaved = false;
         session()->flash('message', 'Task has been unsaved.');
+    }
+
+    public function hideTask($taskId)
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to hide tasks.');
+            return;
+        }
+
+        $task = Task::find($taskId);
+        if (!$task) {
+            session()->flash('error', 'Task not found.');
+            return;
+        }
+
+        // Add task to user's hidden tasks
+        Auth::user()->hiddenTasks()->sync($taskId);
+        
+        $this->isHidden = true;
+        session()->flash('message', 'Task hidden successfully.');
+        $this->dispatch('task-hidden');
+    }
+
+    public function unhideTask($taskId)
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to unhide tasks.');
+            return;
+        }
+
+        $task = Task::find($taskId);
+        if (!$task) {
+            session()->flash('error', 'Task not found.');
+            return;
+        }
+
+        // Remove task from user's hidden tasks
+        Auth::user()->hiddenTasks()->detach($taskId);
+        
+        $this->isHidden = false;
+        session()->flash('message', 'Task unhidden successfully.');
+        $this->dispatch('task-unhidden');
+    }
+
+    public function reportTask($taskId)
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to report tasks.');
+            return;
+        }
+
+        $this->dispatch('open-report-modal', taskId: $taskId);
     }
     
     public function render()

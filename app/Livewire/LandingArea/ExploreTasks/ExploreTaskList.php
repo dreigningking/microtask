@@ -219,6 +219,26 @@ class ExploreTaskList extends Component
         $this->dispatch('task-hidden');
     }
 
+    public function unhideTask($taskId)
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to unhide tasks.');
+            return;
+        }
+
+        $task = Task::find($taskId);
+        if (!$task) {
+            session()->flash('error', 'Task not found.');
+            return;
+        }
+
+        // Remove task from user's hidden tasks
+        Auth::user()->hiddenTasks()->detach($taskId);
+        
+        session()->flash('message', 'Task unhidden successfully.');
+        $this->dispatch('task-unhidden');
+    }
+
     public function reportTask($taskId)
     {
         if (!Auth::check()) {

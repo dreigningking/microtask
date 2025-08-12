@@ -4,6 +4,7 @@ namespace App\Livewire\DashboardArea\Tasks;
 
 use App\Http\Traits\HelperTrait;
 use App\Models\Referral;
+use App\Models\TaskSubmission;
 use App\Notifications\TaskInviteNonUserNotification;
 use App\Notifications\TaskInviteNotification;
 use App\Notifications\JobSubmissionNotification;
@@ -28,6 +29,8 @@ class ViewTask extends Component
     public $requiredTime = null;
     
     public $submittedData = [];
+    public $taskRating = 0;
+    public $taskReview = '';
 
     public $showInviteModal = false;
     public $inviteEmail = '';
@@ -45,14 +48,11 @@ class ViewTask extends Component
         
         // Initialize submittedData with existing values
         $this->submittedData = [];
-        if ($this->taskWorker && $this->taskWorker->submissions) {
-            foreach ($this->submissionFields as $field) {
-                $fieldName = $field['name'];
-                //dd($this->taskWorker->submissions[$fieldName]);
-                if (isset($this->taskWorker->submissions[$fieldName])) {
-                    $this->submittedData[$fieldName] = $this->taskWorker->submissions[$fieldName];
-                }
-            }
+        
+        // Load task rating and review if they exist
+        if ($this->taskWorker) {
+            $this->taskRating = $this->taskWorker->task_rating ?? 0;
+            $this->taskReview = $this->taskWorker->task_review ?? '';
         }
 
         $this->requiredTime = $this->getTimeConversion($this->task->expected_completion_minutes);
@@ -166,10 +166,10 @@ class ViewTask extends Component
         session()->flash('message', 'Processing complete! ' . $this->inviteSummary);
     }
 
-    public function submitTask()
+    public function startTask()
     {
         if (!Auth::check()) {
-            session()->flash('error', 'You must be logged in to submit tasks.');
+            session()->flash('error', 'You must be logged in to start tasks.');
             return;
         }
 
@@ -179,10 +179,82 @@ class ViewTask extends Component
             return;
         }
 
-        // Check if user can submit tasks based on subscription limits
-        if (!Auth::user()->canSubmitTask()) {
-            session()->flash('error', 'You have reached your hourly submission limit or do not have an active worker subscription.');
+        // Check if task is still available (not full)
+        $acceptedWorkersCount = $this->task->workers->whereNotNull('accepted_at')->count();
+        if ($acceptedWorkersCount >= $this->task->number_of_people) {
+            session()->flash('error', 'This task is full and cannot be started.');
             return;
+        }
+
+        // Check if task has expired
+        if ($this->task->expiry_date && $this->task->expiry_date->isPast()) {
+            session()->flash('error', 'This task has expired and can no longer be started.');
+            return;
+        }
+
+        // Create or update the task worker record
+        $this->taskWorker = TaskWorker::updateOrCreate(
+            ['task_id' => $this->task->id, 'user_id' => Auth::id()],
+            ['accepted_at' => now(), 'saved_at' => null]
+        );
+
+        session()->flash('message', 'Task started successfully! You can now submit your work.');
+        
+        // Refresh the component to show updated status
+        $this->dispatch('$refresh');
+    }
+
+    public function cancelTask()
+    {
+        if (!Auth::check() || !$this->taskWorker) {
+            session()->flash('error', 'You must be logged in and have started the task to cancel it.');
+            return;
+        }
+
+        // Delete all submissions for this worker
+        TaskSubmission::where('task_worker_id', $this->taskWorker->id)->delete();
+
+        // Delete the task worker record
+        $this->taskWorker->delete();
+
+        session()->flash('message', 'Task cancelled successfully. All submissions have been deleted.');
+        
+        // Refresh the component
+        $this->dispatch('$refresh');
+    }
+
+    public function submitTask()
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to submit tasks.');
+            return;
+        }
+
+        // Check if user has started the task
+        if (!$this->taskWorker || !$this->taskWorker->accepted_at) {
+            session()->flash('error', 'You must start the task before you can submit your work.');
+            return;
+        }
+
+        // Check if worker has been rejected
+        if ($this->taskWorker->rejected_at) {
+            session()->flash('error', 'You have been rejected from this task and cannot submit work.');
+            return;
+        }
+
+        // Check if user is banned from taking tasks
+        if (Auth::user()->isBannedFromTasks()) {
+            session()->flash('error', 'You are currently banned from taking tasks. Please contact support for more information.');
+            return;
+        }
+
+        // Check if multiple submissions are allowed
+        if (!$this->task->allow_multiple_submissions) {
+            $existingSubmission = TaskSubmission::where('task_worker_id', $this->taskWorker->id)->first();
+            if ($existingSubmission) {
+                session()->flash('error', 'Multiple submissions are not allowed for this task.');
+                return;
+            }
         }
 
         $this->validate([
@@ -195,35 +267,21 @@ class ViewTask extends Component
             $fieldValue = $this->submittedData[$fieldName] ?? null;
             
             if ($field['type'] === 'file' && $fieldValue instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                // Delete old file if it exists
-                if (isset($this->taskWorker->submissions[$fieldName])) {
-                    $oldPath = str_replace('storage/', '', $this->taskWorker->submissions[$fieldName]);
-                    if (Storage::disk('public')->exists($oldPath)) {
-                        Storage::disk('public')->delete($oldPath);
-                    }
-                }
-                
                 // Store the new file and get its path
                 $path = $fieldValue->store('submissions', 'public');
                 $submissionOutput[$fieldName] = 'storage/' . $path;
-            } elseif (isset($this->taskWorker->submissions[$fieldName])) {
-                // Keep the existing file if no new file was uploaded
-                $submissionOutput[$fieldName] = $this->taskWorker->submissions[$fieldName];
             } else {
                 $submissionOutput[$fieldName] = $fieldValue;
             }
         }
 
-        // Ensure all field keys are present in the output
-        foreach ($this->submissionFields as $field) {
-            if (!isset($submissionOutput[$field['name']])) {
-                $submissionOutput[$field['name']] = null;
-            }
-        }
-
-        $this->taskWorker->submissions = $submissionOutput;
-        $this->taskWorker->submitted_at = now();
-        $this->taskWorker->save();
+        // Create task submission record
+        TaskSubmission::create([
+            'user_id' => Auth::id(),
+            'task_id' => $this->task->id,
+            'task_worker_id' => $this->taskWorker->id,
+            'submissions' => $submissionOutput,
+        ]);
 
         // Send job submission notification to task master
         $this->task->user->notify(new JobSubmissionNotification($this->task, Auth::user()));
@@ -232,10 +290,43 @@ class ViewTask extends Component
         return redirect()->route('tasks.index');
     }
 
+    public function reviewTask()
+    {
+        $this->validate([
+            'taskRating' => 'required|integer|min:1|max:5',
+            'taskReview' => 'required|string|min:10',
+        ]);
+
+        if (!$this->taskWorker) {
+            session()->flash('error', 'You must be a worker on this task to review it.');
+            return;
+        }
+
+        $this->taskWorker->update([
+            'task_rating' => $this->taskRating,
+            'task_review' => $this->taskReview,
+        ]);
+
+        session()->flash('message', 'Task review submitted successfully!');
+        $this->dispatch('$refresh');
+    }
+
+    public function setRating($rating)
+    {
+        $this->taskRating = $rating;
+    }
+
     public function render()
     {
+        $submissions = collect();
+        if ($this->taskWorker) {
+            $submissions = TaskSubmission::where('task_worker_id', $this->taskWorker->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         return view('livewire.dashboard-area.tasks.view-task', [
-            'existingSubmissions' => $this->taskWorker ? $this->taskWorker->submissions : [],
+            'submissions' => $submissions,
         ]);
     }
 }

@@ -67,6 +67,7 @@ class EditJob extends Component
     public $serviceFee = 0;
     public $tax_rate = 0;
     public $restricted_countries = [];
+    public $allow_multiple_submissions = false; // New field for allowing multiple submissions from single user
 
     // Transaction charges
     public $transactionPercentage = 0;
@@ -108,6 +109,7 @@ class EditJob extends Component
         'monitoring_type' => 'required',
         'visibility' => 'required|in:public,private',
         'expiry_date' => 'nullable|date|after:today',
+        'allow_multiple_submissions' => 'boolean',
         'terms' => 'accepted',
         'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png', // 10MB max, allowed types
     ];
@@ -219,6 +221,7 @@ class EditJob extends Component
         $this->requirements = $this->task->requirements ?? [];
         $this->files = $this->task->files ?? [];
         $this->templateData = $this->task->template_data ?? [];
+        $this->allow_multiple_submissions = $this->task->allow_multiple_submissions ?? false;
 
         // Load existing promotions
         $this->loadExistingPromotions();
@@ -440,6 +443,7 @@ class EditJob extends Component
         $this->task->monitoring_type = $this->monitoring_type;
         $this->task->restricted_countries = $this->restricted_countries;
         $this->task->is_active = true;
+        $this->task->allow_multiple_submissions = $this->allow_multiple_submissions;
         
         // Store template field values if any
         if (!empty($this->templateData)) {

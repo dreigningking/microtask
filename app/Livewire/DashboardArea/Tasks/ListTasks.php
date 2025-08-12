@@ -86,19 +86,32 @@ class ListTasks extends Component
 
         switch ($this->status) {
             case 'accepted':
-                $query->whereNotNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at');
+                $query->whereNotNull('accepted_at')
+                      ->whereDoesntHave('taskSubmissions', function($q) {
+                          $q->whereNotNull('completed_at');
+                      });
                 break;
             case 'saved':
-                $query->whereNotNull('saved_at')->whereNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at');
+                $query->whereNotNull('saved_at')
+                      ->whereNull('accepted_at')
+                      ->whereDoesntHave('taskSubmissions', function($q) {
+                          $q->whereNotNull('completed_at');
+                      });
                 break;
             case 'submitted':
-                $query->whereNotNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at');
+                $query->whereNotNull('accepted_at')
+                      ->whereHas('taskSubmissions', function($q) {
+                          $q->whereNull('completed_at');
+                      });
                 break;
             case 'completed':
-                $query->whereNotNull('completed_at');
+                $query->whereHas('taskSubmissions', function($q) {
+                    $q->whereNotNull('completed_at');
+                });
                 break;
             case 'cancelled':
-                $query->whereNotNull('cancelled_at');
+                // Cancelled tasks are soft deleted records, so we need to include them
+                $query->withTrashed()->whereNotNull('deleted_at');
                 break;
             case 'all':
             default:
@@ -128,13 +141,41 @@ class ListTasks extends Component
     {
         $tasks = $this->getTasksQuery()->paginate(10);
 
-        // Get stats
+        // Get stats using the new TaskSubmission structure
         $totalTasks = TaskWorker::where('user_id', Auth::id())->count();
-        $acceptedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $savedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('saved_at')->whereNull('accepted_at')->whereNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $submittedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('submitted_at')->whereNull('completed_at')->whereNull('cancelled_at')->count();
-        $completedTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('completed_at')->count();
-        $cancelledTasks = TaskWorker::where('user_id', Auth::id())->whereNotNull('cancelled_at')->count();
+        
+        $acceptedTasks = TaskWorker::where('user_id', Auth::id())
+            ->whereNotNull('accepted_at')
+            ->whereDoesntHave('taskSubmissions', function($q) {
+                $q->whereNotNull('completed_at');
+            })
+            ->count();
+            
+        $savedTasks = TaskWorker::where('user_id', Auth::id())
+            ->whereNotNull('saved_at')
+            ->whereNull('accepted_at')
+            ->whereDoesntHave('taskSubmissions', function($q) {
+                $q->whereNotNull('completed_at');
+            })
+            ->count();
+            
+        $submittedTasks = TaskWorker::where('user_id', Auth::id())
+            ->whereNotNull('accepted_at')
+            ->whereHas('taskSubmissions', function($q) {
+                $q->whereNull('completed_at');
+            })
+            ->count();
+            
+        $completedTasks = TaskWorker::where('user_id', Auth::id())
+            ->whereHas('taskSubmissions', function($q) {
+                $q->whereNotNull('completed_at');
+            })
+            ->count();
+            
+        $cancelledTasks = TaskWorker::where('user_id', Auth::id())
+            ->withTrashed()
+            ->whereNotNull('deleted_at')
+            ->count();
 
         $stats = [
             'total' => $totalTasks,

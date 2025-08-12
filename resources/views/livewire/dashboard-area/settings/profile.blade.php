@@ -17,7 +17,7 @@
                 <div class="card-header">
                     <h6 class="card-title mb-0">Settings Menu</h6>
                 </div>
-                <div class="card-body p-0">
+                <div class="p-0">
                     <div class="list-group list-group-flush">
                         <button wire:click="setActiveSection('basic')" 
                                 class="list-group-item list-group-item-action d-flex align-items-center {{ $activeSection === 'basic' ? 'active' : '' }}">

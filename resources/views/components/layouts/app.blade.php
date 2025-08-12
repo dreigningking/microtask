@@ -64,46 +64,14 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
                             <i class="icon-bell mx-0"></i>
-                            <span class="count"></span>
+                            @livewire('dashboard-area.notifications.notification-dropdown')
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
                             <div class="dropdown-header d-flex justify-content-between align-items-center">
-                                <p class="mb-0 font-weight-normal float-left">Notifications</p>
-                                <a href="{{ route('notifications') }}" class="btn btn-outline-primary btn-sm float-right">View All</a>
+                                <p class="mb-0 font-weight-normal float-left">Recent Notifications</p>
+                                <!-- <a href="{{ route('notifications') }}" class="btn btn-outline-primary btn-sm float-right">View All</a> -->
                             </div>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-success">
-                                        <i class="ti-info-alt mx-0"></i>
-                                    </div>
-                                </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted"> Just now </p>
-                                </div>
-                            </a>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-warning">
-                                        <i class="ti-settings mx-0"></i>
-                                    </div>
-                                </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">Settings</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted"> Private message </p>
-                                </div>
-                            </a>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-info">
-                                        <i class="ti-user mx-0"></i>
-                                    </div>
-                                </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted"> 2 days ago </p>
-                                </div>
-                            </a>
+                            @livewire('dashboard-area.notifications.notification-dropdown-content')
                         </div>
                     </li>
                     <li class="nav-item nav-profile dropdown">
@@ -119,11 +87,7 @@
                                 <i class="ti-power-off text-primary"></i> Logout </a>
                         </div>
                     </li>
-                    <li class="nav-item nav-settings d-none d-lg-flex">
-                        <a class="nav-link" href="#">
-                            <i class="icon-ellipsis"></i>
-                        </a>
-                    </li>
+                    
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
                     <span class="icon-menu"></span>
@@ -242,6 +206,25 @@
     <script src="{{asset('frontend/js/jquery.min.js')}}" type="text/javascript"></script>
     
     @livewireScripts
+    <script>
+		$(document).ready(function() {
+			Livewire.on('closeModal', function(data) {
+				console.log('Close modal event received:', data);
+				const modalId = data[0].modalId;
+
+				const modalEl = document.getElementById(modalId);
+
+				// Check if Bootstrap modal instance already exists
+				let modalInstance = bootstrap.Modal.getInstance(modalEl);
+				if (!modalInstance) {
+					// If not, create a new instance (Bootstrap 5)
+					modalInstance = new bootstrap.Modal(modalEl);
+				}
+				// Hide the modal with Bootstrap 5 API
+				modalInstance.hide();
+			});
+		});
+	</script>
     @stack('scripts')
 </body>
 

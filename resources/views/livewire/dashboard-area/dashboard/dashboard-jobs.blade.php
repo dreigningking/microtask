@@ -126,7 +126,7 @@
                         <div>
                             <div>{{ $submission->user->name }}</div>
                             <small class="text-muted">Submitted for: {{ $submission->task->title }}</small><br>
-                            <small class="text-muted">Submitted {{ $submission->submitted_at->diffForHumans() }}</small>
+                            <small class="text-muted">Submitted {{ $submission->created_at->diffForHumans() }}</small>
                         </div>
                     </div>
                     <a href="{{route('jobs.view',$submission->task)}}" class="btn btn-sm btn-success">Review Submission</a>

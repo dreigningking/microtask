@@ -22,12 +22,11 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->json('submissions')->nullable();
             $table->text('review')->nullable();
-            $table->integer('rating')->nullable();
+            $table->integer('review_reason')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
             $table->foreign('task_worker_id')->references('id')->on('task_workers')->onDelete('cascade');
-            
         });
     }
 

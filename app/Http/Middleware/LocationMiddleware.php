@@ -18,7 +18,7 @@ class LocationMiddleware
         //178.238.11.6 || 197.211.58.12
 
         $ip = $this->visitorIp();
-        // if(!cache('visitors') || cache('visitors') == null || cache('visitors') == [] || !in_array($ip,cache('visitors'))){
+        if(!cache('visitors') || cache('visitors') == null || cache('visitors') == [] || !in_array($ip,cache('visitors'))){
             $result = Curl::to("https://api.ipdata.co/".$ip."?api-key=".config('services.ipdata'))->asJsonResponse()->get();    
             if($result){
                 $country = $this->getCountry($result->country_code);
@@ -35,7 +35,7 @@ class LocationMiddleware
                     abort(503, 'Service unavailable in your country.');
                 }
             }
-        // }
+        }
         return $next($request);
     }
 }

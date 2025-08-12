@@ -14,6 +14,12 @@ return new class extends Migration
             $table->string('ip_address')->nullable();
             $table->string('location')->nullable();
             $table->string('browser')->nullable();
+            $table->string('device')->nullable();
+            $table->string('os')->nullable();
+            $table->string('browser_name')->nullable();
+            $table->string('browser_version')->nullable();
+            $table->string('platform')->nullable();
+            $table->string('platform_version')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

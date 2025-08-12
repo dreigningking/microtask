@@ -16,9 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('subject');
             $table->text('description');
-            $table->string('priority')->default('normal');
+            $table->string('priority')->default('normal'); //low, high, critical
             $table->string('status')->default('open');
             $table->timestamps();
+            
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
     /**

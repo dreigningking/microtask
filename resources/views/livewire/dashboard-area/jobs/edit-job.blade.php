@@ -245,7 +245,7 @@
                         
                         <!-- Budget Per Person -->
                         <div class="mb-3">
-                            <label for="budget_per_person" class="form-label fw-medium mb-1">Budget Per Person <span class="text-danger">*</span></label>
+                            <label for="budget_per_person" class="form-label fw-medium mb-1">Budget Per Submission <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">{{ $currency_symbol }}</span>
                                 <input type="number" id="budget_per_person" wire:model="budget_per_person" wire:input="updateTotals" min="{{ $min_budget_per_person }}" step="0.01" class="form-control {{ $errors->has('budget_per_person') ? 'is-invalid' : '' }}" placeholder="0.00" required @if(!$canEdit) readonly disabled @endif>
@@ -255,7 +255,7 @@
                         
                         <!-- Number of People -->
                         <div class="mb-3">
-                            <label for="number_of_people" class="form-label fw-medium mb-1">Number of People <span class="text-danger">*</span></label>
+                            <label for="number_of_people" class="form-label fw-medium mb-1">Number of Submissions <span class="text-danger">*</span></label>
                             <div class="input-group" style="max-width: 200px;">
                                 <button type="button" wire:click="decreasePeople" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
                                     <i class="ri-subtract-line"></i>
@@ -265,7 +265,19 @@
                                     <i class="ri-add-line"></i>
                                 </button>
                             </div>
+                            <div class="form-text">Total number of submissions needed to complete this job</div>
                             @error('number_of_people') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+                        
+                        <!-- Allow Multiple Submissions from Single User -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" id="allow_multiple_submissions" wire:model="allow_multiple_submissions" class="form-check-input" @if(!$canEdit) disabled @endif>
+                                <label for="allow_multiple_submissions" class="form-check-label fw-medium">
+                                    Allow multiple submissions from single user
+                                </label>
+                            </div>
+                            <div class="form-text">If checked, a single worker can submit multiple times for this job</div>
                         </div>
                     </div>
                     
@@ -315,7 +327,7 @@
                                             @if($urgentPrice == 0)
                                             <i class="ri-check-line text-success me-1"></i>Included in your subscription
                                             @else
-                                            <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($urgentPrice, 2) }} per person
+                                            <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($urgentPrice, 2) }} per submission
                                             @endif
                                         </small>
                                     </div>
@@ -344,7 +356,7 @@
                             <div class="fw-bold text-primary fs-3">
                                 {{ $currency_symbol }} {{ number_format($total, 2) }}
                             </div>
-                            <p class="small text-muted mb-0">For {{ $number_of_people }} person{{ $number_of_people > 1 ? 's' : '' }}</p>
+                            <p class="small text-muted mb-0">For {{ $number_of_people }} submission{{ $number_of_people > 1 ? 's' : '' }}</p>
                         </div>
                     </div>
                     

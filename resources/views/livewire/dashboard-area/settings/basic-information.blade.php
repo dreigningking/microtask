@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
+<div class="p-6">
     <form wire:submit.prevent="updateBasicInformation">
         <div class="row g-3">
             <!-- Name -->

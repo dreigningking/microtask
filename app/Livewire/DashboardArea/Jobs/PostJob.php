@@ -66,6 +66,7 @@ class PostJob extends Component
     public $serviceFee = 0;
     public $tax_rate = 0;
     public $restricted_countries = [];
+    public $allow_multiple_submissions = false; // New field for allowing multiple submissions from single user
 
     // Transaction charges
     public $transactionPercentage = 0;
@@ -188,6 +189,7 @@ class PostJob extends Component
                 'number_of_people' => 'required|numeric|min:1',
                 'monitoring_type' => 'required',
                 'visibility' => 'required|in:public,private',
+                'allow_multiple_submissions' => 'boolean',
             ];
         } elseif ($this->currentStep == 4) {
             // Step 4: Login or review/confirmation
@@ -503,6 +505,7 @@ class PostJob extends Component
         $task->monitoring_type = $this->monitoring_type;
         $task->restricted_countries = $this->restricted_countries;
         $task->is_active = false; // Mark as draft
+        $task->allow_multiple_submissions = $this->allow_multiple_submissions;
         if (!empty($this->templateData)) {
             $task->template_data = $this->templateData;
         }
@@ -559,6 +562,7 @@ class PostJob extends Component
         
         $task->restricted_countries = $this->restricted_countries;
         $task->is_active = true;
+        $task->allow_multiple_submissions = $this->allow_multiple_submissions;
         $task->save();
         
         $order = Order::create(['user_id' => Auth::id()]);

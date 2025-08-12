@@ -28,6 +28,14 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_active')->default(1);
             $table->string('dashboard_view')->default('tasks'); // Added for dashboard preference
+            $table->boolean('two_factor_enabled')->default(0);
+            $table->json('notification_settings')->nullable();
+            $table->boolean('is_banned_from_tasks')->default(false);
+            $table->text('ban_reason')->nullable();
+            $table->unsignedBigInteger('banned_by')->nullable();
+            $table->timestamp('banned_at')->nullable();
+            $table->timestamp('ban_expires_at')->nullable();
+            $table->foreign('banned_by')->references('id')->on('users')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });

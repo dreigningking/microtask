@@ -15,13 +15,13 @@ class Task extends Model
         'title',
         'description',
         'status',
+        'allow_multiple_submissions',
         'created_at',
         'updated_at'
     ];
 
     protected $casts = [
         'requirements' => 'array',
-        'files' => 'array',
         'template_data' => 'array',
         'restricted_countries' => 'array',
         'approved_at'=> 'datetime',
@@ -48,6 +48,12 @@ class Task extends Model
     {
         return $this->hasMany(TaskWorker::class);   
     }
+    
+    public function taskSubmissions()
+    {
+        return $this->hasMany(TaskSubmission::class);
+    }
+    
     public function orderItem()
     {
         return $this->morphOne(OrderItem::class,'orderable');   
@@ -69,6 +75,11 @@ class Task extends Model
         return $this->hasMany(Settlement::class);
     }
 
+    public function referrals()
+    {
+        return $this->hasMany(Referral::class);
+    }
+
     public function reports()
     {
         return $this->hasMany(TaskReport::class);
@@ -81,7 +92,7 @@ class Task extends Model
 
     public function scopeCompleted($query)
     {
-        return $query->whereRaw('number_of_people <= (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND submitted_at IS NOT NULL)');
+        return $query->whereRaw('number_of_people <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
     }
 
     public function scopeActive($query)
@@ -90,7 +101,7 @@ class Task extends Model
                      ->where(function($q) {
                          $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
                      })
-                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND (submitted_at IS NOT NULL OR accepted_at IS NOT NULL))');
+                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
     }
 
     public function scopeListable($query, $countryId)
@@ -105,7 +116,7 @@ class Task extends Model
                      ->where(function($q) {
                          $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
                      })
-                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND (submitted_at IS NOT NULL OR accepted_at IS NOT NULL))');
+                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
     }
 
     public function getStatusAttribute(){
@@ -119,7 +130,7 @@ class Task extends Model
             return 'closed';
         }
         
-        $submittedCount = $this->workers()->whereNotNull('submitted_at')->count();
+        $submittedCount = $this->taskSubmissions()->whereNotNull('completed_at')->count();
         if ($submittedCount >= $this->number_of_people) {
             return 'completed';
         }

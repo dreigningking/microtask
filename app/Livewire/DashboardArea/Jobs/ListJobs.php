@@ -8,6 +8,7 @@ use App\Models\TaskWorker;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class ListJobs extends Component
@@ -58,9 +59,17 @@ class ListJobs extends Component
         $this->stats['total'] = $tasks->count();
         $this->stats['active'] = $tasks->where('is_active', true)->count();
         $this->stats['drafts'] = $tasks->where('is_active', false)->count();
-        $this->stats['in_progress'] = $workers->whereHas('task',function($query){
-            $query->where('is_active',true);
-        })->where('completed_at',null)->whereNotNull('accepted_at')->distinct('task_id')->count();
+        
+        // Count in-progress tasks (tasks with accepted workers but not completed)
+        $this->stats['in_progress'] = Task::where('user_id', $userId)
+            ->where('is_active', true)
+            ->whereHas('workers', function($query) {
+                $query->whereNotNull('accepted_at');
+            })
+            ->whereDoesntHave('taskSubmissions', function($query) {
+                $query->whereNotNull('completed_at');
+            }, '>=', DB::raw('number_of_people'))
+            ->count();
         
         // Calculate completed tasks
         $this->stats['completed'] = 0;
@@ -93,12 +102,17 @@ class ListJobs extends Component
                     case 'in_progress':
                         $q->where('is_active', true)
                           ->whereHas('workers', function($q) {
-                              $q->whereNull('completed_at')->whereNotNull('accepted_at');
-                          });
+                              $q->whereNotNull('accepted_at');
+                          })
+                          ->whereDoesntHave('taskSubmissions', function($q) {
+                              $q->whereNotNull('completed_at');
+                          }, '>=', DB::raw('number_of_people'));
                         break;
                     case 'completed':
                         $q->where('is_active', true)
-                          ->whereRaw('(SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id) >= tasks.number_of_people');
+                          ->whereHas('taskSubmissions', function($q) {
+                              $q->whereNotNull('completed_at');
+                          }, '>=', DB::raw('number_of_people'));
                         break;
                     case 'drafts':
                         $q->where('is_active', false);

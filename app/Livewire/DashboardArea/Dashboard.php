@@ -11,6 +11,7 @@ use App\Models\TaskWorker;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\TaskSubmission;
 
 
 class Dashboard extends Component
@@ -61,21 +62,28 @@ class Dashboard extends Component
     {
         $user = $this->userData;
         
-        // Get completed tasks (TaskWorker entries where the user has completed tasks)
+        // Get completed tasks (TaskWorker entries where the user has completed tasks via TaskSubmission)
         $this->completedTasks = TaskWorker::where('user_id', $user->id)
-            ->whereNotNull('submitted_at')
-            ->with('task')
-            ->orderBy('submitted_at', 'desc')
+            ->whereNotNull('accepted_at')
+            ->whereHas('taskSubmissions', function($query) {
+                $query->whereNotNull('completed_at');
+            })
+            ->with(['task', 'taskSubmissions' => function($query) {
+                $query->whereNotNull('completed_at')->latest();
+            }])
+            ->orderBy('accepted_at', 'desc')
             ->limit(5)
             ->get();
             
         // Get ongoing tasks (TaskWorker entries where the user has accepted tasks but not completed)
         $this->ongoingTasks = TaskWorker::where('user_id', $user->id)
             ->whereNotNull('accepted_at')
-            ->whereNull('completed_at')
-            ->whereNull('submitted_at')
-            ->whereNull('cancelled_at')
-            ->with('task')
+            ->whereDoesntHave('taskSubmissions', function($query) {
+                $query->whereNotNull('completed_at');
+            })
+            ->with(['task', 'taskSubmissions' => function($query) {
+                $query->latest();
+            }])
             ->orderBy('accepted_at', 'desc')
             ->limit(5)
             ->get();
@@ -99,9 +107,12 @@ class Dashboard extends Component
             ->limit(5)
             ->get();
             
-        // Calculate total earnings from settlements
-        $this->earnings = Settlement::where('user_id', $user->id)
-            ->sum('amount');
+        // Calculate total earnings from completed submissions
+        $this->earnings = TaskSubmission::join('tasks', 'task_submissions.task_id', '=', 'tasks.id')
+            ->where('task_submissions.user_id', $user->id)
+            ->whereNotNull('task_submissions.completed_at')
+            ->whereNotNull('task_submissions.paid_at')
+            ->sum('tasks.budget_per_person');
 
         // Calculate referral earnings from settlements
         $this->referralEarnings = Settlement::where('user_id', $user->id)
@@ -120,43 +131,49 @@ class Dashboard extends Component
             ->limit(5)
             ->get();
             
-        // Get recent submissions to user's jobs
-        $this->recentSubmissions = TaskWorker::whereHas('task', function($query) use ($user) {
+        // Get recent submissions to user's jobs from TaskSubmission table
+        $this->recentSubmissions = TaskSubmission::whereHas('task', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-            ->whereNotNull('submitted_at')
-            ->with(['user', 'task'])
-            ->orderBy('submitted_at', 'desc')
+            ->with(['user', 'task', 'taskWorker'])
+            ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
             
         // Get job statistics
         $totalJobs = Task::where('user_id', $user->id)->count();
         $completedJobs = Task::where('user_id', $user->id)
-            ->whereHas('workers', function($query) {
-                $query->whereNotNull('submitted_at');
+            ->whereHas('taskSubmissions', function($query) {
+                $query->whereNotNull('completed_at');
             }, '>=', DB::raw('number_of_people'))
             ->count();
         
-        // Calculate average rating - assuming there's a review field in TaskWorker with rating
+        // Calculate average rating from TaskWorker reviews
         $averageRating = TaskWorker::whereHas('task', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-            ->whereNotNull('completed_at')
-            ->whereNotNull('review')
-            ->avg('rating') ?? 0;
+            ->whereNotNull('task_rating')
+            ->avg('task_rating') ?? 0;
         
-        // Calculate total spent
-        $totalSpent = Task::where('user_id',$user->id)->whereHas('workers',function($query) {
-            $query->whereNotNull('paid_at');
-        })->sum('budget_per_person');
+        // Calculate total spent from completed and paid submissions
+        $totalSpent = TaskSubmission::join('tasks', 'task_submissions.task_id', '=', 'tasks.id')
+            ->where('tasks.user_id', $user->id)
+            ->whereNotNull('task_submissions.completed_at')
+            ->whereNotNull('task_submissions.paid_at')
+            ->sum('tasks.budget_per_person');
         
-        // Get active jobs count
-        $activeJobs = TaskWorker::whereHas('task',function($query) use ($user){
-            $query->where('user_id',$user->id)->where('is_active',true);
-        })->whereNull('submitted_at')->whereNull('cancelled_at')->distinct('task_id')->count();
+        // Get active jobs count (jobs with accepted workers but not completed)
+        $activeJobs = Task::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->whereHas('workers', function($query) {
+                $query->whereNotNull('accepted_at');
+            })
+            ->whereDoesntHave('taskSubmissions', function($query) {
+                $query->whereNotNull('completed_at');
+            }, '>=', DB::raw('number_of_people'))
+            ->count();
         
-        // Get total workers count
+        // Get total workers count (workers who have accepted the task)
         $totalWorkers = TaskWorker::whereHas('task', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
@@ -186,18 +203,20 @@ class Dashboard extends Component
     {
         $user = $this->userData;
         
-        // Get earnings summary (most recent TaskWorker entries with paid_at)
-        $this->earningsSummary = TaskWorker::where('user_id', $user->id)
-            ->whereNotNull('paid_at')
-            ->with('task')
-            ->orderBy('paid_at', 'desc')
+        // Get earnings summary from completed and paid TaskSubmissions
+        $this->earningsSummary = TaskSubmission::join('tasks', 'task_submissions.task_id', '=', 'tasks.id')
+            ->where('task_submissions.user_id', $user->id)
+            ->whereNotNull('task_submissions.completed_at')
+            ->whereNotNull('task_submissions.paid_at')
+            ->select('task_submissions.*', 'tasks.title', 'tasks.budget_per_person')
+            ->orderBy('task_submissions.paid_at', 'desc')
             ->limit(3)
             ->get()
-            ->map(function($taskWorker) {
+            ->map(function($submission) {
                 return (object)[
-                    'description' => $taskWorker->task->title,
-                    'amount' => $taskWorker->task->budget_per_person,
-                    'created_at' => $taskWorker->paid_at,
+                    'description' => $submission->title,
+                    'amount' => $submission->budget_per_person,
+                    'created_at' => $submission->paid_at,
                     'icon' => 'ri-file-text-line',
                     'icon_color' => 'blue',
                 ];
