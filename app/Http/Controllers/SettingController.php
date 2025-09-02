@@ -86,11 +86,10 @@ class SettingController extends Controller
     public function storeRole(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|unique:roles,name',
-            'description' => 'nullable|string',
+            'description' => 'required|string|unique:roles,description',
             'permissions' => 'array',
         ]);
-        $role = Role::create(['name' => $data['name'], 'description' => $data['description'] ?? null]);
+        $role = Role::create(['description' => $data['description']]);
         if (!empty($data['permissions'])) {
             $role->permissions()->sync($data['permissions']);
         }
@@ -100,11 +99,10 @@ class SettingController extends Controller
     public function updateRole(Request $request, Role $role)
     {
         $data = $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $role->id,
-            'description' => 'nullable|string',
+            'description' => 'required|string|unique:roles,description,' . $role->id,
             'permissions' => 'array',
         ]);
-        $role->update(['name' => $data['name'], 'description' => $data['description'] ?? null]);
+        $role->update(['description' => $data['description']]);
         $role->permissions()->sync($data['permissions'] ?? []);
         return back()->with('success', 'Role updated successfully.');
     }

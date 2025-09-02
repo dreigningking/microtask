@@ -40,10 +40,12 @@ class Task extends Model
     {
         return 'slug';
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+    
     public function workers()
     {
         return $this->hasMany(TaskWorker::class);   
@@ -155,5 +157,18 @@ class Task extends Model
         $isPaid = $payment && $payment->status === 'success';
 
         return !$isPaid;
+    }
+
+    public function scopeLocalize($query)
+    {
+        if (auth()->user()->first_role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where(function ($q) {
+            $q->whereHas('user', function ($q) {
+                $q->where('country_id', auth()->user()->country_id);
+            });
+        });
     }
 }

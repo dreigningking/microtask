@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Skill;
+use App\Models\Support;
 use App\Models\Platform;
 use App\Models\TaskWorker;
 use Illuminate\Support\Str;
@@ -111,15 +112,17 @@ class User extends Authenticatable
 
     public function country()
     {
-        return $this->setConnection('sqlite_countries')->belongsTo(Country::class);
+        return $this->belongsTo(Country::class);
     }
+    
     public function state()
     {
-        return $this->setConnection('sqlite_states')->belongsTo(State::class);
+        return $this->belongsTo(State::class);
     }
+    
     public function city()
     {
-        return $this->setConnection('sqlite_cities')->belongsTo(City::class);   
+        return $this->belongsTo(City::class);
     }
     public function bank_account()
     {
@@ -136,6 +139,11 @@ class User extends Authenticatable
     public function task_workers()
     {
         return $this->hasMany(TaskWorker::class);
+    }
+
+    public function taskSubmissions()
+    {
+        return $this->hasMany(TaskSubmission::class);
     }
     
 
@@ -406,9 +414,9 @@ class User extends Authenticatable
         // Count ongoing tasks in the last hour
         $ongoingTasksCount = $this->task_workers()
             ->whereNotNull('accepted_at')
-            ->whereNull('submitted_at')
-            ->whereNull('completed_at')
-            ->whereNull('cancelled_at')
+            ->whereDoesntHave('taskSubmissions', function($q) {
+                $q->whereNotNull('completed_at');
+            })
             ->where('accepted_at', '>=', now()->subHour())
             ->count();
 
@@ -440,13 +448,52 @@ class User extends Authenticatable
         $activeTasksPerHour = $plan->active_tasks_per_hour ?? 1;
 
         // Count submitted tasks in the last hour
-        $submittedTasksCount = $this->task_workers()
-            ->whereNotNull('submitted_at')
+        $submittedTasksCount = $this->taskSubmissions()
+            ->whereNotNull('created_at')
             ->whereNull('completed_at')
-            ->whereNull('cancelled_at')
-            ->where('submitted_at', '>=', now()->subHour())
+            ->where('created_at', '>=', now()->subHour())
             ->count();
 
         return $submittedTasksCount < $activeTasksPerHour;
     }
+
+    /**
+     * Check if the user is active
+     */
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    /**
+     * Scope to only include active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope to only include inactive users
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
+    }
+
+    public function supports()
+    {
+        return $this->hasMany(Support::class);
+    }
+
+    public function scopeLocalize($query)
+    {
+        if (auth()->user()->first_role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where('country_id', auth()->user()->country_id);
+    }
+
+
 }

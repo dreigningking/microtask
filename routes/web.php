@@ -54,7 +54,7 @@ Route::view('review','post-job-review');
 
 
 
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => ['auth','check_user_active']], function () {
     Route::group(['middleware' => ['email_verified','two_factor']], function () {
         /* Task Master */
         Route::group(['prefix' => 'jobs','as'=>'jobs.'], function () {

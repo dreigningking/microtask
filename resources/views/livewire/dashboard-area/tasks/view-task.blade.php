@@ -22,7 +22,7 @@
                 <span class="badge bg-success fs-6">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</span>
             </div>
         </div>
-        </div>
+    </div>
 
     <!-- Stats Cards -->
     <div class="row g-3 mb-4">
@@ -41,7 +41,7 @@
                             @else
                             <i class="ri-clock-line text-secondary"></i>
                             @endif
-            </span>
+                        </span>
                     </div>
                     <h3 class="fw-bold mb-0">
                         @if($taskWorker->completed_at)
@@ -89,10 +89,10 @@
                         <span class="bg-warning bg-opacity-10 rounded-circle p-2"><i class="ri-user-line text-warning"></i></span>
                     </div>
                     <h3 class="fw-bold mb-0">
-            @php
-                $acceptedWorkersCount = $taskWorker->task->workers->whereNotNull('accepted_at')->count();
-                $peopleRemaining = $taskWorker->task->number_of_people - $acceptedWorkersCount;
-            @endphp
+                        @php
+                        $acceptedWorkersCount = $taskWorker->task->workers->whereNotNull('accepted_at')->count();
+                        $peopleRemaining = $taskWorker->task->number_of_people - $acceptedWorkersCount;
+                        @endphp
                         {{ $peopleRemaining > 0 ? $peopleRemaining : 'None' }}
                     </h3>
                 </div>
@@ -112,7 +112,7 @@
                     <div class="mb-4">
                         <h6 class="text-muted mb-2">Description</h6>
                         <p class="mb-0">{{ $taskWorker->task->description }}</p>
-        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -130,6 +130,20 @@
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted mb-2">Expected Time</h6>
                             <p class="fw-semibold mb-0">{{ $requiredTime }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Accepted Date</h6>
+                            <p class="fw-semibold mb-0">{{ $taskWorker->accepted_at ? $taskWorker->accepted_at->format('M d, Y H:i') : 'Not accepted yet' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-2">Multiple Submissions</h6>
+                            <p class="fw-semibold mb-0">
+                                @if($taskWorker->task->allows_multiple_submissions ?? false)
+                                <span class="badge bg-success">Allowed</span>
+                                @else
+                                <span class="badge bg-secondary">Not Allowed</span>
+                                @endif
+                            </p>
                         </div>
                     </div>
 
@@ -165,28 +179,29 @@
                                 </div>
                             </div>
                             @endforeach
-            </div>
-        </div>
-        @endif
+                        </div>
+                    </div>
+                    @endif
 
                     @if($taskWorker->task->requirements)
                     <div class="mb-4">
                         <h6 class="text-muted mb-3">Requirements</h6>
                         <ul class="list-unstyled mb-0">
-                @foreach($taskWorker->task->requirements as $requirement)
+                            @foreach($taskWorker->task->requirements as $requirement)
                             <li class="mb-2">
                                 <i class="ri-check-line text-success me-2"></i>
                                 {{ $requirement }}
                             </li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                 </div>
             </div>
 
             <!-- Submission Form -->
             @if (!empty($submissionFields) && $taskWorker && $taskWorker->accepted_at)
+            @if(($taskWorker->task->allows_multiple_submissions ?? false) || $submissions->count() === 0)
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Submission Requirements</h5>
@@ -194,88 +209,97 @@
                 <div class="card-body">
                     <form wire:submit="submitTask">
                         <div class="row g-3">
-                    @foreach($submissionFields as $index => $field)
+                            @foreach($submissionFields as $index => $field)
                             <div class="col-12">
                                 <label for="submission-field-{{ $index }}" class="form-label">{{ $field['title'] }}</label>
-                        
-                        @if ($field['type'] === 'text')
+
+                                @if ($field['type'] === 'text')
                                 <input type="text" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'textarea')
+                                @elseif ($field['type'] === 'textarea')
                                 <textarea id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" rows="4" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror"></textarea>
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'number')
+                                @elseif ($field['type'] === 'number')
                                 <input type="number" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'email')
+                                @elseif ($field['type'] === 'email')
                                 <input type="email" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'url')
+                                @elseif ($field['type'] === 'url')
                                 <input type="url" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'date')
+                                @elseif ($field['type'] === 'date')
                                 <input type="date" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'time')
+                                @elseif ($field['type'] === 'time')
                                 <input type="time" id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'select')
+                                @elseif ($field['type'] === 'select')
                                 <select id="submission-field-{{ $index }}" wire:model="submittedData.{{ $field['name'] }}" class="form-select @error('submittedData.' . $field['name']) is-invalid @enderror">
-                                <option value="">Select {{ $field['title'] }}</option>
-                                @foreach($field['options'] ?? [] as $option)
+                                    <option value="">Select {{ $field['title'] }}</option>
+                                    @foreach($field['options'] ?? [] as $option)
                                     <option value="{{ $option }}">{{ $option }}</option>
-                                @endforeach
-                            </select>
+                                    @endforeach
+                                </select>
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'checkbox')
+                                @elseif ($field['type'] === 'checkbox')
                                 <div class="mt-2">
-                                @foreach($field['options'] ?? [] as $option)
+                                    @foreach($field['options'] ?? [] as $option)
                                     <div class="form-check">
-                                        <input type="checkbox" 
-                                               id="submission-field-{{ $index }}-{{ Str::slug($option) }}" 
-                                               wire:model="submittedData.{{ $field['name'] }}" 
-                                               value="{{ $option }}"
+                                        <input type="checkbox"
+                                            id="submission-field-{{ $index }}-{{ Str::slug($option) }}"
+                                            wire:model="submittedData.{{ $field['name'] }}"
+                                            value="{{ $option }}"
                                             class="form-check-input @error('submittedData.' . $field['name']) is-invalid @enderror">
                                         <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="form-check-label">{{ $option }}</label>
                                     </div>
-                                @endforeach
-                            </div>
+                                    @endforeach
+                                </div>
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'radio')
+                                @elseif ($field['type'] === 'radio')
                                 <div class="mt-2">
-                                @foreach($field['options'] ?? [] as $option)
+                                    @foreach($field['options'] ?? [] as $option)
                                     <div class="form-check">
-                                        <input type="radio" 
-                                               id="submission-field-{{ $index }}-{{ Str::slug($option) }}" 
-                                               wire:model="submittedData.{{ $field['name'] }}" 
-                                               value="{{ $option }}"
+                                        <input type="radio"
+                                            id="submission-field-{{ $index }}-{{ Str::slug($option) }}"
+                                            wire:model="submittedData.{{ $field['name'] }}"
+                                            value="{{ $option }}"
                                             class="form-check-input @error('submittedData.' . $field['name']) is-invalid @enderror">
                                         <label for="submission-field-{{ $index }}-{{ Str::slug($option) }}" class="form-check-label">{{ $option }}</label>
                                     </div>
-                                @endforeach
-                            </div>
+                                    @endforeach
+                                </div>
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @elseif ($field['type'] === 'file')
-                            <input type="file" 
-                                   id="submission-field-{{ $index }}" 
-                                   wire:model.live="submittedData.{{ $field['name'] }}" 
+                                @elseif ($field['type'] === 'file')
+                                <input type="file"
+                                    id="submission-field-{{ $index }}"
+                                    wire:model.live="submittedData.{{ $field['name'] }}"
                                     class="form-control @error('submittedData.' . $field['name']) is-invalid @enderror">
                                 @error('submittedData.' . $field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        @endif
-                        @if (isset($field['description']))
+                                @endif
+                                @if (isset($field['description']))
                                 <div class="form-text">{{ $field['description'] }}</div>
-                        @endif
-                    </div>
-                    @endforeach
+                                @endif
+                            </div>
+                            @endforeach
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary w-100">
                                     <i class="ri-send-plane-line me-1"></i> Submit Task
-                        </button>
+                                </button>
                             </div>
-                    </div>
-                </form>
+                        </div>
+                    </form>
                 </div>
             </div>
+            @else
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <i class="ri-check-double-line display-4 text-success mb-3"></i>
+                    <h5 class="text-success">You have submitted</h5>
+                    <p class="text-muted">Multiple submissions are not allowed for this task.</p>
+                </div>
+            </div>
+            @endif
             @elseif (!empty($submissionFields) && (!$taskWorker || !$taskWorker->accepted_at))
             <div class="card mb-4">
                 <div class="card-body text-center">
@@ -296,6 +320,61 @@
                 </div>
             </div>
             @endif
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Invite People -->
+            @if ($peopleRemaining > 0)
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Invite People</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning mb-3">
+                        <h6 class="alert-heading">Want to help others earn?</h6>
+                        <p class="mb-0">There are still {{ $peopleRemaining }} spots left for this task. Share it with your friends and earn a commission when they complete it!</p>
+                    </div>
+                    <button wire:click="openInviteModal" class="btn btn-warning w-100">
+                        <i class="ri-share-line me-1"></i> Invite People to do Task
+                    </button>
+                </div>
+            </div>
+            @endif
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        @if (!$taskWorker || !$taskWorker->accepted_at)
+                        <!-- User hasn't started the task yet -->
+                        <button wire:click="startTask" class="btn btn-primary">
+                            <i class="ri-play-line me-1"></i> Start Task
+                        </button>
+                        @elseif ($taskWorker->rejected_at)
+                        <!-- Worker has been rejected -->
+                        <div class="alert alert-danger mb-0">
+                            <i class="ri-error-warning-line me-1"></i>
+                            You have been rejected from this task and cannot submit work.
+                        </div>
+                        @elseif ($taskWorker->completed_at)
+                        <!-- Task has been completed -->
+                        <button wire:click="reviewTask" class="btn btn-success">
+                            <i class="ri-star-line me-1"></i> Review Task
+                        </button>
+                        @else
+                        <!-- Task is in progress -->
+                        <button wire:click="cancelTask" class="btn btn-outline-danger"
+                            onclick="return confirm('Are you sure you want to cancel this task? All submissions will be deleted.')">
+                            <i class="ri-close-line me-1"></i> Cancel Task
+                        </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Submission History -->
@@ -329,22 +408,22 @@
                                 </td>
                                 <td>
                                     @if($submission->completed_at)
-                                        <span class="badge bg-success">Completed</span>
+                                    <span class="badge bg-success">Completed</span>
                                     @elseif($submission->disputed_at)
-                                        @if($submission->resolved_at)
-                                            <span class="badge bg-info">Dispute Resolved</span>
-                                        @else
-                                            <span class="badge bg-warning">Disputed</span>
-                                        @endif
-                                    @elseif($submission->paid_at)
-                                        <span class="badge bg-primary">Paid</span>
+                                    @if($submission->resolved_at)
+                                    <span class="badge bg-info">Dispute Resolved</span>
                                     @else
-                                        <span class="badge bg-secondary">{{ $submission->status }}</span>
+                                    <span class="badge bg-warning">Disputed</span>
+                                    @endif
+                                    @elseif($submission->paid_at)
+                                    <span class="badge bg-primary">Paid</span>
+                                    @else
+                                    <span class="badge bg-secondary">{{ $submission->status }}</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary" 
-                                            onclick="viewSubmission({{ $submission->id }})">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="viewSubmission({{ $submission->id }})">
                                         <i class="ri-eye-line me-1"></i> View
                                     </button>
                                 </td>
@@ -368,168 +447,71 @@
             </div>
             <div class="card-body">
                 @if($taskWorker->task_rating && $taskWorker->task_review)
-                    <!-- Existing Review -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-2">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= $taskWorker->task_rating)
-                                        <i class="ri-star-fill text-warning"></i>
-                                    @else
-                                        <i class="ri-star-line text-muted"></i>
-                                    @endif
+                <!-- Existing Review -->
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="me-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <=$taskWorker->task_rating)
+                                <i class="ri-star-fill text-warning"></i>
+                                @else
+                                <i class="ri-star-line text-muted"></i>
+                                @endif
                                 @endfor
-                            </div>
-                            <span class="fw-medium">{{ $taskWorker->task_rating }}/5 stars</span>
                         </div>
-                        <p class="mb-0">{{ $taskWorker->task_review }}</p>
-                        <small class="text-muted">Reviewed on {{ $taskWorker->updated_at->format('M d, Y') }}</small>
+                        <span class="fw-medium">{{ $taskWorker->task_rating }}/5 stars</span>
                     </div>
+                    <p class="mb-0">{{ $taskWorker->task_review }}</p>
+                    <small class="text-muted">Reviewed on {{ $taskWorker->updated_at->format('M d, Y') }}</small>
+                </div>
                 @else
-                    <!-- Review Form -->
-                    <form wire:submit="reviewTask">
-                        <div class="mb-3">
-                            <label class="form-label">Rating</label>
-                            <div class="d-flex align-items-center">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <button type="button" 
-                                            class="btn btn-link p-0 me-1" 
-                                            wire:click="setRating({{ $i }})">
-                                        @if($i <= $taskRating)
-                                            <i class="ri-star-fill text-warning fs-4"></i>
-                                        @else
-                                            <i class="ri-star-line text-muted fs-4"></i>
-                                        @endif
+                <!-- Review Form -->
+                <form wire:submit="reviewTask">
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <div class="d-flex align-items-center">
+                            @for($i = 1; $i <= 5; $i++)
+                                <button type="button"
+                                class="btn btn-link p-0 me-1"
+                                wire:click="setRating({{ $i }})">
+                                @if($i <= $taskRating)
+                                    <i class="ri-star-fill text-warning fs-4"></i>
+                                    @else
+                                    <i class="ri-star-line text-muted fs-4"></i>
+                                    @endif
                                     </button>
-                                @endfor
-                                <span class="ms-2 fw-medium">{{ $taskRating }}/5 stars</span>
-                            </div>
-                            @error('taskRating') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    @endfor
+                                    <span class="ms-2 fw-medium">{{ $taskRating }}/5 stars</span>
                         </div>
-                        <div class="mb-3">
-                            <label for="taskReview" class="form-label">Review</label>
-                            <textarea id="taskReview" 
-                                      wire:model="taskReview" 
-                                      rows="4" 
-                                      class="form-control @error('taskReview') is-invalid @enderror"
-                                      placeholder="Share your experience with this task..."></textarea>
-                            @error('taskReview') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="ri-send-plane-line me-1"></i> Submit Review
-                        </button>
-                    </form>
+                        @error('taskRating') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskReview" class="form-label">Review</label>
+                        <textarea id="taskReview"
+                            wire:model="taskReview"
+                            rows="4"
+                            class="form-control @error('taskReview') is-invalid @enderror"
+                            placeholder="Share your experience with this task..."></textarea>
+                        @error('taskReview') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="ri-send-plane-line me-1"></i> Submit Review
+                    </button>
+                </form>
                 @endif
             </div>
         </div>
         @endif
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Task Status -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Task Status</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="me-3">
-                            @if($taskWorker->completed_at)
-                            <span class="badge bg-success fs-6">Completed</span>
-                            @elseif($taskWorker->submitted_at)
-                            <span class="badge bg-warning fs-6">Submitted</span>
-                            @elseif($taskWorker->accepted_at)
-                            <span class="badge bg-primary fs-6">In Progress</span>
-                            @elseif($taskWorker->saved_at)
-                            <span class="badge bg-info fs-6">Saved</span>
-                            @else
-                            <span class="badge bg-secondary fs-6">Pending</span>
-                            @endif
-                        </div>
-                    </div>
+        
+    </div>
 
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <small class="text-muted">Accepted</small>
-                            <div class="fw-semibold">{{ $taskWorker->accepted_at ? $taskWorker->accepted_at->format('M d, Y') : 'Not accepted' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted">Submitted</small>
-                            <div class="fw-semibold">{{ $taskWorker->submitted_at ? $taskWorker->submitted_at->format('M d, Y') : 'Not submitted' }}</div>
-                        </div>
-                        @if($taskWorker->completed_at)
-                        <div class="col-6">
-                            <small class="text-muted">Completed</small>
-                            <div class="fw-semibold">{{ $taskWorker->completed_at->format('M d, Y') }}</div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- Invite People -->
-        @if ($peopleRemaining > 0)
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Invite People</h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning mb-3">
-                        <h6 class="alert-heading">Want to help others earn?</h6>
-                        <p class="mb-0">There are still {{ $peopleRemaining }} spots left for this task. Share it with your friends and earn a commission when they complete it!</p>
-                    </div>
-                    <button wire:click="openInviteModal" class="btn btn-warning w-100">
-                        <i class="ri-share-line me-1"></i> Invite People to do Task
-            </button>
-                </div>
-        </div>
-        @endif
-
-        <!-- Action Buttons -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        @if (!$taskWorker || !$taskWorker->accepted_at)
-                            <!-- User hasn't started the task yet -->
-                            <button wire:click="startTask" class="btn btn-primary">
-                                <i class="ri-play-line me-1"></i> Start Task
-                            </button>
-                        @elseif ($taskWorker->rejected_at)
-                            <!-- Worker has been rejected -->
-                            <div class="alert alert-danger mb-0">
-                                <i class="ri-error-warning-line me-1"></i>
-                                You have been rejected from this task and cannot submit work.
-                            </div>
-                        @elseif ($taskWorker->completed_at)
-                            <!-- Task has been completed -->
-                            <button wire:click="reviewTask" class="btn btn-success">
-                                <i class="ri-star-line me-1"></i> Review Task
-                            </button>
-                        @else
-                            <!-- Task is in progress -->
-                            <button wire:click="cancelTask" class="btn btn-outline-danger" 
-                                    onclick="return confirm('Are you sure you want to cancel this task? All submissions will be deleted.')">
-                                <i class="ri-close-line me-1"></i> Cancel Task
-                            </button>
-                            <button wire:click="messageTaskMaster" class="btn btn-outline-secondary">
-                                <i class="ri-message-line me-1"></i> Message Task Master
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        </div>
-
-        @if (session()->has('message'))
+    @if (session()->has('message'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('message') }}
+        {{ session('message') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+    </div>
+    @endif
 
     @if (session()->has('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -563,11 +545,11 @@
                         <label for="inviteEmail" class="form-label">Email Addresses</label>
                         <textarea id="inviteEmail" wire:model.live="inviteEmail" rows="3" placeholder="Enter one or more emails, separated by commas or new lines" class="form-control"></textarea>
                         @error('inviteEmail') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                    @if($inviteSummary)
+                        @if($inviteSummary)
                         <div class="alert alert-info mt-2 mb-0">
-                                            {{ $inviteSummary }}
-                                        </div>
-                                    @endif
+                            {{ $inviteSummary }}
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -21,6 +21,6 @@ class UserLocation extends Model
 
     public function country()
     {
-        return $this->setConnection('sqlite_countries')->belongsTo(Country::class);
+        return $this->belongsTo(Country::class);
     }
 }

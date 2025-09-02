@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('rejected_at')->nullable();
             $table->text('task_review')->nullable();
             $table->integer('task_rating')->nullable();
+            $table->softDeletes();
             $table->timestamps();
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

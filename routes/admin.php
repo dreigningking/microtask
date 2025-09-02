@@ -12,17 +12,18 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\CountrySettingsController;
+use App\Http\Controllers\AnnouncementController;
 
 Route::group(['prefix' => 'admin','as'=> 'admin.'], function () {
     Auth::routes();
 });
 
-Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], function () {
+Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check_user_active']], function () {
     
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
     Route::group(['prefix' => 'tasks','as' => 'tasks.','middleware' => ['permission:task_management']], function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
-        Route::get('promotions', [TaskController::class, 'promotions'])->name('promotions');
+        Route::get('promotions', [PromotionController::class, 'index'])->name('promotions');
         Route::get('view/{task}', [TaskController::class, 'show'])->name('show');
         Route::post('approve', [TaskController::class, 'approve'])->name('approve');
         Route::post('disapprove', [TaskController::class, 'disapprove'])->name('disapprove');
@@ -44,6 +45,7 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
             Route::post('withdrawal/process', [EarningController::class, 'withdrawal_process'])->name('process');
             Route::post('/{id}/approve', [EarningController::class, 'approveWithdrawal'])->name('approve');
             Route::post('/{id}/disapprove', [EarningController::class, 'disapproveWithdrawal'])->name('disapprove');
+            Route::post('/{id}/retry', [EarningController::class, 'retryWithdrawal'])->name('retry');
         });
     });
     
@@ -55,6 +57,8 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
 
         Route::get('show/{user}', [UserController::class, 'show'])->name('show');
         Route::post('suspend', [UserController::class, 'suspend'])->name('suspend');
+        Route::post('enable', [UserController::class, 'enable'])->name('enable');
+        Route::post('ban-from-tasks', [UserController::class, 'banFromTasks'])->name('ban-from-tasks');
         Route::post('delete', [UserController::class, 'destroy'])->name('delete');
         Route::post('wallet', [UserController::class, 'wallet'])->name('wallet.toggle');
     });
@@ -78,10 +82,11 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
     Route::group(['prefix' => 'support','as' => 'support.','middleware' => ['permission:support_management']], function () {
         Route::group(['prefix' => 'tickets','as' => 'tickets.'], function () {
             Route::get('/', [TicketController::class, 'index'])->name('index');
-            Route::get('view/{ticket}', [TicketController::class, 'show'])->name('show');
+            Route::get('view/{support}', [TicketController::class, 'show'])->name('show');
             Route::get('pending', [TicketController::class, 'pending'])->name('pending');
             Route::get('open', [TicketController::class, 'open'])->name('open');
             Route::get('closed', [TicketController::class, 'closed'])->name('closed');
+            Route::post('add-comment', [TicketController::class, 'addComment'])->name('add-comment');
         });
         Route::group(['prefix' => 'disputes','as' => 'disputes.'], function () {
             Route::get('/', [TicketController::class, 'disputes'])->name('index');
@@ -89,6 +94,11 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> 'auth'], funct
             Route::get('open', [TicketController::class, 'disputes_open'])->name('open');
             Route::get('closed', [TicketController::class, 'disputes_closed'])->name('closed');
         });
+    });
+
+    Route::group(['prefix' => 'announcements','as' => 'announcements.','middleware' => ['permission:system_settings']], function () {
+        Route::get('/', [AnnouncementController::class, 'index'])->name('index');
+        Route::post('send', [AnnouncementController::class, 'send'])->name('send');
     });
 
     Route::group(['prefix' => 'settings','as' => 'settings.'], function () {

@@ -1,5 +1,17 @@
 
 <div class="content-wrapper">
+    <!-- Task Ban Warning -->
+    @if($userData->is_banned_from_tasks)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger" role="alert">
+                <i class="mdi mdi-alert-circle me-2"></i>
+                <strong>Account Restriction:</strong> You are currently banned from taking tasks. Please contact support for more information.
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
             <h3 class="font-weight-bold">Welcome {{ $userData->name }}</h3>

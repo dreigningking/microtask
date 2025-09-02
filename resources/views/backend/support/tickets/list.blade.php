@@ -39,60 +39,66 @@
 								</tr>
 							</thead>
 							<tbody>
-								<!-- Sample Support Ticket 1 -->
+								@forelse($tickets as $ticket)
 								<tr>
 									<td>
 										<div>
-											<span class="badge bg-primary">#ST-001</span>
+											<span class="badge bg-primary">#{{ $ticket->id }}</span>
 										</div>
-										<span class="text-muted small">2024-01-15 09:30</span>
-										
+										<span class="text-muted small">{{ $ticket->created_at->format('Y-m-d H:i') }}</span>
 									</td>
 									<td>
-										<strong>Payment Issue - Transaction Failed</strong>
-										<div class="text-muted small">Unable to complete payment for task completion</div>
+										<strong>{{ $ticket->subject ?? 'No Subject' }}</strong>
+										<div class="text-muted small">{{ Str::limit($ticket->description, 100) }}</div>
 										<div class="d-flex mt-2">
-											<span class="badge bg-danger">High</span>
-											<span class="badge bg-warning">In Progress</span>
+											@if($ticket->priority)
+												<span class="badge bg-{{ $ticket->priority === 'high' ? 'danger' : ($ticket->priority === 'medium' ? 'warning' : 'info') }}">{{ ucfirst($ticket->priority) }}</span>
+											@endif
+											<span class="badge bg-{{ $ticket->status === 'open' ? 'success' : ($ticket->status === 'in_progress' ? 'warning' : ($ticket->status === 'resolved' ? 'info' : 'secondary')) }}">{{ ucfirst(str_replace('_', ' ', $ticket->status)) }}</span>
 										</div>
 									</td>
 									<td>
+										@if($ticket->user)
 										<div class="d-flex align-items-center">
-											<img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="rounded-circle me-2" style="width: 32px; height: 32px;">
+											<img src="{{ $ticket->user->profile_photo_url ?? 'https://randomuser.me/api/portraits/men/32.jpg' }}" alt="User" class="rounded-circle me-2" style="width: 32px; height: 32px;">
 											<div>
-												<div class="fw-bold">John Smith</div>
-												<div class="text-muted small">john.smith@email.com</div>
+												<div class="fw-bold">{{ $ticket->user->name }}</div>
+												<div class="text-muted small">{{ $ticket->user->email }}</div>
 											</div>
 										</div>
+										@else
+										<div class="text-muted">No user</div>
+										@endif
 									</td>
 									
 									<td>
-										<span class="badge bg-primary">8 messages</span>
+										<span class="badge bg-primary">{{ $ticket->trails->count() ?? 0 }} messages</span>
 									</td>
 									<td>
+										@if($ticket->assigned_to)
 										<div class="d-flex align-items-center">
 											<img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Staff" class="rounded-circle me-2" style="width: 28px; height: 28px;">
-											<span>Sarah Johnson</span>
+											<span>{{ $ticket->assigned_to }}</span>
 										</div>
+										@else
+										<div class="text-muted">Unassigned</div>
+										@endif
 									</td>
 									
-									<td>2024-01-16 14:22</td>
+									<td>{{ $ticket->updated_at->format('Y-m-d H:i') }}</td>
 									<td>
 										<div class="d-flex gap-1">
-											<a href="{{ route('admin.support.tickets.show', 2) }}" class="btn btn-primary btn-sm">
+											<a href="{{ route('admin.support.tickets.show', $ticket) }}" class="btn btn-primary btn-sm">
 												<i class="ri-eye-line"></i> View
 											</a>
-											<a href="#" class="btn btn-warning btn-sm">
-												<i class="ri-edit-line"></i> Reply
-											</a>
-											<button class="btn btn-success btn-sm">
-												<i class="ri-check-line"></i> Close
-											</button>
 										</div>
 									</td>
 								</tr>
-
-								
+								@empty
+								<tr>
+									<td colspan="7" class="text-center">No tickets found.</td>
+								</tr>
+								@endforelse
 							</tbody>
 						</table>
 					</div>

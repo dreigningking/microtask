@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use App\Models\CountrySetting;
 
 class Withdrawal extends Model
 {
@@ -25,5 +27,30 @@ class Withdrawal extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function getGatewayAttribute()
+    {
+        $country_settings = CountrySetting::where('country_id', $this->user->country_id)->first();
+        return $country_settings->gateway;
+    }
+
+    public function getPaymentMethodAttribute()
+    {
+        $country_settings = CountrySetting::where('country_id', $this->user->country_id)->first();
+        return $country_settings->payout_method;
+    }
+
+    public function scopeLocalize($query)
+    {
+        if (Auth::check() && Auth::user()->first_role && Auth::user()->first_role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where(function ($q) {
+            $q->whereHas('user', function ($q) {
+                $q->where('country_id', Auth::user()->country_id);
+            });
+        });
     }
 }

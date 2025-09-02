@@ -602,7 +602,13 @@
                                             </table>
                                         </div>
                                         
-                                        @if($task->workers->whereNotNull('completed_at')->whereNull('paid_at')->isNotEmpty())
+                                        @php
+                                            $completedUnpaidWorkers = $task->workers->filter(function($worker) {
+                                                return $worker->taskSubmissions->whereNotNull('completed_at')->isNotEmpty() && 
+                                                       $worker->taskSubmissions->whereNotNull('paid_at')->isEmpty();
+                                            });
+                                        @endphp
+                                        @if($completedUnpaidWorkers->isNotEmpty())
                                             <div class="mt-3">
                                                 <button class="btn btn-primary">Pay All Pending Workers</button>
                                             </div>

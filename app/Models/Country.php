@@ -46,11 +46,11 @@ class Country extends Model
 
     public function user_locations()
     {
-        return $this->setConnection('mysql')->hasMany(UserLocation::class);
+        return $this->hasMany(UserLocation::class);
     }
 
     public function users(){
-        return $this->setConnection('mysql')->hasMany(User::class);
+        return $this->hasMany(User::class);
     } 
 
     /**
@@ -58,7 +58,7 @@ class Country extends Model
      */
     public function setting()
     {
-        return $this->setConnection('mysql')->hasOne(CountrySetting::class);
+        return $this->hasOne(CountrySetting::class);
     }
 
     // --- Custom computed properties for settings completeness ---

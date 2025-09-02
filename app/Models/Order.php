@@ -40,4 +40,17 @@ class Order extends Model
     public function payment(){
         return $this->hasOne(Payment::class);
     }
+
+    public function scopeLocalize($query)
+    {
+        if (auth()->user()->first_role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where(function ($q) {
+            $q->whereHas('user', function ($q) {
+                $q->where('country_id', auth()->user()->country_id);
+            });
+        });
+    }
 }

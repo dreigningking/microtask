@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\LocationMiddleware;
+use App\Http\Middleware\CheckUserActive;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\Ensure2FAIsVerifiedMiddleware;
@@ -23,10 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('dashboard');
         });
         $middleware->append(LocationMiddleware::class);
+        // $middleware->append(CheckUserActive::class);
         $middleware->alias([
             'email_verified' => EmailHasBeenVerifiedMiddleware::class,
             'two_factor' => Ensure2FAIsVerifiedMiddleware::class,
             'permission' => CheckPermission::class,
+            'check_user_active' => CheckUserActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

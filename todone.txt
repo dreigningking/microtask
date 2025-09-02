@@ -1,0 +1,5 @@
+Admin message to all via notification
+Ban user from user
+Admin support 
+Admin user limit by Country
+Payouts require approval 

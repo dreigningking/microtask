@@ -30,6 +30,7 @@
                             <div class="mb-2">Jobs Done: <strong>{{ $jobsDone->count() }}</strong></div>
                             <div class="mb-2">Current Subscription: <strong>{{ $currentSubscription ? $currentSubscription->plan->name : 'None' }}</strong></div>
                             <div class="mb-2">Wallet Status: <span class="badge bg-{{ $walletFrozen ? 'danger' : 'success' }}">{{ $walletFrozen ? 'Frozen' : 'Active' }}</span></div>
+                            <div class="mb-2">Task Ban Status: <span class="badge bg-{{ $user->is_banned_from_tasks ? 'danger' : 'success' }}">{{ $user->is_banned_from_tasks ? 'Banned from Tasks' : 'Allowed to Take Tasks' }}</span></div>
                             <div class="mb-2">Avg. Worker Rating: <strong>{{ $averageWorkerRating ? number_format($averageWorkerRating, 2) : 'N/A' }}/5</strong></div>
                             <div class="mb-2">Avg. Poster Rating: <strong>{{ $averagePosterRating ? number_format($averagePosterRating, 2) : 'N/A' }}/5</strong></div>
                         </div>
@@ -47,6 +48,11 @@
                                 @csrf
                                 <input type="hidden" name="user_id" value="{{ $user->id }}">
                                 <button type="submit" class="btn btn-{{ $walletFrozen ? 'success' : 'secondary' }} btn-sm">{{ $walletFrozen ? 'Unfreeze Wallet' : 'Freeze Wallet' }}</button>
+                            </form>
+                            <form action="{{ route('admin.users.ban-from-tasks') }}" method="POST" class="d-inline-block mb-2" onsubmit="return confirm('{{ $user->is_banned_from_tasks ? 'Unban' : 'Ban' }} this user from tasks?');">
+                                @csrf
+                                <input type="hidden" name="user_id" value="{{ $user->id }}">
+                                <button type="submit" class="btn btn-{{ $user->is_banned_from_tasks ? 'success' : 'danger' }} btn-sm">{{ $user->is_banned_from_tasks ? 'Unban from Tasks' : 'Ban from Tasks' }}</button>
                             </form>
                         </div>
                     </div>
@@ -78,6 +84,7 @@
                                     <li class="list-group-item">Name: {{ $user->name }}</li>
                                     <li class="list-group-item">Email: {{ $user->email }}</li>
                                     <li class="list-group-item">Status: <span class="badge bg-{{ $user->is_active ? 'success' : 'danger' }}">{{ $user->is_active ? 'Active' : 'Inactive' }}</span></li>
+                                    <li class="list-group-item">Task Ban Status: <span class="badge bg-{{ $user->is_banned_from_tasks ? 'danger' : 'success' }}">{{ $user->is_banned_from_tasks ? 'Banned from Tasks' : 'Allowed to Take Tasks' }}</span></li>
                                     <li class="list-group-item">Member since: {{ $user->created_at->format('M d, Y') }}</li>
                                     <li class="list-group-item">Current Subscription: {{ $currentSubscription ? $currentSubscription->plan->name : 'None' }}</li>
                                 </ul>

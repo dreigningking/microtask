@@ -8,6 +8,7 @@ use App\Models\Support;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
@@ -26,7 +27,7 @@ class TicketController extends Controller
         $allTickets = $baseQuery->get();
 
         // Filtered query for display
-        $ticketsQuery = Support::with(['trails', 'user']);
+        $ticketsQuery = Support::with(['trails', 'user.country', 'user.state', 'user.city']);
         
         // Apply search filter
         if ($search) {
@@ -90,6 +91,8 @@ class TicketController extends Controller
      */
     public function show(Support $support)
     {
+        // dd($support);
+        $support->load(['user.country', 'user.state', 'user.city', 'trails.user']);
         return view('backend.support.tickets.view',compact('support'));
     }
 
@@ -109,13 +112,13 @@ class TicketController extends Controller
             }
         }
         $support->comments()->create([
-            'profile_id'=> auth()->user()->admin->id,
-            'profile_type'=> get_class(auth()->user()->admin),
-            'user_id' => auth()->id(),
+            'profile_id'=> Auth::id(),
+            'profile_type'=> get_class(Auth::user()),
+            'user_id' => Auth::id(),
             'body' => $request->body,
             'attachments' => $attachments ? $attachments : null,
         ]);
-        Trail::updateOrCreate(['user_id'=> auth()->id(),
+        Trail::updateOrCreate(['user_id'=> Auth::id(),
         'trailable_id'=> $support->id,
         'trailable_type'=> 'App\Models\Support']);
         return redirect()->route('admin.support.tickets.show', $support)->with('success', 'Message sent successfully!');
@@ -127,7 +130,7 @@ class TicketController extends Controller
         Trail::updateOrCreate(['user_id'=> $request->user_id,
         'trailable_id'=> $request->support_id,
         'trailable_type'=> 'App\Models\Support'],[
-        'assigned_by'=> auth()->id(),
+        'assigned_by'=> Auth::id(),
         'message'=> $request->message]);
         if($request->priority){
             Support::where('id',$request->support_id)->update(['priority'=> $request->priority]);

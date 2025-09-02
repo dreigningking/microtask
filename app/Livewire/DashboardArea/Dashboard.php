@@ -135,7 +135,7 @@ class Dashboard extends Component
         $this->recentSubmissions = TaskSubmission::whereHas('task', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-            ->with(['user', 'task', 'taskWorker'])
+            ->with(['user', 'task', 'task_worker'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();

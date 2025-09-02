@@ -52,7 +52,9 @@ class ExploreTaskShow extends Component
 
         if (count($this->task->workers->whereNotNull('accepted_at')) >= $this->task->number_of_people) {
             // If all slots filled and all have submitted
-            $allSubmitted = $this->task->workers->whereNotNull('accepted_at')->every(function($w) { return $w->submitted_at !== null; });
+            $allSubmitted = $this->task->taskSubmissions()
+                ->whereNotNull('completed_at')
+                ->count() >= $this->task->number_of_people;
             if ($allSubmitted) {
                 $this->canStartOrSave = false;
             }

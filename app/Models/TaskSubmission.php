@@ -33,7 +33,7 @@ class TaskSubmission extends Model
     ];
 
     public function getStatusAttribute(){
-        $hours = Setting::get('task_submission_review_hours');
+        $hours = Setting::getValue('submission_review_deadline');
         if ($this->completed_at) {
             return 'completed at ' . $this->completed_at->format('M d, Y H:i');
         }

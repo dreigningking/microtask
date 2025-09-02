@@ -1,7 +1,7 @@
 <div>
     <div class="job-card card p-4 mb-4 shadow-sm border-0">
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="company-logo">
                     @if($task->platform && $task->platform->image)
                         <img src="{{ $task->platform->image }}" class="img-fluid rounded" alt="{{ $task->platform->name }}">

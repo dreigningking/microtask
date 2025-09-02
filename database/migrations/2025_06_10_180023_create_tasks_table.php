@@ -21,6 +21,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->string('expected_completion_minutes')->nullable();
             $table->string('expected_budget')->nullable();
+            $table->string('currency')->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->json('requirements')->nullable();
             $table->json('template_data')->nullable();

@@ -8,16 +8,55 @@ use App\Models\BlogPost;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = BlogPost::latest()->paginate(12);
+        $query = BlogPost::with('user');
+
+        // Apply filters
+        if ($request->filled('title')) {
+            $query->where('title', 'like', '%' . $request->title . '%');
+        }
+
+        if ($request->filled('author')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->author . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('featured')) {
+            $query->where('featured', $request->featured === 'yes');
+        }
+
+        if ($request->filled('published_date')) {
+            $query->whereDate('published_at', $request->published_date);
+        }
+
+        if ($request->filled('published_after')) {
+            $query->whereDate('published_at', '>=', $request->published_after);
+        }
+
+        if ($request->filled('published_before')) {
+            $query->whereDate('published_at', '<=', $request->published_before);
+        }
+
+        $posts = $query->latest()->paginate(20);
         $categories = json_decode(Setting::getValue('blog_categories'));
+        
         return view('backend.blog.index', compact('posts', 'categories'));
     }
 
@@ -73,7 +112,7 @@ class BlogController extends Controller
         $data['allow_comments'] = $request->has('allow_comments');
 
         // Set user_id automatically
-        $data['user_id'] = auth()->user()?->id;
+        $data['user_id'] = Auth::user()?->id;
 
         // Set default meta fields if empty
         if (empty($data['meta_title'])) {
@@ -265,7 +304,7 @@ class BlogController extends Controller
         $comment->update([
             'status' => 'approved',
             'approved_at' => now(),
-            'approved_by' => auth()->id()
+            'approved_by' => Auth::id()
         ]);
 
         return back()->with('success', 'Comment approved successfully.');

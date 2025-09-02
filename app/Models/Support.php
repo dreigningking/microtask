@@ -51,7 +51,7 @@ class Support extends Model
 
     public function scopeLocalize($query)
     {
-        if (auth()->user()->first_role->name == 'Super Admin') {
+        if (auth()->user()->first_role->name == 'super-admin') {
             return $query;
         }
 

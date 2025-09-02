@@ -174,4 +174,17 @@ class BlogPost extends Model
     {
         return $this->allow_comments && $this->is_published;
     }
+
+    public function scopeLocalize($query)
+    {
+        if (auth()->user()->first_role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where(function ($q) {
+            $q->whereHas('user', function ($q) {
+                $q->where('country_id', auth()->user()->country_id);
+            });
+        });
+    }
 }

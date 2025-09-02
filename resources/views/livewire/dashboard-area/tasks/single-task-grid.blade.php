@@ -26,7 +26,7 @@
 <div class="job-card card p-4">
     <a href="{{ route('explore.task',$task) }}">
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <img src="{{ $task->platform->image }}" class="img-fluid rounded" alt="Company Logo">
             </div>
             <div class="col-md-8">

@@ -47,6 +47,18 @@ class Login extends Component
             ]);
         }
 
+        // Check if user is active after successful authentication
+        $user = Auth::user();
+        if (!$user->is_active) {
+            // Log out the user immediately
+            Auth::logout();
+            Session::flush();
+            
+            throw ValidationException::withMessages([
+                'login' => 'Your account has been suspended. Please contact support for assistance.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 

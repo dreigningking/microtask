@@ -128,6 +128,6 @@ class Comment extends Model
 
     public function canBeDeletedBy(User $user): bool
     {
-        return $this->isByUser($user) || $user->hasRole('admin');
+        return $this->isByUser($user) || $user->hasRole('super-admin');
     }
 }

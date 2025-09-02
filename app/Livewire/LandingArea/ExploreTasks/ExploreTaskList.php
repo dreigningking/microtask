@@ -127,7 +127,7 @@ class ExploreTaskList extends Component
             })
             ->where(function($q) {
                 $q->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND accepted_at IS NOT NULL)')
-                  ->orWhereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND submitted_at IS NOT NULL)');
+                  ->orWhereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
             })
             // Filter out tasks from banned users
             ->whereHas('user', function($q) {

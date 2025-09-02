@@ -1,23 +1,31 @@
 ----------------------------------------------- 
 Notifications
 ---------------------------------------------
-Blog Subscription Notification 24hours after post creation
+Taskmaster{
 Job Approved
-JobInvite
-UrgentJob Notification
-JobSubmission
-Late Subsubmission Review Notification
-Disbursement Notification if admin initiated it
-Task Submission Reviewed Notification
-EarningNotification
-SupportReplyNotification
-Verification Result
-Withdrawal Complete 
-Exchange Complete 
-DisputeNotificationTask
-DisputeNotificationJob
-Subscription Expiring/Expiry
--------ADMIN----------
+    JobSubmission
+    Late Subsubmission Review Notification
+    Disbursement Notification if admin initiated it
+    DisputeNotification
+}
+Worker{
+    UrgentJob Notification
+    Task Submission Reviewed Notification
+    EarningNotification
+    Withdrawal Complete 
+    Exchange Complete 
+    DisputeNotification
+}
+General{
+    Blog Subscription Notification 24hours after post creation
+    JobInvite
+    SupportReplyNotification
+    Verification Result
+    Subscription Expiring/Expiry
+}
+
+
+---ADMIN Notification---
 TaskReportNotification
 Withdrawal Request 
 Support Notification - new, closed, 
@@ -53,7 +61,7 @@ Remove Follower Feature  (workers can follow task masters) because it conflicts 
     worker subscription - add feature to receive notification from people you follow
 }
 
-
+2factor
 ---------------------------------------------------------
 REVIEW
 -------------------------------
@@ -93,15 +101,7 @@ blog subscription
 ADMIN
 ---------------------------------------------------
 Admin dashboard - Show pending tasks
-Admin message to all via notification
-Admin user limit by Country
-Admin support 
-Roles slugs
-Ban user from user
 Blog send notification to subscribers and users
-remove these databases: dispute, task, task worker. rerun migration
-Change server upload to 2mb
-payouts require approval ? 
 admin can create task, and assign to user
 Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
 

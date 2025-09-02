@@ -6,19 +6,65 @@ use App\Models\User;
 use App\Models\Payment;
 use App\Models\TaskWorker;
 use App\Models\UserVerification;
+use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::whereDoesntHave('roles')->orderBy('id', 'desc')->get();
+        $query = User::whereDoesntHave('roles');
+
+        // Apply filters
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'suspended') {
+                $query->where('is_active', false);
+            }
+        }
+
+        if ($request->filled('task_ban')) {
+            if ($request->task_ban === 'banned') {
+                $query->where('is_banned_from_tasks', true);
+            } elseif ($request->task_ban === 'allowed') {
+                $query->where('is_banned_from_tasks', false);
+            }
+        }
+
+        if ($request->filled('member_since')) {
+            $query->whereDate('created_at', '>=', $request->member_since);
+        }
+
+        // Country filter for super-admin users
+        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+            $query->where('country_id', $request->country_id);
+        }
+
+        // Get countries for super-admin filter
+        $countries = null;
+        if (Auth::user()->first_role->name === 'super-admin') {
+            $countries = Country::orderBy('name')->get();
+        }
+
+        $users = $query->orderBy('id', 'desc')->paginate(20);
+
+        // Calculate additional data for each user
         foreach ($users as $user) {
-            // Tasks completed: TaskWorker where user_id = user, completed_at not null
-            $tasksCompleted = $user->task_workers()->whereNotNull('completed_at')->count();
+            // Tasks completed: TaskSubmission where user_id = user, completed_at not null
+            $tasksCompleted = $user->taskSubmissions()->whereNotNull('completed_at')->count();
             // Tasks on hand: TaskWorker where user_id = user (all tasks assigned)
             $tasksOnHand = $user->task_workers()->count();
             $user->tasks_completed = $tasksCompleted;
@@ -27,15 +73,20 @@ class UserController extends Controller
             // Jobs completed: Tasks posted by user where all required workers have completed
             $jobsPosted = $user->tasks()->count();
             $jobsCompleted = $user->tasks()->whereHas('workers', function($q) {
-                $q->whereNotNull('completed_at');
+                $q->whereHas('taskSubmissions', function($subQ) {
+                    $subQ->whereNotNull('completed_at');
+                });
             })->get()->filter(function($task) {
-                // A job is completed if number of workers with completed_at >= number_of_people
-                return $task->workers()->whereNotNull('completed_at')->count() >= $task->number_of_people;
+                // A job is completed if number of workers with completed submissions >= number_of_people
+                return $task->workers()->whereHas('taskSubmissions', function($q) {
+                    $q->whereNotNull('completed_at');
+                })->count() >= $task->number_of_people;
             })->count();
             $user->jobs_completed = $jobsCompleted;
             $user->jobs_posted = $jobsPosted;
         }
-        return view('backend.users.list', compact('users'));
+
+        return view('backend.users.list', compact('users', 'countries'));
     }
 
     public function verifications(){
@@ -91,11 +142,11 @@ class UserController extends Controller
         $currentSubscription = $subscriptions->where('status', 'active')->first();
 
         // Ratings (as worker and as job poster)
-        $workerRatings = $user->task_workers()->whereNotNull('rating')->pluck('rating');
+        $workerRatings = $user->task_workers()->whereNotNull('task_rating')->pluck('task_rating');
         $averageWorkerRating = $workerRatings->avg();
         $posterRatings = TaskWorker::whereHas('task', function($q) use ($user) {
             $q->where('user_id', $user->id);
-        })->whereNotNull('rating')->pluck('rating');
+        })->whereNotNull('task_rating')->pluck('task_rating');
         $averagePosterRating = $posterRatings->avg();
 
         // Wallet freeze status (if available)
@@ -129,6 +180,28 @@ class UserController extends Controller
         $user->is_active = !$user->is_active;
         $user->save();
         return back()->with('success', $user->is_active ? 'User enabled.' : 'User suspended.');
+    }
+
+    public function banFromTasks(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+        $user = User::findOrFail($request->user_id);
+        $user->is_banned_from_tasks = !$user->is_banned_from_tasks;
+        $user->save();
+        return back()->with('success', $user->is_banned_from_tasks ? 'User banned from tasks.' : 'User unbanned from tasks.');
+    }
+
+    public function enable(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+        $user = User::findOrFail($request->user_id);
+        $user->is_active = true;
+        $user->save();
+        return back()->with('success', 'User enabled.');
     }
 
     /**

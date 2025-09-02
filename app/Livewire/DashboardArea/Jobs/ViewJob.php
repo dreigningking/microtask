@@ -26,12 +26,20 @@ class ViewJob extends Component
     public $showWorkerDetailsModal = false;
     public $showDisburseConfirmModal = false;
     public $selectedWorker = null;
+    public $selectedSubmission = null;
     public $inviteEmail = '';
     public $inviteSummary = '';
     public $search = '';
     public $perPage = 10;
+    public $reviewReason = '';
+    public $reviewText = '';
 
     protected $queryString = ['search'];
+
+    protected $rules = [
+        'reviewReason' => 'required|in:1,2,3',
+        'reviewText' => 'required|string|min:10',
+    ];
 
     public function mount(Task $task)
     {
@@ -39,7 +47,8 @@ class ViewJob extends Component
             'user.country',
             'platform',
             'template',
-            'promotions'
+            'promotions',
+            'taskSubmissions.task_worker.user'
         ]);
     }
 
@@ -88,6 +97,83 @@ class ViewJob extends Component
         $this->selectedWorker = null;
     }
 
+    public function viewSubmissionDetails($submissionId)
+    {
+        $this->selectedSubmission = $this->task->taskSubmissions()->with('task_worker.user')->find($submissionId);
+        $this->reset(['reviewReason', 'reviewText']);
+        $this->dispatch('openSubmissionDetailsModal');
+    }
+
+    public function closeSubmissionDetailsModal()
+    {
+        $this->selectedSubmission = null;
+        $this->reset(['reviewReason', 'reviewText']);
+        session()->forget('message');
+        $this->dispatch('closeSubmissionDetailsModal');
+    }
+
+    public function reviewSubmission()
+    {
+        $this->validate([
+            'reviewReason' => 'required|in:1,2,3',
+            'reviewText' => 'required|string|min:10',
+        ]);
+
+        if ($this->selectedSubmission) {
+            $this->selectedSubmission->update([
+                'review' => $this->reviewText,
+                'review_reason' => $this->reviewReason,
+                'reviewed_at' => now(),
+            ]);
+
+            // Handle different review decisions
+            switch ($this->reviewReason) {
+                case 1: // Approved
+                    $this->selectedSubmission->update([
+                        'completed_at' => now(),
+                    ]);
+                    $message = 'Submission approved successfully!';
+                    break;
+                case 2: // Needs Revision
+                    $message = 'Submission marked for revision.';
+                    break;
+                case 3: // Rejected
+                    $message = 'Submission rejected.';
+                    break;
+                default:
+                    $message = 'Submission reviewed successfully!';
+            }
+
+            // Reset form
+            $this->reset(['reviewReason', 'reviewText']);
+            
+            // Refresh the submission data
+            $this->selectedSubmission->refresh();
+            
+            session()->flash('message', $message);
+        }
+    }
+
+    public function resetSubmissionForRevision($submissionId)
+    {
+        $submission = $this->task->taskSubmissions()->find($submissionId);
+        
+        if ($submission && $submission->review_reason == 2) {
+            // Reset the submission for revision
+            $submission->update([
+                'reviewed_at' => null,
+                'review' => null,
+                'review_reason' => null,
+                'completed_at' => null,
+            ]);
+            
+            // Refresh the submission data
+            $this->selectedSubmission->refresh();
+            
+            session()->flash('message', 'Submission reset for revision. Worker can now resubmit their work.');
+        }
+    }
+
     public function disbursePayment($workerId)
     {
         $worker = TaskWorker::with('user')->find($workerId);
@@ -114,6 +200,38 @@ class ViewJob extends Component
             
             $this->closeDisburseConfirmModal();
             session()->flash('message', 'Payment disbursed successfully!');
+        }
+    }
+
+    public function disbursePaymentFromSubmission($submissionId)
+    {
+        $submission = $this->task->taskSubmissions()->find($submissionId);
+        
+        if ($submission && $submission->completed_at && !$submission->paid_at) {
+            $worker = $submission->task_worker;
+            
+            if ($worker) {
+                // Create settlement record
+                $settlement = Settlement::create([
+                    'user_id' => $worker->user_id,
+                    'settlementable_id' => $this->task->id,
+                    'settlementable_type' => get_class($this->task),
+                    'amount' => $this->task->budget_per_person,
+                    'currency' => $this->task->user->country->currency,
+                    'status' => 'pending'
+                ]);
+
+                // Mark submission as paid
+                $submission->paid_at = now();
+                $submission->save();
+                
+                // TODO: Implement actual payment processing logic here
+                
+                // Refresh the submission data
+                $this->selectedSubmission->refresh();
+                
+                session()->flash('message', 'Payment disbursed successfully!');
+            }
         }
     }
 

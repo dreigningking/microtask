@@ -92,7 +92,8 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.index') }}">General</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.plans') }}">Plans</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.platforms') }}">Platforms</a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.templates') }}">Templates</a></li>  
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.templates') }}">Templates</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.announcements.index') }}">Announcements</a></li>  
                         @endif   
                         @if(auth()->user()->hasPermission('country_settings'))                  
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.countries') }}">Countries</a></li>

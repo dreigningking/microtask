@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('type', ['featured', 'urgent']);
             $table->integer('days')->default(1);
             $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_at')->nullable();
             $table->integer('cost')->default(0);
             $table->string('currency')->default('USD');
             $table->timestamps();

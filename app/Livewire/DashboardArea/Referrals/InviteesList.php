@@ -31,7 +31,9 @@ class InviteesList extends Component
             if (!$inviteeUser) {
                 $ref->invitee_status = 'Pending Registration';
             } elseif ($ref->task_id && $ref->task) {
-                if ($ref->task->workers && $ref->task->workers->where('user_id', $inviteeUser->id)->whereNotNull('completed_at')->count()) {
+                if ($ref->task->workers && $ref->task->workers->where('user_id', $inviteeUser->id)->whereHas('taskSubmissions', function($q) {
+                    $q->whereNotNull('completed_at');
+                })->count()) {
                     $ref->invitee_status = 'Completed';
                 } else {
                     $ref->invitee_status = 'Pending Completion';
