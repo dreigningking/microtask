@@ -50,8 +50,9 @@ instructions don't make sense, instructions take longer than 2 hours to complete
 or anything else is wrong with this campaign click the report a problem button below
 
 start job - check user's job start limit within the hour i.e number of ongoing jobs vs subscription limit
-start job records user as worker
 submit job - check user's job submit limit within the hour i.e number of ongoing jobs vs subscription limit
+
+start job records user as worker
 
 JOBS
 refund taskmaster the admin-monitoring fee is no intervention was found
@@ -119,3 +120,5 @@ number of dispute cases ongoing can give you a badge
 number of dispute cases can give you a badge
 number of failure to pay on time can give you a badge
 number of bad submissions can give you a badge
+
+https://www.ipqualityscore.com/user/dashboard
