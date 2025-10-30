@@ -92,6 +92,10 @@ class Task extends Model
         return $this->belongsToMany(User::class, 'task_hidden');
     }
 
+    public function submissions(){
+        return $this->hasMany(TaskSubmission::class);
+    }
+
     public function scopeCompleted($query)
     {
         return $query->whereRaw('number_of_people <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');

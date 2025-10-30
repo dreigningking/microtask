@@ -23,6 +23,11 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
     Route::group(['prefix' => 'tasks','as' => 'tasks.','middleware' => ['permission:task_management']], function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
+        Route::get('submissions', [TaskController::class, 'submissions'])->name('submissions');
+        Route::get('review-submission/{submission}', [TaskController::class, 'reviewSubmission'])->name('review_submission');
+        Route::post('review-submission/{submission}', [TaskController::class, 'processReviewSubmission'])->name('review_submission.submit');
+        Route::post('review-submission/{submission}/reset', [TaskController::class, 'resetSubmissionForRevision'])->name('review_submission.reset');
+        Route::post('review-submission/{submission}/disburse', [TaskController::class, 'disbursePayment'])->name('review_submission.disburse');
         Route::get('promotions', [PromotionController::class, 'index'])->name('promotions');
         Route::get('view/{task}', [TaskController::class, 'show'])->name('show');
         Route::post('approve', [TaskController::class, 'approve'])->name('approve');

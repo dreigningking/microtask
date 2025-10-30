@@ -31,6 +31,8 @@
             } elseif ($task->monitoring_type === 'self_monitoring') {
                 // Only escalated submissions need admin review
                 $deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
+                $deadlineHours = intval($deadlineHours);
+
                 $escalatedSubmissions = $submissions->filter(function($submission) use ($deadlineHours) {
                     if ($submission->reviewed_at) return false;
                     $expectedReviewTime = $submission->created_at->addHours($deadlineHours);

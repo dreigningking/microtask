@@ -30,6 +30,7 @@
                     </a>
                     <ul id="tasks" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.index') }}">Task List</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.submissions') }}">Task Submissions</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.promotions') }}">Task Promotions</a></li>
                     </ul>
                 </li>

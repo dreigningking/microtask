@@ -7,6 +7,8 @@ use App\Models\Country;
 use App\Models\Platform;
 use Illuminate\Http\Request;
 use App\Models\TaskPromotion;
+use App\Models\TaskSubmission;
+use App\Models\Setting;
 use App\Notifications\JobApprovedNotification;
 use Illuminate\Support\Facades\Auth;
 
@@ -104,10 +106,124 @@ class TaskController extends Controller
         ];
 
         return view('backend.tasks.list', compact(
-            'tasks', 
-            'countries', 
-            'platforms', 
+            'tasks',
+            'countries',
+            'platforms',
             'monitoringTypes'
+        ));
+    }
+
+    /**
+     * Display a listing of task submissions requiring admin review
+     */
+    public function submissions(Request $request)
+    {
+        $query = TaskSubmission::with(['task.user', 'task.platform', 'user', 'task_worker']);
+
+        // Apply localization scope (country filter for non-super admins)
+        $query->whereHas('task', function($q) {
+            $q->localize();
+        });
+
+        // Search functionality (by task title, worker name, etc.)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $searchType = $request->get('search_type', 'all');
+
+            $query->where(function($q) use ($search, $searchType) {
+                if ($searchType === 'task' || $searchType === 'all') {
+                    $q->whereHas('task', function($subQ) use ($search) {
+                        $subQ->where('title', 'like', "%{$search}%")
+                             ->orWhere('description', 'like', "%{$search}%");
+                    });
+                }
+
+                if ($searchType === 'worker' || $searchType === 'all') {
+                    $q->whereHas('user', function($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%");
+                    });
+                }
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'pending_review':
+                    $query->whereNull('reviewed_at')->whereNull('completed_at');
+                    break;
+                case 'overdue':
+                    $deadlineHours = Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
+                    $query->whereNull('reviewed_at')
+                          ->whereNull('completed_at')
+                          ->whereRaw('(TIMESTAMPDIFF(HOUR, created_at, NOW()) >= ?)', [$deadlineHours]);
+                    break;
+                case 'completed':
+                    $query->whereNotNull('completed_at');
+                    break;
+                case 'disputed':
+                    $query->whereNotNull('disputed_at');
+                    break;
+                case 'reviewed':
+                    $query->whereNotNull('reviewed_at');
+                    break;
+            }
+        }
+
+        // Sub filter by monitoring type (for admin review)
+        if ($request->filled('monitoring_type')) {
+            $query->whereHas('task', function($q) use ($request) {
+                $q->where('monitoring_type', $request->monitoring_type);
+            });
+        }
+
+        // Date range filter
+        if ($request->filled('date_from')) {
+            $query->where('created_at', '>=', $request->date_from . ' 00:00:00');
+        }
+        if ($request->filled('date_to')) {
+            $query->where('created_at', '<=', $request->date_to . ' 23:59:59');
+        }
+
+        // Priority filter: Admin-Monitored tasks first, then escalated self-monitored tasks
+        if ($request->get('priority') === 'admin_first') {
+            $query->join('tasks', 'task_submissions.task_id', '=', 'tasks.id')
+                  ->orderByRaw("CASE WHEN tasks.monitoring_type = 'admin_monitoring' THEN 1 ELSE 2 END ASC")
+                  ->orderBy('task_submissions.created_at', 'desc')
+                  ->select('task_submissions.*');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $submissions = $query->paginate(25)->withQueryString();
+
+        // Get counts for statistics
+        $totalSubmissions = $submissions->total();
+        $pendingReview = (clone $query)->whereNull('reviewed_at')->whereNull('completed_at')->count();
+        $overdue = (clone $query)->whereNull('reviewed_at')->whereNull('completed_at')
+                                ->whereRaw('(TIMESTAMPDIFF(HOUR, created_at, NOW()) >= ?)', [$deadlineHours ?? 24])->count();
+        $thisPage = $submissions->count();
+
+        // Get filter data for the view
+        $countries = Country::where('is_active', 1)->orderBy('name')->get();
+        $platforms = Platform::where('is_active', 1)->orderBy('name')->get();
+        $monitoringTypes = [
+            'self_monitoring' => 'Self Monitoring',
+            'admin_monitoring' => 'Admin Monitoring',
+            'system_monitoring' => 'System Monitoring'
+        ];
+
+        return view('backend.tasks.submissions', compact(
+            'submissions',
+            'totalSubmissions',
+            'pendingReview',
+            'overdue',
+            'thisPage',
+            'countries',
+            'platforms',
+            'monitoringTypes',
+            
         ));
     }
 
@@ -273,5 +389,112 @@ class TaskController extends Controller
         $task = Task::findOrFail($request->task_id);
         $task->delete();
         return back()->with('success', 'Task deleted successfully.');
+    }
+
+    /**
+     * Show review submission page
+     */
+    public function reviewSubmission(\App\Models\TaskSubmission $submission)
+    {
+        $submission->load(['task.user', 'task.platform', 'user']);
+        return view('backend.tasks.review_submission', compact('submission'));
+    }
+
+    /**
+     * Process review submission
+     */
+    public function processReviewSubmission(Request $request, \App\Models\TaskSubmission $submission)
+    {
+        $request->validate([
+            'review_reason' => 'required|in:1,2,3', // 1=approve, 2=request revision, 3=reject
+            'review' => 'nullable|string|max:1000'
+        ]);
+
+        $submission->review_reason = $request->review_reason;
+        $submission->review = $request->review;
+        $submission->reviewed_at = now();
+        $submission->reviewed_by = Auth::id();
+
+        if ($request->review_reason == 1) { // Approve
+            $submission->completed_at = now();
+            $message = 'Submission approved successfully.';
+        } elseif ($request->review_reason == 2) { // Request revision
+            // Clear completed_at to allow resubmission
+            $submission->completed_at = null;
+            $message = 'Revision requested. Worker can resubmit.';
+        } elseif ($request->review_reason == 3) { // Reject
+            // Clear completed_at and potentially remove worker slot
+            $submission->completed_at = null;
+            // TODO: Optionally free up the task worker slot here if rejection is permanent
+            $message = 'Submission rejected.';
+        }
+
+        $submission->save();
+
+        // Optional: Send notification to worker about the review
+
+        return redirect()->route('admin.tasks.review_submission', $submission)->with('success', $message);
+    }
+
+    /**
+     * Reset submission for revision
+     */
+    public function resetSubmissionForRevision(Request $request, \App\Models\TaskSubmission $submission)
+    {
+        $submission->reviewed_at = null;
+        $submission->review_reason = null;
+        $submission->review = null;
+        $submission->completed_at = null;
+        $submission->save();
+
+        return redirect()->route('admin.tasks.review_submission', $submission)->with('success', 'Submission reset for revision.');
+    }
+
+    /**
+     * Disburse payment to worker
+     */
+    public function disbursePayment(Request $request, \App\Models\TaskSubmission $submission)
+    {
+        if ($submission->paid_at) {
+            return redirect()->back()->with('error', 'This submission has already been paid.');
+        }
+
+        if (!$submission->completed_at) {
+            return redirect()->back()->with('error', 'Submission must be completed before payment can be disbursed.');
+        }
+
+        $amount = $submission->task->budget_per_person;
+
+        // Create settlement record
+        $settlement = \App\Models\Settlement::create([
+            'user_id' => $submission->user_id,
+            'task_id' => $submission->task_id,
+            'task_submission_id' => $submission->id,
+            'amount' => $amount,
+            'currency' => $submission->task->currency,
+            'type' => 'credit',
+            'status' => 'completed',
+            'description' => 'Task completion payment',
+            'processed_at' => now(),
+            'processed_by' => Auth::id(),
+        ]);
+
+        // Mark submission as paid
+        $submission->paid_at = now();
+        $submission->save();
+
+        // Add to user's wallet
+        $wallet = $submission->user->wallet ?? \App\Models\Wallet::create([
+            'user_id' => $submission->user_id,
+            'balance' => 0,
+            'currency' => $submission->task->currency
+        ]);
+
+        $wallet->balance += $amount;
+        $wallet->save();
+
+        // Optional: Send payment notification to worker
+
+        return redirect()->back()->with('success', 'Payment disbursed successfully.');
     }
 }

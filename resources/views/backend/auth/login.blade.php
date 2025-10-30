@@ -39,7 +39,7 @@
                                             </span>
                                         @enderror
                                         <small>
-                                            <a href="{{ route('admin.password.request') }}">Forgot password?</a>
+                                            <a href="{{ route('password.request') }}">Forgot password?</a>
                                         </small>
                                     </div>
                                     <div>
