@@ -1,204 +1,205 @@
 <div>
+    <!-- Hero Section -->
     <section class="hero-section">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="hero-title">Find Quick Tasks & <br>Earn Money</h1>
-                    <p class="hero-subtitle">
-                        Connect with thousands of micro-jobs and start earning today. Registration is completely free!
-                    </p>
-            </div>
-        </div>
-
-            <div class="row mt-4">
-                <div class="col-lg-10 mx-auto">
-                    <div class="search-card">
-                        <form class="search-form row g-3" wire:submit.prevent="searchJobs">
-                            <div class="col-md-5">
-                                <input type="text" class="form-control" wire:model.defer="searchQuery" placeholder="Search for jobs...">
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select">
-                                    <option selected>All Locations</option>
-                                    <option>New York</option>
-                                    <option>Los Angeles</option>
-                                    <option>Chicago</option>
-                                    <option>Remote</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select" id="platforms" wire:model.defer="searchPlatform">
-                                    <option value="">All Platforms</option>
-                                    @if($allPlatforms)
-                                        @foreach($allPlatforms as $platform)
-                                            <option value="{{ $platform->id }}">{{ $platform->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                            <div class="col-md-1">
-                                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i></button>
-                            </div>
-                        </form>
-                            </div>
-                        </div>
-                    </div>
-
-            <div class="row mt-4 text-center">
-                <div class="col-md-12">
-                    <p class="text-light mb-0"><strong>Popular Searches:</strong> Graphic Designer, Web Developer, Social Media Manager, Project Manager, Copywriter</p>
-                            </div>
-                        </div>
-                    </div>
-    </section>
-
-    <!-- Job Categories Slider -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-5">
-                    <h2 class="section-title">Popular Platforms</h2>
-                    <p class="text-muted">Browse through the most in-demand platforms and find the perfect micro-job that matches your skills</p>
+            <div class="hero-content">
+                <h1 class="display-4 fw-bold mb-4">Earn Money from Small Tasks</h1>
+                <p class="lead mb-4">Join thousands of users getting paid for completing simple micro-tasks. From social media activities, website surveys, game testing/trials etc... Find tasks that match your expertise.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="tasks.html" class="btn btn-light btn-lg">Find Tasks to Earn</a>
+                    <a href="#" class="btn btn-outline-light btn-lg">Post a Task</a>
                 </div>
             </div>
-
-            <!-- Job Categories Slider -->
-            <div class="position-relative">
-                <!-- Left Button -->
-                <button type="button" class="btn btn-light category-scroll-btn category-scroll-left"
-                    style="position:absolute;top:50%;left:-40px;z-index:2;transform:translateY(-50%);">
-                    <i class="fas fa-chevron-left"></i>
-                        </button>
-
-                <!-- Scrollable Categories -->
-                <div class="category-scroll-wrapper d-flex overflow-auto" style="scroll-behavior:smooth;">
-                    @foreach($popularPlatforms as $platform)
-                        <div class="category-card card text-center p-4 flex-shrink-0 mx-2" style="min-width:220px;">
-                            <div class="category-icon">
-                                @if($platform['image'])
-                                    <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" style="width:40px;height:40px;object-fit:contain;">
-                                @else
-                                    <i class="fas fa-briefcase"></i>
-                                @endif
-                            </div>
-                            <h5>{{ $platform['name'] }}</h5>
-                            <p class="text-muted">{{ number_format($platform['jobs_count']) }} Jobs Available</p>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Right Button -->
-                <button type="button" class="btn btn-light category-scroll-btn category-scroll-right"
-                    style="position:absolute;top:50%;right:-40px;z-index:2;transform:translateY(-50%);">
-                    <i class="fas fa-chevron-right"></i>
-                    </button>
-            </div>
-
-            <!-- Bottom Navigation (arrows) -->
-            <div class="text-center mt-3">
-                <button type="button" class="btn btn-outline-secondary category-scroll-btn category-scroll-left">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary category-scroll-btn category-scroll-right">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-
         </div>
     </section>
 
-    <!-- Featured Jobs -->
-    @if($tasks->count() > 0)
+    <!-- How It Works -->
     <section class="py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-5">
-                    <h2 class="section-title">Featured Jobs</h2>
-                    <p class="text-muted">Hand-picked opportunities you might love</p>
+            <div class="text-center mb-5">
+                <h2 class="section-title center-title">How It Works</h2>
+                <p class="text-muted">Simple steps to start earning or getting tasks done</p>
+            </div>
+            <div class="row g-4">
+                <!-- For Workers -->
+                <div class="col-lg-6">
+                    <div class="how-it-works-card">
+                        <div class="step-icon bg-primary">
+                            <i class="bi bi-person-check"></i>
+                        </div>
+                        <h4 class="text-center mb-3">For Task Workers</h4>
+                        <div class="d-flex mb-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">1</div>
+                            <div class="ms-3">
+                                <h6>Find Tasks</h6>
+                                <p class="text-muted mb-0">Browse available tasks that match your skills</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
+                            <div class="ms-3">
+                                <h6>Do & Submit</h6>
+                                <p class="text-muted mb-0">Complete the task and submit your work</p>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
+                            <div class="ms-3">
+                                <h6>Get Paid</h6>
+                                <p class="text-muted mb-0">Receive payment after approval and review</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- For Posters -->
+                <div class="col-lg-6">
+                    <div class="how-it-works-card">
+                        <div class="step-icon bg-success">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                        <h4 class="text-center mb-3">For Task Posters</h4>
+                        <div class="d-flex mb-3">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">1</div>
+                            <div class="ms-3">
+                                <h6>Describe Task</h6>
+                                <p class="text-muted mb-0">Post your task with clear requirements</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
+                            <div class="ms-3">
+                                <h6>Receive Task Submissions</h6>
+                                <p class="text-muted mb-0">Get notified when people do your task</p>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
+                            <div class="ms-3">
+                                <h6>Review submissions</h6>
+                                <p class="text-muted mb-0">Disburse pay only when you're satisfied with the work</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="row">
-                @foreach($tasks as $task)
-                    <div class="col-lg-6">
-                        @livewire('dashboard-area.tasks.single-task-grid', ['task' => $task])
+    <!-- Featured Categories -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title center-title">Popular Categories</h2>
+                <p class="text-muted">Browse through the most in-demand categories and find the perfect task that matches your skills</p>
+            </div>
+            <div class="row g-4">
+                
+                @foreach($popularPlatforms as $platform)
+                <div class="col-md-2 col-6">
+                    <a href="#" class="category-card card text-center dont_decorate p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            @if($platform['image'])
+                                <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" style="width:40px;height:40px;object-fit:contain;">
+                            @else
+                                <i class="bi bi-laptop text-primary fs-3"></i>
+                            @endif
+                        </div>
+                        <h5>{{ $platform['name'] }}</h5>
+                        <p class="text-muted small">{{ number_format($platform['jobs_count']) }} tasks available</p>
+                    </a>
                 </div>
                 @endforeach
-                <!-- Job 1 --> 
+                
             </div>
+        </div>
+    </section>
 
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <a href="{{ route('explore') }}" class="btn btn-primary">Browse All Tasks</a>
+    @if($tasks->count() > 0)
+    <!-- Featured Tasks -->
+    <section class="py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">Featured Tasks</h2>
+                <a href="{{ route('explore') }}" class="btn btn-outline-primary">View All Tasks</a>
+            </div>
+            <div class="row g-4">
+                @foreach($tasks as $task)
+                <div class="col-lg-4 col-md-6">
+                    @include('components.layouts.taskcard',['task'=> $task])
                 </div>
+                @endforeach
             </div>
         </div>
     </section>
     @endif
-    <!-- How It Works -->
+    <!-- Testimonials -->
     <section class="py-5 bg-light">
         <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-5">
-                    <h2 class="section-title">How It Works</h2>
-                    <p class="text-muted">Get started in just a few easy steps</p>
-                </div>
+            <div class="text-center mb-5">
+                <h2 class="section-title center-title">What Our Users Say</h2>
+                <p class="text-muted">Real stories from our community</p>
             </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="how-it-works-step">
-                        <div class="step-number">1</div>
-                        <h4>Create an Account</h4>
-                        <p>Sign up for free in just a few seconds. No credit card required until you're ready to post a job.</p>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="testimonial-card card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"I've earned over $2,000 completing micro-tasks in my spare time. It's perfect for students!"</p>
+                            <div class="d-flex align-items-center">
+                                <img src="https://placehold.co/50" alt="User" class="rounded-circle me-3">
+                                <div>
+                                    <h6 class="mb-0">Sarah Johnson</h6>
+                                    <small class="text-muted">Completed 45 tasks</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="how-it-works-step">
-                        <div class="step-number">2</div>
-                        <h4>Find Opportunities</h4>
-                        <p>Browse thousands of gigs and tasks that match your skills and preferences.</p>
+                <div class="col-lg-4">
+                    <div class="testimonial-card card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"As a small business owner, MicroTasker helped me get quality work done without hiring full-time."</p>
+                            <div class="d-flex align-items-center">
+                                <img src="https://placehold.co/50" alt="User" class="rounded-circle me-3">
+                                <div>
+                                    <h6 class="mb-0">Mike Chen</h6>
+                                    <small class="text-muted">Posted 23 tasks</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="how-it-works-step">
-                        <div class="step-number">3</div>
-                        <h4>Complete & Get Paid</h4>
-                        <p>Work on tasks, deliver quality results, and receive payment securely through our platform.</p>
+                <div class="col-lg-4">
+                    <div class="testimonial-card card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"The platform is easy to use and payments are always on time. Great for freelance beginners!"</p>
+                            <div class="d-flex align-items-center">
+                                <img src="https://placehold.co/50" alt="User" class="rounded-circle me-3">
+                                <div>
+                                    <h6 class="mb-0">Emily Rodriguez</h6>
+                                    <small class="text-muted">Completed 32 tasks</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3 class="mb-3">Ready to get started?</h3>
+                    <p class="mb-0">Join thousands of users earning money or getting tasks done on MicroTasker.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="#" class="btn btn-light btn-lg me-2">Sign Up Now</a>
+                    <a href="tasks.html" class="btn btn-outline-light btn-lg">Browse Tasks</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
-@push('styles')
-<style>
-    .category-scroll-wrapper {
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none;  /* IE 10+ */
-    }
-    .category-scroll-wrapper::-webkit-scrollbar {
-        display: none; /* Chrome/Safari/Webkit */
-    }
-</style>
-@endpush
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.category-scroll-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const wrapper = document.querySelector('.category-scroll-wrapper');
-                const scrollAmount = 240; // px
-                if (this.classList.contains('category-scroll-left')) {
-                    wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                } else if (this.classList.contains('category-scroll-right')) {
-                    wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                }
-            });
-        });
-    });
-</script>
-@endpush

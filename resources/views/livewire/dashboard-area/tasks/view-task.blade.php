@@ -19,7 +19,7 @@
                 @else
                 <span class="badge bg-secondary">Pending</span>
                 @endif
-                <span class="badge bg-success fs-6">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</span>
+                <span class="badge bg-success fs-6">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_submission, 2) }}</span>
             </div>
         </div>
     </div>
@@ -66,7 +66,7 @@
                         <h6 class="mb-0">Budget</h6>
                         <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-money-dollar-circle-line text-success"></i></span>
                     </div>
-                    <h3 class="fw-bold mb-0">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_person, 2) }}</h3>
+                    <h3 class="fw-bold mb-0">{{ $taskWorker->task->user->country->currency_symbol ?? '$' }}{{ number_format($taskWorker->task->budget_per_submission, 2) }}</h3>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
                     <h3 class="fw-bold mb-0">
                         @php
                         $acceptedWorkersCount = $taskWorker->task->workers->whereNotNull('accepted_at')->count();
-                        $peopleRemaining = $taskWorker->task->number_of_people - $acceptedWorkersCount;
+                        $peopleRemaining = $taskWorker->task->number_of_submissions - $acceptedWorkersCount;
                         @endphp
                         {{ $peopleRemaining > 0 ? $peopleRemaining : 'None' }}
                     </h3>

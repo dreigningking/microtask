@@ -56,16 +56,23 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
     
     Route::group(['prefix' => 'users','as' => 'users.','middleware' => ['permission:user_management']], function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::get('verifications', [UserController::class, 'verifications'])->name('verifications');
-        Route::post('verifications/approve', [UserController::class, 'approveVerification'])->name('verifications.approve');
-        Route::post('verifications/reject', [UserController::class, 'rejectVerification'])->name('verifications.reject');
-
         Route::get('show/{user}', [UserController::class, 'show'])->name('show');
         Route::post('suspend', [UserController::class, 'suspend'])->name('suspend');
         Route::post('enable', [UserController::class, 'enable'])->name('enable');
         Route::post('ban-from-tasks', [UserController::class, 'banFromTasks'])->name('ban-from-tasks');
         Route::post('delete', [UserController::class, 'destroy'])->name('delete');
         Route::post('wallet', [UserController::class, 'wallet'])->name('wallet.toggle');
+
+        Route::group(['prefix' => 'verifications','as' => 'verifications.'], function () {
+            Route::get('/', [UserController::class, 'verifications'])->name('index');
+            Route::post('approve', [UserController::class, 'approveVerification'])->name('approve');
+            Route::post('reject', [UserController::class, 'rejectVerification'])->name('reject');
+        });
+        Route::group(['prefix' => 'subscriptions','as' => 'subscriptions.'], function () {
+            Route::get('/', [UserController::class, 'subscriptions'])->name('index');
+            Route::get('show/{subscription}', [UserController::class, 'subscription_view'])->name('show');
+            
+        });
     });
 
     Route::group(['prefix' => 'blog','as' => 'blog.','middleware' => ['permission:blog_management']], function () {

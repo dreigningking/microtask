@@ -77,10 +77,10 @@ class UserController extends Controller
                     $subQ->whereNotNull('completed_at');
                 });
             })->get()->filter(function($task) {
-                // A job is completed if number of workers with completed submissions >= number_of_people
+                // A job is completed if number of workers with completed submissions >= number_of_submissions
                 return $task->workers()->whereHas('taskSubmissions', function($q) {
                     $q->whereNotNull('completed_at');
-                })->count() >= $task->number_of_people;
+                })->count() >= $task->number_of_submissions;
             })->count();
             $user->jobs_completed = $jobsCompleted;
             $user->jobs_posted = $jobsPosted;
@@ -95,11 +95,50 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display subscriptions
      */
-    public function create()
+    public function subscriptions(Request $request)
     {
-        //
+        $query = \App\Models\Subscription::with('user', 'plan')->localize();
+
+        // Apply filters
+        if ($request->filled('user_email')) {
+            $user = User::where('email', $request->user_email)->first();
+            if ($user) {
+                $query->where('user_id', $user->id);
+            } else {
+                $query->where('user_id', -1); // No matches if user not found
+            }
+        }
+
+        if ($request->filled('plan_id')) {
+            $query->where('plan_id', $request->plan_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('billing_cycle')) {
+            $query->where('billing_cycle', $request->billing_cycle);
+        }
+
+        // Get available plans for filter
+        $plans = \App\Models\Plan::where('is_active', 1)->get();
+
+        $subscriptions = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('backend.users.subscriptions', compact('subscriptions', 'plans'));
+    }
+
+    /**
+     * Display the specified subscription.
+     */
+    public function subscription_view(\App\Models\Subscription $subscription)
+    {
+        $subscription->load('user', 'plan');
+
+        return view('backend.users.subscription_view', compact('subscription'));
     }
 
     /**

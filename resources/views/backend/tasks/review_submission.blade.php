@@ -74,7 +74,7 @@
 
 								<p class="mb-2">
 									<strong>Budget per Person:</strong>
-									{{ $submission->task->currency }} {{ number_format($submission->task->budget_per_person, 2) }}
+									{{ $submission->task->currency }} {{ number_format($submission->task->budget_per_submission, 2) }}
 								</p>
 
 								<p class="mb-0">
@@ -405,7 +405,7 @@
 				<div class="modal-body">
 					<div class="alert alert-success">
 						<i class="ri-money-dollar-circle-line me-2"></i>
-						Process payment of <strong>{{ $submission->task->currency }} {{ number_format($submission->task->budget_per_person, 2) }}</strong> to {{ $submission->user->name }}
+						Process payment of <strong>{{ $submission->task->currency }} {{ number_format($submission->task->budget_per_submission, 2) }}</strong> to {{ $submission->user->name }}
 					</div>
 					<p>This will:</p>
 					<ul class="mb-0">

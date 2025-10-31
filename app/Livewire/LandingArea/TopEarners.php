@@ -5,7 +5,6 @@ namespace App\Livewire\LandingArea;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing')]
 class TopEarners extends Component
 {
     public function render()

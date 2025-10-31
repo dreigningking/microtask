@@ -6,11 +6,13 @@ use App\Models\OrderItem;
 use App\Models\Settlement;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class Task extends Model
 {
     use Sluggable;
-    
+
     protected $fillable = [
         'title',
         'description',
@@ -24,8 +26,8 @@ class Task extends Model
         'requirements' => 'array',
         'template_data' => 'array',
         'restricted_countries' => 'array',
-        'approved_at'=> 'datetime',
-        'expiry_date'=> 'datetime'
+        'approved_at' => 'datetime',
+        'expiry_date' => 'datetime'
     ];
 
     public function sluggable(): array
@@ -45,20 +47,20 @@ class Task extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function workers()
     {
-        return $this->hasMany(TaskWorker::class);   
+        return $this->hasMany(TaskWorker::class);
     }
-    
+
     public function taskSubmissions()
     {
         return $this->hasMany(TaskSubmission::class);
     }
-    
+
     public function orderItem()
     {
-        return $this->morphOne(OrderItem::class,'orderable');   
+        return $this->morphOne(OrderItem::class, 'orderable');
     }
     public function template()
     {
@@ -73,7 +75,8 @@ class Task extends Model
         return $this->hasMany(TaskPromotion::class);
     }
 
-    public function settlements(){
+    public function settlements()
+    {
         return $this->hasMany(Settlement::class);
     }
 
@@ -92,58 +95,65 @@ class Task extends Model
         return $this->belongsToMany(User::class, 'task_hidden');
     }
 
-    public function submissions(){
+    public function submissions()
+    {
         return $this->hasMany(TaskSubmission::class);
     }
 
     public function scopeCompleted($query)
     {
-        return $query->whereRaw('number_of_people <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+        return $query->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
     }
 
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
-                     ->where(function($q) {
-                         $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
-                     })
-                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+            ->where(function ($q) {
+                $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
+            })
+            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
     }
 
-    public function scopeListable($query, $countryId)
+    public function scopeListable($query, $countryId = null)
     {
         return $query->where('is_active', true)
-                     ->where('visibility', 'public')
-                     ->whereNotNull('approved_at')
-                     ->where(function($q) use ($countryId) {
-                         $q->whereNull('restricted_countries')
-                           ->orWhereJsonDoesntContain('restricted_countries', $countryId);
-                     })
-                     ->where(function($q) {
-                         $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
-                     })
-                     ->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+            ->where('visibility', 'public')
+            ->whereNotNull('approved_at')
+            ->where(function ($q) use ($countryId) {
+                if ($countryId) {
+                    $q->whereNull('restricted_countries')
+                        ->orWhereJsonDoesntContain('restricted_countries', $countryId);
+                } else {
+                    $q->whereNull('restricted_countries');
+                }
+            })
+            ->where(function ($q) {
+                $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
+            })
+            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND paid_at IS NOT NULL)');
+        
     }
 
-    public function getStatusAttribute(){
+    public function getStatusAttribute()
+    {
         if (!$this->is_active) {
             return 'draft';
         }
-        
+
         $workerCount = $this->workers()->whereNotNull('accepted_at')->count();
-        
-        if ($workerCount >= $this->number_of_people) {
+
+        if ($workerCount >= $this->number_of_submissions) {
             return 'closed';
         }
-        
+
         $submittedCount = $this->taskSubmissions()->whereNotNull('completed_at')->count();
-        if ($submittedCount >= $this->number_of_people) {
+        if ($submittedCount >= $this->number_of_submissions) {
             return 'completed';
         }
-        
+
         return 'ongoing';
     }
-    
+
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');

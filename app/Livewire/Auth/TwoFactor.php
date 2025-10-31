@@ -8,7 +8,6 @@ use Tzsk\Otp\Facades\Otp;
 use App\Notifications\OTPNotification;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.landing')]
 class TwoFactor extends Component
 {
     public $code;

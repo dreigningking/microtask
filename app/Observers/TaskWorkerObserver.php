@@ -67,7 +67,7 @@ class TaskWorkerObserver
 
                                 if ($commissionRate > 0) {
                                     // 5. Calculate the commission and create a settlement record
-                                    $commission = ($taskWorker->task->budget_per_person * $commissionRate) / 100;
+                                    $commission = ($taskWorker->task->budget_per_submission * $commissionRate) / 100;
 
                                     Settlement::create([
                                         'user_id' => $referral->referrer_id,

@@ -245,28 +245,28 @@
                         
                         <!-- Budget Per Person -->
                         <div class="mb-3">
-                            <label for="budget_per_person" class="form-label fw-medium mb-1">Budget Per Submission <span class="text-danger">*</span></label>
+                            <label for="budget_per_submission" class="form-label fw-medium mb-1">Budget Per Submission <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">{{ $currency_symbol }}</span>
-                                <input type="number" id="budget_per_person" wire:model="budget_per_person" wire:input="updateTotals" min="{{ $min_budget_per_person }}" step="0.01" class="form-control {{ $errors->has('budget_per_person') ? 'is-invalid' : '' }}" placeholder="0.00" required @if(!$canEdit) readonly disabled @endif>
+                                <input type="number" id="budget_per_submission" wire:model="budget_per_submission" wire:input="updateTotals" min="{{ $min_budget_per_submission }}" step="0.01" class="form-control {{ $errors->has('budget_per_submission') ? 'is-invalid' : '' }}" placeholder="0.00" required @if(!$canEdit) readonly disabled @endif>
                             </div>
-                            @error('budget_per_person') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            @error('budget_per_submission') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
                         
                         <!-- Number of People -->
                         <div class="mb-3">
-                            <label for="number_of_people" class="form-label fw-medium mb-1">Number of Submissions <span class="text-danger">*</span></label>
+                            <label for="number_of_submissions" class="form-label fw-medium mb-1">Number of Submissions <span class="text-danger">*</span></label>
                             <div class="input-group" style="max-width: 200px;">
-                                <button type="button" wire:click="decreasePeople" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
+                                <button type="button" wire:click="decreaseSubmissions" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
                                     <i class="ri-subtract-line"></i>
                                 </button>
-                                <input type="number" id="number_of_people" wire:model="number_of_people" wire:input="updateTotals" min="1" class="form-control text-center" style="width: 80px;" @if(!$canEdit) readonly disabled @endif>
-                                <button type="button" wire:click="increasePeople" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
+                                <input type="number" id="number_of_submissions" wire:model="number_of_submissions" wire:input="updateTotals" min="1" class="form-control text-center" style="width: 80px;" @if(!$canEdit) readonly disabled @endif>
+                                <button type="button" wire:click="increaseSubmissions" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
                                     <i class="ri-add-line"></i>
                                 </button>
                             </div>
                             <div class="form-text">Total number of submissions needed to complete this job</div>
-                            @error('number_of_people') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            @error('number_of_submissions') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
                         
                         <!-- Allow Multiple Submissions from Single User -->
@@ -356,7 +356,7 @@
                             <div class="fw-bold text-primary fs-3">
                                 {{ $currency_symbol }} {{ number_format($total, 2) }}
                             </div>
-                            <p class="small text-muted mb-0">For {{ $number_of_people }} submission{{ $number_of_people > 1 ? 's' : '' }}</p>
+                            <p class="small text-muted mb-0">For {{ $number_of_submissions }} submission{{ $number_of_submissions > 1 ? 's' : '' }}</p>
                         </div>
                     </div>
                     
@@ -387,7 +387,7 @@
                                     @if($urgentPrice == 0) 
                                     <span class="text-success">Included</span>
                                     @else 
-                                    {{ $currency_symbol }} {{ number_format($urgentPrice * $number_of_people, 2) }}
+                                    {{ $currency_symbol }} {{ number_format($urgentPrice * $number_of_submissions, 2) }}
                                     @endif
                                 </span>
                             </div>

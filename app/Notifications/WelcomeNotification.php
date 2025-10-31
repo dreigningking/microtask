@@ -26,8 +26,8 @@ class WelcomeNotification extends Notification
         return (new MailMessage)
             ->subject('Welcome to Wonegig!')
             ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('Welcome to Wonegig! We are excited to have you join our community of freelancers and clients.')
-            ->line('Start exploring micro-jobs, post your own, or connect with talented people today!')
+            ->line('Welcome to Wonegig! We are excited to have you join our community of micro task creators and doers.')
+            ->line('Start exploring micro-tasks, post your own, or connect with talented people today!')
             ->action('Get Started', url('/explore'))
             ->line('If you have any questions, feel free to reach out. Happy earning!');
     }

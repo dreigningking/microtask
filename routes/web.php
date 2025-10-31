@@ -15,7 +15,7 @@ use App\Livewire\DashboardArea\Jobs\ViewJob;
 use App\Livewire\DashboardArea\Transactions;
 use App\Livewire\LandingArea\Blog\BlogIndex;
 use App\Livewire\DashboardArea\Jobs\ListJobs;
-use App\Livewire\DashboardArea\Subscriptions;
+use App\Livewire\DashboardArea\Boosters;
 use App\Livewire\LandingArea\Blog\BlogSingle;
 use App\Livewire\DashboardArea\Tasks\ViewTask;
 use App\Livewire\DashboardArea\Support\Tickets;
@@ -31,11 +31,13 @@ use App\Livewire\LandingArea\Policies\TermsAndConditions;
 use App\Livewire\LandingArea\ExploreTasks\ExploreTaskList;
 use App\Livewire\LandingArea\ExploreTasks\ExploreTaskShow;
 use App\Livewire\DashboardArea\Notifications\ListNotifications;
+use App\Livewire\DashboardArea\Support\Dispute;
 use App\Livewire\LandingArea\Policies\PaymentDisputeChargebacks;
 
+Route::get('dispute', Dispute::class)->name('dispute');
 Route::get('/', Welcome::class)->name('index');
 Route::get('explore', ExploreTaskList::class)->name('explore');
-Route::get('explore/{task}',ExploreTaskShow::class)->name('explore.task');
+Route::get('task/{task}',ExploreTaskShow::class)->name('explore.task');
 Route::get('creators', JobCreators::class)->name('creators');
 Route::get('about', AboutPage::class)->name('about');
 Route::get('contact', ContactPage::class)->name('contact');
@@ -91,7 +93,7 @@ Route::group(['middleware' => ['auth','check_user_active']], function () {
         Route::get('invitees',InviteesList::class)->name('invitees');
         Route::get('transactions', Transactions::class)->name('transactions');
         Route::get('payment/callback',[PaymentController::class,'paymentcallback'])->name('payment.callback');
-        Route::get('subscriptions', Subscriptions::class)->name('subscriptions');
+        Route::get('account-booster', Boosters::class)->name('boosters');
         
         Route::get('support', Tickets::class)->name('support');
         Route::get('support/ticket/{ticket}', TicketView::class)->name('support.ticket');

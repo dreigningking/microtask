@@ -51,8 +51,8 @@ class NotifyUrgentTaskPromotion implements ShouldQueue
         $notifyUserIds = array_values(array_intersect($userLocationIds, $platformUserIds));
         if (empty($notifyUserIds)) return;
 
-        // Step 7b: Limit to number_of_people
-        $limit = (int) ($task->number_of_people ?? 1);
+        // Step 7b: Limit to number_of_submissions
+        $limit = (int) ($task->number_of_submissions ?? 1);
         $notifyUserIds = array_slice($notifyUserIds, 0, $limit);
         
         // Step 8: notify

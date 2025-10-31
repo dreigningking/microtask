@@ -6,38 +6,45 @@
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-zinc-50: #fafafa;
-    --color-zinc-100: #f5f5f5;
-    --color-zinc-200: #e5e5e5;
-    --color-zinc-300: #d4d4d4;
-    --color-zinc-400: #a3a3a3;
-    --color-zinc-500: #737373;
-    --color-zinc-600: #525252;
-    --color-zinc-700: #404040;
-    --color-zinc-800: #262626;
-    --color-zinc-900: #171717;
-    --color-zinc-950: #0a0a0a;
-
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
+    /* Primary Brand Colors */
+    --color-primary: #0f766e;
+    --color-primary-dark: #0d5f58;
+    --color-secondary: #f1f5f9;
+    
+    /* Status Colors */
+    --color-success: #16a34a;
+    --color-danger: #dc2626;
+    --color-warning: #d97706;
+    --color-info: #0284c7;
+    
+    /* Neutral Colors */
+    --color-gray-50: #f8fafc;
+    --color-gray-100: #f1f5f9;
+    --color-gray-200: #e2e8f0;
+    --color-gray-300: #cbd5e1;
+    --color-gray-400: #94a3b8;
+    --color-gray-500: #64748b;
+    --color-gray-600: #475569;
+    --color-gray-700: #334155;
+    --color-gray-800: #1e293b;
+    --color-gray-900: #0f172a;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-primary: #14b8a6;
+        --color-secondary: #1e293b;
     }
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
@@ -45,22 +52,117 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+    
+    body {
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        color: var(--color-gray-700);
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--color-gray-900);
+    }
 }
 
+/* Component Overrides */
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-primary ring-offset-2 ring-offset-white;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+/* Unified Button System */
+.btn-modern {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-modern-primary {
+    @apply btn-modern bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+}
+
+.btn-modern-secondary {
+    @apply btn-modern bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500;
+}
+
+.btn-modern-outline {
+    @apply btn-modern border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+}
+
+/* Card System */
+.card-modern {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+    @apply transition-shadow duration-200;
+}
+
+.card-modern:hover {
+    @apply shadow-md;
+}
+
+.card-modern-header {
+    @apply px-6 py-4 border-b border-gray-200;
+}
+
+.card-modern-body {
+    @apply px-6 py-4;
+}
+
+/* Form Controls */
+.form-modern {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+    @apply transition-colors duration-200;
+}
+
+/* Typography Utilities */
+.text-primary { color: var(--color-primary); }
+.text-success { color: var(--color-success); }
+.text-danger { color: var(--color-danger); }
+.text-warning { color: var(--color-warning); }
+.text-muted { color: var(--color-gray-500); }
+
+/* Background Utilities */
+.bg-primary { background-color: var(--color-primary); }
+.bg-success { background-color: var(--color-success); }
+.bg-danger { background-color: var(--color-danger); }
+.bg-warning { background-color: var(--color-warning); }
+
+/* Spacing Utilities */
+.section-padding {
+    @apply py-12 px-4;
+}
+
+.container-modern {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Icon System - Use Bootstrap Icons exclusively */
+.bi {
+    font-family: 'bootstrap-icons', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1 { @apply text-2xl; }
+    h2 { @apply text-xl; }
+    h3 { @apply text-lg; }
+    .section-padding { @apply py-8 px-4; }
+}

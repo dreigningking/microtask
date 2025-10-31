@@ -181,7 +181,7 @@ class ViewTask extends Component
 
         // Check if task is still available (not full)
         $acceptedWorkersCount = $this->task->workers->whereNotNull('accepted_at')->count();
-        if ($acceptedWorkersCount >= $this->task->number_of_people) {
+        if ($acceptedWorkersCount >= $this->task->number_of_submissions) {
             session()->flash('error', 'This task is full and cannot be started.');
             return;
         }

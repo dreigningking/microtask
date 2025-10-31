@@ -101,7 +101,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h1 class="mt-1 mb-3">{{ $task->workers->count() }} / {{ $task->number_of_people }}</h1>
+                        <h1 class="mt-1 mb-3">{{ $task->workers->count() }} / {{ $task->number_of_submissions }}</h1>
                         <div class="mb-0">
                             <span class="text-muted">Positions filled</span>
                         </div>
@@ -123,7 +123,7 @@
                         </div>
                         <h1 class="mt-1 mb-3">{{ $task->currency }} {{ $task->expected_budget }}</h1>
                         <div class="mb-0">
-                            <span class="text-muted">{{ $task->budget_per_person }} per person</span>
+                            <span class="text-muted">{{ $task->budget_per_submission }} per person</span>
                         </div>
                     </div>
                 </div>
@@ -537,7 +537,7 @@
                                                 <div class="card bg-light">
                                                     <div class="card-body p-3">
                                                         <h6 class="card-subtitle text-muted mb-1">Budget Per Worker</h6>
-                                                        <h3 class="mb-0">{{ $task->currency }} {{ $task->budget_per_person }}</h3>
+                                                        <h3 class="mb-0">{{ $task->currency }} {{ $task->budget_per_submission }}</h3>
                                                     </div>
                                                 </div>
                                             </div>
@@ -546,7 +546,7 @@
                                                     <div class="card-body p-3">
                                                         <h6 class="card-subtitle text-muted mb-1">Total Paid</h6>
                                                         @php
-                                                            $totalPaid = $task->workers->whereNotNull('paid_at')->count() * $task->budget_per_person;
+                                                            $totalPaid = $task->workers->whereNotNull('paid_at')->count() * $task->budget_per_submission;
                                                         @endphp
                                                         <h3 class="mb-0">{{ $task->currency }} {{ $totalPaid }}</h3>
                                                     </div>
@@ -596,7 +596,7 @@
                                                             <td>{{ $worker->submitted_at ? $worker->submitted_at->format('M d, Y') : '-' }}</td>
                                                             <td>{{ $worker->completed_at ? $worker->completed_at->format('M d, Y') : '-' }}</td>
                                                             <td>{{ $worker->paid_at ? $worker->paid_at->format('M d, Y') : '-' }}</td>
-                                                            <td>{{ $task->currency }} {{ $task->budget_per_person }}</td>
+                                                            <td>{{ $task->currency }} {{ $task->budget_per_submission }}</td>
                                                         </tr>
                                                         @endforeach
                                                     @endif

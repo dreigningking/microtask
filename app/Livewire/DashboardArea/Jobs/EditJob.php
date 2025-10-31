@@ -59,7 +59,7 @@ class EditJob extends Component
     public $monitoring_type = 'self_monitoring';
     
     // Budget & Capacity
-    public $budget_per_person = 1;
+    public $budget_per_submission = 1;
     public $expected_budget = 0;
     public $currency;
     public $currency_symbol;
@@ -86,7 +86,7 @@ class EditJob extends Component
     public $subtotal = 0;
     public $tax = 0;
     public $total = 0;
-    public $number_of_people = 1;
+    public $number_of_submissions = 1;
     
     // Terms & Conditions
     public $terms = false;
@@ -104,8 +104,8 @@ class EditJob extends Component
         'expected_completion_minutes' => 'required|numeric|min:1',
         'description' => 'required|min:20',
         'requirements' => 'nullable|array',
-        'budget_per_person' => 'required|numeric|min:0',
-        'number_of_people' => 'required|numeric|min:1',
+        'budget_per_submission' => 'required|numeric|min:0',
+        'number_of_submissions' => 'required|numeric|min:1',
         'monitoring_type' => 'required',
         'visibility' => 'required|in:public,private',
         'expiry_date' => 'nullable|date|after:today',
@@ -119,12 +119,12 @@ class EditJob extends Component
         'title.required' => 'Please enter a job title',
         'description.required' => 'Please provide a job description',
         'requirements.required' => 'Please enter at least one required skill',
-        'budget_per_person.required' => 'Please enter a budget per person',
+        'budget_per_submission.required' => 'Please enter a budget per person',
         'files.*.max' => 'Each file must not exceed 10MB.',
         'files.*.mimes' => 'Only PDF, DOC, JPG, and PNG files are allowed.',
     ];
 
-    public $min_budget_per_person = 0;
+    public $min_budget_per_submission = 0;
     public $monitoring_fee = 0;
     public $enable_system_monitoring = false;
     public $showSelfMonitoringRefundNote = false;
@@ -192,7 +192,7 @@ class EditJob extends Component
         if ($this->template_id) {
             $template = TaskTemplate::find($this->template_id);
             if ($template) {
-                $this->min_budget_per_person = $template->prices->firstWhere('country_id', $this->location->country_id)->amount;
+                $this->min_budget_per_submission = $template->prices->firstWhere('country_id', $this->location->country_id)->amount;
             }
         }
         
@@ -212,8 +212,8 @@ class EditJob extends Component
         $this->template_id = $this->task->template_id;
         $this->description = $this->task->description;
         $this->expected_completion_minutes = $this->task->expected_completion_minutes;
-        $this->budget_per_person = $this->task->budget_per_person;
-        $this->number_of_people = $this->task->number_of_people;
+        $this->budget_per_submission = $this->task->budget_per_submission;
+        $this->number_of_submissions = $this->task->number_of_submissions;
         $this->visibility = $this->task->visibility;
         $this->expiry_date = $this->task->expiry_date ? $this->task->expiry_date->format('Y-m-d') : null;
         $this->monitoring_type = $this->task->monitoring_type;
@@ -323,21 +323,21 @@ class EditJob extends Component
     {
         $this->featuredPrice = $this->hasFeaturedInSubscription() ? 0 : ($this->countrySetting->feature_rate ?? 0);
         $this->urgentPrice = $this->hasUrgentInSubscription() ? 0 : ($this->countrySetting->urgent_rate ?? 0);
-        $this->expected_budget = ($this->budget_per_person ?? 0) * $this->number_of_people;
+        $this->expected_budget = ($this->budget_per_submission ?? 0) * $this->number_of_submissions;
         $baseAmount = $this->expected_budget;
         $this->featured_amount = $this->featured ? ($this->featuredPrice * $this->featured_days) : 0;
         $baseAmount += $this->featured_amount;
-        $this->urgent_amount = $this->urgent ? ($this->urgentPrice * $this->number_of_people) : 0;
+        $this->urgent_amount = $this->urgent ? ($this->urgentPrice * $this->number_of_submissions) : 0;
         $baseAmount += $this->urgent_amount;
         $this->monitoring_fee = 0;
-        $people = ($this->number_of_people && $this->number_of_people > 0) ? $this->number_of_people : 1;
+        $submissions = ($this->number_of_submissions && $this->number_of_submissions > 0) ? $this->number_of_submissions : 1;
         $this->showSelfMonitoringRefundNote = false;
         if ($this->monitoring_type === 'admin_monitoring') {
-            $this->monitoring_fee = ($this->countrySetting->admin_monitoring_cost ?? 0) * $people;
+            $this->monitoring_fee = ($this->countrySetting->admin_monitoring_cost ?? 0) * $submissions;
         } elseif ($this->monitoring_type === 'system_monitoring') {
-            $this->monitoring_fee = ($this->countrySetting->system_monitoring_cost ?? 0) * $people;
+            $this->monitoring_fee = ($this->countrySetting->system_monitoring_cost ?? 0) * $submissions;
         } elseif ($this->monitoring_type === 'self_monitoring') {
-            $this->monitoring_fee = ($this->countrySetting->admin_monitoring_cost ?? 0) * $people;
+            $this->monitoring_fee = ($this->countrySetting->admin_monitoring_cost ?? 0) * $submissions;
             $this->showSelfMonitoringRefundNote = true;
         }
         $baseAmount += $this->monitoring_fee;
@@ -378,16 +378,16 @@ class EditJob extends Component
         }
     }
     
-    public function increasePeople()
+    public function increaseSubmissions()
     {
-        $this->number_of_people++;
+        $this->number_of_submissions++;
         $this->updateTotals();
     }
     
-    public function decreasePeople()
+    public function decreaseSubmissions()
     {
-        if ($this->number_of_people > 1) {
-            $this->number_of_people--;
+        if ($this->number_of_submissions > 1) {
+            $this->number_of_submissions--;
             $this->updateTotals();
         }
     }
@@ -435,9 +435,9 @@ class EditJob extends Component
         $this->task->expected_budget = $this->expected_budget;
         $this->task->files = $this->files;
         $this->task->requirements = $this->requirements;
-        $this->task->number_of_people = $this->number_of_people;
+        $this->task->number_of_submissions = $this->number_of_submissions;
         $this->task->visibility = $this->visibility;
-        $this->task->budget_per_person = $this->budget_per_person;
+        $this->task->budget_per_submission = $this->budget_per_submission;
         $this->task->currency = $this->currency;
         $this->task->expiry_date = $this->expiry_date;
         $this->task->monitoring_type = $this->monitoring_type;
@@ -531,7 +531,7 @@ class EditJob extends Component
             'type'=> $type,
             'task_id'=> $taskId,
             'days'=> $type === 'featured' ? $this->featured_days : 1,
-            'cost'=> $type === 'featured' ? $this->featuredPrice * $this->featured_days : $this->urgentPrice * $this->number_of_people,
+            'cost'=> $type === 'featured' ? $this->featuredPrice * $this->featured_days : $this->urgentPrice * $this->number_of_submissions,
             'currency'=> $this->currency
         ]);
     }
@@ -553,16 +553,16 @@ class EditJob extends Component
 
     public function updatedBudgetPerPerson($value)
     {
-        if ($value === '' || !is_numeric($value) || $value < $this->min_budget_per_person) {
-            $this->budget_per_person = $this->min_budget_per_person;
+        if ($value === '' || !is_numeric($value) || $value < $this->min_budget_per_submission) {
+            $this->budget_per_submission = $this->min_budget_per_submission;
         }
         $this->updateTotals();
     }
 
-    public function updatedNumberOfPeople($value)
+    public function updatedNumberOfSubmissions($value)
     {
         if ($value === '' || !is_numeric($value) || $value < 1) {
-            $this->number_of_people = 1;
+            $this->number_of_submissions = 1;
         }
         $this->updateTotals();
     }

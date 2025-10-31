@@ -55,7 +55,8 @@
                     </a>
                     <ul id="users" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.users.index') }}">Users</a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.users.verifications') }}">Verifications</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.users.verifications.index') }}">Verifications</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.users.subscriptions.index') }}">Subscriptions</a></li>
                     </ul>
                 </li>
                 @endif

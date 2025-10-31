@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 
-#[Layout('components.layouts.landing')]
 class ExploreTaskList extends Component
 {
     use WithPagination, GeoLocationTrait;
@@ -126,8 +125,8 @@ class ExploreTaskList extends Component
                   ->orWhereRaw('NOT JSON_CONTAINS(restricted_countries, ?)', [json_encode($countryId)]);
             })
             ->where(function($q) {
-                $q->whereRaw('number_of_people > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND accepted_at IS NOT NULL)')
-                  ->orWhereRaw('number_of_people > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+                $q->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_workers WHERE task_workers.task_id = tasks.id AND accepted_at IS NOT NULL)')
+                  ->orWhereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
             })
             // Filter out tasks from banned users
             ->whereHas('user', function($q) {
@@ -156,7 +155,7 @@ class ExploreTaskList extends Component
         }
 
         // Price Range
-        $query->whereBetween('budget_per_person', [$this->minPrice, $this->maxPrice]);
+        $query->whereBetween('budget_per_submission', [$this->minPrice, $this->maxPrice]);
 
         // Duration
         if (!empty($this->selectedDurations)) {
@@ -189,7 +188,7 @@ class ExploreTaskList extends Component
                 $query->withCount('applications')->orderByDesc('applications_count');
                 break;
             case 'highest_paid':
-                $query->orderByDesc('budget_per_person');
+                $query->orderByDesc('budget_per_submission');
                 break;
             case 'shortest_time':
                 $query->orderBy('expected_completion_minutes');

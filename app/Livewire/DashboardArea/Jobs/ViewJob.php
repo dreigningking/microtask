@@ -187,7 +187,7 @@ class ViewJob extends Component
                 'user_id' => $worker->user_id,
                 'settlementable_id' => $this->task->id,
                 'settlementable_type' => get_class($this->task),
-                'amount' => $this->task->budget_per_person,
+                'amount' => $this->task->budget_per_submission,
                 'currency' => $this->task->user->country->currency,
                 'status' => 'pending'
             ]);
@@ -216,7 +216,7 @@ class ViewJob extends Component
                     'user_id' => $worker->user_id,
                     'settlementable_id' => $this->task->id,
                     'settlementable_type' => get_class($this->task),
-                    'amount' => $this->task->budget_per_person,
+                    'amount' => $this->task->budget_per_submission,
                     'currency' => $this->task->user->country->currency,
                     'status' => 'pending'
                 ]);
@@ -334,8 +334,8 @@ class ViewJob extends Component
             'total_workers' => $this->task->workers->count(),
             'submissions' => $this->task->taskSubmissions->count(),
             'completed' => $this->task->taskSubmissions->whereNotNull('completed_at')->count(),
-            'amount_disbursed' => $this->task->taskSubmissions->whereNotNull('paid_at')->sum('task.budget_per_person'),
-            'total_budget' => $this->task->budget_per_person * $this->task->number_of_people,
+            'amount_disbursed' => $this->task->taskSubmissions->whereNotNull('paid_at')->sum('task.budget_per_submission'),
+            'total_budget' => $this->task->budget_per_submission * $this->task->number_of_submissions,
             'total_invitees' => $totalInvitees,
             'accepted_invitees' => $acceptedInvitees,
             'pending_invitees' => $pendingInvitees

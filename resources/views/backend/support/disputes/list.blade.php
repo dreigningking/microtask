@@ -42,9 +42,9 @@
 									<td>{{ $task->title }}</td>
 									<td>{{ $task->user->name ?? '-' }}</td>
 									<td>{{ $task->platform->name ?? '-' }}</td>
-									<td>{{ $task->workers()->whereNotNull('accepted_at')->count() }} / {{ $task->number_of_people }}</td>
+									<td>{{ $task->workers()->whereNotNull('accepted_at')->count() }} / {{ $task->number_of_submissions }}</td>
 									<td>{{ $task->created_at->format('Y/m/d') }}</td>
-									<td>{{ $task->currency }} {{ number_format($task->budget_per_person, 2) }}</td>
+									<td>{{ $task->currency }} {{ number_format($task->budget_per_submission, 2) }}</td>
 									<td>
 										<a href="{{ route('admin.tasks.show', $task) }}" class="btn btn-primary btn-sm">View</a>
 										@if(!$task->is_active)

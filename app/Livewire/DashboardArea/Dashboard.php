@@ -112,7 +112,7 @@ class Dashboard extends Component
             ->where('task_submissions.user_id', $user->id)
             ->whereNotNull('task_submissions.completed_at')
             ->whereNotNull('task_submissions.paid_at')
-            ->sum('tasks.budget_per_person');
+            ->sum('tasks.budget_per_submission');
 
         // Calculate referral earnings from settlements
         $this->referralEarnings = Settlement::where('user_id', $user->id)
@@ -145,7 +145,7 @@ class Dashboard extends Component
         $completedJobs = Task::where('user_id', $user->id)
             ->whereHas('taskSubmissions', function($query) {
                 $query->whereNotNull('completed_at');
-            }, '>=', DB::raw('number_of_people'))
+            }, '>=', DB::raw('number_of_submissions'))
             ->count();
         
         // Calculate average rating from TaskWorker reviews
@@ -160,7 +160,7 @@ class Dashboard extends Component
             ->where('tasks.user_id', $user->id)
             ->whereNotNull('task_submissions.completed_at')
             ->whereNotNull('task_submissions.paid_at')
-            ->sum('tasks.budget_per_person');
+            ->sum('tasks.budget_per_submission');
         
         // Get active jobs count (jobs with accepted workers but not completed)
         $activeJobs = Task::where('user_id', $user->id)
@@ -170,7 +170,7 @@ class Dashboard extends Component
             })
             ->whereDoesntHave('taskSubmissions', function($query) {
                 $query->whereNotNull('completed_at');
-            }, '>=', DB::raw('number_of_people'))
+            }, '>=', DB::raw('number_of_submissions'))
             ->count();
         
         // Get total workers count (workers who have accepted the task)
@@ -208,14 +208,14 @@ class Dashboard extends Component
             ->where('task_submissions.user_id', $user->id)
             ->whereNotNull('task_submissions.completed_at')
             ->whereNotNull('task_submissions.paid_at')
-            ->select('task_submissions.*', 'tasks.title', 'tasks.budget_per_person')
+            ->select('task_submissions.*', 'tasks.title', 'tasks.budget_per_submission')
             ->orderBy('task_submissions.paid_at', 'desc')
             ->limit(3)
             ->get()
             ->map(function($submission) {
                 return (object)[
                     'description' => $submission->title,
-                    'amount' => $submission->budget_per_person,
+                    'amount' => $submission->budget_per_submission,
                     'created_at' => $submission->paid_at,
                     'icon' => 'ri-file-text-line',
                     'icon_color' => 'blue',

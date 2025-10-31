@@ -2,229 +2,279 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Wonegig Dashboard</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="{{asset('frontend/vendors/feather/feather.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/vendors/ti-icons/css/themify-icons.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/vendors/css/vendor.bundle.base.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/vendors/font-awesome/css/font-awesome.min.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/vendors/mdi/css/materialdesignicons.min.css')}}">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('frontend/js/select.dataTables.min.css')}}">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <link rel="stylesheet" href="{{asset('frontend/css/variables.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
-    <link rel="stylesheet" href="{{asset('frontend/css/dashboard-overrides.css')}}">
-    <!-- endinject -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonegig - Find Your Next Gig</title>
+
     <link rel="shortcut icon" href="{{asset('frontend/images/favicon1.png')}}" />
-    @livewireStyles
+    <meta name="title" content="{{$meta_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta name="description" content="{{ $metaDescription ?? 'Wonegig is a leading micro-jobs platform connecting freelancers with quick tasks and earning opportunities. Post jobs, complete tasks, and earn money online. Join thousands of users worldwide'}}">
+    <meta name="keywords" content="{{ $meta_keywords ?? 'micro jobs, freelance, online work, earn money online, remote work, quick tasks, freelancing platform, work from home'}}">
+    <meta name="author" content="Wonegig">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $og_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta property="og:description" content="{{ $og_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities. Join our community of freelancers and clients worldwide.'}}">
+    <meta property="og:image" content="{{$og_image ?? asset('frontend/images/og-image.png')}}">
+    <meta property="og:site_name" content="Wonegig">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="{{$twitter_title ?? 'Wonegig - Micro-Jobs Platform | Earn Money Online'}}">
+    <meta property="twitter:description" content="{{$twitter_description ?? 'Connect with thousands of micro-jobs and start earning today. Wonegig is the premier platform for quick tasks, freelance work, and online earning opportunities.'}}">
+    <meta property="twitter:image" content="{{ $twitter_image ?? asset('frontend/images/og-image.png')}}">
+
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#051040">
+    <meta name="msapplication-TileColor" content="#051040">
+    <meta name="application-name" content="Wonegig">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url()->current() }}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="{{asset('frontend/css/bootstrap.min.css')}}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="{{asset('frontend/css/bootstrap-icons.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/theme.css')}}">
     @stack('styles')
 </head>
 
 <body>
-    <div class="container-scroller">
-
-        <!-- partial:partials/_navbar.html -->
-        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-
-                <a class="navbar-brand brand-logo me-5" href="{{route('index')}}">
-                    <img src="{{asset('frontend/images/logo2.png')}}" alt="Wonegig" style="height:50px;">
-                </a>
-                <a class="navbar-brand brand-logo-mini" href="{{route('index')}}">
-                    <img src="{{asset('frontend/images/favicon1.png')}}" alt="logo" />
-                </a>
-            </div>
-            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-                    <span class="icon-menu"></span>
-                </button>
-                <ul class="navbar-nav mr-lg-2">
-                    <li class="nav-item nav-search d-none d-lg-block border rounded">
-                        <div class="input-group">
-                            <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
-                                <span class="input-group-text" id="search">
-                                    <i class="icon-search"></i>
-                                </span>
-                            </div>
-                            <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
-                        </div>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a class="btn btn-outline-primary" href="#">Post Job</a>
-                    </li> -->
-                </ul>
-                <ul class="navbar-nav navbar-nav-right">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
-                            <i class="icon-bell mx-0"></i>
-                            @livewire('dashboard-area.notifications.notification-dropdown')
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-                            <div class="dropdown-header d-flex justify-content-between align-items-center">
-                                <p class="mb-0 font-weight-normal float-left">Recent Notifications</p>
-                                <!-- <a href="{{ route('notifications') }}" class="btn btn-outline-primary btn-sm float-right">View All</a> -->
-                            </div>
-                            @livewire('dashboard-area.notifications.notification-dropdown-content')
-                        </div>
-                    </li>
-                    <li class="nav-item nav-profile dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
-                            <img src="{{asset('frontend/images/faces/face28.jpg')}}" alt="profile" />
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                            <a class="dropdown-item" href="{{ route('profile') }}">
-                                <i class="ti-settings text-primary"></i> Profile </a>
-                            <a class="dropdown-item" href="{{ route('subscriptions') }}">
-                                <i class="ti-settings text-primary"></i> Subscription </a>
-                            <a href="{{ route('logout') }}" class="dropdown-item" wire:click.prevent="logout">
-                                <i class="ti-power-off text-primary"></i> Logout </a>
-                        </div>
-                    </li>
-                    
-                </ul>
-                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-                    <span class="icon-menu"></span>
-                </button>
-            </div>
-        </nav>
-        <!-- partial -->
-        <div class="container-fluid page-body-wrapper">
-            <!-- partial:partials/_sidebar.html -->
-            <nav class="sidebar sidebar-offcanvas" id="sidebar" style="background-color: var(--dark-purple);">
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">
-                            <i class="icon-grid menu-icon"></i>
-                            <span class="menu-title">Dashboard</span>
-                        </a>
-                    </li>
 
 
-
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                            <i class="icon-columns menu-icon"></i>
-                            <span class="menu-title">Jobs</span>
-                            <i class="menu-arrow"></i>
-                        </a>
-                        <div class="collapse" id="auth">
-                            <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.create')}}"> New Job </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.ongoing')}}"> Ongoing Jobs </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.completed')}}"> Completed Jobs </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.drafts')}}"> Drafts </a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
-                            <i class="icon-layout menu-icon"></i>
-                            <span class="menu-title">Tasks</span>
-                            <i class="menu-arrow"></i>
-                        </a>
-                        <div class="collapse" id="error">
-                            <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.ongoing') }}"> Ongoing Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.completed') }}"> Completed Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.submitted') }}"> Submitted Tasks </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.saved') }}"> Saved Tasks </a></li>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-primary pt-0" href="{{ url('/') }}">
+                <img src="{{asset('frontend/images/logo2.png')}}" alt="" style="height:30px;">
+            </a>
+            <!-- mobile notification and toggler -->
+            <div class="d-flex d-md-none">
+                <div class="dropdown me-3">
+                    <a href="#" class="btn btn-outline-primary position-relative" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <h6 class="dropdown-header">Notifications</h6>
+                        </li>
+                        <li><a class="dropdown-item" href="notifications.html">New task matches your skills</a></li>
+                        <li><a class="dropdown-item" href="notifications.html">Your withdrawal was processed</a></li>
+                        <li><a class="dropdown-item" href="notifications.html">You have a new message</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-center" href="{{ route('notifications') }}">View All</a></li>
                     </ul>
                 </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#earnings" aria-expanded="false" aria-controls="earnings">
-                            <i class="icon-bar-graph menu-icon"></i>
-                            <span class="menu-title">Earnings</span>
-                            <i class="menu-arrow"></i>
-                        </a>
-                        <div class="collapse" id="earnings">
-                            <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.settlements') }}"> Settlements </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.withdrawals') }}"> Withdrawals </a></li>
-                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.exchanges') }}"> Exchanges </a></li>
-                    </ul>
-                </div>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('transactions') }}">
-                            <i class="icon-paper menu-icon"></i>
-                            <span class="menu-title">Transactions</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('invitees') }}">
-                            <i class="icon-head menu-icon"></i>
-                            <span class="menu-title">Invites</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('support') }}">
-                            <i class="mdi mdi-comment-account-outline menu-icon fs-5"></i>
-                            <span class="menu-title">Support</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </nav>
-            <!-- partial -->
-            <div class="main-panel">
-                {{ $slot }}
-                <!-- content-wrapper ends -->
-                <!-- partial:partials/_footer.html -->
-                <footer class="footer">
-                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2023. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ms-1"></i></span>
-                </div>
-                </footer>
-                <!-- partial -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
-            <!-- main-panel ends -->
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('/')) active @endif" href="{{ url('/') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('explore')) active @endif" href="{{ route('explore') }}">Browse Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('top-earners')) active @endif" href="{{ route('top_earners') }}">Top Earners</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('blog')) active @endif" href="{{ route('blog') }}" href="#">Blog</a>
+                    </li>
+                    @auth
+
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('jobs.index')) active @endif" href="{{ route('jobs.index') }}">My Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(request()->is('tasks.index')) active @endif" href="{{ route('tasks.index') }}" href="#">Applied Tasks</a>
+                    </li>
+                    <!-- Show on mobile -->
+                    <div class="d-md-none">
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('dashboard')) active @endif" href="{{ route('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('earnings.settlements')) active @endif" href="{{ route('earnings.settlements') }}"><i class="bi bi-wallet2"></i> Earnings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('transactions')) active @endif" href="{{ route('transactions') }}"><i class="bi bi-receipt"></i> Transactions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('invitees')) active @endif" href="{{ route('invitees') }}"><i class="bi bi-people"></i> Invitees</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('boosters')) active @endif" href="{{ route('boosters') }}"><i class="bi bi-lightning"></i> Boosters</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->is('support')) active @endif" href="{{ route('support') }}"><i class="bi bi-headset"></i> Support</a>
+                        </li>
+
+                        <li class="nav-item"><a class="nav-link @if(request()->is('profile')) active @endif" href="{{ route('profile') }}"><i class="bi bi-star"></i> Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" wire:click.prevent="logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    </div>
+                    @endauth
+                </ul>
+                @guest
+                <div class="d-flex">
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary me-2">Sign In</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary">Register</a>
+                </div>
+                @else
+                <div class="d-flex">
+
+                    <a href="{{route('jobs.create')}}" class="btn btn-primary me-3"><i class="bi bi-plus-circle"></i> Post a Task</a>
+                    <!-- Notifications -->
+                    <div class="dropdown me-3 d-none d-md-block">
+                        <a href="#" class="btn btn-outline-primary position-relative" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <h6 class="dropdown-header">Notifications</h6>
+                            </li>
+                            <li><a class="dropdown-item" href="notifications.html">New task matches your skills</a></li>
+                            <li><a class="dropdown-item" href="notifications.html">Your withdrawal was processed</a></li>
+                            <li><a class="dropdown-item" href="notifications.html">You have a new message</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-center" href="{{ route('notifications') }}">View All</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Show on Web -->
+                    <div class="dropdown d-none d-md-block">
+                        <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ auth()->user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item @if(request()->is('dashboard')) active @endif" href="{{ route('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item @if(request()->is('jobs.index')) active @endif" href="{{ route('jobs.index') }}"><i class="bi bi-briefcase"></i> My Posted Tasks</a></li>
+                            <li><a class="dropdown-item @if(request()->is('tasks.index')) active @endif" href="{{ route('tasks.index') }}"><i class="bi bi-check-circle"></i> Applied Tasks</a></li>
+                            <li><a class="dropdown-item @if(request()->is('earnings.settlements')) active @endif" href="{{ route('earnings.settlements') }}"><i class="bi bi-wallet2"></i> Earnings</a></li>
+                            <li><a class="dropdown-item @if(request()->is('transactions')) active @endif" href="{{ route('transactions') }}"><i class="bi bi-receipt"></i> Transactions</a></li>
+                            <li><a class="dropdown-item @if(request()->is('invitees')) active @endif" href="{{ route('invitees') }}"><i class="bi bi-people"></i> Invitees</a></li>
+                            <li><a class="dropdown-item @if(request()->is('boosters')) active @endif" href="{{ route('boosters') }}"><i class="bi bi-lightning"></i> Boosters</a></li>
+
+                            <li><a class="dropdown-item @if(request()->is('support')) active @endif" href="{{ route('support') }}"><i class="bi bi-headset"></i> Support</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item @if(request()->is('profile')) active @endif" href="{{ route('profile') }}"><i class="bi bi-person-gear"></i> Profile</a></li>
+                            <li class="nav-item">
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('logout') }}" wire:click.prevent="logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+                @endguest
+            </div>
         </div>
-        <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="{{asset('frontend/vendors/js/vendor.bundle.base.js')}}"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="{{asset('frontend/vendors/chart.js/chart.umd.js')}}"></script>
-    <script src="{{asset('frontend/vendors/datatables.net/jquery.dataTables.js')}}"></script>
-    <script src="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.js')}}"></script>
-    <script src="{{asset('frontend/js/dataTables.select.min.js')}}"></script>
+    </nav>
 
-    <!-- endinject -->
-    <!-- Custom js for this page-->
-    <script src="{{asset('frontend/js/jquery.min.js')}}" type="text/javascript"></script>
-    
+    {{ $slot }}
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <a class="navbar-brand" href="{{ url('/') }}">
+                        <img src="{{asset('frontend/images/logo.png')}}" alt="" style="height:50px;">
+                    </a>
+                    <p class="mb-0">+1 (555) 123-4567</p>
+                    <p class="text-white">info@wonegig.com</p>
+                    <div class="social-icons mt-4">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>For Workers</h6>
+                    <ul class="footer-links">
+                        <li><a href="tasks.html">Find Tasks</a></li>
+                        <li><a href="#">How it Works</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                        <li><a wire:navigate href="{{ route('top_earners') }}">Top Earners</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>For Posters</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Post a Task</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Tips</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>Company</h6>
+                    <ul class="footer-links">
+                        <li><a wire:navigate href="{{ route('index') }}">Home</a> </li>
+                        <li><a wire:navigate href="{{ route('about') }}">About us</a></li>
+                        <li><a wire:navigate href="{{ route('contact') }}">Contact us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a wire:navigate href="{{ route('blog') }}">Our Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h6>Legal</h6>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('legal.dcma') }}">DMCA</a></li>
+                        <li><a href="{{ route('legal.disclaimer') }}">Disclaimer</a></li>
+                        <li> <a href="{{ route('legal.privacy-policy') }}">Privacy Policy</a></li>
+                        <li><a href="{{ route('legal.terms-conditions') }}">Terms & Conditions</a></li>
+                        <li><a href="{{ route('legal.payment-chargeback') }}">Payment & Chargebacks</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">{{ now()->format('Y') }} Wonegig. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{{asset('frontend/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ asset('frontend/js/jquery.min.js') }}"></script>
     @livewireScripts
     <script>
-		$(document).ready(function() {
-			Livewire.on('closeModal', function(data) {
-				console.log('Close modal event received:', data);
-				const modalId = data[0].modalId;
+        $(document).ready(function() {
+            Livewire.on('closeModal', function(data) {
+                console.log('Close modal event received:', data);
+                const modalId = data[0].modalId;
 
-				const modalEl = document.getElementById(modalId);
+                const modalEl = document.getElementById(modalId);
 
-				// Check if Bootstrap modal instance already exists
-				let modalInstance = bootstrap.Modal.getInstance(modalEl);
-				if (!modalInstance) {
-					// If not, create a new instance (Bootstrap 5)
-					modalInstance = new bootstrap.Modal(modalEl);
-				}
-				// Hide the modal with Bootstrap 5 API
-				modalInstance.hide();
-			});
-		});
-	</script>
+                // Check if Bootstrap modal instance already exists
+                let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (!modalInstance) {
+                    // If not, create a new instance (Bootstrap 5)
+                    modalInstance = new bootstrap.Modal(modalEl);
+                }
+                // Hide the modal with Bootstrap 5 API
+                modalInstance.hide();
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 

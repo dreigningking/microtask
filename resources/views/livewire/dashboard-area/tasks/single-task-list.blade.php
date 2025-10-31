@@ -27,7 +27,7 @@
                         <i class="fas fa-clock me-1"></i>{{ $task->created_at->diffForHumans() }}
                     </span>
                     <span class="text-muted mb-1">
-                        <i class="fas fa-users me-1"></i>{{ $task->workers->whereNotNull('accepted_at')->count() }}/{{ $task->number_of_people }}
+                        <i class="fas fa-users me-1"></i>{{ $task->workers->whereNotNull('accepted_at')->count() }}/{{ $task->number_of_submissions }}
                     </span>
                 </div>
                 <p class="text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -55,7 +55,7 @@
             <div class="col-md-2 text-md-end mt-3 mt-md-0">
                 <div class="d-flex flex-column gap-2">
                     <span class="badge bg-success fs-6 px-3 py-2">
-                        {{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_person }}
+                        {{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}
                     </span>
                     <button wire:click="showTaskDetails({{ $task->id }})" class="btn btn-primary btn-sm">
                         View Details

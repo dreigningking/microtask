@@ -1,126 +1,14 @@
 <div>
-    <!-- Flash Messages -->
-    @if (session()->has('message'))
-        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 1060;">
-            {{ session('message') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if (session()->has('error'))
-        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 1060;">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <!-- Hero Section -->
-    <section class="page-hero">
+    <section class="task-header py-4">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h1 class="page-title">Find Your Dream Job</h1>
-                    <p class="page-subtitle">Browse thousands of job opportunities and find the perfect match for your skills and career goals</p>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h2 mb-2">Browse Available Tasks</h1>
+                    <p class="mb-0">Find micro-jobs that match your skills and start earning</p>
                 </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <div class="row mb-5">
-            <div class="col-lg-3">
-                <!-- Filter Toggle Button for Mobile -->
-                <button class="filter-toggle d-lg-none w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterColumn">
-                    <i class="fas fa-filter me-2"></i> Show Filters
-                </button>
-                
-                <!-- Filters Column -->
-                <div class="collapse d-lg-block" id="filterColumn">
-                    <!-- Search Filter -->
-                    <div class="filter-card mb-4">
-                        <div class="filter-header">
-                            <h5 class="filter-title">Search</h5>
-                        </div>
-                        <div class="filter-group">
-                            <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Search for jobs...">
-                        </div>
-                    </div>
-
-                    <!-- Platform Filter -->
-                    <div class="filter-card mb-4">
-                        <div class="filter-header">
-                            <h5 class="filter-title">Platforms</h5>
-                        </div>
-                        <div class="filter-group">
-                            @foreach($platforms as $platform)
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedPlatforms" value="{{ $platform->id }}" id="platform-{{ $platform->id }}">
-                                <label class="form-check-label" for="platform-{{ $platform->id }}">
-                                    {{ $platform->name }}
-                                </label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    
-                    <!-- Price Range Filter -->
-                    <div class="filter-card mb-4">
-                        <div class="filter-header">
-                            <h5 class="filter-title">Price Range</h5>
-                        </div>
-                        <div class="filter-group">
-                            <div class="mb-3">
-                                <input type="range" wire:model.live="maxPrice" min="0" max="1000" class="form-range" id="priceRange">
-                                <div class="d-flex justify-content-between text-sm text-muted mt-1">
-                                    <span>${{ $minPrice }}</span>
-                                    <span>${{ $maxPrice }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Duration Filter -->
-                    <div class="filter-card mb-4">
-                        <div class="filter-header">
-                            <h5 class="filter-title">Task Duration</h5>
-                        </div>
-                        <div class="filter-group">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="less_than_1_hour" id="duration-1">
-                                <label class="form-check-label" for="duration-1">
-                                    Less than 1 hour
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="1_3_hours" id="duration-2">
-                                <label class="form-check-label" for="duration-2">
-                                    1-3 hours
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="3_6_hours" id="duration-3">
-                                <label class="form-check-label" for="duration-3">
-                                    3-6 hours
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="6_plus_hours" id="duration-4">
-                                <label class="form-check-label" for="duration-4">
-                                    6+ hours
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button wire:click="clearFilters" class="btn btn-outline-secondary w-100 mb-3">Clear All Filters</button>
-                </div>
-            </div>
-            
-            <div class="col-lg-9">
-                <div class="d-md-flex justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">Found {{ $totalTasks }} jobs matching your criteria</h4>
-                    <div class="d-flex justify-content-end align-items-center">
-                        <span class="me-2">Sort by:</span>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
+                        <span class="me-3">Sort by:</span>
                         <select wire:model.live="sortBy" class="form-select form-select-sm w-auto">
                             <option value="latest">Newest First</option>
                             <option value="highest_paid">Highest Paying</option>
@@ -129,110 +17,355 @@
                         </select>
                     </div>
                 </div>
-                
-                <!-- Job Listings -->
-                @if($tasks->count() > 0)
-                    @foreach($tasks as $task)
-                        @livewire('dashboard-area.tasks.single-task-list', ['task' => $task], key('task-'.$task->id))
-                    @endforeach
-                @else
-                    <div class="text-center text-muted py-5">
-                        <i class="fas fa-search fa-3x mb-3"></i>
-                        <h5>No tasks found</h5>
-                        <p>Try adjusting your search criteria or filters</p>
-                    </div>
-                @endif
-                
-                <!-- Pagination -->
-                <div class="mt-5">
-                    {{ $tasks->links() }}
-                </div>
             </div>
         </div>
-    </div>
+    </section>
+    <!-- Flash Messages -->
 
-    <!-- Task Details Modal -->
-    @if($showModal && $selectedTask)
-    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $selectedTask->title }}</h5>
-                    <button type="button" class="btn-close" wire:click="closeModal"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Meta Info -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-dollar-sign text-success me-2"></i>
-                                <span>{{ $selectedTask->user->country->currency_symbol ?? '$' }}{{ $selectedTask->budget_per_person }} per person</span>
+
+    <section class="py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Filters Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <button class="filter-toggle d-lg-none w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterColumn">
+                        <i class="fas fa-filter me-2"></i> Show Filters
+                    </button>
+                    <div class="collapse d-lg-block" id="filterColumn">
+                        <div class="filter-section">
+                            <h5 class="mb-3">Filters</h5>
+
+                            <!-- Category Filter -->
+                            <div class="mb-4">
+                                <h6>Category</h6>
+                                @foreach($platforms as $platform)
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedPlatforms" value="{{ $platform->id }}" id="platform-{{ $platform->id }}">
+                                    <label class="form-check-label" for="platform-{{ $platform->id }}">
+                                        {{ $platform->name }}
+                                    </label>
+                                </div>
+                                @endforeach
                             </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-users text-primary me-2"></i>
-                                <span>{{ $selectedTask->workers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_people }} spots filled</span>
+
+
+
+                            <div class="mb-4">
+                                <h6>Price Range</h6>
+                                <div class="mb-3">
+                                    <input type="range" wire:model.live="maxPrice" min="0" max="1000" class="form-range" id="priceRange">
+                                    <div class="d-flex justify-content-between text-sm text-muted mt-1">
+                                        <span>${{ $minPrice }}</span>
+                                        <span>${{ $maxPrice }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="mb-4">
+                                <h6 class="filter-title">Task Duration</h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="less_than_1_hour" id="duration-1">
+                                    <label class="form-check-label" for="duration-1">
+                                        Less than 1 hour
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="1_3_hours" id="duration-2">
+                                    <label class="form-check-label" for="duration-2">
+                                        1-3 hours
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="3_6_hours" id="duration-3">
+                                    <label class="form-check-label" for="duration-3">
+                                        3-6 hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedDurations" value="6_plus_hours" id="duration-4">
+                                    <label class="form-check-label" for="duration-4">
+                                        6+ hours
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Deadline -->
+                            <div class="mb-4">
+                                <h6>Deadline</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="deadline1">
+                                    <label class="form-check-label" for="deadline1">Next 24 hours</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="deadline2">
+                                    <label class="form-check-label" for="deadline2">Next 3 days</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="deadline3">
+                                    <label class="form-check-label" for="deadline3">Next week</label>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100">Apply Filters</button>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h6>Your Activity</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Applied Tasks:</span>
+                                    <strong>12</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Completed:</span>
+                                    <strong>8</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Earnings:</span>
+                                    <strong>$247</strong>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-clock text-warning me-2"></i>
-                                <span>
-                                    @php
-                                        $minutes = $selectedTask->expected_completion_minutes;
-                                        if ($minutes < 60) {
-                                            echo $minutes . " minutes";
-                                        } elseif ($minutes < 1440) {
-                                            echo floor($minutes / 60) . " hours";
-                                        } else {
-                                            echo floor($minutes / 1440) . " days";
-                                        }
-                                    @endphp
-                                </span>
+                    </div>
+                </div>
+
+                <!-- Tasks List -->
+                <div class="col-lg-9">
+                    <!-- Search Bar -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Search tasks...">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
                             </div>
-                            @if($selectedTask->expiry_date)
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-calendar-times text-danger me-2"></i>
-                                <span>Expires in {{ $selectedTask->expiry_date->diffForHumans() }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Found {{ $totalTasks }} tasks </h6>
+                            @if (session()->has('message'))
+                            <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 1060;">
+                                {{ session('message') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            @endif
+                            @if (session()->has('error'))
+                            <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 1060;">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Description Snippet -->
-                    <div class="mb-4">
-                        <p class="text-muted">{{ Str::limit($selectedTask->description, 200) }}</p>
+                    <!-- Tasks Grid -->
+                    <div class="row g-4">
+                        @if($tasks->count() > 0)
+                        @foreach($tasks as $task)
+                        <div class="col-lg-6">
+                            @include('components.layouts.taskcard',['task'=> $task])
+                        </div>
+                        @endforeach
+                        @else
+                        <div class="col-12">
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-search fa-3x mb-3"></i>
+                                <h5>No tasks found</h5>
+                                <p>Try adjusting your search criteria or filters</p>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Task 2 -->
+                        <div class="col-lg-6">
+                            <div class="task-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-success">Social Media</span>
+                                        <span class="price-tag">$45</span>
+                                    </div>
+                                    <h5 class="card-title">Instagram Post Design</h5>
+                                    <p class="card-text text-muted">Create 5 engaging Instagram posts for our coffee shop. Brand guidelines provided.</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> 3 days left</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 8 applicants</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://placehold.co/30" alt="Poster" class="rounded-circle me-2">
+                                        <div>
+                                            <small class="fw-bold">Mike Chen</small>
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star"></i>
+                                                <span class="text-muted">(4.0)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3 -->
+                        <div class="col-lg-6">
+                            <div class="task-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-info">Writing</span>
+                                        <span class="price-tag">$60</span>
+                                    </div>
+                                    <h5 class="card-title">Blog Article Writer</h5>
+                                    <p class="card-text text-muted">Write a 1000-word blog post about sustainable living. SEO knowledge preferred.</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> 5 days left</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 15 applicants</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://placehold.co/30" alt="Poster" class="rounded-circle me-2">
+                                        <div>
+                                            <small class="fw-bold">Tech Solutions Inc.</small>
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <span class="text-muted">(5.0)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 4 -->
+                        <div class="col-lg-6">
+                            <div class="task-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-warning">Graphic Design</span>
+                                        <span class="price-tag">$85</span>
+                                    </div>
+                                    <h5 class="card-title">Logo Design for Startup</h5>
+                                    <p class="card-text text-muted">Create a modern logo for a tech startup. Need vector files and brand guidelines.</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> 7 days left</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 22 applicants</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://placehold.co/30" alt="Poster" class="rounded-circle me-2">
+                                        <div>
+                                            <small class="fw-bold">Innovate Labs</small>
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-half"></i>
+                                                <span class="text-muted">(4.5)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 5 -->
+                        <div class="col-lg-6">
+                            <div class="task-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-secondary">Web Development</span>
+                                        <span class="price-tag">$120</span>
+                                    </div>
+                                    <h5 class="card-title">Fix WordPress Website Issues</h5>
+                                    <p class="card-text text-muted">Need help fixing CSS issues and mobile responsiveness on WordPress site.</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> 1 day left</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 6 applicants</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://placehold.co/30" alt="Poster" class="rounded-circle me-2">
+                                        <div>
+                                            <small class="fw-bold">David Wilson</small>
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star"></i>
+                                                <i class="bi bi-star"></i>
+                                                <span class="text-muted">(3.0)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 6 -->
+                        <div class="col-lg-6">
+                            <div class="task-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-primary">Data Entry</span>
+                                        <span class="price-tag">$35</span>
+                                    </div>
+                                    <h5 class="card-title">PDF to Excel Conversion</h5>
+                                    <p class="card-text text-muted">Convert 20 PDF documents with tables into Excel format. Attention to detail required.</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> 4 days left</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 9 applicants</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://placehold.co/30" alt="Poster" class="rounded-circle me-2">
+                                        <div>
+                                            <small class="fw-bold">Marketing Pro</small>
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <span class="text-muted">(5.0)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex gap-2">
-                            @auth
-                            <button 
-                                wire:click="hideTask({{ $selectedTask->id }})" 
-                                class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-eye-slash me-1"></i>
-                                Hide Task
-                            </button>
-                            <button 
-                                wire:click="reportTask({{ $selectedTask->id }})" 
-                                class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-flag me-1"></i>
-                                Report
-                            </button>
-                            @endauth
-                        </div>
-                        <a href="{{ route('explore.task', $selectedTask) }}" class="btn btn-primary">
-                            View Full Details
-                        </a>
+                    <!-- Pagination -->
+                    <div class="mt-5">
+                        {{ $tasks->links() }}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    @endif
-
-    <!-- Report Task Component -->
-    @livewire('dashboard-area.tasks.report-task')
+    </section>
 </div>
 
 @push('styles')

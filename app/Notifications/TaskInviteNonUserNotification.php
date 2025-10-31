@@ -42,7 +42,7 @@ class TaskInviteNonUserNotification extends Notification
     {
         $registerUrl = url('/register?invite_task=' . $this->task->id . '&email=' . urlencode($this->email));
         $inviterName = $this->task->user->name ?? 'A user';
-        $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_person, 2);
+        $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2);
 
         return (new MailMessage)
             ->subject("Invitation to Join Our Platform & Earn")

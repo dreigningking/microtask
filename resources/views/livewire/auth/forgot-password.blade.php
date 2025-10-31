@@ -1,19 +1,14 @@
-<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+<section class="hero-section">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <!-- Logo and Header -->
-                <div class="text-center my-4">
-                    <!-- <div class="mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6f42c1 0%, #0d6efd 100%);">
-                        <i class="fas fa-unlock-alt text-white fs-2"></i>
-                    </div> -->
-                    <h2 class="fw-bold text-dark mb-2">Forgot Your Password?</h2>
-                    <p class="text-muted">Enter your email address and we'll send you a link to reset your password</p>
-                </div>
-
-                <!-- Forgot Password Form -->
+        <div class="hero-content mx-auto">
+            <div class="min-vh-100">
                 <div class="card shadow border-0" style="border-radius: 1rem;">
                     <div class="card-body p-4 p-md-5">
+                        <div class="text-center my-4">
+
+                            <h2 class="fw-bold text-dark mb-2">Forgot Your Password?</h2>
+                            <p class="text-muted">Enter your email address and we'll send you a link to reset your password</p>
+                        </div>
                         <form wire:submit="sendPasswordResetLink">
                             @csrf
 
@@ -59,7 +54,7 @@
                                 </span>
                                 <span wire:loading><i class="bi bi-arrow-repeat me-2"></i>Sending...</span>
                             </button>
-                            
+
                         </form>
 
                         <!-- Back to Login Link -->
@@ -71,52 +66,53 @@
                                 Back to Login
                             </a>
                         </div>
+                        <div class="text-center mt-4">
+                            <p class="text-muted small">
+                                Remember your password?
+                                <a wire:navigate
+                                    href="{{ route('login') }}"
+                                    class="text-decoration-none text-primary">
+                                    Sign in here
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Additional Info -->
-                <div class="text-center mt-4">
-                    <p class="text-muted small">
-                        Remember your password?
-                        <a wire:navigate
-                            href="{{ route('login') }}"
-                            class="text-decoration-none text-primary">
-                            Sign in here
-                        </a>
-                    </p>
-                </div>
+
             </div>
         </div>
     </div>
-</div>
+</section>
 
-@push('styles')
-<style>
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
-    }
-
-
-    /* Animation for page load */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+    @push('styles')
+    <style>
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
         }
-    }
 
-    .min-vh-100 {
-        animation: fadeInUp 0.6s ease-out;
-    }
-</style>
-@endpush
+
+        /* Animation for page load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .min-vh-100 {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+    @endpush

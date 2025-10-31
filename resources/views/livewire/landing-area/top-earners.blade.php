@@ -1,354 +1,368 @@
-<main class="container mx-auto px-4 py-8">
-    <div class="relative rounded-lg overflow-hidden mb-8">
-        <div class="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
-                alt="Team collaboration"
-                class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/60"></div>
-        </div>
-        <div class="relative px-6 py-12 md:py-16 md:px-12">
-            <h1 class="text-3xl md:text-4xl font-bold text-white">Top Earners</h1>
-            <p class="text-white/90 mt-2 max-w-2xl">Meet our most successful members who are crushing it on the platform</p>
-        </div>
-    </div>
-
-    <!-- Filter and Sort Options -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="relative w-full md:w-64">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="ri-search-line text-gray-400"></i>
+<div>
+    <section class="jumbo-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 fw-bold mb-3">Top Earners</h1>
+                    <p class="lead mb-4">Meet our most successful task workers and get inspired by their achievements</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="tasks.html" class="btn btn-light">Start Earning</a>
+                        <a href="register.html" class="btn btn-outline-light">Join Now</a>
                     </div>
-                    <input type="text" placeholder="Search earners..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-button w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                 </div>
-
-                <select class="border border-gray-300 rounded-button py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white w-full md:w-auto">
-                    <option value="">All Platforms</option>
-                    <option value="design">Design</option>
-                    <option value="writing">Writing</option>
-                    <option value="programming">Programming</option>
-                    <option value="data-entry">Data Entry</option>
-                </select>
-            </div>
-
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <span class="text-gray-600 whitespace-nowrap">Sort by:</span>
-                <select class="border border-gray-300 rounded-button py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white w-full">
-                    <option value="earnings">Total Earnings</option>
-                    <option value="tasks">Tasks Completed</option>
-                    <option value="ratings">Highest Rated</option>
-                    <option value="newest">Recently Joined</option>
-                </select>
+                <div class="col-lg-4 text-center">
+                    <i class="bi bi-trophy-fill trophy-icon"></i>
+                    <h4 class="text-warning">$1.2M+</h4>
+                    <p class="mb-0">Total earned by our top performers</p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Top Earners List -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Earner Card 1 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Sarah Johnson" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">Sarah Johnson</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>New York, USA</span>
-                        </div>
+    <!-- Top Earners Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title center-title">Top Performers This Month</h2>
+                <p class="text-muted">These workers have earned the most completing micro-tasks</p>
+            </div>
 
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-half-fill"></i>
+            <!-- Top 3 Earners -->
+            <div class="row mb-5">
+                <!-- Top Earner -->
+                <div class="col-lg-4 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-1">1</div>
+                        <div class="card-body text-center p-4">
+                            <img src="https://placehold.co/100x100/667eea/ffffff?text=SD" alt="Sarah Davis" class="earner-avatar mb-3">
+                            <h4 class="mb-1">Sarah Davis</h4>
+                            <div class="verified-badge mb-2">
+                                <i class="bi bi-patch-check-fill"></i> Verified Pro
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(127 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$9,745.00</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">231</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">Mar 2022</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">98%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Earner Card 2 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="David Chen" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">David Chen</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>Toronto, Canada</span>
-                        </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
+                            <h3 class="text-success mb-3">$8,450</h3>
+                            <div class="mb-3">
+                                <div class="text-warning mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-muted ms-1">(4.9)</span>
+                                </div>
+                                <small class="text-muted">128 tasks completed</small>
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(203 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$8,940.50</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">189</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">Jan 2021</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">99%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Earner Card 3 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Maria Garcia" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">Maria Garcia</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>Barcelona, Spain</span>
-                        </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-line"></i>
+                            <div class="mb-3">
+                                <span class="skill-tag">Graphic Design</span>
+                                <span class="skill-tag">Social Media</span>
+                                <span class="skill-tag">UI/UX</span>
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(156 reviews)</span>
+                            <p class="text-muted small mb-3">Specializes in creating engaging visual content for brands</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$7,880.25</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">172</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">May 2022</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">96%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Earner Card 4 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="James Wilson" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">James Wilson</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>London, UK</span>
-                        </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-half-fill"></i>
+                <!-- Second Earner -->
+                <div class="col-lg-4 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-2">2</div>
+                        <div class="card-body text-center p-4">
+                            <img src="https://placehold.co/100x100/10b981/ffffff?text=MR" alt="Mike Rodriguez" class="earner-avatar mb-3">
+                            <h4 class="mb-1">Mike Rodriguez</h4>
+                            <div class="verified-badge mb-2">
+                                <i class="bi bi-patch-check-fill"></i> Verified Pro
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(142 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$7,120.75</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">165</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">Feb 2022</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">97%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Earner Card 5 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Olivia Brown" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">Olivia Brown</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>Sydney, Australia</span>
-                        </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-line"></i>
+                            <h3 class="text-success mb-3">$7,210</h3>
+                            <div class="mb-3">
+                                <div class="text-warning mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="text-muted ms-1">(4.7)</span>
+                                </div>
+                                <small class="text-muted">95 tasks completed</small>
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(112 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$6,950.30</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">148</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">Jul 2022</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">95%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Earner Card 6 -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <img src="https://randomuser.me/api/portraits/men/74.jpg" alt="Ahmed Khan" class="w-16 h-16 rounded-full object-cover">
-                    <div class="flex-1">
-                        <a href="#" class="text-xl font-semibold text-gray-800 hover:text-primary">Ahmed Khan</a>
-                        <div class="flex items-center text-gray-500 mt-1">
-                            <i class="ri-map-pin-line mr-1"></i>
-                            <span>Dubai, UAE</span>
-                        </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex text-yellow-400">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-half-fill"></i>
-                                <i class="ri-star-line"></i>
+                            <div class="mb-3">
+                                <span class="skill-tag">Web Development</span>
+                                <span class="skill-tag">JavaScript</span>
+                                <span class="skill-tag">API Integration</span>
                             </div>
-                            <span class="ml-2 text-gray-600 text-sm">(98 reviews)</span>
+                            <p class="text-muted small mb-3">Full-stack developer with 5+ years of experience</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="border-t border-gray-100 mt-4 pt-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 text-sm">Total Earnings</div>
-                            <div class="font-semibold text-primary">$6,485.90</div>
+                <!-- Third Earner -->
+                <div class="col-lg-4 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-3">3</div>
+                        <div class="card-body text-center p-4">
+                            <img src="https://placehold.co/100x100/f59e0b/ffffff?text=EC" alt="Emma Chen" class="earner-avatar mb-3">
+                            <h4 class="mb-1">Emma Chen</h4>
+                            <div class="verified-badge mb-2">
+                                <i class="bi bi-patch-check-fill"></i> Verified Pro
+                            </div>
+                            <h3 class="text-success mb-3">$6,580</h3>
+                            <div class="mb-3">
+                                <div class="text-warning mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-muted ms-1">(5.0)</span>
+                                </div>
+                                <small class="text-muted">112 tasks completed</small>
+                            </div>
+                            <div class="mb-3">
+                                <span class="skill-tag">Content Writing</span>
+                                <span class="skill-tag">SEO</span>
+                                <span class="skill-tag">Blogging</span>
+                            </div>
+                            <p class="text-muted small mb-3">Award-winning writer specializing in tech and business content</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
                         </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Tasks Completed</div>
-                            <div class="font-semibold">136</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Top Earners -->
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <h3 class="section-title">More Top Earners</h3>
+                </div>
+
+                <!-- Earner 4 -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-other">4</div>
+                        <div class="card-body text-center p-3">
+                            <img src="https://placehold.co/80x80/3b82f6/ffffff?text=AJ" alt="Alex Johnson" class="earner-avatar mb-3">
+                            <h5 class="mb-1">Alex Johnson</h5>
+                            <h4 class="text-success mb-2">$5,920</h4>
+                            <div class="mb-2">
+                                <div class="text-warning small mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <span class="text-muted ms-1">(4.2)</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="skill-tag">Data Analysis</span>
+                                <span class="skill-tag">Excel</span>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100">View Profile</a>
                         </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Member Since</div>
-                            <div class="font-semibold">Apr 2022</div>
+                    </div>
+                </div>
+
+                <!-- Earner 5 -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-other">5</div>
+                        <div class="card-body text-center p-3">
+                            <img src="https://placehold.co/80x80/ef4444/ffffff?text=LW" alt="Lisa Wang" class="earner-avatar mb-3">
+                            <h5 class="mb-1">Lisa Wang</h5>
+                            <h4 class="text-success mb-2">$5,450</h4>
+                            <div class="mb-2">
+                                <div class="text-warning small mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="text-muted ms-1">(4.6)</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="skill-tag">Video Editing</span>
+                                <span class="skill-tag">Animation</span>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100">View Profile</a>
                         </div>
-                        <div>
-                            <div class="text-gray-500 text-sm">Completion Rate</div>
-                            <div class="font-semibold text-green-600">94%</div>
+                    </div>
+                </div>
+
+                <!-- Earner 6 -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-other">6</div>
+                        <div class="card-body text-center p-3">
+                            <img src="https://placehold.co/80x80/10b981/ffffff?text=DK" alt="David Kim" class="earner-avatar mb-3">
+                            <h5 class="mb-1">David Kim</h5>
+                            <h4 class="text-success mb-2">$5,120</h4>
+                            <div class="mb-2">
+                                <div class="text-warning small mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-muted ms-1">(4.9)</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="skill-tag">Mobile Apps</span>
+                                <span class="skill-tag">React Native</span>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earner 7 -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="earner-card card h-100 position-relative">
+                        <div class="rank-badge rank-other">7</div>
+                        <div class="card-body text-center p-3">
+                            <img src="https://placehold.co/80x80/8b5cf6/ffffff?text=PT" alt="Priya Sharma" class="earner-avatar mb-3">
+                            <h5 class="mb-1">Priya Sharma</h5>
+                            <h4 class="text-success mb-2">$4,890</h4>
+                            <div class="mb-2">
+                                <div class="text-warning small mb-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="text-muted ms-1">(4.5)</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="skill-tag">Digital Marketing</span>
+                                <span class="skill-tag">SEO</span>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100">View Profile</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Pagination -->
-    <div class="mt-8 flex justify-center">
-        <nav class="inline-flex rounded-md shadow">
-            <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
-                <i class="ri-arrow-left-s-line"></i>
-            </a>
-            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-primary text-white">1</a>
-            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
-            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
-            <span class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500">...</span>
-            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">8</a>
-            <a href="#" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
-                <i class="ri-arrow-right-s-line"></i>
-            </a>
-        </nav>
-    </div>
-</main>
+    <!-- Stats Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title center-title">Platform Earnings Insights</h2>
+                <p class="text-muted">See how our community is earning through micro-tasks</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-3 col-6">
+                    <div class="stats-item">
+                        <div class="stats-value">$2.8M+</div>
+                        <div class="stats-label">Total Earnings</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stats-item">
+                        <div class="stats-value">15,240</div>
+                        <div class="stats-label">Tasks Completed</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stats-item">
+                        <div class="stats-value">4.8/5</div>
+                        <div class="stats-label">Average Rating</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stats-item">
+                        <div class="stats-value">98%</div>
+                        <div class="stats-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-lg-6">
+                    <h4 class="mb-3">Top Earning Categories</h4>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Web Development</span>
+                            <span>32%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" style="width: 32%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Graphic Design</span>
+                            <span>28%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: 28%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Content Writing</span>
+                            <span>18%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" style="width: 18%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Digital Marketing</span>
+                            <span>12%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" style="width: 12%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Data Entry</span>
+                            <span>10%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-secondary" style="width: 10%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <h4 class="mb-3">Success Tips from Top Earners</h4>
+                    <div class="card border-0 bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-lightbulb"></i> Pro Tips</h5>
+                            <ul class="mb-0">
+                                <li class="mb-2">Specialize in high-demand skills</li>
+                                <li class="mb-2">Build a strong portfolio with quality work</li>
+                                <li class="mb-2">Communicate clearly with task posters</li>
+                                <li class="mb-2">Deliver work before deadlines</li>
+                                <li>Ask for reviews and build your reputation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3 class="mb-3">Ready to Start Earning?</h3>
+                    <p class="mb-0">Join our community of top earners and start making money with your skills today.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="register.html" class="btn btn-light btn-lg me-2">Sign Up Now</a>
+                    <a href="tasks.html" class="btn btn-outline-light btn-lg">Browse Tasks</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

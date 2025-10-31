@@ -144,11 +144,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600 mb-6">
                     <div class="flex items-center gap-2">
                         <i class="ri-money-dollar-circle-line text-lg text-primary"></i>
-                        <span>{{ $selectedTask->user->country->currency_symbol ?? '$' }}{{ $selectedTask->budget_per_person }} per person</span>
+                        <span>{{ $selectedTask->user->country->currency_symbol ?? '$' }}{{ $selectedTask->budget_per_submission }} per person</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="ri-group-line text-lg text-primary"></i>
-                        <span>{{ $selectedTask->workers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_people }} spots filled</span>
+                        <span>{{ $selectedTask->workers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_submissions }} spots filled</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="ri-time-line text-lg text-primary"></i>

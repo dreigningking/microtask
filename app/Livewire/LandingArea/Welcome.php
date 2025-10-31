@@ -10,7 +10,6 @@ use App\Http\Traits\HelperTrait;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 
-#[Layout('components.layouts.landing')]
 class Welcome extends Component
 {
     use HelperTrait,GeoLocationTrait;
@@ -43,8 +42,10 @@ class Welcome extends Component
                 return $task;
             });
 
-        $this->popularPlatforms = Platform::withCount(['tasks' => function($query) {
-                $query->where('is_active', true);
+        $this->popularPlatforms = Platform::whereHas('tasks',function($query){
+                $query->listable();
+            })->withCount(['tasks' => function($query) {
+                $query->listable();
             }])
             ->orderByDesc('tasks_count')
             ->take(8)

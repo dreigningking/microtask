@@ -40,7 +40,7 @@ class TaskInviteNotification extends Notification
     {
         $url = route('explore.task', $this->task);
         $inviterName = $this->task->user->name ?? 'A user';
-        $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_person, 2);
+        $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2);
 
         return (new MailMessage)
             ->subject("You've Been Invited to a Task: " . $this->task->title)

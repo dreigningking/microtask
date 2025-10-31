@@ -230,8 +230,8 @@
 									<select class="form-select" id="sort_by" name="sort_by">
 										<option value="created_at" {{ request('sort_by', 'created_at') == 'created_at' ? 'selected' : '' }}>Posted Date</option>
 										<option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
-										<option value="budget_per_person" {{ request('sort_by') == 'budget_per_person' ? 'selected' : '' }}>Budget</option>
-										<option value="number_of_people" {{ request('sort_by') == 'number_of_people' ? 'selected' : '' }}>Workers</option>
+										<option value="budget_per_submission" {{ request('sort_by') == 'budget_per_submission' ? 'selected' : '' }}>Budget</option>
+										<option value="number_of_submissions" {{ request('sort_by') == 'number_of_submissions' ? 'selected' : '' }}>Workers</option>
 									</select>
 								</div>
 
@@ -539,7 +539,7 @@
 										<td>
 											<div class="text-center">
 												<span class="badge bg-primary fs-6">
-													{{ $task->workers()->whereNotNull('accepted_at')->count() }} / {{ $task->number_of_people }}
+													{{ $task->workers()->whereNotNull('accepted_at')->count() }} / {{ $task->number_of_submissions }}
 												</span>
 											</div>
 										</td>
@@ -584,7 +584,7 @@
 										</td>
 										<td>
 											<div class="text-center">
-												<div class="fw-bold">{{ $task->currency }} {{ number_format($task->budget_per_person, 2) }}</div>
+												<div class="fw-bold">{{ $task->currency }} {{ number_format($task->budget_per_submission, 2) }}</div>
 												<div class="text-muted small">per person</div>
 											</div>
 										</td>

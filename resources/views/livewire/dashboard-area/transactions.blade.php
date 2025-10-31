@@ -1,3 +1,140 @@
+<div>
+    <section class="task-header py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h2 mb-2">Transaction History</h1>
+                    <p class="mb-0">View all your payments and financial transactions</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="btn-group">
+                        <a href="dashboard.html" class="btn btn-outline-light">Dashboard</a>
+                        <a href="earnings.html" class="btn btn-outline-light">Transactions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-4">
+        <div class="container">
+            <!-- Transaction Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Transaction Type</label>
+                            <select class="form-select">
+                                <option value="">All Types</option>
+                                <option value="income">Income</option>
+                                <option value="withdrawal">Withdrawal</option>
+                                <option value="subscription">Subscription</option>
+                                <option value="refund">Refund</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date From</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date To</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Transactions</h5>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-download"></i> Export CSV
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Oct 15, 2023</td>
+                                    <td>Task Payment: Blog Writing</td>
+                                    <td><span class="badge bg-success">Income</span></td>
+                                    <td class="text-success">+$60.00</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td><small class="text-muted">TXN-784512</small></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 12, 2023</td>
+                                    <td>Pro Subscription - Monthly</td>
+                                    <td><span class="badge bg-info">Subscription</span></td>
+                                    <td class="text-danger">-$9.99</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td><small class="text-muted">SUB-451236</small></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 10, 2023</td>
+                                    <td>Bank Withdrawal</td>
+                                    <td><span class="badge bg-warning">Withdrawal</span></td>
+                                    <td class="text-danger">-$100.00</td>
+                                    <td><span class="badge bg-warning">Processing</span></td>
+                                    <td><small class="text-muted">WD-789123</small></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 5, 2023</td>
+                                    <td>Referral Bonus - Sarah Johnson</td>
+                                    <td><span class="badge bg-success">Income</span></td>
+                                    <td class="text-success">+$5.50</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td><small class="text-muted">REF-562314</small></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 1, 2023</td>
+                                    <td>Task Payment: Data Entry</td>
+                                    <td><span class="badge bg-success">Income</span></td>
+                                    <td class="text-success">+$25.00</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td><small class="text-muted">TXN-893456</small></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Transaction pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{{--
 <div class="content-wrapper">
     <!-- Header -->
     <div class="card mb-4">
@@ -19,233 +156,233 @@
                         <span class="bg-primary bg-opacity-10 rounded-circle p-2"><i class="ri-money-dollar-circle-line text-primary"></i></span>
                     </div>
                     <h3 class="fw-bold mb-0">{{ $payments->total() }}</h3>
-                </div>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+    <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Successful</h6>
+                <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-check-double-line text-success"></i></span>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Successful</h6>
-                        <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-check-double-line text-success"></i></span>
-                    </div>
-                    <h3 class="fw-bold mb-0">{{ $payments->where('status', 'success')->count() }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Failed</h6>
-                        <span class="bg-danger bg-opacity-10 rounded-circle p-2"><i class="ri-close-circle-line text-danger"></i></span>
-                    </div>
-                    <h3 class="fw-bold mb-0">{{ $payments->where('status', 'failed')->count() }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Total Amount</h6>
-                        <span class="bg-info bg-opacity-10 rounded-circle p-2"><i class="ri-calculator-line text-info"></i></span>
-                    </div>
-                    <h3 class="fw-bold mb-0">{{ number_format($payments->sum('amount'), 2) }}</h3>
-                </div>
-            </div>
+            <h3 class="fw-bold mb-0">{{ $payments->where('status', 'success')->count() }}</h3>
         </div>
     </div>
-
-    <!-- Transactions Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Transaction History</h5>
+</div>
+<div class="col-md-3">
+    <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Failed</h6>
+                <span class="bg-danger bg-opacity-10 rounded-circle p-2"><i class="ri-close-circle-line text-danger"></i></span>
+            </div>
+            <h3 class="fw-bold mb-0">{{ $payments->where('status', 'failed')->count() }}</h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Reference</th>
-                            <th>Currency</th>
-                            <th>Amount</th>
-                            <th>VAT</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Total Amount</h6>
+                <span class="bg-info bg-opacity-10 rounded-circle p-2"><i class="ri-calculator-line text-info"></i></span>
+            </div>
+            <h3 class="fw-bold mb-0">{{ number_format($payments->sum('amount'), 2) }}</h3>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Transaction History</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Currency</th>
+                        <th>Amount</th>
+                        <th>VAT</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                    <tbody>
+                <tbody>
                     @forelse($payments as $payment)
-                        <tr>
-                            <td>
-                                <span class="fw-semibold">{{ $payment->reference }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">{{ $payment->currency }}</span>
-                            </td>
-                            <td>
-                                <span class="fw-bold text-primary">{{ number_format($payment->amount, 2) }}</span>
-                            </td>
-                            <td>
-                                <span class="text-muted">{{ number_format($payment->vat_value, 2) }}</span>
-                            </td>
-                            <td>
-                                @if($payment->status === 'success')
-                                <span class="badge bg-success">Success</span>
-                                @elseif($payment->status === 'failed')
-                                <span class="badge bg-danger">Failed</span>
-                                @else
-                                <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <small class="text-muted">{{ $payment->created_at ? $payment->created_at->format('M d, Y H:i') : '-' }}</small>
-                            </td>
-                            <td>
-                                <button class="btn btn-outline-primary btn-sm view-details-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#transactionModal"
-                                    data-reference="{{ $payment->reference }}"
-                                    data-currency="{{ $payment->currency }}"
-                                    data-amount="{{ number_format($payment->amount, 2) }}"
-                                    data-vat="{{ number_format($payment->vat_value, 2) }}"
-                                    data-status="{{ $payment->status }}"
-                                    data-date="{{ $payment->created_at ? $payment->created_at->format('M d, Y H:i') : '-' }}"
-                                    data-items="{{ json_encode($payment->order->items ?? []) }}">
-                                    <i class="ri-eye-line me-1"></i> View Details
-                                </button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">{{ $payment->reference }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ $payment->currency }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-primary">{{ number_format($payment->amount, 2) }}</span>
+                        </td>
+                        <td>
+                            <span class="text-muted">{{ number_format($payment->vat_value, 2) }}</span>
+                        </td>
+                        <td>
+                            @if($payment->status === 'success')
+                            <span class="badge bg-success">Success</span>
+                            @elseif($payment->status === 'failed')
+                            <span class="badge bg-danger">Failed</span>
+                            @else
+                            <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ $payment->created_at ? $payment->created_at->format('M d, Y H:i') : '-' }}</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm view-details-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#transactionModal"
+                                data-reference="{{ $payment->reference }}"
+                                data-currency="{{ $payment->currency }}"
+                                data-amount="{{ number_format($payment->amount, 2) }}"
+                                data-vat="{{ number_format($payment->vat_value, 2) }}"
+                                data-status="{{ $payment->status }}"
+                                data-date="{{ $payment->created_at ? $payment->created_at->format('M d, Y H:i') : '-' }}"
+                                data-items="{{ json_encode($payment->order->items ?? []) }}">
+                                <i class="ri-eye-line me-1"></i> View Details
+                            </button>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="ri-money-dollar-circle-line display-4 mb-2"></i>
-                                <p>No transactions found</p>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="ri-money-dollar-circle-line display-4 mb-2"></i>
+                            <p>No transactions found</p>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="text-muted small">
-                    Showing <span class="fw-semibold">{{ $payments->firstItem() }}</span> to <span class="fw-semibold">{{ $payments->lastItem() }}</span> of <span class="fw-semibold">{{ $payments->total() }}</span> results
-                </div>
-                <div>
-            {{ $payments->links() }}
-                </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted small">
+                Showing <span class="fw-semibold">{{ $payments->firstItem() }}</span> to <span class="fw-semibold">{{ $payments->lastItem() }}</span> of <span class="fw-semibold">{{ $payments->total() }}</span> results
             </div>
-        </div>
-    </div>
-
-    <!-- Transaction Details Modal -->
-    <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="transactionModalLabel">
-                        Transaction Details
-                        <span class="text-muted" id="modalReference"></span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Payment Information -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h6 class="card-title mb-0">Payment Information</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <small class="text-muted">Reference</small>
-                                            <div class="fw-semibold" id="modalReferenceText"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">Status</small>
-                                            <div id="modalStatus"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">Currency</small>
-                                            <div class="fw-semibold" id="modalCurrency"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">Date</small>
-                                            <div class="fw-semibold" id="modalDate"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h6 class="card-title mb-0">Amount Breakdown</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <small class="text-muted">Amount</small>
-                                            <div class="fw-bold text-primary" id="modalAmount"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">VAT</small>
-                                            <div class="fw-semibold" id="modalVat"></div>
-                                        </div>
-                                        <div class="col-12">
-                                            <hr>
-                                            <div class="d-flex justify-content-between">
-                                                <span class="fw-bold">Total</span>
-                                                <span class="fw-bold text-success" id="modalTotal"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div class="card" id="orderItemsCard" style="display: none;">
-                        <div class="card-header">
-                            <h6 class="card-title mb-0">Items Purchased</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm" id="orderItemsTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Item Type</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="orderItemsBody">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- No Items Alert -->
-                    <div class="alert alert-info" id="noItemsAlert" style="display: none;">
-                        <i class="ri-information-line me-2"></i>
-                        No order items found for this payment.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+            <div>
+                {{ $payments->links() }}
             </div>
         </div>
     </div>
 </div>
 
+<!-- Transaction Details Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">
+                    Transaction Details
+                    <span class="text-muted" id="modalReference"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Payment Information -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Payment Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Reference</small>
+                                        <div class="fw-semibold" id="modalReferenceText"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Status</small>
+                                        <div id="modalStatus"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Currency</small>
+                                        <div class="fw-semibold" id="modalCurrency"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Date</small>
+                                        <div class="fw-semibold" id="modalDate"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Amount Breakdown</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Amount</small>
+                                        <div class="fw-bold text-primary" id="modalAmount"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">VAT</small>
+                                        <div class="fw-semibold" id="modalVat"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-bold">Total</span>
+                                            <span class="fw-bold text-success" id="modalTotal"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card" id="orderItemsCard" style="display: none;">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Items Purchased</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="orderItemsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item Type</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderItemsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Items Alert -->
+                <div class="alert alert-info" id="noItemsAlert" style="display: none;">
+                    <i class="ri-information-line me-2"></i>
+                    No order items found for this payment.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+--}}
 
 
 @push('scripts')

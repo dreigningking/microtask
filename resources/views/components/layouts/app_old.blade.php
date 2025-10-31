@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Wonegig Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{asset('frontend/vendors/feather/feather.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/css/vendor.bundle.base.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/font-awesome/css/font-awesome.min.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/vendors/mdi/css/materialdesignicons.min.css')}}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('frontend/js/select.dataTables.min.css')}}">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{asset('frontend/css/variables.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/dashboard-overrides.css')}}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{{asset('frontend/images/favicon1.png')}}" />
+    @livewireStyles
+    @stack('styles')
+</head>
+
+<body>
+    <div class="container-scroller">
+
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+
+                <a class="navbar-brand brand-logo me-5" href="{{route('index')}}">
+                    <img src="{{asset('frontend/images/logo2.png')}}" alt="Wonegig" style="height:50px;">
+                </a>
+                <a class="navbar-brand brand-logo-mini" href="{{route('index')}}">
+                    <img src="{{asset('frontend/images/favicon1.png')}}" alt="logo" />
+                </a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+                <ul class="navbar-nav mr-lg-2">
+                    <li class="nav-item nav-search d-none d-lg-block border rounded">
+                        <div class="input-group">
+                            <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                                <span class="input-group-text" id="search">
+                                    <i class="icon-search"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
+                        </div>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="btn btn-outline-primary" href="#">Post Job</a>
+                    </li> -->
+                </ul>
+                <ul class="navbar-nav navbar-nav-right">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
+                            <i class="icon-bell mx-0"></i>
+                            @livewire('dashboard-area.notifications.notification-dropdown')
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center">
+                                <p class="mb-0 font-weight-normal float-left">Recent Notifications</p>
+                                <!-- <a href="{{ route('notifications') }}" class="btn btn-outline-primary btn-sm float-right">View All</a> -->
+                            </div>
+                            @livewire('dashboard-area.notifications.notification-dropdown-content')
+                        </div>
+                    </li>
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
+                            <img src="{{asset('frontend/images/faces/face28.jpg')}}" alt="profile" />
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            <a class="dropdown-item" href="{{ route('profile') }}">
+                                <i class="ti-settings text-primary"></i> Profile </a>
+                            <a class="dropdown-item" href="{{ route('subscriptions') }}">
+                                <i class="ti-settings text-primary"></i> Subscription </a>
+                            <a href="{{ route('logout') }}" class="dropdown-item" wire:click.prevent="logout">
+                                <i class="ti-power-off text-primary"></i> Logout </a>
+                        </div>
+                    </li>
+                    
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_sidebar.html -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar" style="background-color: var(--dark-purple);">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
+                            <i class="icon-grid menu-icon"></i>
+                            <span class="menu-title">Dashboard</span>
+                        </a>
+                    </li>
+
+
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+                            <i class="icon-columns menu-icon"></i>
+                            <span class="menu-title">Jobs</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="auth">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.create')}}"> New Job </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.ongoing')}}"> Ongoing Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.completed')}}"> Completed Jobs </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.drafts')}}"> Drafts </a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
+                            <i class="icon-layout menu-icon"></i>
+                            <span class="menu-title">Tasks</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="error">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.ongoing') }}"> Ongoing Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.completed') }}"> Completed Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.submitted') }}"> Submitted Tasks </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.saved') }}"> Saved Tasks </a></li>
+                    </ul>
+                </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#earnings" aria-expanded="false" aria-controls="earnings">
+                            <i class="icon-bar-graph menu-icon"></i>
+                            <span class="menu-title">Earnings</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="earnings">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.settlements') }}"> Settlements </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.withdrawals') }}"> Withdrawals </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{ route('earnings.exchanges') }}"> Exchanges </a></li>
+                    </ul>
+                </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('transactions') }}">
+                            <i class="icon-paper menu-icon"></i>
+                            <span class="menu-title">Transactions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('invitees') }}">
+                            <i class="icon-head menu-icon"></i>
+                            <span class="menu-title">Invites</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('support') }}">
+                            <i class="mdi mdi-comment-account-outline menu-icon fs-5"></i>
+                            <span class="menu-title">Support</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- partial -->
+            <div class="main-panel">
+                {{ $slot }}
+                <!-- content-wrapper ends -->
+                <!-- partial:partials/_footer.html -->
+                <footer class="footer">
+                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2023. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
+                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ms-1"></i></span>
+                </div>
+                </footer>
+                <!-- partial -->
+            </div>
+            <!-- main-panel ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{{asset('frontend/vendors/js/vendor.bundle.base.js')}}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="{{asset('frontend/vendors/chart.js/chart.umd.js')}}"></script>
+    <script src="{{asset('frontend/vendors/datatables.net/jquery.dataTables.js')}}"></script>
+    <script src="{{asset('frontend/vendors/datatables.net-bs5/dataTables.bootstrap5.js')}}"></script>
+    <script src="{{asset('frontend/js/dataTables.select.min.js')}}"></script>
+
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="{{asset('frontend/js/jquery.min.js')}}" type="text/javascript"></script>
+    
+    @livewireScripts
+    <script>
+		$(document).ready(function() {
+			Livewire.on('closeModal', function(data) {
+				console.log('Close modal event received:', data);
+				const modalId = data[0].modalId;
+
+				const modalEl = document.getElementById(modalId);
+
+				// Check if Bootstrap modal instance already exists
+				let modalInstance = bootstrap.Modal.getInstance(modalEl);
+				if (!modalInstance) {
+					// If not, create a new instance (Bootstrap 5)
+					modalInstance = new bootstrap.Modal(modalEl);
+				}
+				// Hide the modal with Bootstrap 5 API
+				modalInstance.hide();
+			});
+		});
+	</script>
+    @stack('scripts')
+</body>
+
+</html>

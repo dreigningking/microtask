@@ -68,7 +68,7 @@ class ListJobs extends Component
             })
             ->whereDoesntHave('taskSubmissions', function($query) {
                 $query->whereNotNull('completed_at');
-            }, '>=', DB::raw('number_of_people'))
+            }, '>=', DB::raw('number_of_submissions'))
             ->count();
         
         // Calculate completed tasks
@@ -76,7 +76,7 @@ class ListJobs extends Component
         foreach ($tasks as $task) {
             $workerCount = TaskWorker::where('task_id', $task->id)->count();
             
-            if ($workerCount >= $task->number_of_people && $task->is_active) {
+            if ($workerCount >= $task->number_of_submissions && $task->is_active) {
                 $this->stats['completed']++;
             }
             
@@ -106,13 +106,13 @@ class ListJobs extends Component
                           })
                           ->whereDoesntHave('taskSubmissions', function($q) {
                               $q->whereNotNull('completed_at');
-                          }, '>=', DB::raw('number_of_people'));
+                          }, '>=', DB::raw('number_of_submissions'));
                         break;
                     case 'completed':
                         $q->where('is_active', true)
                           ->whereHas('taskSubmissions', function($q) {
                               $q->whereNotNull('completed_at');
-                          }, '>=', DB::raw('number_of_people'));
+                          }, '>=', DB::raw('number_of_submissions'));
                         break;
                     case 'drafts':
                         $q->where('is_active', false);

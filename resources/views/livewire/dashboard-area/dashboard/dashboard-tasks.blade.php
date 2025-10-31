@@ -92,7 +92,7 @@
                 <div class="mb-3 border-bottom pb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">{{ $taskWorker->task->title }}</h5>
-                        <span class="badge bg-success">{{ $userData->country->currency_symbol }}{{ $taskWorker->task->budget_per_person }}</span>
+                        <span class="badge bg-success">{{ $userData->country->currency_symbol }}{{ $taskWorker->task->budget_per_submission }}</span>
                     </div>
                     <div class="text-muted small mb-1">
                         <i class="ri-building-line"></i> {{ optional($taskWorker->task->user)->name ?? 'Anonymous' }} &middot;
@@ -162,7 +162,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fw-bold text-success">+{{ $userData->country->currency_symbol }}{{ $taskWorker->task->budget_per_person }}</div>
+                        <div class="fw-bold text-success">+{{ $userData->country->currency_symbol }}{{ $taskWorker->task->budget_per_submission }}</div>
                         <small class="text-muted">
                             @if($taskWorker->taskSubmissions->isNotEmpty() && $taskWorker->taskSubmissions->first()->paid_at)
                             <span class="text-success">Paid {{ $taskWorker->taskSubmissions->first()->paid_at->diffForHumans() }}</span>

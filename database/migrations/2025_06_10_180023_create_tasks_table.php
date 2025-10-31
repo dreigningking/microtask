@@ -25,9 +25,9 @@ return new class extends Migration
             $table->timestamp('expiry_date')->nullable();
             $table->json('requirements')->nullable();
             $table->json('template_data')->nullable();
-            $table->integer('number_of_people')->default(1);
+            $table->integer('number_of_submissions')->default(1);
             $table->enum('visibility', ['public','private'])->default('public');
-            $table->string('budget_per_person')->default(0);
+            $table->string('budget_per_submission')->default(0);
             $table->enum('monitoring_type', ['self_monitoring', 'admin_monitoring','system_monitoring'])->default('self_monitoring');
             $table->boolean('allow_multiple_submission')->default(0);
             $table->string('submission_interval_minutes')->default(60); //one off,

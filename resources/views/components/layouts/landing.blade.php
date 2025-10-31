@@ -137,8 +137,8 @@
                     <h5 class="footer-title">Contact Us</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Remote Lane, Innovation City, USA</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +1 (555) 123-4567</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@wonegig.com</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> </li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> </li>
                     </ul>
                     <div class="mt-3">
                         <div class="input-group">

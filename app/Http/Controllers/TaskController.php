@@ -83,10 +83,10 @@ class TaskController extends Controller
 
         // Budget range filter
         if ($request->filled('budget_min')) {
-            $query->where('budget_per_person', '>=', $request->budget_min);
+            $query->where('budget_per_submission', '>=', $request->budget_min);
         }
         if ($request->filled('budget_max')) {
-            $query->where('budget_per_person', '<=', $request->budget_max);
+            $query->where('budget_per_submission', '<=', $request->budget_max);
         }
 
         // Sort by
@@ -285,10 +285,10 @@ class TaskController extends Controller
         }
 
         if ($request->filled('budget_min')) {
-            $query->where('budget_per_person', '>=', $request->budget_min);
+            $query->where('budget_per_submission', '>=', $request->budget_min);
         }
         if ($request->filled('budget_max')) {
-            $query->where('budget_per_person', '<=', $request->budget_max);
+            $query->where('budget_per_submission', '<=', $request->budget_max);
         }
 
         $sortBy = $request->get('sort_by', 'created_at');
@@ -324,8 +324,8 @@ class TaskController extends Controller
                     $task->platform->name ?? 'N/A',
                     $task->monitoring_type ?? 'N/A',
                     $task->is_active ? 'Active' : 'Inactive',
-                    $task->number_of_people,
-                    $task->budget_per_person,
+                    $task->number_of_submissions,
+                    $task->budget_per_submission,
                     $task->currency,
                     $task->created_at->format('Y-m-d H:i:s'),
                     $task->approved_at ? $task->approved_at->format('Y-m-d H:i:s') : 'N/A',
@@ -463,7 +463,7 @@ class TaskController extends Controller
             return redirect()->back()->with('error', 'Submission must be completed before payment can be disbursed.');
         }
 
-        $amount = $submission->task->budget_per_person;
+        $amount = $submission->task->budget_per_submission;
 
         // Create settlement record
         $settlement = \App\Models\Settlement::create([

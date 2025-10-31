@@ -9,7 +9,7 @@ use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 
-#[Layout('components.layouts.landing')]
+
 class ExploreTaskShow extends Component
 {
     use GeoLocationTrait;
@@ -50,11 +50,11 @@ class ExploreTaskShow extends Component
             abort(404, 'Task not available in your country.');
         }
 
-        if (count($this->task->workers->whereNotNull('accepted_at')) >= $this->task->number_of_people) {
+        if (count($this->task->workers->whereNotNull('accepted_at')) >= $this->task->number_of_submissions) {
             // If all slots filled and all have submitted
             $allSubmitted = $this->task->taskSubmissions()
                 ->whereNotNull('completed_at')
-                ->count() >= $this->task->number_of_people;
+                ->count() >= $this->task->number_of_submissions;
             if ($allSubmitted) {
                 $this->canStartOrSave = false;
             }
