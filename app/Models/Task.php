@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Http\Traits\HelperTrait;
 use App\Models\OrderItem;
 use App\Models\Settlement;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 
 class Task extends Model
 {
-    use Sluggable;
+    use Sluggable,HelperTrait;
 
     protected $fillable = [
         'title',
@@ -134,6 +136,20 @@ class Task extends Model
         
     }
 
+    public function getAvailableAttribute(){
+        if(!$this->is_active)
+            return false;
+        if(!$this->approved_at)
+            return false;
+        if($this->expiry_date < now())
+            return false;
+        if($this->number_of_submissions >= $this->taskSubmissions->whereNotNull('paid_at')->count())
+            return false;
+        if($this->restricted_countries && Auth::check() && in_array(Auth::user()->country_id,$this->restricted_countries))
+            return false;
+        return true;
+    }
+
     public function getStatusAttribute()
     {
         if (!$this->is_active) {
@@ -184,5 +200,27 @@ class Task extends Model
                 $q->where('country_id', auth()->user()->country_id);
             });
         });
+    }
+
+    public function getRemainingTimeAttribute(){
+        if($this->expiry_date < now())
+            return null;
+        $minutes = $this->expiry_date->diffInMinutes(now());
+        $hours = floor($minutes / 60);
+        $days = floor($hours / 24);
+        $weeks = floor($days / 7);
+        $months = floor($days / 30);
+        
+        if ($minutes < 60) {
+            return $minutes . ' mins';
+        } elseif ($hours < 24) {
+            return $hours . ' hr' . ($hours > 1 ? 's' : '');
+        } elseif ($days < 7) {
+            return $days . ' day' . ($days > 1 ? 's' : '');
+        } elseif ($weeks < 4) {
+            return $weeks . ' week' . ($weeks > 1 ? 's' : '');
+        } else {
+            return $months . ' month' . ($months > 1 ? 's' : '');
+        }
     }
 }

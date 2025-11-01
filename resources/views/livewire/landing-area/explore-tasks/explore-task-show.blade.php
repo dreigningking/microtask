@@ -10,18 +10,18 @@
                         </ol>
                     </nav>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-success me-2">Active</span>
-                        <span class="badge bg-light text-dark">Social Media</span>
+                        <span class="badge @if($task->available) bg-success @else bg-danger @endif me-2">{{$task->available ? 'Active':'Not Available'}}</span>
+                        <span class="badge bg-light text-dark">{{ $task->platform->name }}</span>
                     </div>
-                    <h1 class="h3 mb-2">Create 5 Instagram Posts for Coffee Shop</h1>
+                    <h1 class="h3 mb-2">{{ $task->title }}</h1>
                     <div class="d-flex align-items-center text-white-50">
-                        <span class="me-3"><i class="bi bi-people"></i> 12 submissions received</span>
-                        <span><i class="bi bi-clock"></i> 3 days left</span>
+                        <span class="me-3"><i class="bi bi-people"></i> {{ $task->taskSubmissions->count() }} submissions received</span>
+                        <span><i class="bi bi-clock"></i> {{ !$task->remaining_time ? 'Expired': $task->remaining_time.' left'  }} </span>
                     </div>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <div class="h2 text-warning mb-1">$45</div>
-                    <small class="text-white-50">Per approved submission • Multiple submissions allowed</small>
+                    <div class="h2 text-warning mb-1">{{ $task->user->country->currency_symbol ?? '$' }}{{ number_format($task->budget_per_submission, 2) }}</div>
+                    <small class="text-white-50">Per approved submission • {{ $task->allow_multiple_submissions ? 'Multiple submissions allowed': 'One time submission' }}</small>
                 </div>
             </div>
         </div>
@@ -39,20 +39,20 @@
                         </div>
                         <div class="card-body">
                             <h6>Description</h6>
-                            <p>I need 5 engaging Instagram posts created for my coffee shop "Brew & Bean". The posts should reflect our brand aesthetic - minimalist, warm, and inviting.</p>
+                            <p>{{ $task->description }}</p>
 
+                            @if(is_array($task->requirements) && count($task->requirements)) 
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <h6>Requirements</h6>
                                     <ul class="list-unstyled">
-                                        <li><i class="bi bi-check-circle text-success me-2"></i> Image size: 1080x1080px</li>
-                                        <li><i class="bi bi-check-circle text-success me-2"></i> Format: JPEG or PNG</li>
-                                        <li><i class="bi bi-check-circle text-success me-2"></i> Brand colors: #8B4513, #DEB887</li>
-                                        <li><i class="bi bi-check-circle text-success me-2"></i> Include caption & hashtags</li>
+                                        @foreach($task->requirements as $requirement)
+                                        <li><i class="bi bi-check-circle text-success me-2"></i> {{ $requirement }}</li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </div>
-
+                            @endif
                             <div class="mt-4">
                                 <h6>Submission Information</h6>
                                 <div class="d-flex justify-content-between">
@@ -87,7 +87,7 @@
                                 <div class="d-flex align-items-center">
                                     <img src="https://placehold.co/60" alt="Poster" class="rounded-circle me-3">
                                     <div class="flex-grow-1">
-                                        <h5 class="mb-1">Mike Chen</h5>
+                                        <h5 class="mb-1">{{ $task->user->username }}</h5>
                                         <div class="text-warning mb-2">
                                             <i class="bi bi-star-fill"></i>
                                             <i class="bi bi-star-fill"></i>
@@ -98,12 +98,13 @@
                                         </div>
                                         <p class="text-muted mb-0">Member since {{ $task->user->created_at->format('M Y') }}</p>
                                     </div>
+                                
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- My Submissions -->
+                        <!-- My Submissions -->
                     <div class="card mb-4">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">My Submissions</h5>
@@ -170,6 +171,7 @@
                     </div>
 
                 </div>
+                
 
                 <div class="col-lg-4">
                     <!-- BEFORE APPLYING -->
@@ -177,6 +179,7 @@
                         <div class="card-header bg-transparent">
                             <h5 class="mb-0">Apply for this Task</h5>
                         </div>
+                        @if(!$hasStarted)
                         <div class="card-body">
                             <div class="form-check">
                                 <input type="checkbox" wire:model.live="agreementAccepted" class="form-check-input" id="agreement">
@@ -192,6 +195,7 @@
                                 Submit Application
                             </button>
                         </div>
+                        @else
                         <div class="card-body">
                             <div class="alert alert-success">
                                 <i class="bi bi-check-circle"></i> Your have applied for this task! Please submit your work before the deadline.
@@ -200,6 +204,7 @@
                                 Withdraw Application
                             </button>
                         </div>
+                        @endif
                     </div>
 
                     <div class="card mb-4">
@@ -217,7 +222,7 @@
                     </div>
 
                     <!-- AFTER ACCEPTANCE (Hidden by default) -->
-                    <div class="card" id="afterAcceptanceSection">
+                    <div class="card mb-4" id="afterAcceptanceSection">
                         <div class="card-header bg-transparent">
                             <h5 class="mb-0">Submit Your Work</h5>
                         </div>
@@ -272,8 +277,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Task Stats -->
 
                 </div>
 
