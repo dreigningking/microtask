@@ -39,9 +39,9 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group form-switch m-3">
-                                                <input type="hidden" name="enable_system_monitoring" value="0">
-                                                <input class="form-check-input" type="checkbox" id="enableSystemMonitoring" name="enable_system_monitoring" value="1" {{ optional($settings->where('name','enable_system_monitoring')->first())->value == 1 ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="enableSystemMonitoring">Enable System Monitoring</label>
+                                                <input type="hidden" name="enable_system_review" value="0">
+                                                <input class="form-check-input" type="checkbox" id="enableSystemReview" name="enable_system_review" value="1" {{ optional($settings->where('name','enable_system_review')->first())->value == 1 ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="enableSystemReview">Enable System Review</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">

@@ -42,7 +42,7 @@
                             <button type="button"
                                 class="btn btn-primary w-100 py-3 fw-semibold"
                                 wire:click="otp_send">
-                                <i class="fas fa-paper-plane me-2"></i>
+                                <i class="fas fa-paper-boostere me-2"></i>
                                 Get Verification Code
                             </button>
                             @if (session()->has('otp_sent'))

@@ -122,10 +122,10 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
             Route::put('roles/{role}', [SettingController::class, 'updateRole'])->name('roles.update');
             Route::delete('roles/{role}', [SettingController::class, 'destroyRole'])->name('roles.destroy');
 
-            Route::get('plans', [SettingController::class, 'plans'])->name('plans');
-            Route::post('plans/store', [SettingController::class, 'store_plans'])->name('plans.store');
-            Route::post('plans/update', [SettingController::class, 'update_plans'])->name('plans.update');
-            Route::post('plans/delete', [SettingController::class, 'destroy_plans'])->name('plans.destroy');
+            Route::get('boosters', [SettingController::class, 'boosters'])->name('boosters');
+            Route::post('boosters/store', [SettingController::class, 'store_boosters'])->name('boosters.store');
+            Route::post('boosters/update', [SettingController::class, 'update_boosters'])->name('boosters.update');
+            Route::post('boosters/delete', [SettingController::class, 'destroy_boosters'])->name('boosters.destroy');
 
             Route::get('/templates', [SettingController::class, 'templates'])->name('templates');
             Route::post('templates/store', [SettingController::class, 'store_templates'])->name('templates.store');
@@ -150,7 +150,7 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
             Route::post('countries/tasks', [CountrySettingsController::class, 'saveTasks'])->name('countries.tasks');
             Route::post('countries/notification-emails', [CountrySettingsController::class, 'saveNotificationEmails'])->name('countries.notification_emails');
             Route::post('countries/template-prices', [CountrySettingsController::class, 'saveTemplatePrices'])->name('countries.template_prices');
-            Route::post('countries/plan-prices', [CountrySettingsController::class, 'savePlanPrices'])->name('countries.plan_prices');
+            Route::post('countries/booster-prices', [CountrySettingsController::class, 'saveBoosterPrices'])->name('countries.booster_prices');
             Route::post('countries/verification-settings', [CountrySettingsController::class, 'saveVerificationSettings'])->name('countries.verification_settings');
         
         });

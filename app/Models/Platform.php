@@ -2,21 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\TaskTemplate;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Platform extends Model
 {
-    use HasFactory, Sluggable;
-    protected $connection = 'mysql'; 
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'slug',
@@ -25,25 +16,71 @@ class Platform extends Model
         'is_active',
     ];
 
-    public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => 'name',
-                'onUpdate' => true,
-            ]
-        ];
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     /**
-     * Get the tasks for the platform.
+     * Get all platform templates for this platform
      */
-    public function tasks()
+    public function templates(): HasMany
+    {
+        return $this->hasMany(PlatformTemplate::class);
+    }
+
+    /**
+     * Get tasks that use this platform
+     */
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    public function templates()
+    /**
+     * Get users who prefer this platform
+     */
+    public function preferredByUsers(): BelongsToMany
     {
-        return $this->hasMany(TaskTemplate::class);
+        return $this->belongsToMany(User::class, 'preferred_platforms');
+    }
+
+    /**
+     * Get users who have this platform in their cart
+     */
+    public function inCarts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Check if platform is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * Scope for active platforms
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope for platforms by slug
+     */
+    public function scopeBySlug($query, $slug)
+    {
+        return $query->where('slug', $slug);
+    }
+
+    /**
+     * Scope for platforms with templates
+     */
+    public function scopeWithTemplates($query)
+    {
+        return $query->has('templates');
     }
 }

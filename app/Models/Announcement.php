@@ -44,4 +44,20 @@ class Announcement extends Model
     {
         return $query->where('status', 'failed');
     }
+
+    /**
+     * Check if announcement was sent successfully
+     */
+    public function isSuccessful(): bool
+    {
+        return $this->status === 'sent';
+    }
+
+    /**
+     * Check if announcement failed to send
+     */
+    public function hasFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
 }

@@ -18,13 +18,13 @@
                                     Full Name
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-user text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-person"></i>
                                     </span>
                                     <input type="text"
                                         id="name"
                                         wire:model="name"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control border-start-0 py-3"
                                         placeholder="John Doe"
                                         required>
                                 </div>
@@ -42,13 +42,13 @@
                                     Email Address
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-envelope text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-envelope"></i>
                                     </span>
                                     <input type="email"
                                         id="email"
                                         wire:model="email"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control border-start-0 py-3"
                                         placeholder="your@email.com"
                                         required>
                                 </div>
@@ -66,13 +66,13 @@
                                     Password
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-lock text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-lock"></i>
                                     </span>
                                     <input type="password"
                                         id="password"
                                         wire:model="password"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control border-start-0 py-3"
                                         placeholder="••••••••"
                                         required>
                                 </div>
@@ -90,13 +90,13 @@
                                     Confirm Password
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-lock text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-lock"></i>
                                     </span>
                                     <input type="password"
                                         id="password_confirmation"
                                         wire:model="password_confirmation"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control border-start-0 py-3"
                                         placeholder="••••••••"
                                         required>
                                 </div>
@@ -128,7 +128,7 @@
 
                             <!-- Create Account Button -->
                             <button type="submit"
-                                class="btn btn-primary w-100 mb-3">
+                                class="btn btn-primary w-100 mb-3 py-3">
                                 <i class="bi bi-person-fill-up me-2"></i> Create Account
                             </button>
                         </form>
@@ -146,14 +146,14 @@
                             <div class="col-6">
                                 <button type="button"
                                     class="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center">
-                                    <i class="fab fa-google text-danger me-2"></i>
+                                    <i class="bi bi-google me-2"></i>
                                     <span class="small">Google</span>
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button type="button"
                                     class="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center">
-                                    <i class="fab fa-facebook text-primary me-2"></i>
+                                    <i class="bi bi-facebook text-primary me-2"></i>
                                     <span class="small">Facebook</span>
                                 </button>
                             </div>

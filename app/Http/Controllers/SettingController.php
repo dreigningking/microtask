@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Plan;
+use App\Models\Booster;
 use App\Models\Role;
 use App\Models\Task;
 use App\Models\User;
@@ -38,7 +38,7 @@ class SettingController extends Controller
     {
         
         $fields = [
-            'enable_system_monitoring' => 'boolean',
+            'enable_system_review' => 'boolean',
             'freeze_wallets_globally' => 'boolean',
             'allow_wallet_funds_exchange' => 'boolean',
             'job_invite_expiry' => 'integer|min:1',
@@ -366,16 +366,16 @@ class SettingController extends Controller
             ->with('success', 'Platform deleted successfully.');
     }
 
-    public function plans(){
-        // Get all plans with subscriptions count
-        $plans = Plan::withCount('subscriptions')
+    public function boosters(){
+        // Get all boosters with subscriptions count
+        $boosters = Booster::withCount('subscriptions')
             ->orderBy('name','asc')
             ->get();
             
-        return view('backend.settings.plans', compact('plans'));
+        return view('backend.settings.boosters', compact('boosters'));
     }
 
-    public function store_plans(Request $request)
+    public function store_boosters(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -384,84 +384,84 @@ class SettingController extends Controller
             'is_active' => 'nullable|boolean',
             // type-specific validation
             'featured_promotion' => 'nullable|boolean',
-            'urgency_promotion' => 'nullable|boolean',
+            'broadcast_promotion' => 'nullable|boolean',
             'active_tasks_per_hour' => 'nullable|numeric|min:1',
             'withdrawal_maximum_multiplier' => 'nullable|numeric|min:1',
         ]);
 
-        $plan = new Plan();
-        $plan->name = $request->name;
-        $plan->description = $request->description;
-        $plan->type = $request->type;
-        $plan->is_active = $request->has('is_active') ? true : false;
+        $booster = new Booster();
+        $booster->name = $request->name;
+        $booster->description = $request->description;
+        $booster->type = $request->type;
+        $booster->is_active = $request->has('is_active') ? true : false;
 
         if ($request->type === 'taskmaster') {
-            $plan->featured_promotion = $request->has('featured_promotion') ? true : false;
-            $plan->urgency_promotion = $request->has('urgency_promotion') ? true : false;
-            $plan->active_tasks_per_hour = 1;
-            $plan->withdrawal_maximum_multiplier = 1;
+            $booster->featured_promotion = $request->has('featured_promotion') ? true : false;
+            $booster->broadcast_promotion = $request->has('broadcast_promotion') ? true : false;
+            $booster->active_tasks_per_hour = 1;
+            $booster->withdrawal_maximum_multiplier = 1;
         } else {
-            $plan->featured_promotion = false;
-            $plan->urgency_promotion = false;
-            $plan->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
-            $plan->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
+            $booster->featured_promotion = false;
+            $booster->broadcast_promotion = false;
+            $booster->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
+            $booster->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
         }
-        $plan->save();
+        $booster->save();
 
-        return redirect()->back()->with('success', 'Plan created successfully.');
+        return redirect()->back()->with('success', 'Booster created successfully.');
     }
 
-    public function update_plans(Request $request)
+    public function update_boosters(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:plans,id',
+            'id' => 'required|exists:boosters,id',
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'type' => 'required|in:taskmaster,worker',
             'is_active' => 'nullable|boolean',
             // type-specific validation
             'featured_promotion' => 'nullable|boolean',
-            'urgency_promotion' => 'nullable|boolean',
+            'broadcast_promotion' => 'nullable|boolean',
             'active_tasks_per_hour' => 'nullable|numeric|min:1',
             'withdrawal_maximum_multiplier' => 'nullable|numeric|min:1',
         ]);
 
-        $plan = Plan::findOrFail($request->id);
-        $plan->name = $request->name;
-        $plan->description = $request->description;
-        $plan->type = $request->type;
-        $plan->is_active = $request->has('is_active') ? true : false;
+        $booster = Booster::findOrFail($request->id);
+        $booster->name = $request->name;
+        $booster->description = $request->description;
+        $booster->type = $request->type;
+        $booster->is_active = $request->has('is_active') ? true : false;
 
         if ($request->type === 'taskmaster') {
-            $plan->featured_promotion = $request->has('featured_promotion') ? true : false;
-            $plan->urgency_promotion = $request->has('urgency_promotion') ? true : false;
-            $plan->active_tasks_per_hour = 1;
-            $plan->withdrawal_maximum_multiplier = 1;
+            $booster->featured_promotion = $request->has('featured_promotion') ? true : false;
+            $booster->broadcast_promotion = $request->has('broadcast_promotion') ? true : false;
+            $booster->active_tasks_per_hour = 1;
+            $booster->withdrawal_maximum_multiplier = 1;
         } else {
-            $plan->featured_promotion = false;
-            $plan->urgency_promotion = false;
-            $plan->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
-            $plan->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
+            $booster->featured_promotion = false;
+            $booster->broadcast_promotion = false;
+            $booster->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
+            $booster->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
         }
-        $plan->save();
+        $booster->save();
 
-        return redirect()->back()->with('success', 'Plan updated successfully.');
+        return redirect()->back()->with('success', 'Booster updated successfully.');
     }
 
-    public function destroy_plans(Request $request)
+    public function destroy_boosters(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:plans,id',
+            'id' => 'required|exists:boosters,id',
         ]);
 
-        $plan = Plan::findOrFail($request->id);
+        $booster = Booster::findOrFail($request->id);
         // Optionally, check for subscriptions and prevent delete if needed
-        if ($plan->subscriptions()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete plan. It has active subscriptions.');
+        if ($booster->subscriptions()->count() > 0) {
+            return redirect()->back()->with('error', 'Cannot delete booster. It has active subscriptions.');
         }
-        $plan->delete();
+        $booster->delete();
 
-        return redirect()->back()->with('success', 'Plan deleted successfully.');
+        return redirect()->back()->with('success', 'Booster deleted successfully.');
     }
 
     /**

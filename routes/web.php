@@ -1,26 +1,28 @@
 <?php
 
-use App\Livewire\LandingArea\Welcome;
+use App\Livewire\Welcome;
+use App\Livewire\Boosters;
+use App\Livewire\Dashboard;
+use App\Livewire\Transactions;
+use App\Livewire\Blog\BlogIndex;
+use App\Livewire\Tasks\TaskEdit;
+use App\Livewire\Tasks\TaskList;
+use App\Livewire\Tasks\TaskShow;
+use App\Livewire\Blog\BlogSingle;
+use App\Livewire\Settings\Profile;
+use App\Livewire\Tasks\TaskCreate;
+use App\Livewire\Tasks\TaskManage;
+use App\Livewire\Tasks\PostedTasks;
+use App\Livewire\Tasks\TaskDispute;
+use App\Livewire\Tasks\AppliedTasks;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\LandingArea\AboutPage;
 use App\Http\Controllers\HomeController;
 use App\Livewire\LandingArea\TopEarners;
-use App\Livewire\DashboardArea\Dashboard;
 use App\Livewire\LandingArea\ContactPage;
 use App\Livewire\LandingArea\JobCreators;
 use App\Http\Controllers\PaymentController;
-use App\Livewire\DashboardArea\Jobs\EditJob;
-use App\Livewire\DashboardArea\Jobs\PostJob;
-use App\Livewire\DashboardArea\Jobs\ViewJob;
-use App\Livewire\DashboardArea\Transactions;
-use App\Livewire\LandingArea\Blog\BlogIndex;
-use App\Livewire\DashboardArea\Jobs\ListJobs;
-use App\Livewire\DashboardArea\Boosters;
-use App\Livewire\LandingArea\Blog\BlogSingle;
-use App\Livewire\DashboardArea\Tasks\ViewTask;
 use App\Livewire\DashboardArea\Support\Tickets;
-use App\Livewire\DashboardArea\Tasks\ListTasks;
-use App\Livewire\DashboardArea\Settings\Profile;
 use App\Livewire\LandingArea\Policies\Disclaimer;
 use App\Livewire\DashboardArea\Support\TicketView;
 use App\Livewire\LandingArea\Policies\PrivacyPolicy;
@@ -28,16 +30,20 @@ use App\Livewire\DashboardArea\Earnings\ListEarnings;
 use App\Livewire\DashboardArea\Referrals\InviteesList;
 use App\Livewire\LandingArea\Policies\DigitalMillenium;
 use App\Livewire\LandingArea\Policies\TermsAndConditions;
-use App\Livewire\LandingArea\ExploreTasks\ExploreTaskList;
-use App\Livewire\LandingArea\ExploreTasks\ExploreTaskShow;
 use App\Livewire\DashboardArea\Notifications\ListNotifications;
-use App\Livewire\DashboardArea\Support\Dispute;
 use App\Livewire\LandingArea\Policies\PaymentDisputeChargebacks;
 
-Route::get('dispute', Dispute::class)->name('dispute');
+Route::get('run',function(){
+    foreach(\App\Models\Comment::where('commentable_type','App\Models\Post')->get() as $comment){
+            \App\Models\Moderation::create(['moderatable_type'=> get_class($comment),'moderatable_id'=> $comment->id,
+            'moderator_id'=> 1,'purpose'=> 'created_content','status'=> 'pending','moderated_at'=> now()]);
+        
+    }
+    return 'done';
+});
 Route::get('/', Welcome::class)->name('index');
-Route::get('explore', ExploreTaskList::class)->name('explore');
-Route::get('task/{task}',ExploreTaskShow::class)->name('explore.task');
+Route::get('browse', TaskList::class)->name('explore');
+Route::get('task/{task}',TaskShow::class)->name('explore.task');
 Route::get('creators', JobCreators::class)->name('creators');
 Route::get('about', AboutPage::class)->name('about');
 Route::get('contact', ContactPage::class)->name('contact');
@@ -58,25 +64,15 @@ Route::view('review','post-job-review');
 
 Route::group(['middleware' => ['auth','check_user_active']], function () {
     Route::group(['middleware' => ['email_verified','two_factor']], function () {
-        /* Task Master */
-        Route::group(['prefix' => 'jobs','as'=>'jobs.'], function () {
-            Route::get('/', ListJobs::class)->name('index');
-            Route::get('ongoing', ListJobs::class)->name('ongoing');
-            Route::get('completed', ListJobs::class)->name('completed');
-            Route::get('drafts', ListJobs::class)->name('drafts');
-            Route::get('view/{task}', ViewJob::class)->name('view');
-            Route::get('create', PostJob::class)->name('create');
-            Route::get('edit/{task}', EditJob::class)->name('edit');
-        });
 
         /* Task Worker */
         Route::group(['prefix' => 'tasks','as'=>'tasks.'], function () {
-            Route::get('/', ListTasks::class)->name('index');
-            Route::get('ongoing', ListTasks::class)->name('ongoing');
-            Route::get('completed', ListTasks::class)->name('completed');
-            Route::get('submitted', ListTasks::class)->name('submitted');
-            Route::get('saved', ListTasks::class)->name('saved');
-            Route::get('view/{task}', ViewTask::class)->name('view');
+            Route::get('applied', AppliedTasks::class)->name('applied');
+            Route::get('posted', PostedTasks::class)->name('posted');
+            Route::get('create', TaskCreate::class)->name('create');
+            Route::get('edit/{task}', TaskEdit::class)->name('edit');
+            Route::get('manage/{task}', TaskManage::class)->name('manage');
+            Route::get('dispute/{task}', TaskDispute::class)->name('dispute');
         });
         /* Earnings */
         Route::group(['prefix' => 'earnings','as'=>'earnings.'], function () {

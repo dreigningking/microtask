@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\GeoLocationTrait;
 use Illuminate\Auth\Events\Registered;
-use App\Notifications\WelcomeNotification;
-use Livewire\Attributes\Layout;
+use App\Notifications\General\WelcomeNotification;
 
 class Register extends Component
 {

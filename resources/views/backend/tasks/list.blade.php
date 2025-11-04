@@ -93,7 +93,7 @@
 										<li><strong>Search:</strong> Type in the search box to find tasks by title or description</li>
 										<li><strong>Country:</strong> Filter by country (Super Admin only)</li>
 										<li><strong>Platform:</strong> Filter by task platform (e.g., Instagram, Facebook)</li>
-										<li><strong>Monitoring:</strong> Filter by monitoring type (Self, Admin, or System)</li>
+										<li><strong>Review:</strong> Filter by review type (Self, Admin, or System)</li>
 										<li><strong>Status:</strong> Filter by task status (Active, Inactive, Pending Approval, Approved)</li>
 									</ul>
 								</div>
@@ -113,7 +113,7 @@
 									<h6><i class="ri-lightbulb-line me-2"></i>Pro Tips</h6>
 									<div class="alert alert-info mb-0">
 										<ul class="mb-0">
-											<li>Filters auto-apply when you change dropdowns (Platform, Monitoring, Status, Sort)</li>
+											<li>Filters auto-apply when you change dropdowns (Platform, Review, Status, Sort)</li>
 											<li>Search has a 500ms delay to avoid excessive requests</li>
 											<li>Use the export feature to download filtered results as CSV</li>
 											<li>Click on filter badges to remove individual filters</li>
@@ -136,7 +136,7 @@
 						<h5 class="card-title">Search & Filters</h5>
 					</div>
 					<div class="card-body">
-						<form method="GET" action="{{ route('admin.tasks.index') }}" id="taskFiltersForm">
+						<form method="GET" action="{{ route('admin.tasks.applied') }}" id="taskFiltersForm">
 							<div class="row g-3">
 								<!-- Search Input -->
 								<div class="col-md-4">
@@ -173,13 +173,13 @@
 									</select>
 								</div>
 
-								<!-- Monitoring Type Filter -->
+								<!-- Review Type Filter -->
 								<div class="col-md-3">
-									<label for="monitoring_type" class="form-label">Monitoring Type</label>
-									<select class="form-select" id="monitoring_type" name="monitoring_type">
+									<label for="review_type" class="form-label">Review Type</label>
+									<select class="form-select" id="review_type" name="review_type">
 										<option value="">All Types</option>
-										@foreach($monitoringTypes as $key => $label)
-											<option value="{{ $key }}" {{ request('monitoring_type') == $key ? 'selected' : '' }}>
+										@foreach($reviewTypes as $key => $label)
+											<option value="{{ $key }}" {{ request('review_type') == $key ? 'selected' : '' }}>
 												{{ $label }}
 											</option>
 										@endforeach
@@ -249,7 +249,7 @@
 										<button type="submit" class="btn btn-primary" id="applyFiltersBtn">
 											<i class="ri-search-line me-1"></i>Apply Filters
 										</button>
-										<a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary">
+										<a href="{{ route('admin.tasks.applied') }}" class="btn btn-secondary">
 											<i class="ri-refresh-line me-1"></i>Clear Filters
 										</a>
 										<button type="button" class="btn btn-outline-info" id="exportBtn">
@@ -265,7 +265,7 @@
 		</div>
 
 		<!-- Active Filters Display -->
-		@if(request()->hasAny(['search', 'country_id', 'platform_id', 'monitoring_type', 'status', 'date_from', 'date_to', 'budget_min', 'budget_max']))
+		@if(request()->hasAny(['search', 'country_id', 'platform_id', 'review_type', 'status', 'date_from', 'date_to', 'budget_min', 'budget_max']))
 		<div class="row mb-3">
 			<div class="col-12">
 				<div class="card">
@@ -276,7 +276,7 @@
 							@if(request('search'))
 							<span class="badge bg-primary d-flex align-items-center gap-1 quick-filter-badge">
 								Search: "{{ request('search') }}"
-								<a href="{{ route('admin.tasks.index', request()->except('search')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except('search')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -285,7 +285,7 @@
 							@if(request('country_id') && auth()->user()->first_role->name === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.index', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -294,16 +294,16 @@
 							@if(request('platform_id'))
 							<span class="badge bg-success d-flex align-items-center gap-1 quick-filter-badge">
 								Platform: {{ $platforms->firstWhere('id', request('platform_id'))->name ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.index', request()->except('platform_id')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except('platform_id')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
 							@endif
 
-							@if(request('monitoring_type'))
+							@if(request('review_type'))
 							<span class="badge bg-warning d-flex align-items-center gap-1 quick-filter-badge">
-								Monitoring: {{ $monitoringTypes[request('monitoring_type')] ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.index', request()->except('monitoring_type')) }}" class="text-white text-decoration-none ms-1">
+								Review: {{ $reviewTypes[request('review_type')] ?? 'Unknown' }}
+								<a href="{{ route('admin.tasks.applied', request()->except('review_type')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -312,7 +312,7 @@
 							@if(request('status'))
 							<span class="badge bg-secondary d-flex align-items-center gap-1 quick-filter-badge">
 								Status: {{ ucfirst(str_replace('_', ' ', request('status'))) }}
-								<a href="{{ route('admin.tasks.index', request()->except('status')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except('status')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -321,7 +321,7 @@
 							@if(request('date_from') || request('date_to'))
 							<span class="badge bg-dark d-flex align-items-center gap-1 quick-filter-badge">
 								Date: {{ request('date_from', 'Any') }} to {{ request('date_to', 'Any') }}
-								<a href="{{ route('admin.tasks.index', request()->except(['date_from', 'date_to'])) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except(['date_from', 'date_to'])) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -330,13 +330,13 @@
 							@if(request('budget_min') || request('budget_max'))
 							<span class="badge bg-primary d-flex align-items-center gap-1 quick-filter-badge">
 								Budget: {{ request('budget_min', 'Any') }} to {{ request('budget_max', 'Any') }}
-								<a href="{{ route('admin.tasks.index', request()->except(['budget_min', 'budget_max'])) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.applied', request()->except(['budget_min', 'budget_max'])) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
 							@endif
 
-							<a href="{{ route('admin.tasks.index') }}" class="badge bg-danger text-decoration-none quick-filter-badge">
+							<a href="{{ route('admin.tasks.applied') }}" class="badge bg-danger text-decoration-none quick-filter-badge">
 								Clear All Filters
 							</a>
 						</div>
@@ -351,11 +351,11 @@
 				<div class="card">
 					<div class="card-header">
 						<h5 class="card-title">Tasks</h5>
-						<h6 class="card-subtitle text-muted">Manage and monitor task submissions with different monitoring types.</h6>
+						<h6 class="card-subtitle text-muted">Manage and monitor task submissions with different review types.</h6>
 					</div>
 					<div class="card-body">
 						<!-- Results Summary -->
-						@if(request()->hasAny(['search', 'country_id', 'platform_id', 'monitoring_type', 'status', 'date_from', 'date_to', 'budget_min', 'budget_max']))
+						@if(request()->hasAny(['search', 'country_id', 'platform_id', 'review_type', 'status', 'date_from', 'date_to', 'budget_min', 'budget_max']))
 						<div class="alert alert-info mb-3">
 							<strong>Filtered Results:</strong> 
 							Showing {{ $tasks->total() }} task(s) matching your criteria
@@ -368,8 +368,8 @@
 							@if(request('platform_id'))
 								• Platform: {{ $platforms->firstWhere('id', request('platform_id'))->name ?? 'Unknown' }}
 							@endif
-							@if(request('monitoring_type'))
-								• Monitoring: {{ $monitoringTypes[request('monitoring_type')] ?? 'Unknown' }}
+							@if(request('review_type'))
+								• Review: {{ $reviewTypes[request('review_type')] ?? 'Unknown' }}
 							@endif
 							@if(request('status'))
 								• Status: {{ ucfirst(str_replace('_', ' ', request('status'))) }}
@@ -417,9 +417,9 @@
 												<h6 class="mb-0">Pending Review</h6>
 												<h4 class="mb-0">{{ $tasks->filter(function($task) {
 													$submissions = $task->submissions ?? collect();
-													if ($task->monitoring_type === 'admin_monitoring') {
+													if ($task->review_type === 'admin_review') {
 														return $submissions->where('reviewed_at', null)->count() > 0;
-													} elseif ($task->monitoring_type === 'self_monitoring') {
+													} elseif ($task->review_type === 'self_review') {
 														$deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
 														return $submissions->filter(function($submission) use ($deadlineHours) {
 															if ($submission->reviewed_at) return false;
@@ -462,7 +462,7 @@
 										<th style="width: 12%">Owner & Country</th>
 										<th style="width: 10%">Platform</th>
 										<th style="width: 8%">Workers</th>
-										<th style="width: 12%">Monitoring</th>
+										<th style="width: 12%">Review</th>
 										<th style="width: 12%">Admin Review</th>
 										<th style="width: 8%">Posted</th>
 										<th style="width: 8%">Payment</th>
@@ -472,15 +472,15 @@
 								<tbody>
 									@foreach($tasks as $task)
 									@php
-										// Calculate monitoring status
+										// Calculate review status
 										$submissions = $task->submissions ?? collect();
 										$needsAdminReview = 0;
 										$escalatedSubmissions = 0;
 										
-										if ($task->monitoring_type === 'admin_monitoring') {
+										if ($task->review_type === 'admin_review') {
 											// All submissions need admin review
 											$needsAdminReview = $submissions->where('reviewed_at', null)->count();
-										} elseif ($task->monitoring_type === 'self_monitoring') {
+										} elseif ($task->review_type === 'self_review') {
 											// Only escalated submissions need admin review
 											$deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
 											$escalatedSubmissions = $submissions->filter(function($submission) use ($deadlineHours) {
@@ -544,7 +544,7 @@
 											</div>
 										</td>
 										<td>
-											@if($task->monitoring_type === 'self_monitoring')
+											@if($task->review_type === 'self_review')
 												<span class="badge bg-success">
 													<i class="ri-user-line me-1"></i>Self
 												</span>
@@ -553,11 +553,11 @@
 														<i class="ri-arrow-up-line me-1"></i>{{ $escalatedSubmissions }} escalated
 													</div>
 												@endif
-											@elseif($task->monitoring_type === 'admin_monitoring')
+											@elseif($task->review_type === 'admin_review')
 												<span class="badge bg-warning">
 													<i class="ri-shield-user-line me-1"></i>Admin
 												</span>
-											@elseif($task->monitoring_type === 'system_monitoring')
+											@elseif($task->review_type === 'system_review')
 												<span class="badge bg-info">
 													<i class="ri-cpu-line me-1"></i>System
 												</span>
@@ -656,7 +656,7 @@
 		}
 
 		// Auto-submit form when certain filters change
-		$('#platform_id, #monitoring_type, #status, #sort_by, #sort_order').on('change', function() {
+		$('#platform_id, #review_type, #status, #sort_by, #sort_order').on('change', function() {
 			setFormLoading(true);
 			$('#taskFiltersForm').submit();
 		});
@@ -678,7 +678,7 @@
 				// Create a temporary form for export
 				const exportForm = document.createElement('form');
 				exportForm.method = 'POST';
-				exportForm.action = '{{ route("admin.tasks.index") }}';
+				exportForm.action = '{{ route("admin.tasks.applied") }}';
 				exportForm.target = '_blank';
 				
 				// Add CSRF token
@@ -829,7 +829,7 @@
 					width: '200px'
 				},
 				{
-					targets: 4, // Monitoring column
+					targets: 4, // Review column
 					width: '120px'
 				},
 				{

@@ -9,15 +9,15 @@
         <a wire:navigate href="{{ route('index') }}" class="text-white hover:text-gray-200 @if(request()->is('/')) font-semibold border-b-2 border-white @endif">Home</a>
         <a wire:navigate href="{{ route('explore') }}" class="text-white hover:text-gray-200 @if(request()->is('explore')) font-semibold border-b-2 border-white @endif">Explore</a>
         @if($isAuthenticated)
-        <a wire:navigate href="{{ route('tasks.index') }}" class="text-white hover:text-gray-200 @if(request()->is('my-tasks')) font-semibold border-b-2 border-white @endif">My Tasks</a>
-        <a wire:navigate href="{{ route('jobs.index') }}" class="text-white hover:text-gray-200 @if(request()->is('my-jobs')) font-semibold border-b-2 border-white @endif">My Jobs</a>
+        <a wire:navigate href="{{ route('tasks.applied') }}" class="text-white hover:text-gray-200 @if(request()->is('my-tasks')) font-semibold border-b-2 border-white @endif">My Tasks</a>
+        <a wire:navigate href="{{ route('tasks.posted') }}" class="text-white hover:text-gray-200 @if(request()->is('my-jobs')) font-semibold border-b-2 border-white @endif">My Jobs</a>
         @endif
         
         
         
     </div>
     <div class="flex items-center space-x-4">
-        <a wire:navigate href="{{ route('jobs.create') }}"  class="bg-white text-primary px-4 py-2 rounded-button font-medium hover:bg-gray-100 whitespace-nowrap">Post a Job</a>
+        <a wire:navigate href="{{ route('tasks.create') }}"  class="bg-white text-primary px-4 py-2 rounded-button font-medium hover:bg-gray-100 whitespace-nowrap">Post a Job</a>
         @if($isAuthenticated)
             <div class="relative hidden md:block" id="notificationContainer">
                 <button id="notificationButton" class="w-8 h-8 flex items-center justify-center mr-2 relative">

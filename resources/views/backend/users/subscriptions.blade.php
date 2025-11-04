@@ -34,12 +34,12 @@
 								</div>
 
 								<div class="col-md-3 mb-3">
-									<label for="plan_id" class="form-label">Plan</label>
-									<select class="form-select" id="plan_id" name="plan_id">
-										<option value="">All Plans</option>
-										@foreach($plans as $plan)
-											<option value="{{ $plan->id }}" {{ request('plan_id') == $plan->id ? 'selected' : '' }}>
-												{{ $plan->name }} ({{ ucfirst($plan->type) }})
+									<label for="booster_id" class="form-label">Booster</label>
+									<select class="form-select" id="booster_id" name="booster_id">
+										<option value="">All Boosters</option>
+										@foreach($boosters as $booster)
+											<option value="{{ $booster->id }}" {{ request('booster_id') == $booster->id ? 'selected' : '' }}>
+												{{ $booster->name }} ({{ ucfirst($booster->type) }})
 											</option>
 										@endforeach
 									</select>
@@ -101,7 +101,7 @@
 								<thead>
 									<tr>
 										<th>User</th>
-										<th>Plan</th>
+										<th>Booster</th>
 										<th>Status</th>
 										<th>Cost</th>
 										<th>Billing Cycle</th>
@@ -121,9 +121,9 @@
 											</div>
 										</td>
 										<td>
-											<span class="badge bg-primary">{{ $subscription->plan->name }}</span>
+											<span class="badge bg-primary">{{ $subscription->booster->name }}</span>
 											<br>
-											<small class="text-muted">{{ ucfirst($subscription->plan->type) }}</small>
+											<small class="text-muted">{{ ucfirst($subscription->booster->type) }}</small>
 										</td>
 										<td>
 											@if($subscription->status == 'active')
@@ -223,7 +223,7 @@
 <script>
 	$(function() {
 		// Auto-submit form when certain filters change
-		$('#status, #plan_id, #billing_cycle').on('change', function() {
+		$('#status, #booster_id, #billing_cycle').on('change', function() {
 			$('#subscriptionFiltersForm').submit();
 		});
 

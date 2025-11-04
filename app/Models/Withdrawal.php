@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Moderation;
 use App\Models\CountrySetting;
+use Illuminate\Support\Facades\Auth;
+use App\Observers\WithdrawalObserver;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([WithdrawalObserver::class])]
 class Withdrawal extends Model
 {
     protected $fillable = [
@@ -24,9 +30,14 @@ class Withdrawal extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function approver()
+    public function moderations(): MorphMany
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->morphMany(Moderation::class, 'moderatable');
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     public function getGatewayAttribute()

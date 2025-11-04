@@ -4,13 +4,15 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Models\Skill;
+
 use App\Models\Support;
 use App\Models\Platform;
 use App\Models\TaskWorker;
 use Illuminate\Support\Str;
 use App\Models\Subscription;
-use App\Models\UserLocation;
+use App\Observers\UserObserver;
+use App\Models\PreferredLocation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,18 +28,31 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    
     protected $fillable = [
         'name',
+        'username',
         'email',
-        'password',
+        'phone',
         'country_id',
+        'role_id',
         'state_id',
         'city_id',
         'address',
         'dob',
         'gender',
+        'phone_verified_at',
+        'email_verified_at',
+        'password',
         'is_active',
-        'dashboard_view', // Added for dashboard preference
+        'dashboard_view',
+        'two_factor_enabled',
+        'notification_settings',
+        'is_banned_from_tasks',
+        'banned_at',
+        'ban_expires_at',
+        'ban_reason',
+        'banned_by',
     ];
 
     /**
@@ -59,8 +74,20 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
+            'banned_at' => 'datetime',
+            'ban_expires_at' => 'datetime',
             'password' => 'hashed',
+            'notification_settings' => 'array',
+            'two_factor_enabled' => 'boolean',
+            'is_active' => 'boolean',
+            'is_banned_from_tasks' => 'boolean',
         ];
+    }
+
+    public static function boot(){
+        parent::boot();
+        parent::observe(new UserObserver);
     }
 
     /**
@@ -103,7 +130,7 @@ class User extends Authenticatable
 
     public function preferred_locations()
     {
-        return $this->hasMany(UserLocation::class);
+        return $this->hasMany(PreferredLocation::class);
     }
 
     public function preferred_platforms(){
@@ -159,6 +186,11 @@ class User extends Authenticatable
         return $this->hasMany(Wallet::class);
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user');
@@ -182,14 +214,153 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class)->where('starts_at','>',now())->where('expires_at', '>', now());
     }
 
-    public function skills()
-    {
-        return $this->belongsToMany(Skill::class);
-    }
-
     public function wallet()
     {
         return $this->hasOne(Wallet::class);
+    }
+
+    /**
+     * Self-referential relationship for banned_by
+     */
+    public function bannedBy()
+    {
+        return $this->belongsTo(User::class, 'banned_by');
+    }
+
+    /**
+     * Self-referential relationship for banned users
+     */
+    public function bannedUsers()
+    {
+        return $this->hasMany(User::class, 'banned_by');
+    }
+
+    /**
+     * User verification documents
+     */
+    public function userVerifications()
+    {
+        return $this->hasMany(UserVerification::class);
+    }
+
+    /**
+     * Login activities
+     */
+    public function loginActivities()
+    {
+        return $this->hasMany(LoginActivity::class);
+    }
+
+    /**
+     * Posts created by user
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Comments made by user (polymorphic)
+     */
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Announcements sent by user
+     */
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class, 'sent_by');
+    }
+
+    /**
+     * User notifications (polymorphic)
+     */
+    public function notifications()
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable');
+    }
+
+    /**
+     * Moderations for this user (polymorphic)
+     */
+    public function moderations()
+    {
+        return $this->morphMany(Moderation::class, 'moderatable');
+    }
+
+    /**
+     * Moderations done by this user as moderator
+     */
+    public function moderatedItems()
+    {
+        return $this->hasMany(Moderation::class, 'moderator_id');
+    }
+
+    /**
+     * Blocked users relationship (through blocklists)
+     */
+    public function blockedUsers()
+    {
+        return $this->belongsToMany(User::class, 'blocklists', 'user_id', 'enemy_id');
+    }
+
+    /**
+     * Users who blocked this user
+     */
+    public function blockedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'blocklists', 'enemy_id', 'user_id');
+    }
+
+    /**
+     * Carts relationship
+     */
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Orders relationship
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Payments relationship
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Withdrawals relationship
+     */
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
+    /**
+     * Bank accounts relationship
+     */
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccount::class);
+    }
+
+    /**
+     * Task promotions created by user
+     */
+    public function taskPromotions()
+    {
+        return $this->hasMany(TaskPromotion::class);
     }
 
     /**
@@ -320,22 +491,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Task reports submitted by this user
-     */
-    public function taskReports()
-    {
-        return $this->hasMany(TaskReport::class);
-    }
-
-    /**
-     * Tasks hidden by this user (don't show)
-     */
-    public function hiddenTasks()
-    {
-        return $this->belongsToMany(Task::class, 'task_hidden');
-    }
-
-    /**
      * Check if user is currently banned from taking tasks
      */
     public function isBannedFromTasks(): bool
@@ -399,7 +554,7 @@ class User extends Authenticatable
 
         // Check subscription limits
         $activeSubscription = $this->activeSubscriptions()
-            ->whereHas('plan', function($q) {
+            ->whereHas('booster', function($q) {
                 $q->where('type', 'worker');
             })
             ->first();
@@ -408,8 +563,8 @@ class User extends Authenticatable
             return false; // No active worker subscription
         }
 
-        $plan = $activeSubscription->plan;
-        $activeTasksPerHour = $plan->active_tasks_per_hour ?? 1;
+        $booster = $activeSubscription->booster;
+        $activeTasksPerHour = $booster->active_tasks_per_hour ?? 1;
 
         // Count ongoing tasks in the last hour
         $ongoingTasksCount = $this->task_workers()
@@ -435,7 +590,7 @@ class User extends Authenticatable
 
         // Check subscription limits
         $activeSubscription = $this->activeSubscriptions()
-            ->whereHas('plan', function($q) {
+            ->whereHas('booster', function($q) {
                 $q->where('type', 'worker');
             })
             ->first();
@@ -444,8 +599,8 @@ class User extends Authenticatable
             return false; // No active worker subscription
         }
 
-        $plan = $activeSubscription->plan;
-        $activeTasksPerHour = $plan->active_tasks_per_hour ?? 1;
+        $booster = $activeSubscription->booster;
+        $activeTasksPerHour = $booster->active_tasks_per_hour ?? 1;
 
         // Count submitted tasks in the last hour
         $submittedTasksCount = $this->taskSubmissions()
@@ -488,11 +643,11 @@ class User extends Authenticatable
 
     public function scopeLocalize($query)
     {
-        if (auth()->user()->first_role->name == 'super-admin') {
+        if (Auth::user()->first_role->name == 'super-admin') {
             return $query;
         }
 
-        return $query->where('country_id', auth()->user()->country_id);
+        return $query->where('country_id', Auth::user()->country_id);
     }
 
 

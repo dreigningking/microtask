@@ -239,7 +239,7 @@
                             
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="ri-send-plane-fill me-1"></i>Send Reply
+                                    <i class="ri-send-boostere-fill me-1"></i>Send Reply
                                 </button>
                             </div>
                         </form>
@@ -393,7 +393,7 @@
                             <option value="">Select a reason...</option>
                             <option value="technical">Technical issue requiring expertise</option>
                             <option value="payment">Payment processing problem</option>
-                            <option value="urgent">Urgent customer request</option>
+                            <option value="broadcast">Broadcast customer request</option>
                             <option value="complex">Complex issue beyond current scope</option>
                         </select>
                     </div>

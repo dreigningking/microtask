@@ -9,7 +9,7 @@ Job Approved
     DisputeNotification
 }
 Worker{
-    UrgentJob Notification
+    BroadcastJob Notification
     Task Submission Reviewed Notification
     EarningNotification
     Withdrawal Complete 
@@ -55,10 +55,10 @@ submit job - check user's job submit limit within the hour i.e number of ongoing
 start job records user as worker
 
 JOBS
-refund taskmaster the admin-monitoring fee is no intervention was found
+refund taskmaster the admin-review fee is no intervention was found
 
 Featured Jobs - identify places to show featured jobs"
-Remove Follower Feature  (workers can follow task masters) because it conflicts with Urgent Promotion{
+Remove Follower Feature  (workers can follow task masters) because it conflicts with Broadcast Promotion{
     worker subscription - add feature to receive notification from people you follow
 }
 
@@ -111,7 +111,7 @@ New FEATURES
 ----------------------------------------------
 Add Raffle Draw
 Google adsense
-System Monitoring - Implement system monitoring strategies"
+System Review - Implement system review strategies"
 automatic verifications ?
 can verifications expire?
 

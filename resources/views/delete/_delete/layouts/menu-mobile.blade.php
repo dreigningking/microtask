@@ -17,11 +17,11 @@
                 <a wire:navigate href="{{ route('index') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('/')) bg-blue-800 @endif">Home</a>
                 <a wire:navigate href="{{ route('explore') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('explore')) bg-blue-800 @endif">Explore</a>
                 <a wire:navigate href="{{ route('top_earners') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('top-earners')) bg-blue-800 @endif">Top Earners</a>
-                <a wire:navigate href="{{ route('jobs.create') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('post-job')) bg-blue-800 @endif">Post a Job</a>
+                <a wire:navigate href="{{ route('tasks.create') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('post-job')) bg-blue-800 @endif">Post a Job</a>
                 
                 @if($isAuthenticated)
-                    <a wire:navigate href="{{ route('tasks.index') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('my-tasks')) bg-blue-800 @endif">My Tasks</a>
-                    <a wire:navigate href="{{ route('jobs.index') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('my-jobs')) bg-blue-800 @endif">My Jobs</a>
+                    <a wire:navigate href="{{ route('tasks.applied') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('my-tasks')) bg-blue-800 @endif">My Tasks</a>
+                    <a wire:navigate href="{{ route('tasks.posted') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('my-jobs')) bg-blue-800 @endif">My Jobs</a>
                     <a wire:navigate href="{{ route('dashboard') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('dashboard')) bg-blue-800 @endif">Dashboard</a>
                     <a wire:navigate href="{{ route('earnings') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('my-earnings')) bg-blue-800 @endif">Earnings</a>
                     <a wire:navigate href="{{ route('payments') }}" class="text-white py-2 border-b border-blue-700 hover:bg-blue-800 px-2 rounded @if(request()->is('payments')) bg-blue-800 @endif">Payments</a>

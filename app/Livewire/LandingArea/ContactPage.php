@@ -4,7 +4,7 @@ namespace App\Livewire\LandingArea;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\ContactNotification;
+use App\Notifications\Admin\ContactNotification;
 use Livewire\Attributes\Layout;
 
 #[Layout('components.layouts.landing')]

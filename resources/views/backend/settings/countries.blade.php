@@ -31,7 +31,7 @@
 									<th>Banking</th>
 									<th>Transactions</th>
 									<th>Tasks</th>
-									<th>Plan Prices</th>
+									<th>Booster Prices</th>
 									<th>Template Prices</th>
 									<th>Notification Emails</th>
 									<th>Verification</th>
@@ -64,7 +64,7 @@
 										@endif
 									</td>
 									<td>
-										@if($country->hasPlanPrices())
+										@if($country->hasBoosterPrices())
 											<span class="badge bg-success">Set</span>
 										@else
 											<span class="badge bg-danger">Not Set</span>

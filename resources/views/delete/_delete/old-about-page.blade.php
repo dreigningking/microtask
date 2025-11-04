@@ -129,7 +129,7 @@
                         <i class="ri-shield-user-line"></i>
                     </div>
                     <div>
-                        <h4 class="font-semibold mb-1">ISO 27001-aligned controls & 24/7 threat monitoring</h4>
+                        <h4 class="font-semibold mb-1">ISO 27001-aligned controls & 24/7 threat review</h4>
                         <p class="text-gray-600 text-sm">Your data and transactions are protected by industry-leading security standards.</p>
                     </div>
                 </div>

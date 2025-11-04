@@ -100,7 +100,7 @@
                                 <div class="col-md-12">
                                     <div class="d-flex justify-content-end">
                                         <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to send this announcement to all users?')">
-                                            <i class="fas fa-paper-plane me-2"></i>
+                                            <i class="fas fa-paper-boostere me-2"></i>
                                             Send Announcement
                                         </button>
                                     </div>

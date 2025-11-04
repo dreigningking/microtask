@@ -29,7 +29,7 @@
                         <i class="align-middle mr-2 fas fa-fw fa-check-square"></i> <span class="align-middle">Tasks</span>
                     </a>
                     <ul id="tasks" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.index') }}">Task List</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.applied') }}">Task List</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.submissions') }}">Task Submissions</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.tasks.promotions') }}">Task Promotions</a></li>
                     </ul>
@@ -92,7 +92,7 @@
                     <ul id="dashboards" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                         @if(auth()->user()->hasPermission('system_settings') )
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.index') }}">General</a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.plans') }}">Plans</a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.boosters') }}">Boosters</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.platforms') }}">Platforms</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.settings.templates') }}">Templates</a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('admin.announcements.index') }}">Announcements</a></li>  

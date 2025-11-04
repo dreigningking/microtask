@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
-use App\Http\Traits\HelperTrait;
+use App\Models\Comment;
 use App\Models\OrderItem;
+use App\Models\Moderation;
 use App\Models\Settlement;
+use App\Observers\TaskObserver;
+use App\Http\Traits\HelperTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
-
+#[ObservedBy([TaskObserver::class])]
 class Task extends Model
 {
     use Sluggable,HelperTrait;
@@ -40,17 +45,16 @@ class Task extends Model
             ]
         ];
     }
-    public function getRouteKeyName()
-    {
+
+    public function getRouteKeyName(){
         return 'slug';
     }
 
-    public function user()
-    {
+    public function user(){
         return $this->belongsTo(User::class);
     }
 
-    public function workers()
+    public function taskWorkers()
     {
         return $this->hasMany(TaskWorker::class);
     }
@@ -64,9 +68,9 @@ class Task extends Model
     {
         return $this->morphOne(OrderItem::class, 'orderable');
     }
-    public function template()
+    public function platformTemplate()
     {
-        return $this->belongsTo(TaskTemplate::class);
+        return $this->belongsTo(PlatformTemplate::class);
     }
     public function platform()
     {
@@ -87,14 +91,19 @@ class Task extends Model
         return $this->hasMany(Referral::class);
     }
 
-    public function reports()
+    public function moderations(): MorphMany
     {
-        return $this->hasMany(TaskReport::class);
+        return $this->morphMany(Moderation::class, 'moderatable');
     }
 
-    public function hiddenByUsers()
+    public function comments(): MorphMany
     {
-        return $this->belongsToMany(User::class, 'task_hidden');
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     public function submissions()
@@ -104,7 +113,7 @@ class Task extends Model
 
     public function scopeCompleted($query)
     {
-        return $query->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+        return $query->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
     }
 
     public function scopeActive($query)
@@ -113,14 +122,16 @@ class Task extends Model
             ->where(function ($q) {
                 $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
             })
-            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND completed_at IS NOT NULL)');
+            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
     }
 
     public function scopeListable($query, $countryId = null)
     {
         return $query->where('is_active', true)
             ->where('visibility', 'public')
-            ->whereNotNull('approved_at')
+            ->whereHas('latestModeration',function($mod){
+                $mod->where('status','approved');
+            })
             ->where(function ($q) use ($countryId) {
                 if ($countryId) {
                     $q->whereNull('restricted_countries')
@@ -132,21 +143,52 @@ class Task extends Model
             ->where(function ($q) {
                 $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
             })
-            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND paid_at IS NOT NULL)');
-        
+            ->whereHas('user', function($q) {
+                $q->where('is_banned_from_tasks', false)
+                  ->orWhereNull('is_banned_from_tasks');
+            })
+            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
+            ->whereDoesntHave('user.blockedByUsers', function($q) {
+                if (Auth::check()) {
+                    $q->where('users.id', Auth::id());
+                }
+            });
     }
 
     public function getAvailableAttribute(){
+        // 3. Task is_active is true
         if(!$this->is_active)
             return false;
-        if(!$this->approved_at)
+        
+        // 4. Task moderation status is approved
+        if(!$this->latestModeration || $this->latestModeration->status !== 'approved')
             return false;
-        if($this->expiry_date < now())
+        
+        // 2. Task is not expired
+        if($this->expiry_date && $this->expiry_date < now())
             return false;
-        if($this->number_of_submissions >= $this->taskSubmissions->whereNotNull('paid_at')->count())
+        
+        // 5. Task is not yet completed - number of paid submissions is less than task->number_of_submissions
+        $acceptedSubmissions = $this->taskSubmissions()->where('accepted', true)->count();
+        if($acceptedSubmissions >= $this->number_of_submissions)
             return false;
-        if($this->restricted_countries && Auth::check() && in_array(Auth::user()->country_id,$this->restricted_countries))
-            return false;
+        
+        // 6. User is not logged in or user is logged in and he has not blocked the task creator or the task creator has not blocked him
+        if(Auth::check()) {
+            $currentUser = Auth::user();
+            // Check if current user has blocked the task creator
+            $userBlockedCreator = $currentUser->blockedUsers->where('id', $this->user_id)->isNotEmpty();
+            // Check if task creator has blocked the current user
+            $creatorBlockedUser = $this->user->blockedUsers->where('id', $currentUser->id)->isNotEmpty();
+            
+            if($userBlockedCreator || $creatorBlockedUser)
+                return false;
+            if($this->restricted_countries && in_array($currentUser->country_id, $this->restricted_countries))
+                return false;
+            if($currentUser->is_banned_from_tasks)
+                return false;
+        }
+        
         return true;
     }
 
@@ -156,13 +198,13 @@ class Task extends Model
             return 'draft';
         }
 
-        $workerCount = $this->workers()->whereNotNull('accepted_at')->count();
+        $workerCount = $this->taskWorkers()->whereNotNull('accepted_at')->count();
 
         if ($workerCount >= $this->number_of_submissions) {
             return 'closed';
         }
 
-        $submittedCount = $this->taskSubmissions()->whereNotNull('completed_at')->count();
+        $submittedCount = $this->taskSubmissions()->where('accepted', true)->count();
         if ($submittedCount >= $this->number_of_submissions) {
             return 'completed';
         }
@@ -191,13 +233,13 @@ class Task extends Model
 
     public function scopeLocalize($query)
     {
-        if (auth()->user()->first_role->name == 'super-admin') {
+        if (Auth::user()->first_role->name == 'super-admin') {
             return $query;
         }
 
         return $query->where(function ($q) {
             $q->whereHas('user', function ($q) {
-                $q->where('country_id', auth()->user()->country_id);
+                $q->where('country_id', Auth::user()->country_id);
             });
         });
     }
@@ -205,7 +247,7 @@ class Task extends Model
     public function getRemainingTimeAttribute(){
         if($this->expiry_date < now())
             return null;
-        $minutes = $this->expiry_date->diffInMinutes(now());
+        $minutes = abs($this->expiry_date->diffInMinutes(now()));
         $hours = floor($minutes / 60);
         $days = floor($hours / 24);
         $weeks = floor($days / 7);

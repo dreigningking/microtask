@@ -4,8 +4,7 @@ namespace App\Observers;
 
 use App\Models\Settlement;
 use Illuminate\Support\Facades\DB;
-use App\Models\Wallet;
-use App\Notifications\EarningsNotification;
+use App\Notifications\TaskWorker\EarningsNotification;
 
 class SettlementObserver
 {

@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use App\Models\Moderation;
+use App\Observers\CommentObserver;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([CommentObserver::class])]
 class Comment extends Model
 {
     use HasFactory, SoftDeletes;
@@ -16,18 +22,16 @@ class Comment extends Model
         'user_id',
         'commentable_id',
         'commentable_type',
+        'parent_id',
+        'title',
         'body',
         'attachments',
         'is_flag',
-        'approved_at',
-        'approved_by'
     ];
 
     protected $casts = [
         'attachments' => 'array',
         'is_flag' => 'boolean',
-        'approved_at' => 'datetime',
-        'approved_by' => 'integer'
     ];
 
     protected $touches = ['commentable']; // name of the relationship method
@@ -38,9 +42,35 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the parent comment (for nested comments)
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Comment::class, 'parent_id');
+    }
+
+    /**
+     * Get the child comments (replies)
+     */
+    public function children()
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
+    }
+
     public function commentable()
     {
         return $this->morphTo();
+    }
+
+    public function moderations(): MorphMany
+    {
+        return $this->morphMany(Moderation::class, 'moderatable');
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     // Scopes
@@ -70,23 +100,15 @@ class Comment extends Model
     }
 
     // Methods
-    public function approve($approvedBy = null): bool
+    public function approve(): bool
     {
-        $this->update([
-            'approved_at' => now(),
-            'approved_by' => $approvedBy ?? auth()->id(),
-        ]);
-
+        $this->update(['is_flag' => false]);
         return true;
     }
 
-    public function reject($rejectedBy = null): bool
+    public function reject(): bool
     {
-        $this->update([
-            'approved_at' => null,
-            'approved_by' => $rejectedBy ?? auth()->id(),
-        ]);
-
+        $this->update(['is_flag' => true]);
         return true;
     }
 
@@ -94,16 +116,6 @@ class Comment extends Model
     {
         $this->update(['is_flag' => !$this->is_flag]);
         return $this->is_flag;
-    }
-
-    public function isApproved(): bool
-    {
-        return !is_null($this->approved_at);
-    }
-
-    public function isPending(): bool
-    {
-        return is_null($this->approved_at);
     }
 
     public function isFlagged(): bool
@@ -123,11 +135,11 @@ class Comment extends Model
 
     public function canBeEditedBy(User $user): bool
     {
-        return $this->isByUser($user) && $this->isPending();
+        return $this->isByUser($user);
     }
 
     public function canBeDeletedBy(User $user): bool
     {
-        return $this->isByUser($user) || $user->hasRole('super-admin');
+        return $this->isByUser($user) || ($user->hasPermission && $user->hasPermission('system-settings'));
     }
 }

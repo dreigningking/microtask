@@ -138,8 +138,8 @@ class ListEarnings extends Component
 
             // Check for active subscription and apply multiplier
             $activeSubscription = $user->activeSubscriptions()->latest('expires_at')->first();
-            if ($activeSubscription && isset($activeSubscription->plan->withdrawal_maximum_multiplier)) {
-                $multiplier = $activeSubscription->plan->withdrawal_maximum_multiplier;
+            if ($activeSubscription && isset($activeSubscription->booster->withdrawal_maximum_multiplier)) {
+                $multiplier = $activeSubscription->booster->withdrawal_maximum_multiplier;
                 if (is_numeric($multiplier) && $multiplier > 0) {
                     $max = $max * $multiplier;
                 }

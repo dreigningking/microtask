@@ -283,12 +283,12 @@
             <div class="row">
                 <div class="col-12 text-center mb-5">
                     <h2 class="section-title">Simple, Transparent Pricing</h2>
-                    <p class="text-muted">Choose the plan that works best for your hiring needs</p>
+                    <p class="text-muted">Choose the booster that works best for your hiring needs</p>
                 </div>
             </div>
 
             <div class="row justify-content-center">
-                <!-- Basic Plan -->
+                <!-- Basic Booster -->
                 <div class="col-md-4">
                     <div class="pricing-card">
                         <h4>Starter</h4>
@@ -305,7 +305,7 @@
                     </div>
                 </div>
 
-                <!-- Professional Plan (Popular) -->
+                <!-- Professional Booster (Popular) -->
                 <div class="col-md-4">
                     <div class="pricing-card popular">
                         <div class="popular-badge">MOST POPULAR</div>
@@ -323,7 +323,7 @@
                     </div>
                 </div>
 
-                <!-- Enterprise Plan -->
+                <!-- Enterprise Booster -->
                 <div class="col-md-4">
                     <div class="pricing-card">
                         <h4>Enterprise</h4>
@@ -387,7 +387,7 @@
                             </h2>
                             <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    <p>Posting a job is completely free on our Starter plan. For more advanced features like featured job listings and AI candidate matching, we offer paid Professional and Enterprise plans.</p>
+                                    <p>Posting a job is completely free on our Starter booster. For more advanced features like featured job listings and AI candidate matching, we offer paid Professional and Enterprise boosters.</p>
                                 </div>
                             </div>
                         </div>

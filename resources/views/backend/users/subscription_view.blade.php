@@ -24,7 +24,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <h4 class="mb-1">
-                                    {{ $subscription->plan->name }} Subscription
+                                    {{ $subscription->booster->name }} Subscription
                                     <span class="badge
                                         @if($subscription->status == 'active') bg-success
                                         @elseif($subscription->status == 'expired') bg-warning
@@ -39,7 +39,7 @@
                                     <strong>User:</strong> {{ $subscription->user->name }} ({{ $subscription->user->email }})
                                 </div>
                                 <div class="mb-2">
-                                    <strong>Plan Type:</strong> {{ ucfirst($subscription->plan->type) }}
+                                    <strong>Booster Type:</strong> {{ ucfirst($subscription->booster->type) }}
                                 </div>
                                 <div class="mb-2">
                                     <strong>Cost:</strong> {{ $subscription->currency }} {{ $subscription->cost }}
@@ -101,8 +101,8 @@
                                 <ul class="list-group mb-3">
                                     <li class="list-group-item"><strong>ID:</strong> {{ $subscription->id }}</li>
                                     <li class="list-group-item"><strong>User:</strong> {{ $subscription->user->name }} ({{ $subscription->user->email }})</li>
-                                    <li class="list-group-item"><strong>Plan:</strong> {{ $subscription->plan->name }}</li>
-                                    <li class="list-group-item"><strong>Plan Type:</strong> {{ ucfirst($subscription->plan->type) }}</li>
+                                    <li class="list-group-item"><strong>Booster:</strong> {{ $subscription->booster->name }}</li>
+                                    <li class="list-group-item"><strong>Booster Type:</strong> {{ ucfirst($subscription->booster->type) }}</li>
                                     <li class="list-group-item"><strong>Status:</strong>
                                         <span class="badge
                                             @if($subscription->status == 'active') bg-success
@@ -135,19 +135,19 @@
                                     <li class="list-group-item"><strong>Updated At:</strong> {{ $subscription->updated_at->format('M d, Y H:i') }}</li>
                                 </ul>
 
-                                <h5>Plan Information</h5>
+                                <h5>Booster Information</h5>
                                 <ul class="list-group mb-3">
-                                    <li class="list-group-item"><strong>Plan Name:</strong> {{ $subscription->plan->name }}</li>
-                                    <li class="list-group-item"><strong>Slug:</strong> {{ $subscription->plan->slug ?? 'N/A' }}</li>
-                                    <li class="list-group-item"><strong>Description:</strong> {{ $subscription->plan->description ?? 'N/A' }}</li>
-                                    <li class="list-group-item"><strong>Type:</strong> {{ ucfirst($subscription->plan->type) }}</li>
-                                    <li class="list-group-item"><strong>Featured Promotion:</strong> {{ $subscription->plan->featured_promotion ? 'Yes (Taskmasters)' : 'No' }}</li>
-                                    <li class="list-group-item"><strong>Urgency Promotion:</strong> {{ $subscription->plan->urgency_promotion ? 'Yes (Taskmasters)' : 'No' }}</li>
-                                    @if($subscription->plan->type == 'worker')
-                                    <li class="list-group-item"><strong>Active Tasks per Hour:</strong> {{ $subscription->plan->active_tasks_per_hour }}</li>
-                                    <li class="list-group-item"><strong>Withdrawal Max Multiplier:</strong> x{{ $subscription->plan->withdrawal_maximum_multiplier }}</li>
+                                    <li class="list-group-item"><strong>Booster Name:</strong> {{ $subscription->booster->name }}</li>
+                                    <li class="list-group-item"><strong>Slug:</strong> {{ $subscription->booster->slug ?? 'N/A' }}</li>
+                                    <li class="list-group-item"><strong>Description:</strong> {{ $subscription->booster->description ?? 'N/A' }}</li>
+                                    <li class="list-group-item"><strong>Type:</strong> {{ ucfirst($subscription->booster->type) }}</li>
+                                    <li class="list-group-item"><strong>Featured Promotion:</strong> {{ $subscription->booster->featured_promotion ? 'Yes (Taskmasters)' : 'No' }}</li>
+                                    <li class="list-group-item"><strong>Broadcast Promotion:</strong> {{ $subscription->booster->broadcast_promotion ? 'Yes (Taskmasters)' : 'No' }}</li>
+                                    @if($subscription->booster->type == 'worker')
+                                    <li class="list-group-item"><strong>Active Tasks per Hour:</strong> {{ $subscription->booster->active_tasks_per_hour }}</li>
+                                    <li class="list-group-item"><strong>Withdrawal Max Multiplier:</strong> x{{ $subscription->booster->withdrawal_maximum_multiplier }}</li>
                                     @endif
-                                    <li class="list-group-item"><strong>Plan Status:</strong> {{ $subscription->plan->is_active ? 'Active' : 'Inactive' }}</li>
+                                    <li class="list-group-item"><strong>Booster Status:</strong> {{ $subscription->booster->is_active ? 'Active' : 'Inactive' }}</li>
                                 </ul>
                             </div>
                         </div>
@@ -179,27 +179,27 @@
                                     <div class="alert alert-info">No features data available for this subscription.</div>
                                 @endif
 
-                                <h5>Plan Features</h5>
-                                @if($subscription->plan->type == 'taskmaster')
+                                <h5>Booster Features</h5>
+                                @if($subscription->booster->type == 'taskmaster')
                                     <ul class="list-group">
                                         <li class="list-group-item">
-                                            <strong>Featured Promotion:</strong> {{ $subscription->plan->featured_promotion ? 'Available' : 'Not available' }}
+                                            <strong>Featured Promotion:</strong> {{ $subscription->booster->featured_promotion ? 'Available' : 'Not available' }}
                                         </li>
                                         <li class="list-group-item">
-                                            <strong>Urgency Promotion:</strong> {{ $subscription->plan->urgency_promotion ? 'Available' : 'Not available' }}
+                                            <strong>Broadcast Promotion:</strong> {{ $subscription->booster->broadcast_promotion ? 'Available' : 'Not available' }}
                                         </li>
                                     </ul>
-                                @elseif($subscription->plan->type == 'worker')
+                                @elseif($subscription->booster->type == 'worker')
                                     <ul class="list-group">
                                         <li class="list-group-item">
-                                            <strong>Active Tasks per Hour:</strong> {{ $subscription->plan->active_tasks_per_hour }}
+                                            <strong>Active Tasks per Hour:</strong> {{ $subscription->booster->active_tasks_per_hour }}
                                         </li>
                                         <li class="list-group-item">
-                                            <strong>Withdrawal Max Multiplier:</strong> x{{ $subscription->plan->withdrawal_maximum_multiplier }}
+                                            <strong>Withdrawal Max Multiplier:</strong> x{{ $subscription->booster->withdrawal_maximum_multiplier }}
                                         </li>
                                     </ul>
                                 @else
-                                    <div class="alert alert-info">Plan type not recognized.</div>
+                                    <div class="alert alert-info">Booster type not recognized.</div>
                                 @endif
                             </div>
                         </div>

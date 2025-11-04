@@ -33,7 +33,7 @@
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="{{ route('jobs.create') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
+                    <a href="{{ route('tasks.create') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
                     <a href="{{ route('register') }}" class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Register Now</a>
                 </div>
             </div>
@@ -559,7 +559,7 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Start Earning or Find Talent?</h2>
                 <p class="text-xl text-blue-100 mb-8">Join our community of freelancers and clients today. Registration is free and takes less than a minute.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="{{ route('jobs.create') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
+                    <a href="{{ route('tasks.create') }}" class="bg-white text-primary px-8 py-3 rounded-button font-semibold shadow-md hover:shadow-lg transition-shadow whitespace-nowrap">Post a Job</a>
                     <a href="{{ route('explore') }}" class="bg-secondary bg-opacity-20 text-white border border-white border-opacity-30 px-8 py-3 rounded-button font-semibold hover:bg-opacity-30 transition-colors whitespace-nowrap">Find Work</a>
                 </div>
             </div>

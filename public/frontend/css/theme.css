@@ -325,6 +325,11 @@ a.dont_decorate {
     margin: 0.25rem;
 }
 
+.card-title>a{
+    text-decoration: none !important;
+    color: var(--bs-card-title-color);
+}
+
 .section-title {
     position: relative;
     margin-bottom: 2rem;

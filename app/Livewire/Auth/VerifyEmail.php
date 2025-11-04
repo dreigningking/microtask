@@ -5,12 +5,8 @@ namespace App\Livewire\Auth;
 use App\Models\User;
 use Livewire\Component;
 use Tzsk\Otp\Facades\Otp;
-use App\Livewire\Auth\Logout;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Validate;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\OTPNotification;
-use Illuminate\Support\Facades\Session;
+use App\Notifications\General\OTPNotification;
 
 class VerifyEmail extends Component
 {

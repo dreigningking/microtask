@@ -116,7 +116,7 @@
                         </a>
                         <div class="collapse" id="auth">
                             <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"> <a class="nav-link" href="{{route('jobs.create')}}"> New Job </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{{route('tasks.create')}}"> New Job </a></li>
                                 <li class="nav-item"> <a class="nav-link" href="{{route('jobs.ongoing')}}"> Ongoing Jobs </a></li>
                                 <li class="nav-item"> <a class="nav-link" href="{{route('jobs.completed')}}"> Completed Jobs </a></li>
                                 <li class="nav-item"> <a class="nav-link" href="{{route('jobs.drafts')}}"> Drafts </a></li>

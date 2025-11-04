@@ -120,8 +120,8 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ route('blog.show', $comment->blogPost->slug) }}" target="_blank" class="text-decoration-none">
-                                    {{ Str::limit($comment->blogPost->title, 40) }}
+                                <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank" class="text-decoration-none">
+                                    {{ Str::limit($comment->post->title, 40) }}
                                 </a>
                             </td>
                             <td>

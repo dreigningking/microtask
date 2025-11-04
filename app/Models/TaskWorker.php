@@ -7,6 +7,7 @@ use App\Observers\TaskWorkerObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 #[ObservedBy([TaskWorkerObserver::class])]
 class TaskWorker extends Model
 {

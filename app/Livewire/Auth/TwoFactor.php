@@ -5,7 +5,7 @@ namespace App\Livewire\Auth;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Tzsk\Otp\Facades\Otp;
-use App\Notifications\OTPNotification;
+use App\Notifications\General\OTPNotification;
 use Livewire\Attributes\Layout;
 
 class TwoFactor extends Component

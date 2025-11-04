@@ -436,12 +436,12 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                        <label class="form-label">Urgency Rate per email </label>
+                                                        <label class="form-label">Broadcast Rate per email </label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                        <input type="number" class="form-control" name="urgent_rate" value="{{ old('urgent_rate', $settings->urgent_rate) }}" step="0.01">
+                                                        <input type="number" class="form-control" name="broadcast_rate" value="{{ old('broadcast_rate', $settings->broadcast_rate) }}" step="0.01">
                                                         </div>
-                                                        <small class="text-muted">Cost to send urgent email per recipient</small>
+                                                        <small class="text-muted">Cost to send broadcast email per recipient</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -450,24 +450,24 @@
                                     <div class="col-md-6">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="mb-4">Monitoring Costs</h5>
+                                                <h5 class="mb-4">Review Costs</h5>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Admin Monitoring Cost</label>
+                                                    <label class="form-label">Admin Review Cost</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                        <input type="number" class="form-control" name="admin_monitoring_cost" value="{{ old('admin_monitoring_cost', $settings->admin_monitoring_cost) }}" step="0.01">
+                                                        <input type="number" class="form-control" name="admin_review_cost" value="{{ old('admin_review_cost', $settings->admin_review_cost) }}" step="0.01">
                                                     </div>
                                                     <small class="text-muted">Cost for admin-monitored tasks</small>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">System Monitoring Cost</label>
+                                                    <label class="form-label">System Review Cost</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                        <input type="number" class="form-control" name="system_monitoring_cost" value="{{ old('system_monitoring_cost', $settings->system_monitoring_cost) }}" step="0.01">
+                                                        <input type="number" class="form-control" name="system_review_cost" value="{{ old('system_review_cost', $settings->system_review_cost) }}" step="0.01">
                                                     </div>
-                                                    <small class="text-muted">Cost for system-automated monitoring</small>
+                                                    <small class="text-muted">Cost for system-automated review</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -516,40 +516,40 @@
                     <div class="tab-pane fade" id="subscriptions" role="tabpanel">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h5 class="card-title">Subscription Plans</h5>
-                                <h6 class="card-subtitle text-muted">Manage subscription plan pricing for {{ $country->name }}.</h6>
+                                <h5 class="card-title">Boosters</h5>
+                                <h6 class="card-subtitle text-muted">Manage booster pricing for {{ $country->name }}.</h6>
                             </div>
                             <div class="card-body">
-                                <form action="{{ route('admin.settings.countries.plan_prices') }}" method="POST">
+                                <form action="{{ route('admin.settings.countries.booster_prices') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
                                     
-                                    @if($plans->count() > 0)
+                                    @if($boosters->count() > 0)
                                         <div class="row">
-                                            @foreach($plans as $plan)
+                                            @foreach($boosters as $booster)
                                                 <div class="col-md-6 col-lg-4 mb-4">
                                                     <div class="card h-100">
                                                         <div class="card-header">
-                                                            <h6 class="card-title mb-0">{{ $plan->name }}</h6>
-                                                            <small class="text-muted">{{ ucfirst($plan->type) }} Plan</small>
+                                                            <h6 class="card-title mb-0">{{ $booster->name }}</h6>
+                                                            <small class="text-muted">{{ ucfirst($booster->type) }} Booster</small>
                                                         </div>
                                                         <div class="card-body">
                                                             <p class="card-text text-muted small mb-3">
-                                                                {{ Str::limit($plan->description, 100) }}
+                                                                {{ Str::limit($booster->description, 100) }}
                                                             </p>
                                                             <div class="mb-3">
-                                                                <label class="form-label">Plan Price</label>
+                                                                <label class="form-label">Booster Price</label>
                                                                 <div class="input-group">
                                                                     <span class="input-group-text">{{ $country->currency_symbol }}</span>
                                                                     <input type="number" 
                                                                            class="form-control" 
-                                                                           name="plan_prices[{{ $plan->id }}]" 
-                                                                           value="{{ old('plan_prices.' . $plan->id, isset($countryPricesByKey[App\Models\Plan::class][$plan->id]) ? $countryPricesByKey[App\Models\Plan::class][$plan->id]->amount : '') }}" 
+                                                                           name="booster_prices[{{ $booster->id }}]" 
+                                                                           value="{{ old('booster_prices.' . $booster->id, isset($countryPricesByKey[App\Models\Booster::class][$booster->id]) ? $countryPricesByKey[App\Models\Booster::class][$booster->id]->amount : '') }}" 
                                                                            step="0.01" 
                                                                            min="0"
                                                                            placeholder="0.00">
                                                                 </div>
-                                                                <small class="text-muted">Set the price for this plan in {{ $country->currency_symbol }}</small>
+                                                                <small class="text-muted">Set the price for this booster in {{ $country->currency_symbol }}</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -559,7 +559,7 @@
                                         <div class="mt-4 d-flex justify-content-between align-items-center">
                                             <div class="text-muted small">
                                                 <i class="fas fa-info-circle"></i> 
-                                                {{ $plans->count() }} active plan(s) found
+                                                {{ $boosters->count() }} active booster(s) found
                                             </div>
                                             <div>
                                                 <button type="submit" class="btn btn-primary">Save Subscription Settings</button>
@@ -570,8 +570,8 @@
                                         <div class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                                <p>No active subscription plans found.</p>
-                                                <p class="small">Create subscription plans first to configure pricing.</p>
+                                                <p>No active subscription boosters found.</p>
+                                                <p class="small">Create subscription boosters first to configure pricing.</p>
                                             </div>
                                         </div>
                                     @endif

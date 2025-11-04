@@ -49,7 +49,7 @@
                             <button type="submit" wire:loading.attr="disabled" wire:loading.class="btn-loading" wire:target="sendPasswordResetLink"
                                 class="btn btn-primary w-100 py-3 fw-semibold mb-4">
                                 <span wire:loading.remove class="d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-paper-plane me-2"></i>
+                                    <i class="fas fa-paper-boostere me-2"></i>
                                     Send Reset Link
                                 </span>
                                 <span wire:loading><i class="bi bi-arrow-repeat me-2"></i>Sending...</span>

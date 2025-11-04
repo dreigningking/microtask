@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->string('country_id');
+            $table->string('role_id')->nullable();
             $table->string('state_id')->nullable();
             $table->string('city_id')->nullable();
             $table->string('address')->nullable();
@@ -31,10 +33,10 @@ return new class extends Migration
             $table->boolean('two_factor_enabled')->default(0);
             $table->json('notification_settings')->nullable();
             $table->boolean('is_banned_from_tasks')->default(false);
-            $table->text('ban_reason')->nullable();
-            $table->unsignedBigInteger('banned_by')->nullable();
             $table->timestamp('banned_at')->nullable();
             $table->timestamp('ban_expires_at')->nullable();
+            $table->text('ban_reason')->nullable();
+            $table->unsignedBigInteger('banned_by')->nullable();
             $table->foreign('banned_by')->references('id')->on('users')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();

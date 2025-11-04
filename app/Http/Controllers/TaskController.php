@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\TaskPromotion;
 use App\Models\TaskSubmission;
 use App\Models\Setting;
-use App\Notifications\JobApprovedNotification;
+use App\Notifications\TaskMaster\TaskApprovedNotification;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -50,9 +50,9 @@ class TaskController extends Controller
             $query->where('platform_id', $request->platform_id);
         }
 
-        // Monitoring type filter
-        if ($request->filled('monitoring_type')) {
-            $query->where('monitoring_type', $request->monitoring_type);
+        // Review type filter
+        if ($request->filled('review_type')) {
+            $query->where('review_type', $request->review_type);
         }
 
         // Status filter
@@ -99,17 +99,17 @@ class TaskController extends Controller
         // Get filter data for the view
         $countries = Country::where('is_active', 1)->orderBy('name')->get();
         $platforms = Platform::where('is_active', 1)->orderBy('name')->get();
-        $monitoringTypes = [
-            'self_monitoring' => 'Self Monitoring',
-            'admin_monitoring' => 'Admin Monitoring',
-            'system_monitoring' => 'System Monitoring'
+        $reviewTypes = [
+            'self_review' => 'System Review',
+            'admin_review' => 'Admin Review',
+            'system_review' => 'System Review'
         ];
 
         return view('backend.tasks.list', compact(
             'tasks',
             'countries',
             'platforms',
-            'monitoringTypes'
+            'reviewTypes'
         ));
     }
 
@@ -151,19 +151,16 @@ class TaskController extends Controller
         if ($request->filled('status')) {
             switch ($request->status) {
                 case 'pending_review':
-                    $query->whereNull('reviewed_at')->whereNull('completed_at');
+                    $query->whereNull('reviewed_at')->whereNull('paid_at');
                     break;
                 case 'overdue':
                     $deadlineHours = Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
                     $query->whereNull('reviewed_at')
-                          ->whereNull('completed_at')
+                          ->whereNull('paid_at')
                           ->whereRaw('(TIMESTAMPDIFF(HOUR, created_at, NOW()) >= ?)', [$deadlineHours]);
                     break;
                 case 'completed':
-                    $query->whereNotNull('completed_at');
-                    break;
-                case 'disputed':
-                    $query->whereNotNull('disputed_at');
+                    $query->whereNotNull('paid_at');
                     break;
                 case 'reviewed':
                     $query->whereNotNull('reviewed_at');
@@ -171,10 +168,10 @@ class TaskController extends Controller
             }
         }
 
-        // Sub filter by monitoring type (for admin review)
-        if ($request->filled('monitoring_type')) {
+        // Sub filter by review type (for admin review)
+        if ($request->filled('review_type')) {
             $query->whereHas('task', function($q) use ($request) {
-                $q->where('monitoring_type', $request->monitoring_type);
+                $q->where('review_type', $request->review_type);
             });
         }
 
@@ -189,7 +186,7 @@ class TaskController extends Controller
         // Priority filter: Admin-Monitored tasks first, then escalated self-monitored tasks
         if ($request->get('priority') === 'admin_first') {
             $query->join('tasks', 'task_submissions.task_id', '=', 'tasks.id')
-                  ->orderByRaw("CASE WHEN tasks.monitoring_type = 'admin_monitoring' THEN 1 ELSE 2 END ASC")
+                  ->orderByRaw("CASE WHEN tasks.review_type = 'admin_review' THEN 1 ELSE 2 END ASC")
                   ->orderBy('task_submissions.created_at', 'desc')
                   ->select('task_submissions.*');
         } else {
@@ -200,18 +197,18 @@ class TaskController extends Controller
 
         // Get counts for statistics
         $totalSubmissions = $submissions->total();
-        $pendingReview = (clone $query)->whereNull('reviewed_at')->whereNull('completed_at')->count();
-        $overdue = (clone $query)->whereNull('reviewed_at')->whereNull('completed_at')
+        $pendingReview = (clone $query)->whereNull('reviewed_at')->whereNull('paid_at')->count();
+        $overdue = (clone $query)->whereNull('reviewed_at')->whereNull('paid_at')
                                 ->whereRaw('(TIMESTAMPDIFF(HOUR, created_at, NOW()) >= ?)', [$deadlineHours ?? 24])->count();
         $thisPage = $submissions->count();
 
         // Get filter data for the view
         $countries = Country::where('is_active', 1)->orderBy('name')->get();
         $platforms = Platform::where('is_active', 1)->orderBy('name')->get();
-        $monitoringTypes = [
-            'self_monitoring' => 'Self Monitoring',
-            'admin_monitoring' => 'Admin Monitoring',
-            'system_monitoring' => 'System Monitoring'
+        $reviewTypes = [
+            'self_review' => 'System Review',
+            'admin_review' => 'Admin Review',
+            'system_review' => 'System Review'
         ];
 
         return view('backend.tasks.submissions', compact(
@@ -222,7 +219,7 @@ class TaskController extends Controller
             'thisPage',
             'countries',
             'platforms',
-            'monitoringTypes',
+            'reviewTypes',
             
         ));
     }
@@ -256,8 +253,8 @@ class TaskController extends Controller
             $query->where('platform_id', $request->platform_id);
         }
 
-        if ($request->filled('monitoring_type')) {
-            $query->where('monitoring_type', $request->monitoring_type);
+        if ($request->filled('review_type')) {
+            $query->where('review_type', $request->review_type);
         }
 
         if ($request->filled('status')) {
@@ -310,7 +307,7 @@ class TaskController extends Controller
             // CSV headers
             fputcsv($file, [
                 'ID', 'Title', 'Description', 'Owner', 'Country', 'Platform', 
-                'Monitoring Type', 'Status', 'Workers', 'Budget Per Person', 
+                'Review Type', 'Status', 'Workers', 'Budget Per Person', 
                 'Currency', 'Posted Date', 'Approved Date', 'Expiry Date'
             ]);
 
@@ -322,7 +319,7 @@ class TaskController extends Controller
                     $task->user->name ?? 'N/A',
                     $task->user->country->name ?? 'N/A',
                     $task->platform->name ?? 'N/A',
-                    $task->monitoring_type ?? 'N/A',
+                    $task->review_type ?? 'N/A',
                     $task->is_active ? 'Active' : 'Inactive',
                     $task->number_of_submissions,
                     $task->budget_per_submission,
@@ -359,7 +356,7 @@ class TaskController extends Controller
         $task->approved_at = now();
         $task->approved_by = Auth::id();
         $task->save();
-        $task->user->notify(new JobApprovedNotification($task));
+        $task->user->notify(new TaskApprovedNotification($task));
         return back()->with('success', 'Task approved successfully.');
     }
 
@@ -416,18 +413,8 @@ class TaskController extends Controller
         $submission->reviewed_by = Auth::id();
 
         if ($request->review_reason == 1) { // Approve
-            $submission->completed_at = now();
             $message = 'Submission approved successfully.';
-        } elseif ($request->review_reason == 2) { // Request revision
-            // Clear completed_at to allow resubmission
-            $submission->completed_at = null;
-            $message = 'Revision requested. Worker can resubmit.';
-        } elseif ($request->review_reason == 3) { // Reject
-            // Clear completed_at and potentially remove worker slot
-            $submission->completed_at = null;
-            // TODO: Optionally free up the task worker slot here if rejection is permanent
-            $message = 'Submission rejected.';
-        }
+        } 
 
         $submission->save();
 
@@ -444,7 +431,6 @@ class TaskController extends Controller
         $submission->reviewed_at = null;
         $submission->review_reason = null;
         $submission->review = null;
-        $submission->completed_at = null;
         $submission->save();
 
         return redirect()->route('admin.tasks.review_submission', $submission)->with('success', 'Submission reset for revision.');
@@ -459,8 +445,8 @@ class TaskController extends Controller
             return redirect()->back()->with('error', 'This submission has already been paid.');
         }
 
-        if (!$submission->completed_at) {
-            return redirect()->back()->with('error', 'Submission must be completed before payment can be disbursed.');
+        if (!$submission->reviewed_at) {
+            return redirect()->back()->with('error', 'Submission must be reviewed before payment can be disbursed.');
         }
 
         $amount = $submission->task->budget_per_submission;

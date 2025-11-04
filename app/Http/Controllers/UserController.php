@@ -63,8 +63,8 @@ class UserController extends Controller
 
         // Calculate additional data for each user
         foreach ($users as $user) {
-            // Tasks completed: TaskSubmission where user_id = user, completed_at not null
-            $tasksCompleted = $user->taskSubmissions()->whereNotNull('completed_at')->count();
+            // Tasks completed: TaskSubmission where user_id = user, paid_at not null
+            $tasksCompleted = $user->taskSubmissions()->whereNotNull('paid_at')->count();
             // Tasks on hand: TaskWorker where user_id = user (all tasks assigned)
             $tasksOnHand = $user->task_workers()->count();
             $user->tasks_completed = $tasksCompleted;
@@ -74,12 +74,12 @@ class UserController extends Controller
             $jobsPosted = $user->tasks()->count();
             $jobsCompleted = $user->tasks()->whereHas('workers', function($q) {
                 $q->whereHas('taskSubmissions', function($subQ) {
-                    $subQ->whereNotNull('completed_at');
+                    $subQ->whereNotNull('paid_at');
                 });
             })->get()->filter(function($task) {
                 // A job is completed if number of workers with completed submissions >= number_of_submissions
                 return $task->workers()->whereHas('taskSubmissions', function($q) {
-                    $q->whereNotNull('completed_at');
+                    $q->whereNotNull('paid_at');
                 })->count() >= $task->number_of_submissions;
             })->count();
             $user->jobs_completed = $jobsCompleted;
@@ -99,7 +99,7 @@ class UserController extends Controller
      */
     public function subscriptions(Request $request)
     {
-        $query = \App\Models\Subscription::with('user', 'plan')->localize();
+        $query = \App\Models\Subscription::with('user', 'booster')->localize();
 
         // Apply filters
         if ($request->filled('user_email')) {
@@ -111,8 +111,8 @@ class UserController extends Controller
             }
         }
 
-        if ($request->filled('plan_id')) {
-            $query->where('plan_id', $request->plan_id);
+        if ($request->filled('booster_id')) {
+            $query->where('booster_id', $request->booster_id);
         }
 
         if ($request->filled('status')) {
@@ -123,12 +123,12 @@ class UserController extends Controller
             $query->where('billing_cycle', $request->billing_cycle);
         }
 
-        // Get available plans for filter
-        $plans = \App\Models\Plan::where('is_active', 1)->get();
+        // Get available boosters for filter
+        $boosters = \App\Models\Booster::where('is_active', 1)->get();
 
         $subscriptions = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('backend.users.subscriptions', compact('subscriptions', 'plans'));
+        return view('backend.users.subscriptions', compact('subscriptions', 'boosters'));
     }
 
     /**
@@ -136,7 +136,7 @@ class UserController extends Controller
      */
     public function subscription_view(\App\Models\Subscription $subscription)
     {
-        $subscription->load('user', 'plan');
+        $subscription->load('user', 'booster');
 
         return view('backend.users.subscription_view', compact('subscription'));
     }
@@ -168,7 +168,7 @@ class UserController extends Controller
         $jobsPosted = $user->tasks()->withCount('workers')->get();
 
         // Jobs done (tasks user worked on)
-        $jobsDone = $user->task_workers()->with('task')->whereNotNull('accepted_at')->get();
+        $jobsDone = $user->task_workers()->with('task')->get();
 
         // Payments made
         $payments = Payment::where('user_id', $user->id)->latest()->get();

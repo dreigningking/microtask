@@ -95,10 +95,10 @@
                     @auth
 
                     <li class="nav-item">
-                        <a class="nav-link @if(request()->is('jobs.index')) active @endif" href="{{ route('jobs.index') }}">My Tasks</a>
+                        <a class="nav-link @if(request()->is('tasks.posted')) active @endif" href="{{ route('tasks.posted') }}">My Tasks</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @if(request()->is('tasks.index')) active @endif" href="{{ route('tasks.index') }}" href="#">Applied Tasks</a>
+                        <a class="nav-link @if(request()->is('tasks.applied')) active @endif" href="{{ route('tasks.applied') }}" href="#">Applied Tasks</a>
                     </li>
                     <!-- Show on mobile -->
                     <div class="d-md-none">
@@ -134,7 +134,7 @@
                 @else
                 <div class="d-flex">
 
-                    <a href="{{route('jobs.create')}}" class="btn btn-primary me-3"><i class="bi bi-plus-circle"></i> Post a Task</a>
+                    <a href="{{route('tasks.create')}}" class="btn btn-primary me-3"><i class="bi bi-plus-circle"></i> Post a Task</a>
                     <!-- Notifications -->
                     <div class="dropdown me-3 d-none d-md-block">
                         <a href="#" class="btn btn-outline-primary position-relative" data-bs-toggle="dropdown">
@@ -162,8 +162,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item @if(request()->is('dashboard')) active @endif" href="{{ route('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                            <li><a class="dropdown-item @if(request()->is('jobs.index')) active @endif" href="{{ route('jobs.index') }}"><i class="bi bi-briefcase"></i> My Posted Tasks</a></li>
-                            <li><a class="dropdown-item @if(request()->is('tasks.index')) active @endif" href="{{ route('tasks.index') }}"><i class="bi bi-check-circle"></i> Applied Tasks</a></li>
+                            <li><a class="dropdown-item @if(request()->is('tasks.posted')) active @endif" href="{{ route('tasks.posted') }}"><i class="bi bi-briefcase"></i> My Posted Tasks</a></li>
+                            <li><a class="dropdown-item @if(request()->is('tasks.applied')) active @endif" href="{{ route('tasks.applied') }}"><i class="bi bi-check-circle"></i> Applied Tasks</a></li>
                             <li><a class="dropdown-item @if(request()->is('earnings.settlements')) active @endif" href="{{ route('earnings.settlements') }}"><i class="bi bi-wallet2"></i> Earnings</a></li>
                             <li><a class="dropdown-item @if(request()->is('transactions')) active @endif" href="{{ route('transactions') }}"><i class="bi bi-receipt"></i> Transactions</a></li>
                             <li><a class="dropdown-item @if(request()->is('invitees')) active @endif" href="{{ route('invitees') }}"><i class="bi bi-people"></i> Invitees</a></li>
@@ -253,7 +253,7 @@
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="{{asset('frontend/js/bootstrap.bundle.min.js')}}"></script>
+    <script data-navigate-once src="{{asset('frontend/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{ asset('frontend/js/jquery.min.js') }}"></script>
     @livewireScripts
     <script>

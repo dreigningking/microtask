@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - MicroTasker</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f8fafc;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .blog-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .blog-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .blog-category {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .read-time {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .sidebar-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .popular-post {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .popular-post:last-child {
+            border-bottom: none;
+        }
+        
+        .popular-post-image {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .section-title {
+            position: relative;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .center-title:after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer h5 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: #9ca3af;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-primary" href="index.html">
+                <i class="bi bi-lightning-charge"></i> MicroTasker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="tasks.html">Browse Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="blog.html">Blog</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="login.html" class="btn btn-outline-primary me-2">Sign In</a>
+                    <a href="register.html" class="btn btn-primary">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 fw-bold mb-3">MicroTasker Blog</h1>
+                    <p class="lead mb-4">Tips, insights, and success stories from the world of micro-jobs</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="#featured" class="btn btn-light">Featured Posts</a>
+                        <a href="#categories" class="btn btn-outline-light">Browse Categories</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <i class="bi bi-journal-text display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- Featured Posts -->
+                    <div class="mb-5" id="featured">
+                        <h2 class="section-title">Featured Posts</h2>
+                        <div class="row">
+                            <!-- Featured Post 1 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="blog-card card h-100">
+                                    <img src="https://placehold.co/600x400/667eea/ffffff?text=MicroTasker+Blog" class="blog-image" alt="Featured Post">
+                                    <div class="card-body">
+                                        <span class="blog-category">Success Stories</span>
+                                        <h4 class="card-title mt-2">How I Made $5,000 in My First Month on MicroTasker</h4>
+                                        <p class="card-text text-muted">Discover the strategies that helped Sarah Johnson earn significant income while working from home...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/667eea/ffffff?text=SJ" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">Sarah Johnson</div>
+                                                <div class="read-time">Nov 15, 2023 · 8 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Featured Post 2 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="blog-card card h-100">
+                                    <img src="https://placehold.co/600x400/10b981/ffffff?text=MicroTasker+Blog" class="blog-image" alt="Featured Post">
+                                    <div class="card-body">
+                                        <span class="blog-category">Tips & Tricks</span>
+                                        <h4 class="card-title mt-2">10 Proven Ways to Get Your Task Applications Accepted</h4>
+                                        <p class="card-text text-muted">Learn the secrets to standing out from the competition and increasing your task acceptance rate...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/10b981/ffffff?text=MC" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">Mike Chen</div>
+                                                <div class="read-time">Nov 12, 2023 · 6 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Posts -->
+                    <div class="mb-5">
+                        <h2 class="section-title">Recent Posts</h2>
+                        
+                        <!-- Post 1 -->
+                        <div class="blog-card card mb-4">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="https://placehold.co/400x300/3b82f6/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <span class="blog-category">Product Updates</span>
+                                        <h4 class="card-title">New Feature: Account Boosters Now Available</h4>
+                                        <p class="card-text text-muted">We're excited to announce our new Account Boosters feature that lets you enhance your experience with temporary account features...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/3b82f6/ffffff?text=AD" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">Alex Davis</div>
+                                                <div class="read-time">Nov 10, 2023 · 5 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post 2 -->
+                        <div class="blog-card card mb-4">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="https://placehold.co/400x300/f59e0b/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <span class="blog-category">For Task Posters</span>
+                                        <h4 class="card-title">How to Write Task Descriptions That Attract Quality Workers</h4>
+                                        <p class="card-text text-muted">A well-written task description can make the difference between finding the perfect worker and receiving low-quality submissions...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/f59e0b/ffffff?text=ER" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">Emma Rodriguez</div>
+                                                <div class="read-time">Nov 8, 2023 · 7 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post 3 -->
+                        <div class="blog-card card mb-4">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="https://placehold.co/400x300/ef4444/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <span class="blog-category">Freelancing</span>
+                                        <h4 class="card-title">Balancing Micro-Tasks With Your Full-Time Job</h4>
+                                        <p class="card-text text-muted">Many of our top earners started while working full-time jobs. Here's how they manage their time effectively...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/ef4444/ffffff?text=DK" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">David Kim</div>
+                                                <div class="read-time">Nov 5, 2023 · 9 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post 4 -->
+                        <div class="blog-card card mb-4">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="https://placehold.co/400x300/8b5cf6/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <span class="blog-category">Community</span>
+                                        <h4 class="card-title">Meet Our Top Earner: An Interview With Sarah Davis</h4>
+                                        <p class="card-text text-muted">We sat down with Sarah Davis, who has earned over $25,000 on MicroTasker, to learn about her journey and strategies...</p>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <img src="https://placehold.co/40x40/8b5cf6/ffffff?text=PS" alt="Author" class="author-avatar me-2">
+                                            <div>
+                                                <div class="fw-bold">Priya Sharma</div>
+                                                <div class="read-time">Nov 2, 2023 · 10 min read</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Blog pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Search -->
+                    <div class="sidebar-card card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Search Blog</h5>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search articles...">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="sidebar-card card mb-4" id="categories">
+                        <div class="card-body">
+                            <h5 class="card-title">Categories</h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>Success Stories</span>
+                                        <span class="badge bg-primary">12</span>
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>Tips & Tricks</span>
+                                        <span class="badge bg-primary">8</span>
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>For Task Posters</span>
+                                        <span class="badge bg-primary">5</span>
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>Product Updates</span>
+                                        <span class="badge bg-primary">4</span>
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>Freelancing</span>
+                                        <span class="badge bg-primary">7</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>Community</span>
+                                        <span class="badge bg-primary">3</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Popular Posts -->
+                    <div class="sidebar-card card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Popular Posts</h5>
+                            
+                            <div class="popular-post">
+                                <img src="https://placehold.co/80x60/667eea/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
+                                <div>
+                                    <h6 class="mb-1">How to Maximize Your Earnings on MicroTasker</h6>
+                                    <small class="text-muted">Oct 28, 2023</small>
+                                </div>
+                            </div>
+                            
+                            <div class="popular-post">
+                                <img src="https://placehold.co/80x60/10b981/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
+                                <div>
+                                    <h6 class="mb-1">The Complete Guide to Task Applications</h6>
+                                    <small class="text-muted">Oct 22, 2023</small>
+                                </div>
+                            </div>
+                            
+                            <div class="popular-post">
+                                <img src="https://placehold.co/80x60/f59e0b/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
+                                <div>
+                                    <h6 class="mb-1">5 Common Mistakes New Task Posters Make</h6>
+                                    <small class="text-muted">Oct 15, 2023</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="sidebar-card card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Popular Tags</h5>
+                            <div class="d-flex flex-wrap">
+                                <a href="#" class="tag">Earnings</a>
+                                <a href="#" class="tag">Tips</a>
+                                <a href="#" class="tag">Success</a>
+                                <a href="#" class="tag">Freelancing</a>
+                                <a href="#" class="tag">Applications</a>
+                                <a href="#" class="tag">Productivity</a>
+                                <a href="#" class="tag">Reviews</a>
+                                <a href="#" class="tag">Community</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="sidebar-card card">
+                        <div class="card-body">
+                            <h5 class="card-title">Subscribe to Newsletter</h5>
+                            <p class="card-text text-muted small">Get the latest blog posts and platform updates delivered to your inbox.</p>
+                            <div class="input-group mb-2">
+                                <input type="email" class="form-control" placeholder="Your email address">
+                                <button class="btn btn-primary" type="button">Subscribe</button>
+                            </div>
+                            <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5><i class="bi bi-lightning-charge"></i> MicroTasker</h5>
+                    <p class="text-muted">Connecting task posters with skilled workers for micro-jobs worldwide.</p>
+                    <div class="social-icons mt-4">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>For Workers</h6>
+                    <ul class="footer-links">
+                        <li><a href="tasks.html">Find Tasks</a></li>
+                        <li><a href="#">How it Works</a></li>
+                        <li><a href="earnings.html">Top Earners</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>For Posters</h6>
+                    <ul class="footer-links">
+                        <li><a href="task_create.html">Post a Task</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Tips</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>Company</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6>Legal</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">&copy; 2024 MicroTasker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

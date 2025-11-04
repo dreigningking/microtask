@@ -24,7 +24,7 @@ How Wonegig Works
 4.Collaborate & Deliver – Built-in chat, milestone tracking, and file vault keep work moving.
 5.Rate & Re-Hire – Reputation scoring rewards reliability, making future matches even faster.
 Trust & Safety You Can Audit
-ISO 27001-aligned controls and 24/7 threat monitoring
+ISO 27001-aligned controls and 24/7 threat review
 Two-factor authentication and IP/geo-fencing for every account
 Independent dispute-resolution panel with sub-48-hour rulings
 Our Values

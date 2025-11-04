@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Payment;
 use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\Sluggable;
 
 class Order extends Model
@@ -33,24 +34,85 @@ class Order extends Model
         return uniqid();
     }
 
-    public function items(){
+    public function items()
+    {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function payment(){
+    public function payment()
+    {
         return $this->hasOne(Payment::class);
     }
 
-    public function scopeLocalize($query)
+    /**
+     * Get the user who created this order
+     */
+    public function user(): BelongsTo
     {
-        if (auth()->user()->first_role->name == 'super-admin') {
-            return $query;
-        }
+        return $this->belongsTo(User::class);
+    }
 
-        return $query->where(function ($q) {
-            $q->whereHas('user', function ($q) {
-                $q->where('country_id', auth()->user()->country_id);
-            });
-        });
+    /**
+     * Check if order is processed
+     */
+    public function isProcessed(): bool
+    {
+        return !is_null($this->processed_at);
+    }
+
+    /**
+     * Check if order is completed
+     */
+    public function isCompleted(): bool
+    {
+        return !is_null($this->completed_at);
+    }
+
+    /**
+     * Check if order is refunded
+     */
+    public function isRefunded(): bool
+    {
+        return !is_null($this->refunded_at);
+    }
+
+    /**
+     * Scope for processed orders
+     */
+    public function scopeProcessed($query)
+    {
+        return $query->whereNotNull('processed_at');
+    }
+
+    /**
+     * Scope for completed orders
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->whereNotNull('completed_at');
+    }
+
+    /**
+     * Scope for refunded orders
+     */
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('refunded_at');
+    }
+
+    /**
+     * Scope for orders by user
+     */
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope for orders with specific slug
+     */
+    public function scopeBySlug($query, $slug)
+    {
+        return $query->where('slug', $slug);
     }
 }

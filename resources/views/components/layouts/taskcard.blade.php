@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
             <span class="badge bg-info">{{ $task->platform->name }}</span>
             <span class="price-tag">{{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
         </div>
-        <h5 class="card-title">{{ $task->title }}</h5>
+        <h5 class="card-title">
+             <a href="{{ route('explore.task',$task) }}">{{ $task->title }}</a>  
+        </h5>
         <p class="card-text text-muted">{{ Str::words($task->description, 10, '...') }}</p>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <small class="text-muted"><i class="bi bi-clock"></i> {{ $task->estimated_time }} left</small>

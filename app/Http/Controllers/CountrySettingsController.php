@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Traits\HelperTrait;
-use App\Models\Plan;
+use App\Models\Booster;
 use App\Models\Country;
 use App\Models\CountryPrice;
 use App\Models\TaskTemplate;
@@ -45,7 +45,7 @@ class CountrySettingsController extends Controller
         }
         
         $templates = TaskTemplate::where('is_active', true)->orderBy('name', 'asc')->get();
-        $plans = Plan::where('is_active',true)->get();
+        $boosters = Booster::where('is_active',true)->get();
         // Fetch all country prices for this country
         $countryPrices = CountryPrice::where('country_id', $country->id)->get();
         // Key by priceable_type and priceable_id for easy lookup in the view
@@ -60,7 +60,7 @@ class CountrySettingsController extends Controller
         } catch (\Exception $e) {
             $exchangeRate = 1;
         }
-        return view('backend.settings.country-config', compact('country', 'settings', 'templates','plans', 'countryPricesByKey', 'exchangeRate'));
+        return view('backend.settings.country-config', compact('country', 'settings', 'templates','boosters', 'countryPricesByKey', 'exchangeRate'));
     }
 
     public function update(Request $request)
@@ -115,13 +115,13 @@ class CountrySettingsController extends Controller
             }
         }
         
-        // Handle Urgent Rates
-        if ($request->has('urgent_rates')) {
-            $urgentRates = $request->input('urgent_rates');
-            if (is_string($urgentRates)) {
-                $settings->urgent_rates = json_decode($urgentRates, true);
+        // Handle Broadcast Rates
+        if ($request->has('broadcast_rates')) {
+            $broadcastRates = $request->input('broadcast_rates');
+            if (is_string($broadcastRates)) {
+                $settings->broadcast_rates = json_decode($broadcastRates, true);
             } else {
-                $settings->urgent_rates = $urgentRates;
+                $settings->broadcast_rates = $broadcastRates;
             }
         }
         
@@ -149,7 +149,7 @@ class CountrySettingsController extends Controller
         $settings->holiday_payout = $request->has('holiday_payout');
         $settings->gateway = $request->input('gateway');
         $settings->feature_rate = $request->input('feature_rate', 0);
-        $settings->urgent_rate = $request->input('urgent_rate', 0);
+        $settings->broadcast_rate = $request->input('broadcast_rate', 0);
         $settings->save();
 
         // Handle Country Prices for Templates
@@ -167,14 +167,14 @@ class CountrySettingsController extends Controller
                 );
             }
         }
-        // Handle Country Prices for Plans
-        if ($request->has('plan_prices')) {
-            foreach ($request->input('plan_prices') as $planId => $amount) {
+        // Handle Country Prices for Boosters
+        if ($request->has('booster_prices')) {
+            foreach ($request->input('booster_prices') as $boosterId => $amount) {
                 \App\Models\CountryPrice::updateOrCreate(
                     [
                         'country_id' => $countryId,
-                        'priceable_type' => Plan::class,
-                        'priceable_id' => $planId,
+                        'priceable_type' => Booster::class,
+                        'priceable_id' => $boosterId,
                     ],
                     [
                         'amount' => $amount
@@ -248,9 +248,9 @@ class CountrySettingsController extends Controller
         $settings = CountrySetting::firstOrNew(['country_id' => $countryId]);
 
         $settings->feature_rate = $request->input('feature_rate', 0);
-        $settings->urgent_rate = $request->input('urgent_rate', 0);
-        $settings->admin_monitoring_cost = $request->input('admin_monitoring_cost', 0);
-        $settings->system_monitoring_cost = $request->input('system_monitoring_cost', 0);
+        $settings->broadcast_rate = $request->input('broadcast_rate', 0);
+        $settings->admin_review_cost = $request->input('admin_review_cost', 0);
+        $settings->system_review_cost = $request->input('system_review_cost', 0);
         $settings->invitee_commission_percentage = $request->input('invitee_commission_percentage', 0);
         $settings->referral_earnings_percentage = $request->input('referral_earnings_percentage', 0);
         $settings->save();
@@ -297,17 +297,17 @@ class CountrySettingsController extends Controller
         return redirect()->route('admin.settings.country', $country)->with('success', 'Template prices updated.');
     }
 
-    public function savePlanPrices(Request $request)
+    public function saveBoosterPrices(Request $request)
     {
         $countryId = $request->input('country_id');
         $country = Country::findOrFail($countryId);
-        if ($request->has('plan_prices')) {
-            foreach ($request->input('plan_prices') as $planId => $amount) {
+        if ($request->has('booster_prices')) {
+            foreach ($request->input('booster_prices') as $boosterId => $amount) {
                 \App\Models\CountryPrice::updateOrCreate(
                     [
                         'country_id' => $countryId,
-                        'priceable_type' => \App\Models\Plan::class,
-                        'priceable_id' => $planId,
+                        'priceable_type' => \App\Models\Booster::class,
+                        'priceable_id' => $boosterId,
                     ],
                     [
                         'amount' => $amount
@@ -315,7 +315,7 @@ class CountrySettingsController extends Controller
                 );
             }
         }
-        return redirect()->route('admin.settings.country', $country)->with('success', 'Plan prices updated.');
+        return redirect()->route('admin.settings.country', $country)->with('success', 'Booster prices updated.');
     }
 
     public function saveVerificationSettings(Request $request)

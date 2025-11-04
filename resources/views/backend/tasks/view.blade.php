@@ -10,25 +10,25 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.tasks.index') }}">Tasks</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.tasks.applied') }}">Tasks</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ $task->title }}</li>
                 </ol>
             </nav>
         </div>
 
         @php
-            // Calculate monitoring status
+            // Calculate review status
             
             $submissions = $task->submissions ?? collect();
             $needsAdminReview = 0;
             $escalatedSubmissions = 0;
             $adminReviewFee = 0;
             
-            if ($task->monitoring_type === 'admin_monitoring') {
+            if ($task->review_type === 'admin_review') {
                 // All submissions need admin review
                 $needsAdminReview = $submissions->where('reviewed_at', null)->count();
-                $adminReviewFee = $submissions->count() * ($task->country->admin_monitoring_cost ?? 10);
-            } elseif ($task->monitoring_type === 'self_monitoring') {
+                $adminReviewFee = $submissions->count() * ($task->country->admin_review_cost ?? 10);
+            } elseif ($task->review_type === 'self_review') {
                 // Only escalated submissions need admin review
                 $deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
                 $deadlineHours = intval($deadlineHours);
@@ -39,10 +39,10 @@
                     return now()->isAfter($expectedReviewTime);
                 })->count();
                 $needsAdminReview = $escalatedSubmissions;
-                $adminReviewFee = $escalatedSubmissions * ($task->country->admin_monitoring_cost ?? 10);
+                $adminReviewFee = $escalatedSubmissions * ($task->country->admin_review_cost ?? 10);
             }
             
-            $totalPaidFee = $task->admin_monitoring_fee ?? 0;
+            $totalPaidFee = $task->admin_review_fee ?? 0;
             $refundAmount = $totalPaidFee - $adminReviewFee;
         @endphp
 
@@ -64,8 +64,8 @@
                                 @if($promotion->type == 'featured')
                                     <span class="badge bg-info me-2">Featured</span>
                                 @endif
-                                @if($promotion->type == 'urgent')
-                                    <span class="badge bg-danger me-2">Urgent</span>
+                                @if($promotion->type == 'broadcast')
+                                    <span class="badge bg-danger me-2">Broadcast</span>
                                 @endif
                             @endforeach
                             
@@ -279,15 +279,15 @@
 
                                                 <hr>
 
-                                                <h6 class="card-subtitle text-muted mb-3">Monitoring Details</h6>
+                                                <h6 class="card-subtitle text-muted mb-3">Review Details</h6>
                                                 <div class="mb-3">
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <span class="text-muted">Type</span>
-                                                        <span class="text-body">{{ ucfirst(str_replace('_', ' ', $task->monitoring_type)) }}</span>
+                                                        <span class="text-body">{{ ucfirst(str_replace('_', ' ', $task->review_type)) }}</span>
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <span class="text-muted">Frequency</span>
-                                                        <span class="text-body">{{ ucfirst($task->monitoring_frequency) }}</span>
+                                                        <span class="text-body">{{ ucfirst($task->review_frequency) }}</span>
                                                     </div>
                                                 </div>
 
@@ -665,7 +665,7 @@
                                                         <label class="form-label">Promotion Type</label>
                                                         <select class="form-select">
                                                             <option value="featured">Featured Task</option>
-                                                            <option value="urgent">Urgent Task</option>
+                                                            <option value="broadcast">Broadcast Task</option>
                                                         </select>
                                                     </div>
                                                     <div class="mb-3">

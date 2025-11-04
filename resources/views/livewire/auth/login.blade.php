@@ -18,13 +18,13 @@
                                     Email or Username
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-envelope text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-envelope"></i>
                                     </span>
                                     <input type="text"
                                         id="login"
                                         wire:model="login"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control py-3"
                                         placeholder="your@email.com or username"
                                         required>
                                 </div>
@@ -42,13 +42,13 @@
                                     Password
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-lock text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-lock text-muted"></i>
                                     </span>
                                     <input type="password"
                                         id="password"
                                         wire:model="password"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control py-3"
                                         placeholder="••••••••"
                                         required>
                                 </div>

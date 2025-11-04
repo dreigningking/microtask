@@ -182,12 +182,7 @@
                 <div class="flex justify-between items-center">
                     <div class="flex gap-2">
                         @auth
-                        <button 
-                            wire:click="hideTask({{ $selectedTask->id }})" 
-                            class="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-button hover:bg-gray-50">
-                            <i class="ri-eye-off-line"></i>
-                            <span>Hide Task</span>
-                        </button>
+                        
                         <button 
                             wire:click="reportTask({{ $selectedTask->id }})" 
                             class="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-700 rounded-button hover:bg-red-50">

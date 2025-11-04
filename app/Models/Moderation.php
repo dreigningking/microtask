@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Moderation extends Model
+{
+    protected $fillable = [
+        'moderatable_id',
+        'moderatable_type',
+        'moderator_id',
+        'purpose',
+        'status',
+        'notes',
+        'moderated_at',
+    ];
+
+    protected $casts = [
+        'moderated_at' => 'datetime',
+    ];
+
+    /**
+     * Get the parent moderatable model (polymorphic)
+     */
+    public function moderatable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Get the moderator who performed the moderation
+     */
+    public function moderator(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Scope for pending moderations
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope for approved moderations
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Scope for rejected moderations
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    /**
+     * Scope for moderations by type
+     */
+    public function scopeOfType($query, $type)
+    {
+        return $query->where('moderatable_type', $type);
+    }
+}

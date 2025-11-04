@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Setting;
-use App\Models\BlogPost;
+use App\Models\Post;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +17,7 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BlogPost::with('user');
+        $query = Post::with('user');
 
         // Apply filters
         if ($request->filled('title')) {
@@ -125,7 +125,7 @@ class BlogController extends Controller
         // Calculate reading time
         $data['reading_time'] = $this->calculateReadingTime($data['content']);
 
-        BlogPost::create($data);
+        Post::create($data);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog post created successfully.');
     }
@@ -149,7 +149,7 @@ class BlogController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(BlogPost $post)
+    public function edit(Post $post)
     {
         $categories = json_decode(Setting::getValue('blog_categories'));
         return view('backend.blog.edit', compact('post', 'categories'));
@@ -160,7 +160,7 @@ class BlogController extends Controller
      */
     public function update(Request $request)
     {
-        $post = BlogPost::findOrFail($request->id);
+        $post = Post::findOrFail($request->id);
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
@@ -224,7 +224,7 @@ class BlogController extends Controller
      */
     public function destroy(Request $request)
     {
-        $post = BlogPost::findOrFail($request->id);
+        $post = Post::findOrFail($request->id);
 
         if ($post->featured_image && Storage::disk('public')->exists($post->featured_image)) {
             Storage::disk('public')->delete($post->featured_image);
@@ -240,7 +240,7 @@ class BlogController extends Controller
      */
     public function comments()
     {
-        $query = Comment::with(['blogPost', 'user', 'approvedBy'])
+        $query = Comment::with(['post', 'user', 'approvedBy'])
             ->latest();
 
         // Filter by status
@@ -250,7 +250,7 @@ class BlogController extends Controller
 
         // Filter by blog post
         if (request('post')) {
-            $query->where('blog_post_id', request('post'));
+            $query->where('post_id', request('post'));
         }
 
         // Search functionality
@@ -264,7 +264,7 @@ class BlogController extends Controller
                       $userQuery->where('name', 'like', "%{$search}%")
                                ->orWhere('email', 'like', "%{$search}%");
                   })
-                  ->orWhereHas('blogPost', function($postQuery) use ($search) {
+                  ->orWhereHas('post', function($postQuery) use ($search) {
                       $postQuery->where('title', 'like', "%{$search}%");
                   });
             });
@@ -279,7 +279,7 @@ class BlogController extends Controller
         $spamCount = Comment::where('status', 'spam')->count();
 
         // Get all blog posts for filter dropdown
-        $posts = BlogPost::select('id', 'title')->orderBy('title')->get();
+        $posts = Post::select('id', 'title')->orderBy('title')->get();
 
         return view('backend.blog.comments', compact(
             'comments', 

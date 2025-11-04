@@ -16,6 +16,7 @@ class Wallet extends Model
         'user_id',
         'currency',
         'balance',
+        'is_frozen'
     ];
 
     public function user(): BelongsTo

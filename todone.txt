@@ -1,5 +1,30 @@
-Admin message to all via notification
-Ban user from user
-Admin support 
-Admin user limit by Country
-Payouts require approval 
+Tasks cannot be found when{
+    Task visibility is private
+    Task is expired
+    Task is inactive
+    Task is pending approval
+    Task is completed - number of paid submissions is complete to number required
+    You have blocked the task creator or the task creator has blocked you
+}
+
+Tasks cannot be applied for when{
+    User is banned from taking Task
+    Country is restricted
+    Number of submission is complete
+    You have blocked the task creator or the task creator has blocked you
+}
+
+Tasks cannot be submitted when{
+    Task creator has restricted user from submiting
+    Task submission allows only single submission 
+    User is banned from taking Task
+    Task is expired
+    You have blocked the task creator or the task creator has blocked you
+}
+
+notifications
+ - welcome
+ - invitation
+ - otp
+ - booster subscription expiry
+ - 

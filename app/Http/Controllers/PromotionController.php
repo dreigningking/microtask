@@ -104,17 +104,17 @@ class PromotionController extends Controller
         // Get data for filters
         $countries = Country::orderBy('name')->get();
         $promotionTypes = TaskPromotion::distinct()->pluck('type')->filter()->values();
-        $monitoringTypes = [
-            'self_monitoring' => 'Self Monitoring',
-            'admin_monitoring' => 'Admin Monitoring',
-            'system_monitoring' => 'System Monitoring'
+        $reviewTypes = [
+            'self_review' => 'System Review',
+            'admin_review' => 'Admin Review',
+            'system_review' => 'System Review'
         ];
 
         return view('backend.tasks.promotions', compact(
             'promotions',
             'countries',
             'promotionTypes',
-            'monitoringTypes'
+            'reviewTypes'
         ));
     }
 

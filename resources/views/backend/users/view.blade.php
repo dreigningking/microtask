@@ -28,7 +28,7 @@
                             <div class="mb-2">Total Earnings: <strong>${{ number_format($totalEarnings, 2) }}</strong></div>
                             <div class="mb-2">Jobs Posted: <strong>{{ $jobsPosted->count() }}</strong></div>
                             <div class="mb-2">Jobs Done: <strong>{{ $jobsDone->count() }}</strong></div>
-                            <div class="mb-2">Current Subscription: <strong>{{ $currentSubscription ? $currentSubscription->plan->name : 'None' }}</strong></div>
+                            <div class="mb-2">Current Subscription: <strong>{{ $currentSubscription ? $currentSubscription->booster->name : 'None' }}</strong></div>
                             <div class="mb-2">Wallet Status: <span class="badge bg-{{ $walletFrozen ? 'danger' : 'success' }}">{{ $walletFrozen ? 'Frozen' : 'Active' }}</span></div>
                             <div class="mb-2">Task Ban Status: <span class="badge bg-{{ $user->is_banned_from_tasks ? 'danger' : 'success' }}">{{ $user->is_banned_from_tasks ? 'Banned from Tasks' : 'Allowed to Take Tasks' }}</span></div>
                             <div class="mb-2">Avg. Worker Rating: <strong>{{ $averageWorkerRating ? number_format($averageWorkerRating, 2) : 'N/A' }}/5</strong></div>
@@ -86,7 +86,7 @@
                                     <li class="list-group-item">Status: <span class="badge bg-{{ $user->is_active ? 'success' : 'danger' }}">{{ $user->is_active ? 'Active' : 'Inactive' }}</span></li>
                                     <li class="list-group-item">Task Ban Status: <span class="badge bg-{{ $user->is_banned_from_tasks ? 'danger' : 'success' }}">{{ $user->is_banned_from_tasks ? 'Banned from Tasks' : 'Allowed to Take Tasks' }}</span></li>
                                     <li class="list-group-item">Member since: {{ $user->created_at->format('M d, Y') }}</li>
-                                    <li class="list-group-item">Current Subscription: {{ $currentSubscription ? $currentSubscription->plan->name : 'None' }}</li>
+                                    <li class="list-group-item">Current Subscription: {{ $currentSubscription ? $currentSubscription->booster->name : 'None' }}</li>
                                 </ul>
                                 <h5>Wallets</h5>
                                 @if($user->wallets->count())
@@ -238,7 +238,7 @@
                                 <table class="table table-striped">
                                                             <thead>
                                                                 <tr>
-                                            <th>Plan</th>
+                                            <th>Booster</th>
                                             <th>Status</th>
                                             <th>Started</th>
                                             <th>Expires</th>
@@ -248,7 +248,7 @@
                                                             <tbody>
                                         @forelse($subscriptions as $sub)
                                             <tr>
-                                                <td>{{ $sub->plan->name ?? '-' }}</td>
+                                                <td>{{ $sub->booster->name ?? '-' }}</td>
                                                 <td>{{ ucfirst($sub->status) }}</td>
                                                 <td>{{ $sub->starts_at ? $sub->starts_at->format('M d, Y') : '-' }}</td>
                                                 <td>{{ $sub->expires_at ? $sub->expires_at->format('M d, Y') : '-' }}</td>

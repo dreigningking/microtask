@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Payment;
-use App\Jobs\NotifyUrgentTaskPromotion;
+use App\Jobs\BroadcastTaskJob;
 use App\Models\TaskPromotion;
 
 class PaymentObserver
@@ -33,8 +33,8 @@ class PaymentObserver
                 // dd($item);
                 if ($item->orderable_type === 'App\Models\TaskPromotion') {
                     $promotion = TaskPromotion::find($item->orderable_id);
-                    if ($promotion && $promotion->type === 'urgent') {
-                        dispatch(new NotifyUrgentTaskPromotion($promotion));
+                    if ($promotion && $promotion->type === 'broadcast') {
+                        dispatch(new BroadcastTaskJob($promotion));
                     }
                 }
             }

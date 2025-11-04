@@ -78,8 +78,8 @@
 								</p>
 
 								<p class="mb-0">
-									<strong>Monitoring Type:</strong>
-									{{ ucfirst(str_replace('_', ' ', $submission->task->monitoring_type)) }}
+									<strong>Review Type:</strong>
+									{{ ucfirst(str_replace('_', ' ', $submission->task->review_type)) }}
 								</p>
 							</div>
 							<div class="col-md-6">
@@ -94,8 +94,8 @@
 										<div>
 											@if($submission->completed_at)
 												<span class="badge bg-success">Completed</span>
-											@elseif($submission->disputed_at)
-												@if($submission->resolved_at)
+											@elseif($submission->dispute)
+												@if($submission->dispute->resolved_at)
 													<span class="badge bg-info">Dispute Resolved</span>
 												@else
 													<span class="badge bg-warning">Disputed</span>
@@ -251,8 +251,8 @@
 							<div class="col-12">
 								<div class="d-flex justify-content-between align-items-center mb-2">
 									<span class="text-muted">Dispute Status:</span>
-									@if($submission->disputed_at)
-										@if($submission->resolved_at)
+									@if($submission->dispute)
+										@if($submission->dispute->resolved_at)
 											<span class="badge bg-info">Resolved</span>
 										@else
 											<span class="badge bg-warning">Active</span>
