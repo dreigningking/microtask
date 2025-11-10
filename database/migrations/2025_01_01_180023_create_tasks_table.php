@@ -23,10 +23,11 @@ return new class extends Migration
             $table->json('requirements')->nullable();
             $table->enum('visibility', ['public','private'])->default('public');
             $table->json('template_data')->nullable();
-            $table->json('restricted_countries')->nullable();
+            $table->enum('restriction',['allow','deny'])->nullable();
+            $table->json('task_countries')->nullable();
             $table->string('expected_budget')->nullable();
             $table->timestamp('expiry_date')->nullable();
-            $table->boolean('allow_multiple_submission')->default(0);
+            $table->boolean('allow_multiple_submissions')->default(0);
             $table->integer('number_of_submissions')->default(1);
             $table->string('budget_per_submission')->default(0);
             $table->enum('submission_review_type', ['self_review', 'admin_review','system_review'])->default('self_review');

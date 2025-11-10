@@ -12,30 +12,32 @@ use App\Models\Platform;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
-use App\Models\TaskTemplate;
+use App\Models\PlatformTemplate;
 use App\Models\TaskPromotion;
 use Livewire\WithFileUploads;
 use App\Http\Traits\PaymentTrait;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Http\Traits\GeoLocationTrait;
+use Illuminate\Support\Facades\Auth;
 
 
 class TaskCreate extends Component
 {
-    use WithFileUploads,GeoLocationTrait,PaymentTrait;
+    use WithFileUploads,PaymentTrait;
 
     // Step tracking
-    public $isLoggedIn = false;
     public $currentStep = 1;
     public $totalSteps = 4;
+
+    // Template loading state
+    public $isTemplateLoading = false;
+    public $templateFieldsLoaded = false;
     
     // Data collections
     public $platforms;
     public $templates;
-    public $location;
     public $countries;
     public $countrySetting;
+    public $restriction = 'all';
     
     // Template data from child component
     public $templateData = [];
@@ -45,7 +47,7 @@ class TaskCreate extends Component
     public $title;
     public $platform_id;
     public $template_id;
-    public $expected_completion_minutes;
+    public $average_completion_minutes;
     public $time_unit = 'minutes';
     
     // Job Description
@@ -65,7 +67,7 @@ class TaskCreate extends Component
     public $basePrice = 0;
     public $serviceFee = 0;
     public $tax_rate = 0;
-    public $restricted_countries = [];
+    public $task_countries = [];
     public $allow_multiple_submissions = false; // New field for allowing multiple submissions from single user
 
     // Transaction charges
@@ -90,22 +92,19 @@ class TaskCreate extends Component
     
     // Terms & Conditions
     public $terms = false;
-    public $email;
-    public $password;
-    public $remember = false;
     
     // Define listeners for model changes
     protected $listeners = [
-        'updateSelect2' => 'handleSelect2Update',
-        'templateFieldsLoaded' => 'handleTemplateFieldsLoaded',
-        'templateFieldUpdated' => 'handleTemplateFieldUpdated'
+        'templateFieldsAreLoaded' => 'handleTemplateFieldsLoaded',
+        'templateFieldUpdated' => 'handleTemplateFieldUpdated',
+        'choiceSelected' => 'handleChoiceSelected'
     ];
     
     // Validation rules
     protected $rules = [
         'title' => 'required|min:5',
         'platform_id' => 'required',
-        'expected_completion_minutes' => 'required|numeric|min:1',
+        'average_completion_minutes' => 'required|numeric|min:1',
         'description' => 'required|min:20',
         'requirements' => 'nullable|array',
         'budget_per_submission' => 'required|numeric|min:0',
@@ -113,9 +112,7 @@ class TaskCreate extends Component
         'review_type' => 'required',
         'visibility' => 'required|in:public,private',
         'expiry_date' => 'nullable|date|after:today',
-        'email' => 'required|email|sometimes',
-        'password' => 'required|sometimes',
-        'terms' => 'accepted|sometimes',
+        'terms' => 'accepted',
     ];
 
     // Validation messages
@@ -129,32 +126,64 @@ class TaskCreate extends Component
 
     public $min_budget_per_submission = 0;
     public $review_fee = 0;
-    public $enable_system_review = false;
+    public $enable_system_submission_review = false;
     public $showSystemReviewRefundNote = false;
+    public $adminReviewCost = 0;
+    public $systemReviewCost = 0;
+    public $hasFeaturedSubscription = false;
+    public $hasBroadcastSubscription = false;
+    public $featuredSubscriptionDaysRemaining = 0;
 
-    public $serviceUnavailable = false;
-    public $unavailableCountryName = null;
+   
 
     public static $allowedFileTypes = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
-
-    public $canSaveDraft = false;
 
     public function getStepRules()
     {
         $rules = [];
         if ($this->currentStep == 1) {
-            // Step 1: Template selection (must select a template only)
-            $rules = [
-                'template_id' => 'required',
-            ];
-        } elseif ($this->currentStep == 2) {
-            // Step 2: Job details
+            // Step 1: Template selection and basic info
             $rules = [
                 'title' => 'required|min:5',
                 'description' => 'required|min:20',
-                'expected_completion_minutes' => 'required|numeric|min:1',
+                'template_id' => 'required',
+            ];
+
+            // Add validation rules for required template fields in step 1
+            if (!empty($this->templateData)) {
+                Log::info("Template data for step 1 validation:", $this->templateData);
+                foreach ($this->templateData as $key => $field) {
+                    if ($field['required'] ?? false) {
+                        // For file fields, check if a file path exists
+                        if (isset($field['type']) && $field['type'] === 'file') {
+                            // Don't add validation rule for file fields, we'll check manually
+                            Log::info("File field detected in step 1: {$key}", [
+                                'field_type' => $field['type'],
+                                'field_value' => $field['value'],
+                                'is_empty' => empty($field['value']),
+                                'field_structure' => $field
+                            ]);
+                        } else {
+                            $rules["templateData.{$key}.value"] = 'required';
+                            Log::info("Added step 1 validation rule for field: {$key}", [
+                                'field_type' => $field['type'] ?? 'unknown',
+                                'field_value' => $field['value'],
+                                'is_empty' => empty($field['value'])
+                            ]);
+                        }
+                        $this->messages["templateData.{$key}.value.required"] = "The {$field['title']} field is required";
+                    }
+                }
+            }
+        } elseif ($this->currentStep == 2) {
+            // Step 2: Job details - include basic fields
+            $rules = [
+                'title' => 'required|min:5',
+                'description' => 'required|min:20',
+                'average_completion_minutes' => 'required|numeric|min:1',
                 'requirements' => 'nullable|array',
             ];
+
             // Add validation rules for required template fields
             if (!empty($this->templateData)) {
                 Log::info("Template data for validation:", $this->templateData);
@@ -192,67 +221,56 @@ class TaskCreate extends Component
                 'allow_multiple_submissions' => 'boolean',
             ];
         } elseif ($this->currentStep == 4) {
-            // Step 4: Login or review/confirmation
-            if (!Auth::check()) {
-                $rules = [
-                    'email' => 'required|email',
-                    'password' => 'required',
-                ];
-            } else {
-                $rules = [
-                    'terms' => 'accepted',
-                ];
-            }
+            // Step 4: Review/confirmation
+            $rules = [
+                'terms' => 'accepted',
+            ];
         }
         return $rules;
     }
 
     public function mount()
     {
-        $this->isLoggedIn = Auth::check();
-        $this->location = $this->getLocation();
-        $this->currency = $this->location->currency;
-        $this->currency_symbol = $this->location->currency_symbol;
+        $user = Auth::user();
+        $country = Country::find($user->country_id);
+        $this->currency = $country->currency;
+        $this->currency_symbol = $country->currency_symbol;
         $this->requirements = [];
         $this->platforms = Platform::where('is_active', true)->get();
-        $this->templates = TaskTemplate::where('is_active', true)
-            ->whereHas('prices', function($q) {
-                $q->where('country_id', $this->location->country_id);
+        $this->templates = PlatformTemplate::where('is_active', true)
+            ->whereHas('countryPrices', function($q) use ($user) {
+                $q->where('country_id', $user->country_id);
             })->get();
         // Determine approved countries using Country model methods
-        $allCountries = Country::orderBy('name')->get();
-        $approvedCountries = collect();
-        foreach ($allCountries as $country) {
-            if ($country->status) {
-                $approvedCountries->push($country);
-            }
-        }
-        $this->countries = $approvedCountries;
-        // Set countrySetting for the user's/guest's country if available
-        $this->countrySetting = $this->location->country_id ? $approvedCountries->firstWhere('id', $this->location->country_id)?->setting : null;
-        // If user's/guest's country is not approved, set serviceUnavailable
-        if (!$approvedCountries->pluck('id')->contains($this->location->country_id)) {
-            $this->serviceUnavailable = true;
-            $this->unavailableCountryName = $this->location->country_name ?? 'your country';
-        }
+        $this->countries = Country::orderBy('name')->get();
+        $this->countrySetting = $country->setting;
 
         // Set pricing and other settings if available
-        $this->featured = $this->hasFeaturedInSubscription();
-        $this->broadcast = $this->hasBroadcastInSubscription();
-        $this->featuredPrice = $this->hasFeaturedInSubscription() ? 0 : ($this->countrySetting->feature_rate ?? 0);
-        $this->broadcastPrice = $this->hasBroadcastInSubscription() ? 0 : ($this->countrySetting->broadcast_rate ?? 0);
-        $this->tax_rate = $this->countrySetting->tax_rate ?? 0;
-        if ($this->countrySetting && $this->countrySetting->transaction_charges) {
-            $transactionCharges = $this->countrySetting->transaction_charges;
-            $this->transactionPercentage = $transactionCharges['percentage'] ?? 0;
-            $this->transactionFixed = $transactionCharges['fixed'] ?? 0;
-            $this->transactionCap = $transactionCharges['cap'] ?? 0;
+        $this->hasFeaturedSubscription = $this->hasFeaturedInSubscription();
+        $this->hasBroadcastSubscription = $this->hasBroadcastInSubscription();
+        $this->featured = $this->hasFeaturedSubscription;
+        $this->broadcast = $this->hasBroadcastSubscription;
+
+        // Get promotion costs from country settings
+        if ($this->countrySetting && isset($this->countrySetting->promotion_settings)) {
+            $this->featuredPrice = $this->hasFeaturedSubscription ? 0 : ($this->countrySetting->promotion_settings['feature_rate'] ?? 0);
+            $this->broadcastPrice = $this->hasBroadcastSubscription ? 0 : ($this->countrySetting->promotion_settings['broadcast_rate'] ?? 0);
+        }
+
+        // Get tax and transaction charges from country settings
+        if ($this->countrySetting && isset($this->countrySetting->transaction_settings)) {
+            $transactionSettings = $this->countrySetting->transaction_settings;
+            $this->tax_rate = $transactionSettings['tax']['percentage'] ?? 0;
+            $charges = $transactionSettings['charges'] ?? [];
+            $this->transactionPercentage = $charges['percentage'] ?? 0;
+            $this->transactionFixed = $charges['fixed'] ?? 0;
+            $this->transactionCap = $charges['cap'] ?? 0;
         }
         $this->min_budget_per_submission = 0;
         if ($this->template_id) {
-            $template = TaskTemplate::find($this->template_id);
+            $template = PlatformTemplate::find($this->template_id);
             if ($template) {
-                $this->min_budget_per_submission = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
+                $this->min_budget_per_submission = $template->prices->firstWhere('country_id', $user->country_id)->amount;
             }
         }
         // Set budget_per_submission and expected_budget to minimum on first visit
@@ -260,7 +278,14 @@ class TaskCreate extends Component
             $this->budget_per_submission = $this->min_budget_per_submission;
         }
         $this->expected_budget = $this->budget_per_submission * 1;
-        $this->enable_system_review = (bool) Setting::getValue('enable_system_review', false);
+        $this->enable_system_submission_review = (bool) Setting::getValue('enable_system_submission_review', false);
+
+        // Get review costs from country settings
+        if ($this->countrySetting && isset($this->countrySetting->review_settings)) {
+            $this->adminReviewCost = $this->countrySetting->review_settings['admin_review_cost'] ?? 0;
+            $this->systemReviewCost = $this->countrySetting->review_settings['system_review_cost'] ?? 0;
+        }
+
         $this->updateReviewFee();
         $this->updateTotals();
     }
@@ -275,7 +300,7 @@ class TaskCreate extends Component
             Log::info("Current template data:", $this->templateData);
             
             // Manual validation for file fields
-            if ($this->currentStep == 2 && !empty($this->templateData)) {
+            if (!empty($this->templateData)) {
                 foreach ($this->templateData as $key => $field) {
                     if (($field['required'] ?? false) && isset($field['type']) && $field['type'] === 'file') {
                         if (empty($field['value'])) {
@@ -298,20 +323,12 @@ class TaskCreate extends Component
             if ($this->currentStep < $this->totalSteps) {
                 $this->currentStep++;
                 if($this->currentStep == 2){
+                    Log::info('Step 2 now');
                     $this->dispatch('step2-shown');
                 }
             } elseif ($this->currentStep == $this->totalSteps) {
-                // On step 4, if not logged in, handle login
-                if (!Auth::check()) {
-                    $this->login();
-                    // If login successful, stay on step 4 and show review/confirmation
-                    if (Auth::check()) {
-                        $this->isLoggedIn = true;
-                        // No increment, stay on step 4
-                    }
-                } else {
-                    $this->submitJob();
-                }
+                // On final step, submit the job
+                $this->submitJob();
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error("Validation failed:", [
@@ -328,19 +345,48 @@ class TaskCreate extends Component
     {
         if ($this->currentStep > 1) {
             $this->currentStep--;
+            if($this->currentStep == 1){
+                Log::info('Step 1 now');
+                $this->dispatch('step1-shown');
+            }
             if($this->currentStep == 2){
                 $this->dispatch('step2-shown');
             }
         }
     }
     
-    public function handleSelect2Update($data, $element)
+    #[On('choiceSelected')]
+    public function handleChoiceSelected($id,$values)
     {
-        if($element == 'restricted_countries'){
-            $this->restricted_countries = $data;
-        }elseif($element == 'requirements'){
-            $this->requirements = $data;
+        if ($id === 'selectedTemplate') {
+            // Handle template selection
+            $this->template_id = is_array($values) ? ($values[0] ?? null) : $values;
+            $this->selectTemplate();
+            // Dispatch event to TaskTemplateFields component
+        } elseif ($id === 'toolsSelect') {
+            // Handle tools selection
+            $this->requirements = is_array($values) ? $values : ($values ? [$values] : []);
+        } elseif ($id === 'countriesSelect') {
+            // Handle countries selection
+            $this->task_countries = is_array($values) ? $values : ($values ? [$values] : []);
         }
+    }
+
+    public function selectTemplate()
+    {
+        $this->isTemplateLoading = true;
+        $this->templateFieldsLoaded = false;
+
+        $template = PlatformTemplate::find($this->template_id);
+        if ($template) {
+            $user = Auth::user();
+            $this->min_budget_per_submission = $template->countryPrices->firstWhere('country_id', $user->country_id)->amount;
+            if ($this->budget_per_submission < $this->min_budget_per_submission) {
+                $this->budget_per_submission = $this->min_budget_per_submission;
+            }
+            $this->updateTotals();
+        }
+        $this->dispatch('templateSelected', templateId:$this->template_id);
     }
     
     /**
@@ -349,7 +395,10 @@ class TaskCreate extends Component
     public function handleTemplateFieldsLoaded($templateFieldValues)
     {
         // Always set the full array, not just those with values
+        Log::info($templateFieldValues);
         $this->templateData = $templateFieldValues;
+        $this->isTemplateLoading = false;
+        $this->templateFieldsLoaded = true;
     }
     
     /**
@@ -365,25 +414,45 @@ class TaskCreate extends Component
         $this->templateData = $allValues;
     }
 
+
+
     public function updateTotals()
     {
-        $this->featuredPrice = $this->hasFeaturedInSubscription() ? 0 : ($this->countrySetting->feature_rate ?? 0);
-        $this->broadcastPrice = $this->hasBroadcastInSubscription() ? 0 : ($this->countrySetting->broadcast_rate ?? 0);
+        // Get promotion costs from country settings
+        if ($this->countrySetting && isset($this->countrySetting->promotion_settings)) {
+            $this->featuredPrice = $this->hasFeaturedSubscription ? 0 : ($this->countrySetting->promotion_settings['feature_rate'] ?? 0);
+            $this->broadcastPrice = $this->hasBroadcastSubscription ? 0 : ($this->countrySetting->promotion_settings['broadcast_rate'] ?? 0);
+        }
+
         $this->expected_budget = ($this->budget_per_submission ?? 0) * $this->number_of_submissions;
         $baseAmount = $this->expected_budget;
-        $this->featured_amount = $this->featured ? ($this->featuredPrice * $this->featured_days) : 0;
+
+        // Calculate featured amount - if user has subscription, use remaining days, otherwise use selected days
+        if ($this->featured) {
+            if ($this->hasFeaturedSubscription) {
+                $this->featured_days = $this->featuredSubscriptionDaysRemaining;
+                $this->featured_amount = 0; // Free for subscribers
+            } else {
+                $this->featured_amount = $this->featuredPrice * $this->featured_days;
+            }
+        } else {
+            $this->featured_amount = 0;
+        }
         $baseAmount += $this->featured_amount;
-        $this->broadcast_amount = $this->broadcast ? ($this->broadcastPrice * $this->number_of_submissions) : 0;
+
+        // Calculate broadcast amount
+        $this->broadcast_amount = $this->broadcast ? ($this->hasBroadcastSubscription ? 0 : ($this->broadcastPrice * $this->number_of_submissions)) : 0;
         $baseAmount += $this->broadcast_amount;
+
         $this->review_fee = 0;
         $submissions = ($this->number_of_submissions && $this->number_of_submissions > 0) ? $this->number_of_submissions : 1;
         $this->showSystemReviewRefundNote = false;
         if ($this->review_type === 'admin_review') {
-            $this->review_fee = ($this->countrySetting->admin_review_cost ?? 0) * $submissions;
+            $this->review_fee = $this->adminReviewCost * $submissions;
         } elseif ($this->review_type === 'system_review') {
-            $this->review_fee = ($this->countrySetting->system_review_cost ?? 0) * $submissions;
+            $this->review_fee = $this->systemReviewCost * $submissions;
         } elseif ($this->review_type === 'self_review') {
-            $this->review_fee = ($this->countrySetting->admin_review_cost ?? 0) * $submissions;
+            $this->review_fee = $this->adminReviewCost * $submissions;
             $this->showSystemReviewRefundNote = true;
         }
         $baseAmount += $this->review_fee;
@@ -442,7 +511,7 @@ class TaskCreate extends Component
     
     public function convertTimeToMinutes()
     {
-        $minutes = $this->expected_completion_minutes;
+        $minutes = $this->average_completion_minutes;
         
         switch ($this->time_unit) {
             case 'hours':
@@ -473,43 +542,19 @@ class TaskCreate extends Component
     
     public function saveAsDraft()
     {
-        if (!Auth::check()) {
-            session()->flash('error', 'You must be logged in to save a draft.');
-            return;
-        }
         // Only require template_id and platform_id (from template)
         if (!$this->template_id) {
             $this->addError('template_id', 'Please select a template.');
             return;
         }
-        $template = TaskTemplate::find($this->template_id);
+        $template = PlatformTemplate::find($this->template_id);
         if (!$template) {
             $this->addError('template_id', 'Invalid template selected.');
             return;
         }
-        $platform_id = $template->platform_id;
-        $task = new Task();
-        $task->user_id = Auth::id();
-        $task->template_id = $this->template_id;
-        $task->platform_id = $platform_id;
-        $task->title = $this->title;
-        $task->description = $this->description;
-        $task->expected_completion_minutes = $this->expected_completion_minutes;
-        $task->expected_budget = $this->expected_budget;
-        $task->requirements = $this->requirements;
-        $task->number_of_submissions = $this->number_of_submissions;
-        $task->visibility = $this->visibility;
-        $task->budget_per_submission = $this->budget_per_submission;
-        $task->currency = $this->currency;
-        $task->expiry_date = $this->expiry_date;
-        $task->review_type = $this->review_type;
-        $task->restricted_countries = $this->restricted_countries;
-        $task->is_active = false; // Mark as draft
-        $task->allow_multiple_submissions = $this->allow_multiple_submissions;
-        if (!empty($this->templateData)) {
-            $task->template_data = $this->templateData;
-        }
-        $task->save();
+
+        $task = $this->saveTask(false, false);
+
         // Save promotions if selected
         if ($this->featured) {
             $promotion = $this->createPromotion($task->id, 'featured');
@@ -523,48 +568,13 @@ class TaskCreate extends Component
     public function submitJob()
     {
         $this->validate($this->getStepRules());
-        
-        // If user is not logged in, we don't proceed with job submission
-        if (!Auth::check()) {
-            // Just validate login fields - actual login is handled by the login method
-            return;
-        }
-        
-        // Convert time units to minutes
-        $minutes = $this->convertTimeToMinutes();
-        
+
         // Calculate total budget based on per person budget
         $this->updateTotals();
-        
+
         // Create the task
-        $task = new Task();
-        $task->user_id = Auth::id();
-        $task->template_id = $this->template_id ?? 1; // Default template if none selected
-        $task->platform_id = TaskTemplate::find($this->template_id)->platform_id;
-        $task->title = $this->title;
-        $task->description = $this->description;
-        $task->expected_completion_minutes = $minutes;
-        $task->expected_budget = $this->expected_budget;
-        $task->requirements = $this->requirements;
-        $task->number_of_submissions = $this->number_of_submissions;
-        $task->visibility = $this->visibility;
-        $task->budget_per_submission = $this->budget_per_submission;
-        $task->currency = $this->currency;
-        $task->expiry_date = $this->expiry_date;
-        
-        // Store template field values if any
-        if (!empty($this->templateData)) {
-            $task->template_data = $this->templateData;
-        }
-        
-        // Convert review frequency to match the database enum values
-        $task->review_type = $this->review_type;
-        
-        $task->restricted_countries = $this->restricted_countries;
-        $task->is_active = true;
-        $task->allow_multiple_submissions = $this->allow_multiple_submissions;
-        $task->save();
-        
+        $task = $this->saveTask(true, true);
+
         $order = Order::create(['user_id' => Auth::id()]);
         OrderItem::create([
             'order_id' => $order->id,
@@ -572,6 +582,7 @@ class TaskCreate extends Component
             'orderable_type' => get_class($task),
             'amount' => $this->total - ($this->featured_amount + $this->broadcast_amount),
         ]);
+
         // If promotions are selected, create them
         if ($this->featured) {
             $promotion = $this->createPromotion($task->id, 'featured');
@@ -582,7 +593,7 @@ class TaskCreate extends Component
                 'amount' => $this->featured_amount,
             ]);
         }
-        
+
         if ($this->broadcast) {
             $promotion = $this->createPromotion($task->id, 'broadcast');
             OrderItem::create([
@@ -592,7 +603,7 @@ class TaskCreate extends Component
                 'amount' => $this->broadcast_amount,
             ]);
         }
-        
+
         $payment = Payment::create([
             'user_id' => Auth::id(),
             'order_id' => $order->id,
@@ -611,6 +622,34 @@ class TaskCreate extends Component
             return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
         }
     }
+
+    private function saveTask($isActive = false, $convertTime = false)
+    {
+        $task = new Task();
+        $task->user_id = Auth::id();
+        $task->platform_template_id = $this->template_id ?? 1;
+        $task->platform_id = PlatformTemplate::find($this->template_id)->platform_id;
+        $task->title = $this->title;
+        $task->description = $this->description;
+        $task->average_completion_minutes = $convertTime ? $this->convertTimeToMinutes() : $this->average_completion_minutes;
+        $task->expected_budget = $this->expected_budget;
+        $task->requirements = $this->requirements;
+        $task->number_of_submissions = $this->number_of_submissions;
+        $task->allow_multiple_submissions = $this->allow_multiple_submissions;
+        $task->visibility = $this->visibility;
+        $task->budget_per_submission = $this->budget_per_submission;
+        $task->expiry_date = $this->expiry_date;
+        $task->task_countries = $this->task_countries;
+        $task->submission_review_type = $this->review_type;
+        $task->restriction = $this->restriction == 'all' ? null : $this->restriction;
+        $task->is_active = $isActive;
+        
+        if (!empty($this->templateData)) {
+            $task->template_data = $this->templateData;
+        }
+        $task->save();
+        return $task;
+    }
     
     protected function createPromotion($taskId, $type)
     {
@@ -624,25 +663,6 @@ class TaskCreate extends Component
         ]);
     }
 
-    /**
-     * Handle user login
-     */
-    public function login()
-    {
-        $this->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-        $remember = $this->remember ?? false;
-        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $remember)) {
-            $this->reset(['password']);
-            $this->isLoggedIn = true;
-            $this->dispatch('UserHasLoggedIn');
-        } else {
-            session()->flash('error', 'Invalid credentials. Please try again.');
-            $this->addError('email', 'These credentials do not match our records.');
-        }
-    }
 
     public function updatedReviewType($value)
     {
@@ -653,23 +673,27 @@ class TaskCreate extends Component
     {
         $this->review_fee = 0;
         if ($this->review_type === 'admin_review') {
-            $this->review_fee = $this->countrySetting->admin_review_cost ?? 0;
+            $this->review_fee = $this->adminReviewCost;
         } elseif ($this->review_type === 'system_review') {
-            $this->review_fee = $this->countrySetting->system_review_cost ?? 0;
+            $this->review_fee = $this->systemReviewCost;
+        } elseif ($this->review_type === 'self_review') {
+            $this->review_fee = $this->adminReviewCost;
         }
     }
 
     public function getReviewLabelProperty()
     {
         if ($this->review_type === 'admin_review') {
-            return 'Admin-Monitored (' . $this->currency_symbol . number_format($this->countrySetting->admin_review_cost ?? 0, 2) . ')';
+            return 'Admin-Monitored (' . $this->currency_symbol . number_format($this->adminReviewCost, 2) . ')';
         } elseif ($this->review_type === 'system_review') {
-            return 'System-Automated (' . $this->currency_symbol . number_format($this->countrySetting->system_review_cost ?? 0, 2) . ')';
+            return 'System-Automated (' . $this->currency_symbol . number_format($this->systemReviewCost, 2) . ')';
+        } elseif ($this->review_type === 'self_review') {
+            return 'Self-Monitored (' . $this->currency_symbol . number_format($this->adminReviewCost, 2) . ' - Refundable)';
         }
         return 'Self-Monitored (Free)';
     }
 
-    public function updatedBudgetPerPerson($value)
+    public function updatedBudgetPerSubmission($value)
     {
         if ($value === '' || !is_numeric($value) || $value < $this->min_budget_per_submission) {
             $this->budget_per_submission = $this->min_budget_per_submission;
@@ -685,6 +709,11 @@ class TaskCreate extends Component
         $this->updateTotals();
     }
 
+    public function updatedRestriction($value)
+    {
+        // Dispatch event to initialize countries select when restriction changes
+        $this->dispatch('restriction-changed');
+    }
     public function updatedFeaturedDays($value)
     {
         if ($value === '' || !is_numeric($value) || $value < 1) {
@@ -698,40 +727,33 @@ class TaskCreate extends Component
         return view('livewire.tasks.task-create');
     }
 
-    public function selectTemplate($templateId)
-    {
-        $this->template_id = $templateId;
-        $template = TaskTemplate::find($templateId);
-        if ($template) {
-            //$this->platform_id = $template->platform_id; // Set platform_id from template
-            $this->description = $template->description ?? $this->description;
-            $this->min_budget_per_submission = $template->prices->firstWhere('country_id',$this->location->country_id)->amount;
-            if ($this->budget_per_submission < $this->min_budget_per_submission) {
-                $this->budget_per_submission = $this->min_budget_per_submission;
-            }
-            $this->updateTotals();
-        }
-        Log::info('dispatching event with template_id: ' . $this->template_id);
-        $this->dispatch('templateSelected', templateId:$this->template_id);
-    }
-
     public function hasFeaturedInSubscription()
     {
         if (!Auth::check()) return false;
-        // Check if user has active subscriptions with featured feature
         $user = Auth::user();
-        // This would need to be implemented based on your subscription system
-        // For now, return false as a placeholder
+        // Check for active subscription with 'feature-all-tasks' booster
+        $subscription = \App\Models\Subscription::where('user_id', $user->id)
+            ->where('booster_id', \App\Models\Booster::where('slug', 'feature-all-tasks')->first()?->id)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if ($subscription) {
+            $this->featuredSubscriptionDaysRemaining = intval(now()->diffInDays($subscription->expires_at));
+            return true;
+        }
         return false;
     }
 
     public function hasBroadcastInSubscription()
     {
         if (!Auth::check()) return false;
-        // Check if user has active subscriptions with broadcast feature
         $user = Auth::user();
-        // This would need to be implemented based on your subscription system
-        // For now, return false as a placeholder
-        return false;
+        // Check for active subscription with 'broadcast-all-tasks' booster
+        $subscription = \App\Models\Subscription::where('user_id', $user->id)
+            ->where('booster_id', \App\Models\Booster::where('slug', 'broadcast-all-tasks')->first()?->id)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        return $subscription ? true : false;
     }
 }

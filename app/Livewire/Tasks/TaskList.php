@@ -98,7 +98,7 @@ class TaskList extends Component
         $countryId = $this->countryId;
         $query = Task::query()
             ->with(['user.country', 'platform','latestModeration'])
-            ->listable();
+            ->listable($countryId);
 
         // Search
         if ($this->search) {

@@ -21,6 +21,14 @@
                 <p class="text-muted">Simple steps to start earning or getting tasks done</p>
             </div>
             <div class="row g-4">
+                <div class="col-12">
+                    <div wire:ignore class="mb-4">
+                        <label for="toolsSelect" class="form-label fw-bold">Tools Required</label>
+                        <input type="text" placeholder="Add tools" id="toolsSelect">
+                        <div class="form-text">Add tools or software required for this job</div>
+
+                    </div>
+                </div>
                 <!-- For Workers -->
                 <div class="col-lg-6">
                     <div class="how-it-works-card">
@@ -94,15 +102,15 @@
                 <p class="text-muted">Browse through the most in-demand categories and find the perfect task that matches your skills</p>
             </div>
             <div class="row g-4">
-                
+
                 @foreach($popularPlatforms as $platform)
                 <div class="col-md-2 col-6">
                     <a href="#" class="category-card card text-center dont_decorate p-4">
                         <div class="bg-primary bg-opacity-10 rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                             @if($platform['image'])
-                                <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" style="width:40px;height:40px;object-fit:contain;">
+                            <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" style="width:40px;height:40px;object-fit:contain;">
                             @else
-                                <i class="bi bi-laptop text-primary fs-3"></i>
+                            <i class="bi bi-laptop text-primary fs-3"></i>
                             @endif
                         </div>
                         <h5>{{ $platform['name'] }}</h5>
@@ -110,7 +118,7 @@
                     </a>
                 </div>
                 @endforeach
-                
+
             </div>
         </div>
     </section>
@@ -206,3 +214,41 @@
     </section>
 
 </div>
+@push('scripts')
+<script src="{{ asset('frontend/js/choices.min.js') }}"></script>
+<script>
+    const toolsSelect = document.getElementById('toolsSelect');
+    if (toolsSelect && !toolsSelect.choicesInstance) {
+        toolsSelectInstance = new Choices('#toolsSelect', {
+            addItems: true,
+            delimiter: ',',
+            editItems: true,
+            maxItemCount: 5,
+            removeItemButton: true,
+            placeholder: true,
+            placeholderValue: 'Add tools (e.g., Photoshop, Excel)',
+            
+
+        });
+
+        // Sync Choices.js selections with Livewire
+        toolsSelect.addEventListener('change', function(event) {
+            const values = toolsSelectInstance.getValue(true);
+            // Dispatch Livewire event
+            Livewire.dispatch('choiceSelected', {
+                id: 'toolsSelect',
+                values: values
+            });
+        });
+    }
+</script>
+@endpush
+@push('styles')
+<link href="{{ asset('frontend/css/choices.min.css') }}" rel="stylesheet" />
+<style>
+    .choices__list--multiple .choices__item{
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+</style>
+@endpush

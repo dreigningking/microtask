@@ -98,7 +98,7 @@
                         <span class="badge bg-primary">{{ $job->task_workers_count ?? 0 }} Workers</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="badge bg-{{ $job->status === 'open' ? 'warning' : ($job->status === 'ongoing' ? 'success' : 'secondary') }}">{{ ucfirst(str_replace('_', ' ', $job->status)) }}</span>
+                        <span class="badge bg-{{ $job->status === 'open' ? 'warning' : ($job->status === 'active' ? 'success' : 'secondary') }}">{{ ucfirst(str_replace('_', ' ', $job->status)) }}</span>
                         <div>
                             <button class="btn btn-sm btn-primary">View Details</button>
                             <button class="btn btn-sm btn-outline-secondary ms-2">Edit</button>

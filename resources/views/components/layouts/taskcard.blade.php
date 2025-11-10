@@ -1,7 +1,3 @@
-<?php
-use Illuminate\Support\Str;
-?>
-
 <div class="task-card card h-100">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-3">

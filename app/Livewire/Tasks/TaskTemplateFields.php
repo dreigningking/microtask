@@ -4,12 +4,12 @@ namespace App\Livewire\Tasks;
 
 use Livewire\Component;
 use Illuminate\Support\Str;
-use App\Models\TaskTemplate;
 use Livewire\Attributes\On; 
 use Livewire\WithFileUploads;
-use Livewire\TemporaryUploadedFile;
+use App\Models\PlatformTemplate;
 
 use Illuminate\Support\Facades\Log;
+use Livewire\TemporaryUploadedFile;
 
 class TaskTemplateFields extends Component
 {
@@ -21,16 +21,15 @@ class TaskTemplateFields extends Component
     public $validationErrors = [];
     
     protected $listeners = [
-        'validationErrors' => 'handleValidationErrors'
+        'validationErrors' => 'handleValidationErrors',
+        'templateSelected' => 'loadTemplateFields'
     ];
     
     /**
      * Load fields from the selected template
      */
-    #[On('templateSelected')] 
     public function loadTemplateFields($templateId)
     {
-        Log::info($templateId);
         $this->templateId = $templateId;
         
         // Reset template fields
@@ -39,7 +38,7 @@ class TaskTemplateFields extends Component
         $this->validationErrors = [];
         
         if (!empty($templateId)) {
-            $template = TaskTemplate::find($templateId);
+            $template = PlatformTemplate::find($templateId);
             
             if ($template && !empty($template->task_fields)) {
                 $taskFields = $template->task_fields;
@@ -50,9 +49,9 @@ class TaskTemplateFields extends Component
                     foreach ($taskFields as $field) {
                         Log::info($field);
                         if (isset($field['title'])) {
-                            $this->templateData[$field['name']] = [
+                            $this->templateData[$field['slug']] = [
                                 'value' => '',
-                                'name' => $field['name'],
+                                'slug' => $field['slug'],
                                 'required' => $field['required'] ?? false,
                                 'title' => $field['title'],
                                 'type' => $field['type'] ?? 'text'
@@ -63,7 +62,7 @@ class TaskTemplateFields extends Component
             }
         }
         // Always dispatch the full templateData array, even if empty
-        $this->dispatch('templateFieldsLoaded', $this->templateData);
+        $this->dispatch('templateFieldsAreLoaded', $this->templateData)->to(TaskCreate::class);
     }
     
     /**
@@ -109,7 +108,7 @@ class TaskTemplateFields extends Component
                 'value' => $this->templateData[$key]['value'],
                 'full_template_data' => $this->templateData
             ]);
-            $this->dispatch('templateFieldUpdated', $key, $this->templateData[$key]['value'], $this->templateData);
+            $this->dispatch('templateFieldUpdated', $key, $this->templateData[$key]['value'], $this->templateData)->to(TaskCreate::class);
         }
     }
 
@@ -155,7 +154,7 @@ class TaskTemplateFields extends Component
                         }
                         
                         // Dispatch event to notify parent component
-                        $this->dispatch('templateFieldUpdated', $fieldKey, $this->templateData[$fieldKey]['value'], $this->templateData);
+                        $this->dispatch('templateFieldUpdated', $fieldKey, $this->templateData[$fieldKey]['value'], $this->templateData)->to(TaskCreate::class);
                     } catch (\Exception $e) {
                         Log::error("File upload failed: " . $e->getMessage());
                         $this->addError("templateData.$fieldKey.value", "Failed to upload file: " . $e->getMessage());

@@ -704,6 +704,10 @@ a.dont_decorate {
     color: white;
     border-radius: 10px;
 }
+.stat-card.worker {
+    background: linear-gradient(135deg, #667eea 0%, #4ba299 100%);
+}
+
 
 
 .task-status-badge {

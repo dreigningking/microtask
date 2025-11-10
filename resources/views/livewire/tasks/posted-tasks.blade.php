@@ -6,11 +6,13 @@
                     <h1 class="h2 mb-2">My Posted Tasks</h1>
                     <p class="mb-0">Manage tasks you've posted and review applicants</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="btn-group">
-                        <a href="dashboard.html" class="btn btn-outline-light">Dashboard</a>
-                        <a href="applied-tasks.html" class="btn btn-outline-light">Applied Tasks</a>
-                    </div>
+                <div class="col-md-6 d-flex justify-content-md-end">
+                    <nav class="mt-2 mt-md-0" aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Posted Task</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -21,28 +23,40 @@
         <div class="container">
             <!-- Stats Overview -->
             <div class="row mb-4">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="card text-center p-3">
-                        <h4 class="text-primary mb-1">5</h4>
+                        <h4 class="text-dark mb-1">{{ $stats['total'] }}</h4>
                         <small class="text-muted">Total Posted</small>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="card text-center p-3">
-                        <h4 class="text-success mb-1">3</h4>
-                        <small class="text-muted">Completed</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center p-3">
-                        <h4 class="text-warning mb-1">1</h4>
+                        <h4 class="text-info mb-1">{{ $stats['in_progress'] }}</h4>
                         <small class="text-muted">In Progress</small>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="card text-center p-3">
-                        <h4 class="text-info mb-1">1</h4>
-                        <small class="text-muted">Waiting Review</small>
+                        <h4 class="text-warning mb-1">{{ $stats['pending_review'] }}</h4>
+                        <small class="text-muted">Pending Review</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center p-3">
+                        <h4 class="text-danger mb-1">{{ $stats['rejected'] }}</h4>
+                        <small class="text-muted">Rejected</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center p-3">
+                        <h4 class="text-secondary mb-1">{{ $stats['drafts'] }}</h4>
+                        <small class="text-muted">Draft</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center p-3">
+                        <h4 class="text-success mb-1">{{ $stats['completed'] }}</h4>
+                        <small class="text-muted">Completed</small>
                     </div>
                 </div>
             </div>
@@ -50,13 +64,16 @@
             <!-- Task Tabs -->
             <ul class="nav nav-tabs mb-4" id="myTasksTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button">Active Tasks</button>
+                    <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button">Active Tasks ({{ $stats['in_progress'] }})</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button">Completed</button>
+                    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">Pending Review ({{ $stats['pending_review'] }})</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="draft-tab" data-bs-toggle="tab" data-bs-target="#draft" type="button">Drafts</button>
+                    <button class="nav-link" id="draft-tab" data-bs-toggle="tab" data-bs-target="#draft" type="button">Drafts ({{ $stats['drafts'] }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button">Completed ({{ $stats['completed'] }})</button>
                 </li>
             </ul>
 
@@ -64,423 +81,251 @@
                 <!-- Active Tasks Tab -->
                 <div class="tab-pane fade show active" id="active" role="tabpanel">
                     <div class="row g-4">
-                        <!-- Task 1 - In Progress -->
+                        @forelse($activeTasks as $task)
                         <div class="col-12">
                             <div class="task-card card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <div>
-                                            <span class="badge bg-warning status-badge">In Progress</span>
-                                            <span class="badge bg-primary">Data Entry</span>
+                                            <span class="badge bg-success status-badge">Active</span>
+                                            <span class="badge bg-primary">{{ $task->platform->name }}</span>
                                         </div>
                                         <div class="text-end">
-                                            <h4 class="text-success mb-0">$25</h4>
+                                            <h4 class="text-success mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
                                             <small class="text-muted">Budget</small>
                                         </div>
                                     </div>
-                                    <h5 class="card-title">Excel Data Entry for Customer Records</h5>
-                                    <p class="card-text">Need someone to input 500 customer records into Excel spreadsheet with basic formatting and data validation.</p>
+                                    <h5 class="card-title">{{ $task->title }}</h5>
+                                    <p class="card-text">{{ Str::limit($task->description, 150) }}</p>
 
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-clock"></i> Deadline: 2 days left</small>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-file-earmark-text"></i> Submissions: {{ $task->taskSubmissions->count() }}/{{ $task->number_of_submissions }}</small>
                                         </div>
-                                        <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-people"></i> 8 applicants</small>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-people"></i> Workers: {{ $task->taskWorkers->count() }}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-clock"></i> Pending Reviews: {{ $task->taskSubmissions->where('accepted', false)->count() }}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-calendar"></i> Deadline: {{ $task->remaining_time ?? 'No deadline' }}</small>
                                         </div>
                                     </div>
 
-                                    <!-- Assigned Worker -->
+                                    <!-- Actions -->
                                     <div class="border-top pt-3">
-                                        <h6>Assigned Worker</h6>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/40" alt="Worker" class="rounded-circle me-3">
+                                        <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong>Sarah Johnson</strong>
-                                                <div class="text-warning small">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-half"></i>
-                                                    <span class="text-muted">(4.5)</span>
-                                                </div>
+                                                <small class="text-muted">Manage your active task</small>
                                             </div>
-                                            <div class="ms-auto">
-                                                <button class="btn btn-outline-primary btn-sm">Message</button>
-                                                <button class="btn btn-primary btn-sm">Review Work</button>
+                                            <div>
+                                                <a href="{{ route('tasks.manage', $task) }}" class="btn btn-primary btn-sm">View Details</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-briefcase display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Active Tasks</h4>
+                            <p class="text-muted">You don't have any active tasks at the moment.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                    @if($activeTasks->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $activeTasks->links() }}
+                    </div>
+                    @endif
+                </div>
 
-                        <!-- Task 2 - Waiting for Worker -->
+                <!-- Pending Review Tab -->
+                <div class="tab-pane fade" id="pending" role="tabpanel">
+                    <div class="row g-4">
+                        @forelse($pendingTasks as $task)
                         <div class="col-12">
                             <div class="task-card card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <div>
-                                            <span class="badge bg-info status-badge">Waiting for Worker</span>
-                                            <span class="badge bg-success">Social Media</span>
+                                            <span class="badge bg-warning status-badge">Pending Review</span>
+                                            <span class="badge bg-info">{{ $task->platform->name }}</span>
                                         </div>
                                         <div class="text-end">
-                                            <h4 class="text-success mb-0">$45</h4>
+                                            <h4 class="text-secondary mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
                                             <small class="text-muted">Budget</small>
                                         </div>
                                     </div>
-                                    <h5 class="card-title">Instagram Content Creation</h5>
-                                    <p class="card-text">Create 5 engaging Instagram posts for our coffee shop with brand-consistent visuals and captions.</p>
+                                    <h5 class="card-title">{{ $task->title }}</h5>
+                                    <p class="card-text">{{ Str::limit($task->description, 150) }}</p>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-clock"></i> Deadline: 5 days left</small>
+                                            <small class="text-muted"><i class="bi bi-calendar"></i> Submitted: {{ $task->created_at->diffForHumans() }}</small>
                                         </div>
                                         <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-people"></i> 3 applicants</small>
+                                            <small class="text-muted"><i class="bi bi-clock"></i> Waiting for admin approval</small>
                                         </div>
                                     </div>
 
-                                    <!-- Applicants -->
+                                    <!-- Actions -->
                                     <div class="border-top pt-3">
-                                        <h6>Applicants</h6>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <img src="https://via.placeholder.com/30" alt="Applicant" class="rounded-circle me-2">
-                                            <div class="flex-grow-1">
-                                                <strong>Mike Chen</strong>
-                                                <div class="text-warning small">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star"></i>
-                                                    <span class="text-muted">(4.0)</span>
-                                                </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <small class="text-muted">Your task is under review by our team</small>
                                             </div>
-                                            <button class="btn btn-success btn-sm">Accept</button>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/30" alt="Applicant" class="rounded-circle me-2">
-                                            <div class="flex-grow-1">
-                                                <strong>Emily Davis</strong>
-                                                <div class="text-warning small">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <span class="text-muted">(5.0)</span>
-                                                </div>
+                                            <div>
+                                                <a href="{{ route('tasks.edit', $task) }}" class="btn btn-outline-primary btn-sm">Edit Task</a>
                                             </div>
-                                            <button class="btn btn-success btn-sm">Accept</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-hourglass display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Tasks Pending Review</h4>
+                            <p class="text-muted">All your tasks have been reviewed.</p>
+                        </div>
+                        @endforelse
                     </div>
+                    @if($pendingTasks->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $pendingTasks->links() }}
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Completed Tasks Tab -->
                 <div class="tab-pane fade" id="completed" role="tabpanel">
                     <div class="row g-4">
-                        <!-- Completed Task 1 -->
+                        @forelse($completedTasks as $task)
                         <div class="col-12">
                             <div class="task-card card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <div>
                                             <span class="badge bg-success status-badge">Completed</span>
-                                            <span class="badge bg-info">Writing</span>
+                                            <span class="badge bg-info">{{ $task->platform->name }}</span>
                                         </div>
                                         <div class="text-end">
-                                            <h4 class="text-success mb-0">$60</h4>
-                                            <small class="text-muted">Paid</small>
+                                            <h4 class="text-success mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
+                                            <small class="text-muted">Total Budget</small>
                                         </div>
                                     </div>
-                                    <h5 class="card-title">Blog Article about Sustainable Living</h5>
-                                    <p class="card-text">1000-word blog post with SEO optimization and relevant images.</p>
+                                    <h5 class="card-title">{{ $task->title }}</h5>
+                                    <p class="card-text">{{ Str::limit($task->description, 150) }}</p>
 
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-calendar-check"></i> Completed: 2 days ago</small>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-file-earmark-check"></i> Submissions: {{ $task->taskSubmissions->where('accepted', true)->count() }}</small>
                                         </div>
-                                        <div class="col-md-6">
-                                            <small class="text-muted"><i class="bi bi-star-fill text-warning"></i> You rated: 5 stars</small>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-cash"></i> Paid Out: {{ Auth::user()->country->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-arrow-counterclockwise"></i> Refund: {{ Auth::user()->country->currency_symbol }}{{ number_format(($task->number_of_submissions - $task->taskSubmissions->where('accepted', true)->count()) * $task->budget_per_submission, 2) }}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted"><i class="bi bi-check-circle"></i> Reviewed: {{ $task->taskSubmissions->whereNotNull('reviewed_at')->count() }} (Admin: {{ $task->taskSubmissions->where('review_type', 'admin_review')->count() }}, Self: {{ $task->taskSubmissions->where('review_type', 'self_review')->count() }}, System: {{ $task->taskSubmissions->where('review_type', 'system_review')->count() }})</small>
                                         </div>
                                     </div>
 
-                                    <!-- Worker Info -->
+                                    <!-- Actions -->
                                     <div class="border-top pt-3">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <div class="d-flex align-items-center">
-                                                <img src="https://via.placeholder.com/40" alt="Worker" class="rounded-circle me-3">
-                                                <div>
-                                                    <strong>David Wilson</strong>
-                                                    <div class="text-warning small">
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <span class="text-muted">(5.0)</span>
-                                                    </div>
-                                                </div>
+                                            <div>
+                                                <small class="text-muted">Task completed successfully</small>
                                             </div>
-                                            <button class="btn btn-outline-secondary btn-sm">View Work</button>
+                                            <div>
+                                                <a href="{{ route('tasks.manage', $task) }}" class="btn btn-primary btn-sm">View Full Details</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-check-circle display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Completed Tasks</h4>
+                            <p class="text-muted">You don't have any completed tasks yet.</p>
+                        </div>
+                        @endforelse
                     </div>
+                    @if($completedTasks->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $completedTasks->links() }}
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Drafts Tab -->
                 <div class="tab-pane fade" id="draft" role="tabpanel">
-                    <div class="text-center py-5">
-                        <i class="bi bi-file-earmark-text display-1 text-muted"></i>
-                        <h4 class="text-muted mt-3">No Draft Tasks</h4>
-                        <p class="text-muted">You don't have any tasks in draft mode.</p>
-                        <a href="#" class="btn btn-primary">Create Your First Task</a>
+                    <div class="row g-4">
+                        @forelse($draftTasks as $task)
+                        <div class="col-12">
+                            <div class="task-card card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <span class="badge bg-secondary status-badge">Draft</span>
+                                            <span class="badge bg-light text-dark">{{ $task->platform->name }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <h4 class="text-muted mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
+                                            <small class="text-muted">Budget</small>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title">{{ $task->title }}</h5>
+                                    <p class="card-text">{{ Str::limit($task->description, 150) }}</p>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <small class="text-muted"><i class="bi bi-clock"></i> Created: {{ $task->created_at->diffForHumans() }}</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted"><i class="bi bi-pencil"></i> Draft - Not published</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="border-top pt-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <small class="text-muted">Complete your draft to publish</small>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('tasks.edit', $task) }}" class="btn btn-primary btn-sm">Edit Draft</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-file-earmark-text display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Draft Tasks</h4>
+                            <p class="text-muted">You don't have any tasks in draft mode.</p>
+                            <a href="{{ route('tasks.create') }}" class="btn btn-primary">Create Your First Task</a>
+                        </div>
+                        @endforelse
                     </div>
+                    @if($draftTasks->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $draftTasks->links() }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
 
 
-    <div class="content-wrapper d-none">
-        <!-- Header -->
-        <div class="card mb-4">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h4 mb-0">
-                        @switch($status)
-                        @case('in_progress')
-                        Ongoing Jobs
-                        @break
-                        @case('completed')
-                        Completed Jobs
-                        @break
-                        @case('drafts')
-                        Draft Jobs
-                        @break
-                        @default
-                        My Jobs
-                        @endswitch
-                    </h1>
-                    <p class="text-muted mb-0">
-                        @switch($status)
-                        @case('in_progress')
-                        Jobs that are currently being worked on by your team
-                        @break
-                        @case('completed')
-                        Jobs that have been successfully completed
-                        @break
-                        @case('drafts')
-                        Jobs that are saved but not yet published
-                        @break
-                        @default
-                        Manage all your posted jobs in one place
-                        @endswitch
-                    </p>
-                </div>
-                <a href="{{ route('tasks.create') }}" class="btn btn-primary d-flex align-items-center">
-                    <i class="ri-add-line me-1"></i>
-                    <span>Post New Job</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Filtering and Status Tabs -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row mb-4">
-                    <!-- Status Tabs -->
-                    <div class="col-md-8 mb-2 mb-md-0">
-                        <div class="btn-group" role="group">
-                            <a href="{{ route('tasks.posted') }}" class="btn btn-sm {{ $status === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                All Jobs ({{ $stats['total'] }})
-                            </a>
-                            <a href="{{ route('jobs.ongoing') }}" class="btn btn-sm {{ $status === 'in_progress' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Ongoing ({{ $stats['in_progress'] }})
-                            </a>
-                            <a href="{{ route('jobs.completed') }}" class="btn btn-sm {{ $status === 'completed' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Completed ({{ $stats['completed'] }})
-                            </a>
-                            <a href="{{ route('jobs.drafts') }}" class="btn btn-sm {{ $status === 'drafts' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Drafts ({{ $stats['drafts'] }})
-                            </a>
-                        </div>
-                    </div>
-                    <!-- Search -->
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <input type="text" wire:model.live.debounce.300ms="search" class="form-control form-control-sm" placeholder="Search jobs...">
-                            <span class="input-group-text bg-white border-0"><i class="ri-search-line text-muted"></i></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mobile Cards View -->
-                <div class="d-md-none">
-                    <div class="row g-3">
-                        @forelse($jobs as $job)
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">{{ $job->title }}</h5>
-                                            <div class="text-muted small">{{ $job->platform->name }}</div>
-                                        </div>
-                                        <div>
-                                            @if(!$job->is_active)
-                                            <span class="badge bg-secondary">Draft</span>
-                                            @elseif($job->workers->count() >= $job->number_of_submissions)
-                                            <span class="badge bg-warning">Completed</span>
-                                            @elseif($job->workers->count() > 0)
-                                            <span class="badge bg-info">In Progress</span>
-                                            @else
-                                            <span class="badge bg-success">Active</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-6 small"><span class="text-muted">Budget:</span> <span class="fw-semibold">{{ $job->user->country->currency_symbol }}{{ number_format($job->expected_budget, 2) }}</span></div>
-                                        <div class="col-6 small"><span class="text-muted">Workers:</span> <span class="fw-semibold">{{ $job->workers->count() }}/{{ $job->number_of_submissions }}</span></div>
-                                        <div class="col-6 small"><span class="text-muted">Submissions:</span> <span class="fw-semibold">{{ $job->workers->whereNotNull('submitted_at')->count() }}/{{ $job->workers->count() }}</span></div>
-                                        <div class="col-6 small"><span class="text-muted">Posted:</span> <span class="fw-semibold">{{ $job->created_at->format('M d, Y') }}</span></div>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('tasks.manage', $job) }}" class="btn btn-primary btn-sm flex-fill"><i class="ri-eye-line me-1"></i> View</a>
-                                        @if($job->can_be_edited)
-                                        <a href="{{ route('tasks.edit', $job) }}" class="btn btn-outline-secondary btn-sm flex-fill"><i class="ri-edit-line me-1"></i> Edit</a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="col-12 text-center text-muted py-4">
-                            <i class="ri-briefcase-4-line display-4 mb-2"></i>
-                            <p>No jobs found</p>
-                        </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Desktop Table View -->
-                <div class="d-none d-md-block table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Job Title</th>
-                                <th>Platform</th>
-                                <th>Posted Date</th>
-                                <th>Budget</th>
-                                <th>Workers</th>
-                                <th>Submissions</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($jobs as $job)
-                            <tr>
-                                <td>{{ $job->title }}</td>
-                                <td>{{ $job->platform->name }}</td>
-                                <td>{{ $job->created_at->format('M d, Y') }}</td>
-                                <td>{{ $job->user->country->currency_symbol }}{{ number_format($job->expected_budget, 2) }}</td>
-                                <td>{{ $job->workers->count() }}/{{ $job->number_of_submissions }}</td>
-                                <td>{{ $job->workers->whereNotNull('submitted_at')->count() }}/{{ $job->workers->count() }}</td>
-                                <td>
-                                    @if(!$job->is_active)
-                                    <span class="badge bg-secondary">Draft</span>
-                                    @elseif($job->workers->count() >= $job->number_of_submissions)
-                                    <span class="badge bg-warning">Completed</span>
-                                    @elseif($job->workers->count() > 0)
-                                    <span class="badge bg-info">In Progress</span>
-                                    @else
-                                    <span class="badge bg-success">Active</span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <a href="{{ route('tasks.manage', $job) }}" class="btn btn-primary btn-sm me-1"><i class="ri-eye-line me-1"></i> View</a>
-                                    @if($job->can_be_edited)
-                                    <a href="{{ route('tasks.edit', $job) }}" class="btn btn-outline-secondary btn-sm"><i class="ri-edit-line me-1"></i> Edit</a>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">No jobs found</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted small">
-                        Showing <span class="fw-semibold">{{ $jobs->firstItem() }}</span> to <span class="fw-semibold">{{ $jobs->lastItem() }}</span> of <span class="fw-semibold">{{ $jobs->total() }}</span> results
-                    </div>
-                    <div>
-                        {{ $jobs->links() }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Total Jobs</h6>
-                            <span class="bg-primary bg-opacity-10 rounded-circle p-2"><i class="ri-briefcase-4-line text-primary"></i></span>
-                        </div>
-                        <h3 class="fw-bold mb-0">{{ $stats['total'] }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Active Jobs</h6>
-                            <span class="bg-success bg-opacity-10 rounded-circle p-2"><i class="ri-check-double-line text-success"></i></span>
-                        </div>
-                        <h3 class="fw-bold mb-0">{{ $stats['active'] }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Total Workers</h6>
-                            <span class="bg-purple bg-opacity-10 rounded-circle p-2"><i class="ri-user-3-line text-purple"></i></span>
-                        </div>
-                        <h3 class="fw-bold mb-0">{{ $stats['total_workers'] }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Total Spent</h6>
-                            <span class="bg-warning bg-opacity-10 rounded-circle p-2"><i class="ri-money-dollar-circle-line text-warning"></i></span>
-                        </div>
-                        <h3 class="fw-bold mb-0">${{ number_format($stats['total_spent'], 2) }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 </div>

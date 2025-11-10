@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 #[ObservedBy([TaskObserver::class])]
 class Task extends Model
 {
-    use Sluggable,HelperTrait;
+    use Sluggable, HelperTrait;
 
     protected $fillable = [
         'title',
@@ -29,10 +29,14 @@ class Task extends Model
         'updated_at'
     ];
 
+    protected $append = [
+        'inProgress', 'isCompleted', 'isPendingReview', 'isRejected'
+    ];
+
     protected $casts = [
         'requirements' => 'array',
         'template_data' => 'array',
-        'restricted_countries' => 'array',
+        'task_countries' => 'array',
         'approved_at' => 'datetime',
         'expiry_date' => 'datetime'
     ];
@@ -46,11 +50,13 @@ class Task extends Model
         ];
     }
 
-    public function getRouteKeyName(){
+    public function getRouteKeyName()
+    {
         return 'slug';
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
@@ -68,14 +74,17 @@ class Task extends Model
     {
         return $this->morphOne(OrderItem::class, 'orderable');
     }
+
     public function platformTemplate()
     {
         return $this->belongsTo(PlatformTemplate::class);
     }
+
     public function platform()
     {
         return $this->belongsTo(Platform::class);
     }
+
     public function promotions()
     {
         return $this->hasMany(TaskPromotion::class);
@@ -116,105 +125,131 @@ class Task extends Model
         return $query->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
     }
 
-    public function scopeActive($query)
+    public function scopeProgressing($query)
     {
-        return $query->where('is_active', true)
-            ->where(function ($q) {
+        return $query->where('is_active',true)
+        ->whereHas('latestModeration', function ($mod) {
+                $mod->where('status', 'approved');
+            })
+        ->where(function ($q) {
                 $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
             })
-            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
+        ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
     }
+    
+    public function scopePendingReview($query)
+    {
+        return $query->where('is_active',true)
+        ->whereHas('latestModeration', function ($mod) {
+                $mod->where('status', 'pending');
+            });
+    }
+
+    public function getInProgressAttribute()
+    {
+        if($this->is_active &&
+            (!$this->expiry_date || $this->expiry_date >= now()) &&
+            $this->taskSubmissions->where('accepted',true)->count() < $this->number_of_submissions
+        )
+        return true;
+        return false;
+    }
+    public function getIsCompletedAttribute()
+    {
+        if($this->is_active &&
+            $this->taskSubmissions->count() >= $this->number_of_submissions
+        )
+        return true;
+        return false;
+    }
+
+    public function getIsPendingReviewAttribute()
+    {
+        return $this->is_active && $this->latestModeration && $this->latestModeration->status === 'pending';
+    }
+
+    public function getIsRejectedAttribute()
+    {
+        return $this->is_active && $this->latestModeration && $this->latestModeration->status === 'rejected';
+    }
+
+    
 
     public function scopeListable($query, $countryId = null)
     {
         return $query->where('is_active', true)
             ->where('visibility', 'public')
-            ->whereHas('latestModeration',function($mod){
-                $mod->where('status','approved');
+            ->whereHas('latestModeration', function ($mod) {
+                $mod->where('status', 'approved');
             })
-            ->where(function ($q) use ($countryId) {
-                if ($countryId) {
-                    $q->whereNull('restricted_countries')
-                        ->orWhereJsonDoesntContain('restricted_countries', $countryId);
-                } else {
-                    $q->whereNull('restricted_countries');
-                }
+            ->when($countryId, function ($q) use ($countryId) {
+                $q->where(function ($inner) use ($countryId) {
+                    // No country restriction
+                    $inner->whereNull('restriction')
+                        // Deny: if country is in restricted_countries, exclude
+                        ->orWhere(function ($ii) use ($countryId) {
+                            $ii->where('restriction', 'deny')
+                                ->whereJsonDoesntContain('task_countries', json_encode($countryId));
+                        })
+                        // Allow: country must be in restricted countries when restriction = 'allow'
+                        ->orWhere(function ($ii) use ($countryId) {
+                            $ii->where('restriction', 'allow')
+                                ->whereJsonContains('task_countries', json_encode($countryId));
+                        });
+                });
             })
+           
             ->where(function ($q) {
                 $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
             })
-            ->whereHas('user', function($q) {
+            ->whereHas('user', function ($q) {
                 $q->where('is_banned_from_tasks', false)
-                  ->orWhereNull('is_banned_from_tasks');
+                    ->orWhereNull('is_banned_from_tasks');
             })
             ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
-            ->whereDoesntHave('user.blockedByUsers', function($q) {
+            ->whereDoesntHave('user.blockedByUsers', function ($q) {
                 if (Auth::check()) {
                     $q->where('users.id', Auth::id());
                 }
             });
     }
 
-    public function getAvailableAttribute(){
+    public function getAvailableAttribute()
+    {
         // 3. Task is_active is true
-        if(!$this->is_active)
+        if (!$this->is_active)
             return false;
-        
+
         // 4. Task moderation status is approved
-        if(!$this->latestModeration || $this->latestModeration->status !== 'approved')
+        if (!$this->latestModeration || $this->latestModeration->status !== 'approved')
             return false;
-        
+
         // 2. Task is not expired
-        if($this->expiry_date && $this->expiry_date < now())
+        if ($this->expiry_date && $this->expiry_date < now())
             return false;
-        
+
         // 5. Task is not yet completed - number of paid submissions is less than task->number_of_submissions
         $acceptedSubmissions = $this->taskSubmissions()->where('accepted', true)->count();
-        if($acceptedSubmissions >= $this->number_of_submissions)
+        if ($acceptedSubmissions >= $this->number_of_submissions)
             return false;
-        
+
         // 6. User is not logged in or user is logged in and he has not blocked the task creator or the task creator has not blocked him
-        if(Auth::check()) {
+        if (Auth::check()) {
             $currentUser = Auth::user();
             // Check if current user has blocked the task creator
             $userBlockedCreator = $currentUser->blockedUsers->where('id', $this->user_id)->isNotEmpty();
             // Check if task creator has blocked the current user
             $creatorBlockedUser = $this->user->blockedUsers->where('id', $currentUser->id)->isNotEmpty();
-            
-            if($userBlockedCreator || $creatorBlockedUser)
+
+            if ($userBlockedCreator || $creatorBlockedUser)
                 return false;
-            if($this->restricted_countries && in_array($currentUser->country_id, $this->restricted_countries))
+            if ($this->restricted_countries && in_array($currentUser->country_id, $this->restricted_countries))
                 return false;
-            if($currentUser->is_banned_from_tasks)
+            if ($currentUser->is_banned_from_tasks)
                 return false;
         }
-        
+
         return true;
-    }
-
-    public function getStatusAttribute()
-    {
-        if (!$this->is_active) {
-            return 'draft';
-        }
-
-        $workerCount = $this->taskWorkers()->whereNotNull('accepted_at')->count();
-
-        if ($workerCount >= $this->number_of_submissions) {
-            return 'closed';
-        }
-
-        $submittedCount = $this->taskSubmissions()->where('accepted', true)->count();
-        if ($submittedCount >= $this->number_of_submissions) {
-            return 'completed';
-        }
-
-        return 'ongoing';
-    }
-
-    public function approver()
-    {
-        return $this->belongsTo(User::class, 'approved_by');
     }
 
     /**
@@ -244,15 +279,16 @@ class Task extends Model
         });
     }
 
-    public function getRemainingTimeAttribute(){
-        if($this->expiry_date < now())
+    public function getRemainingTimeAttribute()
+    {
+        if ($this->expiry_date < now())
             return null;
         $minutes = abs($this->expiry_date->diffInMinutes(now()));
         $hours = floor($minutes / 60);
         $days = floor($hours / 24);
         $weeks = floor($days / 7);
         $months = floor($days / 30);
-        
+
         if ($minutes < 60) {
             return $minutes . ' mins';
         } elseif ($hours < 24) {

@@ -2,12 +2,12 @@
 (function() {
     window.initLineNumberedTextareas = function() {
         var containers = document.querySelectorAll('.linenumbered-textarea');
-        console.log('Initializing line numbered textareas:', containers.length);
+        // console.log('Initializing line numbered textareas:', containers.length);
         
         containers.forEach(function(container) {
             // Prevent double-initialization
             if (container.dataset.linenumbersInitialized) {
-                console.log('Already initialized, skipping');
+                // console.log('Already initialized, skipping');
                 return;
             }
             
@@ -17,7 +17,7 @@
             var hiddenInput = container.querySelector('input[type="hidden"]');
 
             if (!linenumbers || !editor) {
-                console.log('Required elements not found');
+                // console.log('Required elements not found');
                 return;
             }
 
@@ -121,7 +121,7 @@
             // Initial update
             updateLineNumbers();
             
-            console.log('Line numbered textarea initialized successfully');
+            // console.log('Line numbered textarea initialized successfully');
         });
     };
     

@@ -40,10 +40,10 @@ class Dashboard extends Component
 
     public function mount()
     {
-        $this->userData = Auth::user();
-        $this->activeView = $this->userData->dashboard_view ?? 'tasks';
-        $this->loadDashboardData();
-        $this->loadSubscriptionData();
+        // $this->userData = Auth::user();
+        // $this->activeView = $this->userData->dashboard_view ?? 'tasks';
+        // $this->loadDashboardData();
+        // $this->loadSubscriptionData();
     }
 
     public function loadDashboardData()
@@ -253,7 +253,7 @@ class Dashboard extends Component
         $activeSubscriptions = $this->userData->activeSubscriptions()->with('booster')->get();
         $pendingSubscriptions = $this->userData->pendingSubscriptions()->with('booster')->get();
 
-        $this->workerSubscription = $activeSubscriptions->firstWhere('booster.type', 'worker');
+        $this->workerSubscription = $activeSubscriptions->firstWhere('booster.is_status', 'worker');
         $this->taskmasterSubscription = $activeSubscriptions->firstWhere('booster.type', 'taskmaster');
 
         $this->workerPendingSubscription = $pendingSubscriptions->firstWhere('booster.type', 'worker');
@@ -262,27 +262,26 @@ class Dashboard extends Component
         // Suggest worker upgrade
         if ($this->workerSubscription) {
             // Find the next booster up for workers
-            $this->workerUpgradeSuggestion = Booster::where('type', 'worker')
-                ->where('id', '!=', $this->workerSubscription->booster_id)
+            $this->workerUpgradeSuggestion = Booster::where('id', '!=', $this->workerSubscription->booster_id)
                 ->where('is_active', true)
                 ->orderBy('id') // A simple way to get a different booster
                 ->first();
         } else {
             // Suggest the first worker booster if none is active
-            $this->workerUpgradeSuggestion = Booster::where('type', 'worker')->where('is_active', true)->orderBy('id')->first();
+            $this->workerUpgradeSuggestion = Booster::where('is_active', true)->orderBy('id')->first();
         }
 
         // Suggest taskmaster upgrade
         if ($this->taskmasterSubscription) {
             // Find the next booster up for taskmasters
-            $this->taskmasterUpgradeSuggestion = Booster::where('type', 'taskmaster')
-                ->where('id', '!=', $this->taskmasterSubscription->booster_id)
+            $this->taskmasterUpgradeSuggestion = Booster::
+                where('id', '!=', $this->taskmasterSubscription->booster_id)
                 ->where('is_active', true)
                 ->orderBy('id')
                 ->first();
         } else {
             // Suggest the first taskmaster booster if none is active
-            $this->taskmasterUpgradeSuggestion = Booster::where('type', 'taskmaster')->where('is_active', true)->orderBy('id')->first();
+            $this->taskmasterUpgradeSuggestion = Booster::where('is_active', true)->orderBy('id')->first();
         }
     }
 
@@ -295,6 +294,6 @@ class Dashboard extends Component
     
     public function render()
     {
-        return view('livewire.dashboard.base');
+        return view('livewire.dashboard');
     }
 }

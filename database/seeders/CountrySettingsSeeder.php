@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\CountrySetting;
 use App\Models\CountryPrice;
+use App\Models\PlatformTemplate;
 
 class CountrySettingsSeeder extends Seeder
 {
@@ -19,171 +20,307 @@ class CountrySettingsSeeder extends Seeder
         $countries = [
             233 => [ // USA
                 'gateway' => 'stripe',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '10',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'routing_number', 'swift_code']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'expiry_date' => 'nullable'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date', 'expiry_date' => 'nullable']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 2.50, 'broadcast_rate' => 1.50]),
-                'transaction_settings' => json_encode(['percentage' => 2.5, 'fixed' => 0.30, 'cap' => 25.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.5, 'fixed' => 0.25, 'min_withdrawal' => 10.00, 'max_withdrawal' => 5000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 5.0, 'invitee_commission_percentage' => 3.0]),
-                'review_settings' => json_encode(['admin_review_cost' => 0.50, 'system_review_cost' => 0.25]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'routing_number', 'swift_code'],
+                'verification_settings' => [
+                    'verification_provider' => 'veriff',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 2.50, 'broadcast_rate' => 1.50],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.5, 'fixed' => 0.30, 'cap' => 25.00],
+                    'tax' => ['percentage' => 0.0, 'apply' => false]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.5, 'fixed' => 0.25, 'cap' => 10.00],
+                    'min_withdrawal' => 10.00,
+                    'max_withdrawal' => 5000.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 0],
+                'referral_settings' => ['referral_earnings_percentage' => 5.0, 'invitee_commission_percentage' => 3.0],
+                'review_settings' => ['admin_review_cost' => 0.50, 'system_review_cost' => 0.25],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
+                    'ip_blacklist' => []
+                ],
             ],
             39 => [ // Canada
                 'gateway' => 'stripe',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'routing_number']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'expiry_date' => 'date'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 2.25, 'broadcast_rate' => 1.35]),
-                'transaction_settings' => json_encode(['percentage' => 2.4, 'fixed' => 0.25, 'cap' => 20.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.25, 'fixed' => 0.25, 'min_withdrawal' => 8.00, 'max_withdrawal' => 4000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 5.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 4.5, 'invitee_commission_percentage' => 2.8]),
-                'review_settings' => json_encode(['admin_review_cost' => 0.45, 'system_review_cost' => 0.22]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'routing_number'],
+                'verification_settings' => [
+                    'verification_provider' => 'veriff',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 2.25, 'broadcast_rate' => 1.35],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.4, 'fixed' => 0.25, 'cap' => 20.00],
+                    'tax' => ['percentage' => 0.0, 'apply' => false]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.25, 'fixed' => 0.25, 'cap' => 10.00],
+                    'min_withdrawal' => 8.00,
+                    'max_withdrawal' => 4000.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 5.0],
+                'referral_settings' => ['referral_earnings_percentage' => 4.5, 'invitee_commission_percentage' => 2.8],
+                'review_settings' => ['admin_review_cost' => 0.45, 'system_review_cost' => 0.22],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
+                    'ip_blacklist' => []
+                ],
             ],
             232 => [ // UK
                 'gateway' => 'stripe',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'sort_code', 'iban_number']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['passport', 'national_id'], 'require' => 'one', 'expiry_date' => 'date'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 2.00, 'broadcast_rate' => 1.20]),
-                'transaction_settings' => json_encode(['percentage' => 2.3, 'fixed' => 0.20, 'cap' => 18.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.0, 'fixed' => 0.20, 'min_withdrawal' => 6.00, 'max_withdrawal' => 3500.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 10.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 4.0, 'invitee_commission_percentage' => 2.5]),
-                'review_settings' => json_encode(['admin_review_cost' => 0.40, 'system_review_cost' => 0.20]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'sort_code', 'iban_number'],
+                'verification_settings' => [
+                    'verification_provider' => 'veriff',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['passport', 'national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 2.00, 'broadcast_rate' => 1.20],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.3, 'fixed' => 0.20, 'cap' => 18.00],
+                    'tax' => ['percentage' => 20.0, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.0, 'fixed' => 0.20, 'cap' => 10.00],
+                    'min_withdrawal' => 6.00,
+                    'max_withdrawal' => 3500.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 10.0],
+                'referral_settings' => ['referral_earnings_percentage' => 4.0, 'invitee_commission_percentage' => 2.5],
+                'review_settings' => ['admin_review_cost' => 0.40, 'system_review_cost' => 0.20],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
+                    'ip_blacklist' => []
+                ],
             ],
             161 => [ // Nigeria
                 'gateway' => 'paystack',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '10',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'bvn']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id', 'nin', 'passport'], 'require' => 'one', 'expiry_date' => 'nullable'],
-                    'address' => ['file' => ['utility_bill', 'waste_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 1.00, 'broadcast_rate' => 0.75]),
-                'transaction_settings' => json_encode(['percentage' => 2.0, 'fixed' => 15.00, 'cap' => 2000.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.0, 'fixed' => 10.00, 'min_withdrawal' => 500.00, 'max_withdrawal' => 500000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 15.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 3.0, 'invitee_commission_percentage' => 2.0]),
-                'review_settings' => json_encode(['admin_review_cost' => 50.00, 'system_review_cost' => 25.00]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 3, 'ban_duration' => 'day']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'bvn'],
+                'verification_settings' => [
+                    'verification_provider' => 'manual',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id', 'nin', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
+                    'address' => ['file' => ['utility_bill', 'waste_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 1.00, 'broadcast_rate' => 0.75],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.0, 'fixed' => 15.00, 'cap' => 2000.00],
+                    'tax' => ['percentage' => 7.5, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.0, 'fixed' => 10.00, 'cap' => 100.00],
+                    'min_withdrawal' => 500.00,
+                    'max_withdrawal' => 500000.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => true
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 15.0],
+                'referral_settings' => ['referral_earnings_percentage' => 3.0, 'invitee_commission_percentage' => 2.0],
+                'review_settings' => ['admin_review_cost' => 50.00, 'system_review_cost' => 25.00],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 3, 'ban_duration' => 'day'],
+                    'ip_blacklist' => []
+                ],
             ],
             113 => [ // Kenya
                 'gateway' => 'mpesa',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '6',
                     'require_account_verification' => false,
                     'account_verification_method' => 'manual',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'swift_code']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'expiry_date' => 'date'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 0.75, 'broadcast_rate' => 0.50]),
-                'transaction_settings' => json_encode(['percentage' => 2.5, 'fixed' => 50.00, 'cap' => 5000.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.5, 'fixed' => 25.00, 'min_withdrawal' => 100.00, 'max_withdrawal' => 100000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 20.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 2.5, 'invitee_commission_percentage' => 1.5]),
-                'review_settings' => json_encode(['admin_review_cost' => 25.00, 'system_review_cost' => 12.50]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'swift_code'],
+                'verification_settings' => [
+                    'verification_provider' => 'manual',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 0.75, 'broadcast_rate' => 0.50],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.5, 'fixed' => 50.00, 'cap' => 5000.00],
+                    'tax' => ['percentage' => 16.0, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.5, 'fixed' => 25.00, 'cap' => 100.00],
+                    'min_withdrawal' => 100.00,
+                    'max_withdrawal' => 100000.00,
+                    'method' => 'manual',
+                    'weekend_payout' => false,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 20.0],
+                'referral_settings' => ['referral_earnings_percentage' => 2.5, 'invitee_commission_percentage' => 1.5],
+                'review_settings' => ['admin_review_cost' => 25.00, 'system_review_cost' => 12.50],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
+                    'ip_blacklist' => []
+                ],
             ],
             83 => [ // Ghana
                 'gateway' => 'flutterwave',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
                     'account_verification_method' => 'manual',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'expiry_date' => 'date'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 0.60, 'broadcast_rate' => 0.40]),
-                'transaction_settings' => json_encode(['percentage' => 2.8, 'fixed' => 30.00, 'cap' => 3000.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.25, 'fixed' => 20.00, 'min_withdrawal' => 50.00, 'max_withdrawal' => 75000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 18.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 2.0, 'invitee_commission_percentage' => 1.25]),
-                'review_settings' => json_encode(['admin_review_cost' => 20.00, 'system_review_cost' => 10.00]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number'],
+                'verification_settings' => [
+                    'verification_provider' => 'manual',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 0.60, 'broadcast_rate' => 0.40],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.8, 'fixed' => 30.00, 'cap' => 3000.00],
+                    'tax' => ['percentage' => 15.0, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.25, 'fixed' => 20.00, 'cap' => 100.00],
+                    'min_withdrawal' => 50.00,
+                    'max_withdrawal' => 75000.00,
+                    'method' => 'manual',
+                    'weekend_payout' => false,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 18.0],
+                'referral_settings' => ['referral_earnings_percentage' => 2.0, 'invitee_commission_percentage' => 1.25],
+                'review_settings' => ['admin_review_cost' => 20.00, 'system_review_cost' => 10.00],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
+                    'ip_blacklist' => []
+                ],
             ],
             101 => [ // India
                 'gateway' => 'razorpay',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '11',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'ifsc_code']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'expiry_date' => 'nullable'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 0.85, 'broadcast_rate' => 0.55]),
-                'transaction_settings' => json_encode(['percentage' => 2.0, 'fixed' => 3.00, 'cap' => 500.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.0, 'fixed' => 5.00, 'min_withdrawal' => 50.00, 'max_withdrawal' => 75000.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 22.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 2.75, 'invitee_commission_percentage' => 1.75]),
-                'review_settings' => json_encode(['admin_review_cost' => 10.00, 'system_review_cost' => 5.00]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'ifsc_code'],
+                'verification_settings' => [
+                    'verification_provider' => 'veriff',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 0.85, 'broadcast_rate' => 0.55],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.0, 'fixed' => 3.00, 'cap' => 500.00],
+                    'tax' => ['percentage' => 18.0, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.0, 'fixed' => 5.00, 'cap' => 100.00],
+                    'min_withdrawal' => 50.00,
+                    'max_withdrawal' => 75000.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 22.0],
+                'referral_settings' => ['referral_earnings_percentage' => 2.75, 'invitee_commission_percentage' => 1.75],
+                'review_settings' => ['admin_review_cost' => 10.00, 'system_review_cost' => 5.00],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
+                    'ip_blacklist' => []
+                ],
             ],
             14 => [ // Australia
                 'gateway' => 'stripe',
-                'banking_settings' => json_encode([
+                'banking_settings' => [
                     'account_length' => '6',
                     'require_account_verification' => true,
                     'account_verification_method' => 'gateway',
                     'bank_account_storage' => 'on_premises'
-                ]),
-                'banking_fields' => json_encode(['account_name', 'bank_name', 'account_number', 'bsb_code']),
-                'verification_fields' => json_encode([
-                    'govt_id' => ['file' => ['drivers_license', 'passport'], 'require' => 'one', 'expiry_date' => 'date'],
-                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => 'date']
-                ]),
-                'promotion_settings' => json_encode(['feature_rate' => 2.75, 'broadcast_rate' => 1.65]),
-                'transaction_settings' => json_encode(['percentage' => 2.7, 'fixed' => 0.35, 'cap' => 28.00]),
-                'withdrawal_settings' => json_encode(['percentage' => 1.75, 'fixed' => 0.30, 'min_withdrawal' => 12.00, 'max_withdrawal' => 4500.00]),
-                'wallet_settings' => json_encode(['wallet_status' => true, 'usd_exchange_rate_percentage' => 8.0]),
-                'referral_settings' => json_encode(['referral_earnings_percentage' => 4.25, 'invitee_commission_percentage' => 2.75]),
-                'review_settings' => json_encode(['admin_review_cost' => 0.55, 'system_review_cost' => 0.28]),
-                'security_settings' => json_encode(['ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week']]),
+                ],
+                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'bsb_code'],
+                'verification_settings' => [
+                    'verification_provider' => 'veriff',
+                    'verifications_can_expire' => true
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['drivers_license', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
+                    'address' => ['file' => ['utility_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 2.75, 'broadcast_rate' => 1.65],
+                'transaction_settings' => [
+                    'charges' => ['percentage' => 2.7, 'fixed' => 0.35, 'cap' => 28.00],
+                    'tax' => ['percentage' => 10.0, 'apply' => true]
+                ],
+                'withdrawal_settings' => [
+                    'charges' => ['percentage' => 1.75, 'fixed' => 0.30, 'cap' => 10.00],
+                    'min_withdrawal' => 12.00,
+                    'max_withdrawal' => 4500.00,
+                    'method' => 'gateway',
+                    'weekend_payout' => true,
+                    'holiday_payout' => false
+                ],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 8.0],
+                'referral_settings' => ['referral_earnings_percentage' => 4.25, 'invitee_commission_percentage' => 2.75],
+                'review_settings' => ['admin_review_cost' => 0.55, 'system_review_cost' => 0.28],
+                'security_settings' => [
+                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
+                    'ip_blacklist' => []
+                ],
             ],
         ];
 
@@ -197,18 +334,47 @@ class CountrySettingsSeeder extends Seeder
 
         $this->command->info('Country settings seeded successfully.');
 
+        // Get all active platform templates
+        $templates = PlatformTemplate::where('is_active', true)->get();
+
         // Create sample country prices for boosters and platform templates
         $prices = [
             // USA (233) prices
             ['country_id' => 233, 'amount' => '5.99', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 1],
             ['country_id' => 233, 'amount' => '12.99', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 2],
             ['country_id' => 233, 'amount' => '19.99', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 3],
-            
+
             // Nigeria (161) prices
             ['country_id' => 161, 'amount' => '2500', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 1],
             ['country_id' => 161, 'amount' => '5000', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 2],
             ['country_id' => 161, 'amount' => '7500', 'priceable_type' => 'App\Models\Booster', 'priceable_id' => 3],
         ];
+
+        // Add random prices for PlatformTemplate for each country
+        $countries = [233, 39, 232, 161, 113, 83, 101, 14]; // Country IDs from the seeder
+        foreach ($countries as $countryId) {
+            foreach ($templates as $template) {
+                // Generate random price based on country (higher for developed countries, lower for developing)
+                $basePrice = match($countryId) {
+                    233 => rand(500, 2000) / 100, // USA: $5.00 - $20.00
+                    39 => rand(450, 1800) / 100,  // Canada: $4.50 - $18.00
+                    232 => rand(400, 1600) / 100, // UK: $4.00 - $16.00
+                    14 => rand(550, 2200) / 100,  // Australia: $5.50 - $22.00
+                    161 => rand(2000, 10000),     // Nigeria: ₦2000 - ₦10000
+                    113 => rand(500, 2500),       // Kenya: KSh 500 - 2500
+                    83 => rand(50, 300),          // Ghana: GH₵ 50 - 300
+                    101 => rand(300, 1500),       // India: ₹300 - 1500
+                    default => rand(100, 1000) / 100 // Default: $1.00 - $10.00
+                };
+
+                $prices[] = [
+                    'country_id' => $countryId,
+                    'amount' => (string) $basePrice,
+                    'priceable_type' => 'App\Models\PlatformTemplate',
+                    'priceable_id' => $template->id,
+                ];
+            }
+        }
 
         foreach ($prices as $price) {
             CountryPrice::updateOrCreate(

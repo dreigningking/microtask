@@ -34,48 +34,48 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $facebook->id,
                 'name' => 'Facebook Post Creation',
                 'description' => 'Create engaging Facebook posts with images and text',
-                'task_fields' => json_encode([
-                    'facebook_username' => 'text',
-                    'post_content' => 'textarea',
-                    'post_image' => 'file',
-                    'target_audience' => 'select',
-                    'post_hashtags' => 'text'
-                ]),
-                'submission_fields' => json_encode([
-                    'post_url' => 'url',
-                    'post_screenshot' => 'file',
-                    'engagement_metrics' => 'number'
-                ]),
+                'task_fields' => [
+                    ["slug" => "facebook_username", "title" => "Facebook Username", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "post_content", "title" => "Post Content", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "post_image", "title" => "Post Image", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "target_audience", "title" => "Target Audience", "type" => "select", "options" => ["General Public", "Business Professionals", "Young Adults", "Families"], "required" => true],
+                    ["slug" => "post_hashtags", "title" => "Post Hashtags", "type" => "text", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "post_url", "title" => "Post URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "post_screenshot", "title" => "Post Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "engagement_metrics", "title" => "Engagement Metrics", "type" => "number", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $facebook->id,
                 'name' => 'Facebook Page Like',
                 'description' => 'Like and follow Facebook pages',
-                'task_fields' => json_encode([
-                    'page_name' => 'text',
-                    'page_url' => 'url',
-                    'required_interaction' => 'select'
-                ]),
-                'submission_fields' => json_encode([
-                    'screenshot' => 'file',
-                    'profile_confirmation' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "page_name", "title" => "Page Name", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "page_url", "title" => "Page URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "required_interaction", "title" => "Required Interaction", "type" => "select", "options" => ["Like", "Follow", "Like and Follow"], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "screenshot", "title" => "Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "profile_confirmation", "title" => "Profile Confirmation", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $facebook->id,
                 'name' => 'Facebook Comment Engagement',
                 'description' => 'Engage with posts through meaningful comments',
-                'task_fields' => json_encode([
-                    'post_url' => 'url',
-                    'comment_requirements' => 'textarea',
-                    'comment_count' => 'number'
-                ]),
-                'submission_fields' => json_encode([
-                    'comment_screenshot' => 'file',
-                    'comment_text' => 'textarea'
-                ]),
+                'task_fields' => [
+                    ["slug" => "post_url", "title" => "Post URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "comment_requirements", "title" => "Comment Requirements", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "comment_count", "title" => "Comment Count", "type" => "number", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "comment_screenshot", "title" => "Comment Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "comment_text", "title" => "Comment Text", "type" => "textarea", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -84,33 +84,33 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $twitter->id,
                 'name' => 'Twitter Post Creation',
                 'description' => 'Create tweets with engaging content',
-                'task_fields' => json_encode([
-                    'twitter_handle' => 'text',
-                    'tweet_content' => 'textarea',
-                    'tweet_image' => 'file',
-                    'hashtags' => 'text',
-                    'mention_accounts' => 'text'
-                ]),
-                'submission_fields' => json_encode([
-                    'tweet_url' => 'url',
-                    'tweet_screenshot' => 'file',
-                    'retweet_count' => 'number'
-                ]),
+                'task_fields' => [
+                    ["slug" => "twitter_handle", "title" => "Twitter Handle", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "tweet_content", "title" => "Tweet Content", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "tweet_image", "title" => "Tweet Image", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "hashtags", "title" => "Hashtags", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "mention_accounts", "title" => "Mention Accounts", "type" => "text", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "tweet_url", "title" => "Tweet URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "tweet_screenshot", "title" => "Tweet Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "retweet_count", "title" => "Retweet Count", "type" => "number", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $twitter->id,
                 'name' => 'Twitter Engagement',
                 'description' => 'Like, retweet, and comment on tweets',
-                'task_fields' => json_encode([
-                    'target_tweet_url' => 'url',
-                    'engagement_type' => 'select',
-                    'engagement_count' => 'number'
-                ]),
-                'submission_fields' => json_encode([
-                    'engagement_screenshot' => 'file',
-                    'profile_link' => 'url'
-                ]),
+                'task_fields' => [
+                    ["slug" => "target_tweet_url", "title" => "Target Tweet URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "engagement_type", "title" => "Engagement Type", "type" => "select", "options" => ["Like", "Retweet", "Comment"], "required" => true],
+                    ["slug" => "engagement_count", "title" => "Engagement Count", "type" => "number", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "engagement_screenshot", "title" => "Engagement Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "profile_link", "title" => "Profile Link", "type" => "url", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -119,32 +119,32 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $instagram->id,
                 'name' => 'Instagram Post Creation',
                 'description' => 'Create Instagram posts with photos and captions',
-                'task_fields' => json_encode([
-                    'instagram_username' => 'text',
-                    'post_caption' => 'textarea',
-                    'post_image' => 'file',
-                    'hashtags' => 'text',
-                    'location_tag' => 'text'
-                ]),
-                'submission_fields' => json_encode([
-                    'post_url' => 'url',
-                    'post_screenshot' => 'file',
-                    'like_count' => 'number'
-                ]),
+                'task_fields' => [
+                    ["slug" => "instagram_username", "title" => "Instagram Username", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "post_caption", "title" => "Post Caption", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "post_image", "title" => "Post Image", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "hashtags", "title" => "Hashtags", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "location_tag", "title" => "Location Tag", "type" => "text", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "post_url", "title" => "Post URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "post_screenshot", "title" => "Post Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "like_count", "title" => "Like Count", "type" => "number", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $instagram->id,
                 'name' => 'Instagram Story Engagement',
                 'description' => 'Engage with Instagram stories',
-                'task_fields' => json_encode([
-                    'story_url' => 'url',
-                    'story_interaction' => 'select'
-                ]),
-                'submission_fields' => json_encode([
-                    'story_screenshot' => 'file',
-                    'profile_verification' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "story_url", "title" => "Story URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "story_interaction", "title" => "Story Interaction", "type" => "select", "options" => ["View", "Reply", "React"], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "story_screenshot", "title" => "Story Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "profile_verification", "title" => "Profile Verification", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -153,29 +153,29 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $youtube->id,
                 'name' => 'YouTube Video Watch',
                 'description' => 'Watch YouTube videos and provide engagement',
-                'task_fields' => json_encode([
-                    'video_url' => 'url',
-                    'watch_duration_minutes' => 'number',
-                    'engagement_type' => 'select'
-                ]),
-                'submission_fields' => json_encode([
-                    'watch_confirmation' => 'file',
-                    'engagement_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "video_url", "title" => "Video URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "watch_duration_minutes", "title" => "Watch Duration Minutes", "type" => "number", "options" => [], "required" => true],
+                    ["slug" => "engagement_type", "title" => "Engagement Type", "type" => "select", "options" => ["Like", "Comment", "Subscribe"], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "watch_confirmation", "title" => "Watch Confirmation", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "engagement_screenshot", "title" => "Engagement Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $youtube->id,
                 'name' => 'YouTube Channel Subscribe',
                 'description' => 'Subscribe to YouTube channels',
-                'task_fields' => json_encode([
-                    'channel_url' => 'url',
-                    'subscription_confirmation' => 'file'
-                ]),
-                'submission_fields' => json_encode([
-                    'subscription_screenshot' => 'file',
-                    'channel_verification' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "channel_url", "title" => "Channel URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "subscription_confirmation", "title" => "Subscription Confirmation", "type" => "file", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "subscription_screenshot", "title" => "Subscription Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "channel_verification", "title" => "Channel Verification", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -184,16 +184,16 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $linkedin->id,
                 'name' => 'LinkedIn Post Creation',
                 'description' => 'Create professional LinkedIn posts',
-                'task_fields' => json_encode([
-                    'linkedin_profile' => 'text',
-                    'post_content' => 'textarea',
-                    'post_image' => 'file',
-                    'professional_tags' => 'text'
-                ]),
-                'submission_fields' => json_encode([
-                    'post_url' => 'url',
-                    'post_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "linkedin_profile", "title" => "LinkedIn Profile", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "post_content", "title" => "Post Content", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "post_image", "title" => "Post Image", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "professional_tags", "title" => "Professional Tags", "type" => "text", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "post_url", "title" => "Post URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "post_screenshot", "title" => "Post Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -202,15 +202,15 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $tiktok->id,
                 'name' => 'TikTok Video Engagement',
                 'description' => 'Engage with TikTok videos through likes and comments',
-                'task_fields' => json_encode([
-                    'video_url' => 'url',
-                    'engagement_type' => 'select',
-                    'engagement_count' => 'number'
-                ]),
-                'submission_fields' => json_encode([
-                    'engagement_screenshot' => 'file',
-                    'profile_verification' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "video_url", "title" => "Video URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "engagement_type", "title" => "Engagement Type", "type" => "select", "options" => ["Like", "Comment", "Share"], "required" => true],
+                    ["slug" => "engagement_count", "title" => "Engagement Count", "type" => "number", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "engagement_screenshot", "title" => "Engagement Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "profile_verification", "title" => "Profile Verification", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -219,15 +219,15 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $whatsapp->id,
                 'name' => 'WhatsApp Group Join',
                 'description' => 'Join WhatsApp groups and engage with content',
-                'task_fields' => json_encode([
-                    'group_invite_link' => 'url',
-                    'group_description' => 'textarea',
-                    'participation_requirements' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'group_screenshot' => 'file',
-                    'profile_in_group' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "group_invite_link", "title" => "Group Invite Link", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "group_description", "title" => "Group Description", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "participation_requirements", "title" => "Participation Requirements", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "group_screenshot", "title" => "Group Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "profile_in_group", "title" => "Profile in Group", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -236,30 +236,30 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $customWebsite->id,
                 'name' => 'Website Registration',
                 'description' => 'Register on custom websites and platforms',
-                'task_fields' => json_encode([
-                    'website_url' => 'url',
-                    'registration_steps' => 'textarea',
-                    'required_information' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'registration_confirmation' => 'file',
-                    'account_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "website_url", "title" => "Website URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "registration_steps", "title" => "Registration Steps", "type" => "textarea", "options" => [], "required" => true],
+                    ["slug" => "required_information", "title" => "Required Information", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "registration_confirmation", "title" => "Registration Confirmation", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "account_screenshot", "title" => "Account Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
             [
                 'platform_id' => $customWebsite->id,
                 'name' => 'Website Content Engagement',
                 'description' => 'Engage with website content through interactions',
-                'task_fields' => json_encode([
-                    'website_url' => 'url',
-                    'content_type' => 'select',
-                    'engagement_requirements' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'engagement_screenshot' => 'file',
-                    'interaction_proof' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "website_url", "title" => "Website URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "content_type", "title" => "Content Type", "type" => "select", "options" => ["Article", "Video", "Image", "Forum Post"], "required" => true],
+                    ["slug" => "engagement_requirements", "title" => "Engagement Requirements", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "engagement_screenshot", "title" => "Engagement Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "interaction_proof", "title" => "Interaction Proof", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -268,15 +268,15 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $mobileGames->id,
                 'name' => 'Mobile Game Level Complete',
                 'description' => 'Complete specific levels in mobile games',
-                'task_fields' => json_encode([
-                    'game_name' => 'text',
-                    'level_number' => 'number',
-                    'gameplay_requirements' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'level_completion_screenshot' => 'file',
-                    'score_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "game_name", "title" => "Game Name", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "level_number", "title" => "Level Number", "type" => "number", "options" => [], "required" => true],
+                    ["slug" => "gameplay_requirements", "title" => "Gameplay Requirements", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "level_completion_screenshot", "title" => "Level Completion Screenshot", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "score_screenshot", "title" => "Score Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -285,15 +285,15 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $surveySites->id,
                 'name' => 'Survey Completion',
                 'description' => 'Complete online surveys and provide feedback',
-                'task_fields' => json_encode([
-                    'survey_platform' => 'text',
-                    'survey_topic' => 'text',
-                    'survey_length' => 'number'
-                ]),
-                'submission_fields' => json_encode([
-                    'survey_completion_certificate' => 'file',
-                    'survey_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "survey_platform", "title" => "Survey Platform", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "survey_topic", "title" => "Survey Topic", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "survey_length", "title" => "Survey Length", "type" => "number", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "survey_completion_certificate", "title" => "Survey Completion Certificate", "type" => "file", "options" => [], "required" => true],
+                    ["slug" => "survey_screenshot", "title" => "Survey Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -302,16 +302,16 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $reviewPlatforms->id,
                 'name' => 'Business Review Creation',
                 'description' => 'Write reviews for businesses on review platforms',
-                'task_fields' => json_encode([
-                    'business_name' => 'text',
-                    'business_location' => 'text',
-                    'review_platform' => 'select',
-                    'review_requirements' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'review_url' => 'url',
-                    'review_screenshot' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "business_name", "title" => "Business Name", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "business_location", "title" => "Business Location", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "review_platform", "title" => "Review Platform", "type" => "select", "options" => ["Google Reviews", "Yelp", "TripAdvisor"], "required" => true],
+                    ["slug" => "review_requirements", "title" => "Review Requirements", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "review_url", "title" => "Review URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "review_screenshot", "title" => "Review Screenshot", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
 
@@ -320,16 +320,16 @@ class PlatformTemplatesSeeder extends Seeder
                 'platform_id' => $ecommerce->id,
                 'name' => 'Product Review',
                 'description' => 'Review products on e-commerce platforms',
-                'task_fields' => json_encode([
-                    'product_name' => 'text',
-                    'ecommerce_platform' => 'select',
-                    'product_category' => 'text',
-                    'review_requirements' => 'textarea'
-                ]),
-                'submission_fields' => json_encode([
-                    'review_url' => 'url',
-                    'product_verification' => 'file'
-                ]),
+                'task_fields' => [
+                    ["slug" => "product_name", "title" => "Product Name", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "ecommerce_platform", "title" => "E-commerce Platform", "type" => "select", "options" => ["Amazon", "eBay", "Walmart"], "required" => true],
+                    ["slug" => "product_category", "title" => "Product Category", "type" => "text", "options" => [], "required" => true],
+                    ["slug" => "review_requirements", "title" => "Review Requirements", "type" => "textarea", "options" => [], "required" => true],
+                ],
+                'submission_fields' => [
+                    ["slug" => "review_url", "title" => "Review URL", "type" => "url", "options" => [], "required" => true],
+                    ["slug" => "product_verification", "title" => "Product Verification", "type" => "file", "options" => [], "required" => true],
+                ],
                 'is_active' => true,
             ],
         ];

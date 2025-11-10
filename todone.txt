@@ -1,30 +1,32 @@
-Tasks cannot be found when{
-    Task visibility is private
-    Task is expired
-    Task is inactive
-    Task is pending approval
-    Task is completed - number of paid submissions is complete to number required
-    You have blocked the task creator or the task creator has blocked you
+1. Create Task - renuild templates and template fields.. 
+- each field must have type, name, title, required, options
+2. Admin Approve/Disapprove Task {
+    if disapprove, what happens{
+        Approve Notification
+        Disapprove Notification
+        Funds Return to wallet
+    }
 }
-
-Tasks cannot be applied for when{
-    User is banned from taking Task
-    Country is restricted
-    Number of submission is complete
-    You have blocked the task creator or the task creator has blocked you
+3. Browse Task | Apply for Task | Report Task {
+    {
+        Admin notification of report
+    }
 }
-
-Tasks cannot be submitted when{
-    Task creator has restricted user from submiting
-    Task submission allows only single submission 
-    User is banned from taking Task
-    Task is expired
-    You have blocked the task creator or the task creator has blocked you
+4. Submit Task{
+    Task creator's notification of submisssion
 }
+5. Review Submission{
+    Task worker receive notification of review & payment \ review only
+}
+6. Dispute submission review {
+    Task creator & admin receives notification of dispute 
+}
+7. Arbitrate & Resolve dispute{
+    everybody receive message notification 
+}
+8. Task review after payment (worker reviews task){
+    Task creator receives notification
+}
+----------------------------------------------------------------------
 
-notifications
- - welcome
- - invitation
- - otp
- - booster subscription expiry
- - 
+

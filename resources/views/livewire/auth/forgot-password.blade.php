@@ -10,7 +10,7 @@
                             <p class="text-muted">Enter your email address and we'll send you a link to reset your password</p>
                         </div>
                         <form wire:submit="sendPasswordResetLink">
-                            @csrf
+
 
                             @if (session('status'))
                             <div class="alert alert-success mb-4">
@@ -27,13 +27,13 @@
                                     Email Address
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-envelope text-muted"></i>
+                                    <span class="input-group-text bg-light border-end-0 px-4">
+                                        <i class="bi bi-envelope"></i>
                                     </span>
-                                    <input type="email"
+                                    <input type="text"
                                         id="email"
                                         wire:model="email"
-                                        class="form-control border-start-0 ps-0"
+                                        class="form-control py-3"
                                         placeholder="your@email.com"
                                         required>
                                 </div>
@@ -48,11 +48,14 @@
                             <!-- Send Reset Link Button -->
                             <button type="submit" wire:loading.attr="disabled" wire:loading.class="btn-loading" wire:target="sendPasswordResetLink"
                                 class="btn btn-primary w-100 py-3 fw-semibold mb-4">
-                                <span wire:loading.remove class="d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-paper-boostere me-2"></i>
+                                <span wire:loading.class="d-none" wire:target="sendPasswordResetLink" class="d-inline-flex align-items-center justify-content-center">
+                                    <i class="fas fa-paper-clip me-2"></i>
                                     Send Reset Link
                                 </span>
-                                <span wire:loading><i class="bi bi-arrow-repeat me-2"></i>Sending...</span>
+                                <span wire:loading.class="d-inline-flex" wire:target="sendPasswordResetLink" class="align-items-center justify-content-center" style="display: none;">
+                                    <i class="bi bi-arrow-repeat me-2"></i>
+                                    Sending...
+                                </span>
                             </button>
 
                         </form>
@@ -86,33 +89,33 @@
     </div>
 </section>
 
-    @push('styles')
-    <style>
-        .card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+@push('styles')
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+    }
+
+
+    /* Animation for page load */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
 
-
-        /* Animation for page load */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .min-vh-100 {
-            animation: fadeInUp 0.6s ease-out;
-        }
-    </style>
-    @endpush
+    .min-vh-100 {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+@endpush

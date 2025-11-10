@@ -650,5 +650,345 @@ class User extends Authenticatable
         return $query->where('country_id', Auth::user()->country_id);
     }
 
+    /**
+     * Scope for users who are task workers (have applied for or worked on tasks)
+     */
+    public function scopeTaskWorkers($query)
+    {
+        return $query->whereHas('task_workers');
+    }
 
+    /**
+     * Scope for users who are task creators (have created tasks)
+     */
+    public function scopeTaskCreators($query)
+    {
+        return $query->whereHas('tasks');
+    }
+
+    /**
+     * Scope for users with admin roles
+     */
+    public function scopeAdminUsers($query)
+    {
+        return $query->whereHas('roles', function ($q) {
+            $q->whereIn('name', ['admin', 'super-admin']);
+        });
+    }
+
+    /**
+     * Scope for verified users
+     */
+    public function scopeVerified($query)
+    {
+        return $query->where(function ($q) {
+            // Get verification requirements from country settings
+            $countrySettings = \App\Models\CountrySetting::whereNotNull('verification_fields')->get();
+            
+            foreach ($countrySettings as $setting) {
+                $requirements = $setting->verification_fields;
+                if (is_string($requirements)) {
+                    $requirements = json_decode($requirements, true);
+                }
+                
+                if ($requirements && is_array($requirements)) {
+                    // For now, mark users as verified if they have at least one approved verification
+                    $q->orWhereHas('userVerifications', function ($verificationQuery) {
+                        $verificationQuery->where('status', 'approved');
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * Scope for unverified users
+     */
+    public function scopeUnverified($query)
+    {
+        return $query->whereDoesntHave('userVerifications', function ($q) {
+            $q->where('status', 'approved');
+        });
+    }
+
+    /**
+     * Scope for users who posted tasks within specified days
+     */
+    public function scopeRecentTaskPosters($query, $days = 30)
+    {
+        return $query->whereHas('tasks', function ($q) use ($days) {
+            $q->where('created_at', '>=', now()->subDays($days));
+        });
+    }
+
+    /**
+     * Scope for users who worked on tasks within specified days
+     */
+    public function scopeRecentTaskWorkers($query, $days = 30)
+    {
+        return $query->whereHas('task_workers', function ($q) use ($days) {
+            $q->where('created_at', '>=', now()->subDays($days));
+        });
+    }
+
+    /**
+     * Scope for users with active premium subscriptions
+     */
+    public function scopePremiumUsers($query)
+    {
+        return $query->whereHas('activeSubscriptions', function ($q) {
+            $q->whereHas('booster', function ($boosterQuery) {
+                $boosterQuery->where('type', 'premium');
+            });
+        });
+    }
+
+    /**
+     * Scope for users with active worker subscriptions
+     */
+    public function scopeWorkerSubscriptionUsers($query)
+    {
+        return $query->whereHas('activeSubscriptions', function ($q) {
+            $q->whereHas('booster', function ($boosterQuery) {
+                $boosterQuery->where('type', 'worker');
+            });
+        });
+    }
+
+    /**
+     * Scope for users with active creator subscriptions
+     */
+    public function scopeCreatorSubscriptionUsers($query)
+    {
+        return $query->whereHas('activeSubscriptions', function ($q) {
+            $q->whereHas('booster', function ($boosterQuery) {
+                $boosterQuery->where('type', 'creator');
+            });
+        });
+    }
+
+    /**
+     * Scope for users without active subscriptions
+     */
+    public function scopeNoSubscription($query)
+    {
+        return $query->whereDoesntHave('activeSubscriptions');
+    }
+
+    /**
+     * Scope for users banned from tasks
+     */
+    public function scopeBannedFromTasks($query)
+    {
+        return $query->where('is_banned_from_tasks', true);
+    }
+
+    /**
+     * Scope for users from specific countries
+     */
+    public function scopeFromCountries($query, $countryIds)
+    {
+        if (!is_array($countryIds)) {
+            $countryIds = [$countryIds];
+        }
+        
+        return $query->whereIn('country_id', $countryIds);
+    }
+
+    /**
+     * Scope for users registered within specified days
+     */
+    public function scopeRecentlyRegistered($query, $days = 7)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    /**
+     * Scope for users with high task completion rates
+     */
+    public function scopeHighCompletionRate($query, $minRate = 80, $minTasks = 5)
+    {
+        return $query->whereHas('taskSubmissions', function ($q) use ($minRate, $minTasks) {
+            // This is a complex query that would need to be implemented based on your business logic
+            // For now, we'll use a simple approach based on accepted submissions
+            $q->selectRaw('user_id,
+                COUNT(*) as total_submissions,
+                SUM(CASE WHEN accepted = 1 THEN 1 ELSE 0 END) as accepted_submissions,
+                CASE
+                    WHEN COUNT(*) > 0 THEN (SUM(CASE WHEN accepted = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*))
+                    ELSE 0
+                END as completion_rate
+            ')
+            ->groupBy('user_id')
+            ->havingRaw('completion_rate >= ? AND total_submissions >= ?', [$minRate, $minTasks]);
+        });
+    }
+
+    /**
+     * Scope for users with earnings above threshold
+     */
+    public function scopeHighEarning($query, $minEarnings = 100, $currency = 'USD')
+    {
+        return $query->whereHas('settlements', function ($q) use ($minEarnings, $currency) {
+            $q->selectRaw('user_id, SUM(amount) as total_earnings')
+              ->where('currency', $currency)
+              ->groupBy('user_id')
+              ->havingRaw('total_earnings >= ?', [$minEarnings]);
+        });
+    }
+
+    /**
+     * Get users by segment configuration
+     */
+    public function scopeBySegment($query, string $segment, array $criteria = [])
+    {
+        $segments = config('settings.announcement_segments');
+        $segmentConfig = $segments[$segment] ?? null;
+
+        if (!$segmentConfig) {
+            return $query;
+        }
+
+        $filters = $segmentConfig['filters'] ?? [];
+        $type = $filters['type'] ?? 'all';
+        $conditions = $filters['conditions'] ?? [];
+
+        // Apply specific conditions from criteria parameter
+        foreach ($criteria as $key => $value) {
+            $conditions[$key] = $value;
+        }
+
+        switch ($type) {
+            case 'all':
+                // Return all users, no additional filtering
+                break;
+
+            case 'active_users':
+                $query->where('is_active', true)
+                      ->where('is_banned_from_tasks', false);
+                break;
+
+            case 'relationship':
+                if (($conditions['has_task_workers'] ?? false)) {
+                    $query->taskWorkers();
+                }
+                if (($conditions['has_tasks'] ?? false)) {
+                    $query->taskCreators();
+                }
+                break;
+
+            case 'role':
+                if (!empty($conditions['roles'])) {
+                    $query->adminUsers();
+                }
+                break;
+
+            case 'verification':
+                if (($conditions['is_verified'] ?? false)) {
+                    $query->verified();
+                } else {
+                    $query->unverified();
+                }
+                break;
+
+            case 'activity':
+                if (($conditions['has_tasks_within_days'] ?? false)) {
+                    $query->recentTaskPosters($conditions['has_tasks_within_days']);
+                }
+                if (($conditions['has_task_workers_within_days'] ?? false)) {
+                    $query->recentTaskWorkers($conditions['has_task_workers_within_days']);
+                }
+                break;
+
+            case 'subscription':
+                if (($conditions['has_active_subscription'] ?? false)) {
+                    $subscriptionType = $conditions['subscription_type'] ?? null;
+                    if ($subscriptionType === 'premium') {
+                        $query->premiumUsers();
+                    } elseif ($subscriptionType === 'worker') {
+                        $query->workerSubscriptionUsers();
+                    } elseif ($subscriptionType === 'creator') {
+                        $query->creatorSubscriptionUsers();
+                    }
+                } else {
+                    $query->noSubscription();
+                }
+                break;
+
+            case 'status':
+                if (($conditions['is_banned_from_tasks'] ?? false)) {
+                    $query->bannedFromTasks();
+                }
+                if (($conditions['is_active'] ?? true) === false) {
+                    $query->where('is_active', false);
+                }
+                break;
+
+            case 'geographic':
+                if (($conditions['country_id'] ?? false)) {
+                    $query->fromCountries($conditions['country_id']);
+                }
+                break;
+
+            case 'registration':
+                if (($conditions['registered_within_days'] ?? false)) {
+                    $query->recentlyRegistered($conditions['registered_within_days']);
+                }
+                break;
+
+            case 'performance':
+                if (($conditions['min_completion_rate'] ?? false)) {
+                    $query->highCompletionRate(
+                        $conditions['min_completion_rate'],
+                        $conditions['min_total_tasks'] ?? 5
+                    );
+                }
+                break;
+
+            case 'earnings':
+                if (($conditions['min_earnings'] ?? false)) {
+                    $query->highEarning(
+                        $conditions['min_earnings'],
+                        $conditions['currency'] ?? 'USD'
+                    );
+                }
+                break;
+        }
+
+        return $query;
+    }
+
+    /**
+     * Check if user belongs to a specific segment
+     */
+    public function belongsToSegment(string $segment, array $criteria = []): bool
+    {
+        return self::where('id', $this->id)->bySegment($segment, $criteria)->exists();
+    }
+
+    /**
+     * Get all available user segments
+     */
+    public static function getAvailableSegments(): array
+    {
+        return config('settings.announcement_segments', []);
+    }
+
+    /**
+     * Get segment display name
+     */
+    public static function getSegmentName(string $segment): string
+    {
+        $segments = config('settings.announcement_segments');
+        return $segments[$segment]['name'] ?? $segment;
+    }
+
+    /**
+     * Get segment description
+     */
+    public static function getSegmentDescription(string $segment): string
+    {
+        $segments = config('settings.announcement_segments');
+        return $segments[$segment]['description'] ?? '';
+    }
 }

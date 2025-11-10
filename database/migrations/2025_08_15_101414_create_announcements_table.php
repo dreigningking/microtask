@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('subject');
             $table->text('message');
+            $table->text('via'); //['email','database']
             $table->unsignedBigInteger('sent_by');
             $table->integer('recipients_count')->default(0);
             $table->enum('status', ['sent', 'failed'])->default('sent');

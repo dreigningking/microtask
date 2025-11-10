@@ -13,7 +13,7 @@ class ForgotPassword extends Component
     /**
      * Send a password reset link to the provided email address.
      */
-    public function sendPasswordResetLink(): void
+    public function sendPasswordResetLink()
     {
         $this->validate([
             'email' => ['required', 'string', 'email'],

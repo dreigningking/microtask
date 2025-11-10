@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.2",
         "cviebrock/eloquent-sluggable": "*",
-        "ixudra/curl": "^6.22",
+        "ixudra/curl": "6.*",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
