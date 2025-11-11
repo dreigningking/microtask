@@ -13,7 +13,7 @@ class PostObserver
     public function created(Post $post): void
     {
         Moderation::create(['moderatable_type'=> get_class($post),'moderatable_id'=> $post->id,
-        'purpose'=> 'created_content','status'=> 'pending']);
+        'purpose'=> 'created_post','status'=> 'pending']);
     }
 
     /**
@@ -22,7 +22,7 @@ class PostObserver
     public function updated(Post $post): void
     {
         Moderation::create(['moderatable_type'=> get_class($post),'moderatable_id'=> $post->id,
-        'purpose'=> 'updated_content','status'=> 'pending']);
+        'purpose'=> 'updated_post','status'=> 'pending']);
     }
 
     /**

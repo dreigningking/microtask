@@ -13,7 +13,7 @@ class TaskObserver
     public function created(Task $task): void
     {
         Moderation::create(['moderatable_type'=> get_class($task),'moderatable_id'=> $task->id,
-        'purpose'=> 'created_content','status'=> 'pending']);
+        'purpose'=> 'created_task','status'=> 'pending']);
     }
 
     /**
@@ -22,7 +22,7 @@ class TaskObserver
     public function updated(Task $task): void
     {
         Moderation::create(['moderatable_type'=> get_class($task),'moderatable_id'=> $task->id,
-        'purpose'=> 'updated_content','status'=> 'pending']);
+        'purpose'=> 'updated_task','status'=> 'pending']);
     }
 
     /**

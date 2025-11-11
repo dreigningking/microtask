@@ -3,25 +3,29 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="tasks.html" class="text-white">Browse Tasks</a></li>
-                            <li class="breadcrumb-item active text-white" aria-current="page">Task Details</li>
-                        </ol>
-                    </nav>
                     <div class="d-flex align-items-center mb-2">
                         <span class="badge @if($task->available) bg-success @else bg-danger @endif me-2">{{$task->available ? 'Active':'Not Available'}}</span>
                         <span class="badge bg-light text-dark">{{ $task->platform->name }}</span>
                     </div>
                     <h1 class="h3 mb-2">{{ $task->title }}</h1>
                     <div class="d-flex align-items-center text-white-50">
+                        <span class="me-3"><i class="bi bi-calendar-fill"></i> {{ $task->created_at->format('d-M-Y') }}</span>
                         <span class="me-3"><i class="bi bi-people"></i> {{ $task->taskSubmissions->count() }} submissions received</span>
                         <span><i class="bi bi-clock"></i> {{ !$task->remaining_time ? 'Expired': $task->remaining_time.' left'  }} </span>
                     </div>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <div class="h2 text-warning mb-1">{{ $task->user->country->currency_symbol ?? '$' }}{{ number_format($task->budget_per_submission, 2) }}</div>
+                    <div class="h2 d-inline d-md-block text-warning mb-1">{{ $task->user->country->currency_symbol.number_format($task->budget_per_submission,2) }}</div>
                     <small class="text-white-50">Per approved submission</small>
+                    <div class="d-flex justify-content-md-end">
+                        <nav class="mt-2 mt-md-0" aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{route('explore')}}">Browse Tasks</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Task Details</li>
+                            </ol>
+                        </nav>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -53,33 +57,73 @@
                                 </div>
                             </div>
                             @endif
+                            @if($task->template_data && is_array($task->template_data) && count($task->template_data))
                             <div class="mt-4">
-                                <h6>Submission Information</h6>
-                                <div class="d-flex justify-content-between">
-                                    <span>Submissions Needed:</span>
-                                    <strong>{{ $task->number_of_submissions }} total</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Multiple Submissions:</span>
-                                    <strong>{{ $task->allow_multiple_submissions ? 'Allowed':'Not Allowed'}}</strong>
-                                </div>
-                                @if($hasUserSubmitted)
-                                <div class="d-flex justify-content-between">
-                                    <span>Your Submissions:</span>
-                                    <strong>{{ $userSubmissionCount }} ({{ $userSubmissions->where('accepted', false)->whereNull('reviewed_at')->count() }} pending, {{ $userSubmissions->where('accepted', true)->count() }} approved)</strong>
-                                </div>
+                                @foreach($task->template_data as $field)
+                                <p class="">
+                                <h6 class="fw-medium mb-2">{{ $field['title'] ?? 'Field' }}</h6>
+                                @if(isset($field['type']) && $field['type'] === 'file')
+                                @if(!empty($field['value']))
+                                <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download me-1"></i> {{ basename($field['value']) }}
+                                </a>
+                                @else
+                                <span class="text-muted small">No file uploaded</span>
                                 @endif
+                                @else
+                                @if(is_array($field['value'] ?? null))
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach($field['value'] as $item)
+                                    <span class="badge bg-light text-dark">{{ $item }}</span>
+                                    @endforeach
+                                </div>
+                                @else
+                                <p class="mb-0 small">{{ $field['value'] ?? 'Not provided' }}</p>
+                                @endif
+                                @endif
+                                </p>
+                                @endforeach
                             </div>
+                            @endif
 
+                            @if($task->files && is_array($task->files) && count($task->files))
                             <div class="mt-4">
                                 <h6>Attachments</h6>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-download"></i> brand_guidelines.pdf
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-download"></i> logo.png
-                                    </button>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @foreach($task->files as $file)
+                                    <a href="{{ asset($file['path']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-download me-1"></i> {{ $file['name'] }}
+                                    </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
+                            <hr>
+
+                            <div class="mt-4">
+                                <h6>Submissions</h6>
+                                <div class="d-flex justify-content-between">
+                                    <span>Submissions:</span>
+                                    <strong>{{ $task->taskSubmissions->count().'/'.$task->number_of_submissions }}</strong>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <span>Multiple Submissions:</span>
+                                    <strong>{{ $task->allow_multiple_submissions ? 'Allowed': 'Not Allowed' }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Budget per submission</span>
+                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Amount Disbursed</span>
+                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Budget:</span>
+                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission * $task->number_of_submissions, 2) }}</strong>
                                 </div>
                             </div>
 
@@ -106,62 +150,136 @@
                         </div>
                     </div>
 
-                    <!-- My Submissions - Only show if user has submissions -->
-                    @if($hasUserSubmitted)
-                    <div class="card mb-4">
-                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">My Submissions</h5>
-                            <span class="badge bg-primary">{{ $userSubmissionCount }} {{ $userSubmissionCount == 1 ? 'submission' : 'submissions' }}</span>
-                        </div>
-                        <div class="card-body">
-                            @foreach($userSubmissions as $index => $submission)
-                            <!-- Submission {{ $index + 1 }} -->
-                            <div class="submission-history-card status-{{ $submission->paid_at ? 'approved' : ($submission->reviewed_at ? ($submission->accepted ? 'approved' : 'rejected') : 'pending') }} p-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1">Submission #{{ $index + 1 }}</h6>
-                                        <p class="text-muted mb-2">Submitted: {{ $submission->created_at->format('F j, Y') }}</p>
+                    <div wire:ignore.self class="accordion mb-4" id="taskAccordion">
+                        @if($hasUserSubmitted)
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSubmissions">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubmissions" aria-expanded="true" aria-controls="collapseSubmissions">
+                                    My Submissions <span class="badge bg-primary ms-2">{{ $userSubmissionCount }} {{ $userSubmissionCount == 1 ? 'submission' : 'submissions' }}</span>
+                                </button>
+                            </h2>
+                            <div id="collapseSubmissions" class="accordion-collapse collapse show" aria-labelledby="headingSubmissions" data-bs-parent="#taskAccordion">
+                                <div class="accordion-body">
+                                    @foreach($userSubmissions as $index => $submission)
+                                    <!-- Submission {{ $index + 1 }} -->
+                                    <div class="submission-history-card status-{{ $submission->paid_at ? 'approved' : ($submission->reviewed_at ? ($submission->accepted ? 'approved' : 'rejected') : 'pending') }} p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Submission #{{ $index + 1 }}</h6>
+                                                <p class="text-muted mb-2">Submitted: {{ $submission->created_at->format('F j, Y') }}</p>
+                                            </div>
+                                            @if($submission->paid_at)
+                                            <span class="badge bg-success">Approved & Paid</span>
+                                            @elseif($submission->reviewed_at)
+                                            @if($submission->accepted)
+                                            <span class="badge bg-success">Approved</span>
+                                            @else
+                                            <span class="badge bg-danger">Rejected</span>
+                                            @endif
+                                            @else
+                                            <span class="badge bg-warning">Pending Review</span>
+                                            @endif
+                                        </div>
+
+                                        @if($submission->paid_at)
+                                        <div class="alert alert-success">
+                                            <i class="bi bi-check-circle"></i> This submission was approved and payment has been processed.
+                                        </div>
+                                        @elseif($submission->reviewed_at && $submission->accepted)
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-check-circle"></i> This submission was approved. Payment will be processed soon.
+                                        </div>
+                                        @endif
+
+                                        <p class="mb-2"><strong>Submission Notes:</strong> {{ $submission->submission_details['notes'] ?? 'No notes provided' }}</p>
+
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View Submission
+                                            </button>
+                                            @if(!$submission->reviewed_at)
+                                            <button class="btn btn-sm btn-outline-danger" wire:click="withdrawSubmission({{ $submission->id }})">
+                                                <i class="bi bi-trash"></i> Withdraw
+                                            </button>
+                                            @endif
+                                        </div>
                                     </div>
-                                    @if($submission->paid_at)
-                                    <span class="badge bg-success">Approved & Paid</span>
-                                    @elseif($submission->reviewed_at)
-                                    @if($submission->accepted)
-                                    <span class="badge bg-success">Approved</span>
-                                    @else
-                                    <span class="badge bg-danger">Rejected</span>
-                                    @endif
-                                    @else
-                                    <span class="badge bg-warning">Pending Review</span>
-                                    @endif
-                                </div>
-
-                                @if($submission->paid_at)
-                                <div class="alert alert-success">
-                                    <i class="bi bi-check-circle"></i> This submission was approved and payment has been processed.
-                                </div>
-                                @elseif($submission->reviewed_at && $submission->accepted)
-                                <div class="alert alert-info">
-                                    <i class="bi bi-check-circle"></i> This submission was approved. Payment will be processed soon.
-                                </div>
-                                @endif
-
-                                <p class="mb-2"><strong>Submission Notes:</strong> {{ $submission->submission_details['notes'] ?? 'No notes provided' }}</p>
-
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> View Submission
-                                    </button>
-                                    @if(!$submission->reviewed_at)
-                                    <button class="btn btn-sm btn-outline-danger" wire:click="withdrawSubmission({{ $submission->id }})">
-                                        <i class="bi bi-trash"></i> Withdraw
-                                    </button>
-                                    @endif
+                                    @endforeach
                                 </div>
                             </div>
-                            @endforeach
+                        </div>
+                        @endif
+
+                        <div wire:ignore.self class="accordion-item">
+                            <h2 class="accordion-header" id="headingComments">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments" aria-expanded="false" aria-controls="collapseComments">
+                                    Questions and Answers
+                                </button>
+                            </h2>
+                            <div wire:ignore.self id="collapseComments" class="accordion-collapse collapse" aria-labelledby="headingComments" data-bs-parent="#taskAccordion">
+                                <div class="accordion-body">
+                                    @auth
+                                    <div class="mb-4">
+                                        <h6>Ask a Question</h6>
+                                        <form wire:submit.prevent="askQuestion">
+                                            <div class="mb-3">
+                                                <textarea class="form-control" rows="3" wire:model.live="question" placeholder="Type your question here..."></textarea>
+                                            </div>
+                                            @if(isset($similarQuestions) && count($similarQuestions))
+                                            <div class="mb-3">
+                                                <small class="text-muted">Similar questions:</small>
+                                                <div class="list-group">
+                                                    @foreach($similarQuestions as $similar)
+                                                    <a href="#" class="list-group-item list-group-item-action" onclick="scrollToQuestion({{ $similar->id }})">
+                                                        {{ Str::limit($similar->body, 100) }}
+                                                    </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @endif
+                                            <button type="submit" class="btn btn-primary">Ask Question</button>
+                                        </form>
+                                    </div>
+                                    @else
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> You must be logged in to ask questions.
+                                    </div>
+                                    @endauth
+
+                                    <div class="comments-section">
+                                        @forelse($comments ?? [] as $comment)
+                                        <div class="comment-item mb-3" id="question-{{ $comment->id }}">
+                                            <div class="d-flex">
+                                                <img src="{{ $comment->user->avatar ?? 'https://placehold.co/40' }}" alt="User" class="rounded-circle me-3" width="40" height="40">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">{{ $comment->user->username }}</h6>
+                                                    <p class="mb-2">{{ $comment->body }}</p>
+                                                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                    @if($comment->children->count() > 0)
+                                                    @foreach($comment->children as $answer)
+                                                    <div class="ms-4 mt-3 p-3 bg-light rounded">
+                                                        <div class="d-flex">
+                                                            <img src="{{ $answer->user->avatar ?? 'https://placehold.co/40' }}" alt="User" class="rounded-circle me-3" width="40" height="40">
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="mb-1">{{ $answer->user->username }}</h6>
+                                                                <p class="mb-2">{{ $answer->body }}</p>
+                                                                <small class="text-muted">{{ $answer->created_at->diffForHumans() }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @empty
+                                        <p class="text-muted">No questions yet. Be the first to ask!</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    @endif
 
                 </div>
 
@@ -390,6 +508,13 @@
                     </div>
                 </form>
             </div>
+        function scrollToQuestion(id) {
+            const element = document.getElementById('question-' + id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
         </div>
     </div>
 </div>

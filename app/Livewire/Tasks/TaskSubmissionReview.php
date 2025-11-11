@@ -17,6 +17,15 @@ class TaskSubmissionReview extends Component
     public $selectedWorker = null;
     public $selectedSubmission = null;
 
+    protected $listeners = [
+        'submissionClicked' => 'displaySubmissionData',
+    ];
+
+
+    public function displaySubmissionData(){
+
+    }
+
     public function viewSubmission($workerId)
     {
         $this->selectedWorker = TaskWorker::with('user')->find($workerId);

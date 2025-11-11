@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('moderatable'); //user_verifications, tasks, withdrawals,post, comments
             $table->foreignId('moderator_id')->nullable()->constrained('users');
-            $table->enum('purpose',['created_content','updated_content']);
+            $table->string('purpose');
             $table->enum('status', ['pending', 'approved', 'rejected']);
             $table->text('notes')->nullable();
             $table->timestamp('moderated_at')->nullable();

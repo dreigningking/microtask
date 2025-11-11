@@ -115,9 +115,8 @@ class Task extends Model
         return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
-    public function submissions()
-    {
-        return $this->hasMany(TaskSubmission::class);
+    public function disputes(){
+        return $this->hasManyThrough(TaskDispute::class,TaskSubmission::class);
     }
 
     public function scopeCompleted($query)
@@ -136,7 +135,7 @@ class Task extends Model
             })
         ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
     }
-    
+
     public function scopePendingReview($query)
     {
         return $query->where('is_active',true)

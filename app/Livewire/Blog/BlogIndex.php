@@ -5,6 +5,7 @@ namespace App\Livewire\Blog;
 use App\Models\Post;
 use App\Models\Setting;
 use Livewire\Component;
+use App\Models\Category;
 use Livewire\WithPagination;
 
 class BlogIndex extends Component
@@ -20,14 +21,14 @@ class BlogIndex extends Component
     public function mount()
     {
         $this->category = request()->get('category');
-        $this->categories = json_decode(Setting::where('name', 'blog_categories')->first()->value);
+        $this->categories = Category::all();
     }
 
     public function render()
     {
-        $query = Post::published()->with('user')->orderBy('published_at', 'desc');
+        $query = Post::with('user')->orderBy('created_at', 'desc');
         if (!empty($this->category)) {
-            $query->where('category', $this->category);
+            $query->where('category_id', $this->category);
         }
         $posts = $query->paginate(8);
 

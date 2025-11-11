@@ -80,7 +80,6 @@ Route::view('review', 'post-job-review');
 
 Route::group(['middleware' => ['auth', 'check_user_active']], function () {
     Route::group(['middleware' => ['email_verified', 'two_factor']], function () {
-
         /* Task Worker */
         Route::group(['prefix' => 'tasks', 'as' => 'tasks.'], function () {
             Route::get('applied', AppliedTasks::class)->name('applied');
@@ -96,8 +95,6 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
             Route::get('withdrawals', ListEarnings::class)->name('withdrawals');
             Route::get('exchanges', ListEarnings::class)->name('exchanges');
         });
-
-
         /* General */
         Route::get('notifications', ListNotifications::class)->name('notifications');
         Route::get('dashboard', Dashboard::class)->name('dashboard');

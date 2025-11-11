@@ -13,7 +13,7 @@ class UserVerificationObserver
     public function created(UserVerification $user_verification): void
     {
         Moderation::create(['moderatable_type'=> get_class($user_verification),'moderatable_id'=> $user_verification->id,
-        'purpose'=> 'created_content','status'=> 'pending']);
+        'purpose'=> 'created_user_verification','status'=> 'pending']);
     }
 
     /**
@@ -22,7 +22,7 @@ class UserVerificationObserver
     public function updated(UserVerification $user_verification): void
     {
         Moderation::create(['moderatable_type'=> get_class($user_verification),'moderatable_id'=> $user_verification->id,
-        'purpose'=> 'updated_content','status'=> 'pending']);
+        'purpose'=> 'updated_user_verification','status'=> 'pending']);
     }
 
     /**

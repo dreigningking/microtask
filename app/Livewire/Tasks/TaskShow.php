@@ -38,6 +38,11 @@ class TaskShow extends Component
     // Report functionality
     public $reportReason = '';
 
+    // Comments functionality
+    public $question = '';
+    public $comments;
+    public $similarQuestions = [];
+
     public function mount(Task $task)
     {
 
@@ -48,36 +53,39 @@ class TaskShow extends Component
             $location = $this->getLocation();
             $this->countryId = $location ? $location->country_id : null;
         }
-        
+
+        // Load comments
+        $this->loadComments();
+
         // Check task availability first
         $this->isTaskAvailable = $this->task->available;
         if (!$this->isTaskAvailable) {
             $this->unavailableReasons = $this->getUnavailabilityReasons();
         }
-        
-        
+
+
         // Load user-specific data if logged in
         if (Auth::check()) {
             $this->loadUserState();
-            
+
             // Check for blocklist issues (this would make task unavailable)
             $currentUser = Auth::user();
             $userBlockedCreator = $currentUser->blockedUsers->where('id', $this->task->user_id)->isNotEmpty();
-            
+
             $creatorBlockedUser = $this->task->user->blockedUsers->where('id', $currentUser->id)->isNotEmpty();
-            
+
             if($userBlockedCreator || $creatorBlockedUser) {
                 if (!$this->isTaskAvailable) {
                     $this->unavailableReasons[] = 'You cannot view this task due to blocklist restrictions.';
                 }
             }
-            
+
             // Check if user has reported this task
             $this->userReported = $this->task->comments()
                 ->where('is_flag', true)
                 ->where('user_id', $currentUser->id)
                 ->exists();
-                
+
             // If user has reported the task, they cannot apply or submit
             if ($this->userReported && $this->isTaskAvailable) {
                 $this->unavailableReasons[] = 'You have reported this task and cannot apply or submit work.';
@@ -94,30 +102,38 @@ class TaskShow extends Component
         if (!Auth::check()) {
             return;
         }
-        
+
         $userId = Auth::id();
-        
+
         // Check if user has applied for this task
         $this->userTaskWorker = TaskWorker::where('task_id', $this->task->id)
             ->where('user_id', $userId)
             ->first();
-            
+
         $this->hasStarted = $this->userTaskWorker !== null;
-        
+
         // Load user's submissions for this task
         $this->userSubmissions = $this->task->taskSubmissions()
             ->where('user_id', $userId)
             ->get();
-            
+
         $this->userSubmissionCount = $this->userSubmissions->count();
         $this->hasUserSubmitted = $this->userSubmissionCount > 0;
-        
+
         // Check if user can submit more (for multiple submissions)
         if ($this->task->allow_multiple_submissions == 1) {
             $this->canSubmitMore = true; // Allow multiple
         } else {
             $this->canSubmitMore = !$this->hasUserSubmitted; // Only if no submission yet
         }
+    }
+
+    /**
+     * Load comments for this task
+     */
+    private function loadComments()
+    {
+        $this->comments = $this->task->comments()->where('is_flag', false)->whereNull('parent_id')->with(['user', 'children' => function($q) { $q->with('user')->orderBy('created_at'); }])->orderBy('created_at', 'desc')->get();
     }
     
     /**
@@ -247,26 +263,67 @@ class TaskShow extends Component
             session()->flash('error', 'You must be logged in to withdraw submissions.');
             return;
         }
-        
+
         $submission = TaskSubmission::where('id', $submissionId)
             ->where('user_id', Auth::id())
             ->where('task_id', $this->task->id)
             ->where('accepted', false)
             ->whereNull('reviewed_at')
             ->first();
-            
+
         if (!$submission) {
             session()->flash('error', 'Submission not found or cannot be withdrawn.');
             return;
         }
-        
+
         // Delete the submission (since it can't be edited)
         $submission->delete();
-        
+
         session()->flash('success', 'Submission withdrawn successfully.');
-        
+
         // Refresh user state
         $this->loadUserState();
+    }
+
+    public function updatedQuestion()
+    {
+        if (strlen($this->question) > 3) {
+            $this->similarQuestions = Comment::where('commentable_id', $this->task->id)
+                ->where('commentable_type', Task::class)
+                ->where('is_flag', false)
+                ->where('body', 'like', '%' . $this->question . '%')
+                ->with('user')
+                ->limit(5)
+                ->get();
+        } else {
+            $this->similarQuestions = [];
+        }
+    }
+
+    public function askQuestion()
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to ask questions.');
+            return;
+        }
+
+        $this->validate([
+            'question' => 'required|min:10|max:1000'
+        ]);
+
+        Comment::create([
+            'user_id' => Auth::id(),
+            'commentable_id' => $this->task->id,
+            'commentable_type' => Task::class,
+            'body' => $this->question,
+            'is_flag' => false,
+        ]);
+
+        session()->flash('success', 'Your question has been submitted successfully.');
+
+        $this->question = '';
+        $this->similarQuestions = [];
+        $this->loadComments();
     }
     
     public function render()

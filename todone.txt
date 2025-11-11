@@ -1,5 +1,10 @@
-1. Create Task - renuild templates and template fields.. 
-- each field must have type, name, title, required, options
+Template field upload not working yet 
+
+if admin does not approve task,{
+   user will edit task ? 
+}  
+
+
 2. Admin Approve/Disapprove Task {
     if disapprove, what happens{
         Approve Notification

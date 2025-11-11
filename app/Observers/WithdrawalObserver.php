@@ -13,7 +13,7 @@ class WithdrawalObserver
     public function created(Withdrawal $withdrawal): void
     {
         Moderation::create(['moderatable_type'=> get_class($withdrawal),'moderatable_id'=> $withdrawal->id,
-        'purpose'=> 'created_content','status'=> 'pending']);
+        'purpose'=> 'created_withdrawal','status'=> 'pending']);
     }
 
     /**
@@ -22,7 +22,7 @@ class WithdrawalObserver
     public function updated(Withdrawal $withdrawal): void
     {
         Moderation::create(['moderatable_type'=> get_class($withdrawal),'moderatable_id'=> $withdrawal->id,
-        'purpose'=> 'updated_content','status'=> 'pending']);
+        'purpose'=> 'updated_withdrawal','status'=> 'pending']);
     }
 
     /**
