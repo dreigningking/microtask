@@ -6,7 +6,11 @@
                 <div class="col-md-8">
 
                     <div class="d-flex align-items-center mb-2">
+                        @if($dispute->resolved_at)
+                        <span class="badge bg-success me-2">Resolved</span>
+                        @else
                         <span class="badge bg-warning me-2">Under Review</span>
+                        @endif
                         <span class="badge bg-dark me-2 text-light">Task: #{{ $taskSubmission->task_id }}</span>
                         <span class="badge bg-light text-dark">Submission: #{{ $taskSubmission->id }}</span>
                     </div>
@@ -261,6 +265,7 @@
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle"></i> {{ $taskSubmission->review_body }}
                             </div>
+                            
 
                         </div>
                     </div>

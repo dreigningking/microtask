@@ -1,20 +1,51 @@
+Template field upload not working yet during task create 
+
+Dispute submission review {
+    dispute resolution
+    dispute escalation
+    dispute timeline
+}
+ 
+Refund notification & Earnings Notification sync
+
+2. Admin Approve/Disapprove Task {
+    Approve Notification
+    Disapprove Notification
+    if admin does not approve task,{
+        user will edit task || Funds Return to wallet? 
+    } 
+}
+
+notifications
+ - welcome
+ - invitation
+ - otp
+ - booster subscription expiry
+ - 
+
+8. Task review after payment (worker reviews task){
+    Task creator receives notification
+}
+----------------------------------------------------------------------
+
+
+
 ----------------------------------------------- 
 Notifications
 ---------------------------------------------
 Taskmaster{
 Job Approved
-    JobSubmission
+    
     Late Subsubmission Review Notification
     Disbursement Notification if admin initiated it
-    DisputeNotification
+    
 }
 Worker{
     BroadcastJob Notification
-    Task Submission Reviewed Notification
     EarningNotification
     Withdrawal Complete 
     Exchange Complete 
-    DisputeNotification
+    
 }
 General{
     Blog Subscription Notification 24hours after post creation
@@ -31,7 +62,7 @@ Withdrawal Request
 Support Notification - new, closed, 
 SupportEscalation
 Verification Request
-DisputeNotification
+
 
 -----------------------------------------------------
 User
@@ -41,26 +72,14 @@ Job templates should show platform image
 vpn block
 Logs of activities e.g accepted terms
 
-if user country is restricted from taking job, don't show saving & start..
-if user is banned from taking new tasks, don't show saving & start
 
-Worker can Report a task: 
-Is there something wrong with this campaign? If the link is broken, 
-instructions don't make sense, instructions take longer than 2 hours to complete, 
-or anything else is wrong with this campaign click the report a problem button below
-
-start job - check user's job start limit within the hour i.e number of ongoing jobs vs subscription limit
-submit job - check user's job submit limit within the hour i.e number of ongoing jobs vs subscription limit
-
-start job records user as worker
 
 JOBS
 refund taskmaster the admin-review fee is no intervention was found
 
 Featured Jobs - identify places to show featured jobs"
-Remove Follower Feature  (workers can follow task masters) because it conflicts with Broadcast Promotion{
-    worker subscription - add feature to receive notification from people you follow
-}
+worker subscription - add feature to receive notification from people you follow
+
 
 2factor
 ---------------------------------------------------------
@@ -94,7 +113,6 @@ after job submission review - worker
 -----------------------------------------------------
 Guest
 -----------------------------------------------------
-Home page search for jobs - locations
 Top Earners
 blog subscription
 
@@ -115,41 +133,4 @@ System Review - Implement system review strategies"
 automatic verifications ?
 can verifications expire?
 
-BADGES
-number of dispute cases ongoing can give you a badge
-number of dispute cases can give you a badge
-number of failure to pay on time can give you a badge
-number of bad submissions can give you a badge
-
 https://www.ipqualityscore.com/user/dashboard
-
-Tasks cannot be found when{
-    Task visibility is private
-    Task is expired
-    Task is inactive
-    Task is pending approval
-    Task is completed - number of paid submissions is complete to number required
-    You have blocked the task creator or the task creator has blocked you
-}
-
-Tasks cannot be applied for when{
-    User is banned from taking Task
-    Country is restricted
-    Number of submission is complete
-    You have blocked the task creator or the task creator has blocked you
-}
-
-Tasks cannot be submitted when{
-    Task creator has restricted user from submiting
-    Task submission allows only single submission 
-    User is banned from taking Task
-    Task is expired
-    You have blocked the task creator or the task creator has blocked you
-}
-
-notifications
- - welcome
- - invitation
- - otp
- - booster subscription expiry
- - 
