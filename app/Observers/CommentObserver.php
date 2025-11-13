@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Moderation;
+use App\Http\Traits\HelperTrait;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\General\Comments\TaskCommentNotification;
 use App\Notifications\General\Comments\DisputeCommentNotification;
@@ -12,6 +13,7 @@ use App\Notifications\General\Comments\SupportCommentNotification;
 
 class CommentObserver
 {
+    use HelperTrait;
     /**
      * Handle the Comment "created" event.
      */
@@ -52,10 +54,10 @@ class CommentObserver
                     $comment->commentable->taskSubmission->task->user->notify(new DisputeCommentNotification($comment,'admin'));
                     $comment->commentable->taskSubmission->user->notify(new DisputeCommentNotification($comment,'admin'));
                 }elseif($comment->commentable->taskSubmission->user_id == $comment->user_id){
-                    $this->getAdmin()->notify(new DisputeCommentNotification($comment,'worker'));
+                    $comment->commentable->latestTrail->user->notify(new DisputeCommentNotification($comment,'worker'));
                     $comment->commentable->taskSubmission->task->user->notify(new DisputeCommentNotification($comment,'worker'));
                 }else{
-                    $this->getAdmin()->notify(new DisputeCommentNotification($comment,'author'));
+                    $comment->commentable->latestTrail->user->notify(new DisputeCommentNotification($comment,'author'));
                     $comment->commentable->taskSubmission->user->notify(new DisputeCommentNotification($comment,'author'));
                 }
             break;
@@ -64,9 +66,6 @@ class CommentObserver
 
     }
 
-    public function getAdmin(){
-        return User::where('role_id',1)->first();
-    }
 
     /**
      * Handle the Comment "updated" event.

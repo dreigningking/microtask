@@ -4,22 +4,22 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
+
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge bg-warning me-2">Under Review</span>
+                        <span class="badge bg-dark me-2 text-light">Task: #{{ $taskSubmission->task_id }}</span>
+                        <span class="badge bg-light text-dark">Submission: #{{ $taskSubmission->id }}</span>
+                    </div>
+                    <h1 class="h3 mb-2">Dispute Number: #{{ $taskSubmission->dispute->id }}</h1>
+                    <p class="mb-0">Desired Outcome: {{ $taskSubmission->dispute->outcome }}</p>
+                </div>
+                <div class="col-md-4 d-flex justify-content-md-end">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="dashboard.html" class="text-white">Dashboard</a></li>
                             <li class="breadcrumb-item active text-white" aria-current="page">Dispute Resolution</li>
                         </ol>
                     </nav>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-warning me-2">Under Review</span>
-                        <span class="badge bg-light text-dark">Task: #TSK-784512</span>
-                    </div>
-                    <h1 class="h3 mb-2">Dispute: Work Quality Issues</h1>
-                    <p class="mb-0">Social Media Content Creation - Mike Chen vs Sarah Johnson</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="h4 text-warning mb-1">$45</div>
-                    <small class="text-white-50">Disputed Amount</small>
                 </div>
             </div>
         </div>
@@ -37,13 +37,16 @@
                             <h5 class="mb-0">Task Details</h5>
                         </div>
                         <div class="card-body">
-                            <h6>Description</h6>
+                            <h6>Task Title</h6>
+                            <p>{{ $task->title }}</p>
+
+                            <h6>Task Description</h6>
                             <p>{{ $task->description }}</p>
 
                             @if(is_array($task->requirements) && count($task->requirements))
                             <div class="row mt-4">
                                 <div class="col-12">
-                                    <h6>Requirements</h6>
+                                    <h6>Task Requirements</h6>
                                     <ul class="list-unstyled">
                                         @foreach($task->requirements as $requirement)
                                         <li><i class="bi bi-check-circle text-success me-2"></i> {{ $requirement }}</li>
@@ -53,8 +56,10 @@
                             </div>
                             @endif
 
+
                             @if($task->template_data && is_array($task->template_data) && count($task->template_data))
                             <div class="mt-4">
+                                <h6>Task Fields</h6>
                                 @foreach($task->template_data as $field)
                                 <p class="">
                                 <h6 class="fw-medium mb-2">{{ $field['title'] ?? 'Field' }}</h6>
@@ -83,7 +88,6 @@
                             @endif
 
 
-
                             <hr>
 
                             <div class="mt-4">
@@ -94,6 +98,10 @@
                                             <img src="https://placehold.co/60" alt="Poster" class="rounded-circle me-3">
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-1">{{ $task->user->username }}</h6>
+                                                <div class="text-warning small">
+                                                    <span class="text-muted">{{ $task->user->tasks->count() }} tasks posted</span>
+                                                    <span class="text-muted">• {{ $task->user->taskSubmissions->where('accepted',true)->count() }} tasks completed</span>
+                                                </div>
                                                 <p class="text-muted mb-0">Task Poster</p>
                                             </div>
                                         </div>
@@ -103,14 +111,20 @@
                                             <img src="https://placehold.co/60" alt="Worker" class="rounded-circle me-3">
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-1">{{ $taskSubmission->user->username }}</h6>
+                                                <div class="text-warning small">
+                                                    <span class="text-muted">{{ $taskSubmission->taskWorker->user->tasks->count() }} tasks posted</span>
+                                                    <span class="text-muted">• {{ $taskSubmission->taskWorker->user->taskSubmissions->where('accepted',true)->count() }} tasks completed</span>
+                                                </div>
                                                 <p class="text-muted mb-0">Worker</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
+
 
                     <!-- Communication Thread -->
                     <div class="card mb-4">
@@ -120,82 +134,137 @@
                         <div class="card-body">
                             <!-- Response Form -->
                             <div class="mb-4">
-                                <form id="disputeResponseForm">
+                                <form wire:submit.prevent="submitDisputeResponse">
                                     <div class="mb-3">
                                         <label class="form-label">Add to Discussion</label>
-                                        <textarea class="form-control" rows="3" placeholder="Type your response..."></textarea>
+                                        <textarea class="form-control" wire:model="disputeMessage" rows="3" placeholder="Type your response..."></textarea>
+                                        @error('disputeMessage') <div class="text-danger">{{ $message }}</div> @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Add Evidence (Optional)</label>
-                                        <input type="file" class="form-control" multiple>
+                                        <input type="file" class="form-control" wire:model="disputeAttachments" multiple>
                                         <div class="form-text">Upload additional screenshots or files to support your case</div>
                                     </div>
                                     <div class="d-flex gap-3">
-                                        <button type="submit" class="btn btn-primary">Send Response</button>
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#resolutionModal">
-                                            Suggest Resolution
+                                        <button type="submit" wire:target="submitDisputeResponse" class="btn btn-primary" wire:loading.attr="disabled">
+                                            <span wire:loading.class="d-none" wire:target="submitDisputeResponse" class="d-inline-flex align-items-center justify-content-center">
+                                                Send Response
+                                            </span>
+                                            <span wire:loading.class="d-inline-flex" wire:target="submitDisputeResponse" class="align-items-center justify-content-center" style="display: none;">
+                                                Sending...
+                                            </span>
                                         </button>
+
+
                                     </div>
                                 </form>
                             </div>
 
                             <!-- Messages -->
                             <div class="messages-container" style="max-height: 400px; overflow-y: auto;">
-                                <div class="message-card message-user p-3 mb-3">
+                                @forelse($disputeComments as $comment)
+                                <div class="message-card {{ $comment->user_id == Auth::id() ? 'message-user' : 'message-other' }} p-3 mb-3">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <strong>Mike Chen (Poster)</strong>
-                                        <small class="text-muted">2 hours ago</small>
+                                        <strong>{{ $comment->user->username }}</strong>
+                                        <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
                                     </div>
-                                    <p class="mb-2">The submitted images are only 500x500px instead of the required 1080x1080px. Also, the brand colors were not used as specified in the guidelines.</p>
+                                    <p class="mb-2">{{ $comment->body }}</p>
+                                    @if($comment->attachments)
                                     <div class="evidence-section">
-                                        <h6>Evidence</h6>
+                                        <h6>Attachments</h6>
                                         <div class="d-flex gap-3">
-                                            <div class="border rounded p-3 text-center">
-                                                <i class="bi bi-file-earmark-text fs-1 text-muted"></i>
-                                                <div class="small">submitted_work.zip</div>
-                                                <button class="btn btn-sm btn-outline-primary mt-2">Download</button>
-                                            </div>
-                                            <div class="border rounded p-3 text-center">
-                                                <i class="bi bi-image fs-1 text-muted"></i>
-                                                <div class="small">screenshot_1.png</div>
-                                                <button class="btn btn-sm btn-outline-primary mt-2">View</button>
-                                            </div>
+                                            @foreach($comment->attachments as $attachment)
+                                            @php
+                                            $extension = strtolower(pathinfo($attachment, PATHINFO_EXTENSION));
+                                            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']);
+                                            @endphp
+                                            <a href="{{ asset($attachment) }}" @if($isImage) target="_blank" @else download @endif class="btn btn-outline-primary btn-sm">
+                                                @if($isImage)
+                                                <i class="bi bi-image me-1"></i>
+                                                @else
+                                                <i class="bi bi-file-earmark-text me-1"></i>
+                                                @endif
+                                                {{ Str::limit(basename($attachment), 15) }}
+                                            </a>
+
+
+                                            @endforeach
                                         </div>
                                     </div>
+                                    @endif
                                 </div>
-
-                                <div class="message-card message-other p-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <strong>Sarah Johnson (Worker)</strong>
-                                        <small class="text-muted">1 hour ago</small>
-                                    </div>
-                                    <p class="mb-2">I used the correct dimensions but the files might have been compressed during upload. I can provide higher resolution versions. Regarding colors, I used shades close to the specified ones as they worked better visually.</p>
-                                    <div class="evidence-section">
-                                        <h6>Evidence</h6>
-                                        <div class="d-flex gap-3">
-                                            <div class="border rounded p-3 text-center">
-                                                <i class="bi bi-image fs-1 text-muted"></i>
-                                                <div class="small">screenshot_2.png</div>
-                                                <button class="btn btn-sm btn-outline-primary mt-2">View</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="message-card message-admin p-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <strong>Admin (Support Team)</strong>
-                                        <small class="text-muted">30 minutes ago</small>
-                                    </div>
-                                    <p class="mb-0">We're reviewing the submitted work against the task requirements. Both parties, please provide any additional evidence or clarification within 24 hours.</p>
-                                </div>
+                                @empty
+                                <div class="text-center text-muted">No messages yet.</div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
+
+                    <script>
+                        document.addEventListener('livewire:loaded', function() {
+                            new Choices('#staffSelect', {
+                                searchEnabled: true,
+                                itemSelectText: '',
+                                placeholder: true,
+                                placeholderValue: 'Select a staff member...'
+                            });
+                        });
+                    </script>
                 </div>
 
                 <!-- Right Column - Timeline & Actions -->
                 <div class="col-lg-4">
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent d-flex justify-content-between">
+                            <h6 class="mb-0">Disputed Submission </h6>
+                            <a href="{{ route('explore.task',$taskSubmission->task) }}" target="_blank" class="dont_decorate">View Task <i class="bi bi-arrow-up-right-circle"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <h6>Submitted Data</h6>
+                            <div class="submission-preview border rounded p-3 bg-light mb-3">
+                                @if($taskSubmission->submission_details && is_array($taskSubmission->submission_details))
+                                @foreach($taskSubmission->submission_details as $field)
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <h6 class="fw-medium">{{ $field['title'] }}</h6>
+                                    </div>
+                                    <div class="col-12">
+                                        @if($field['type'] === 'file')
+                                        @if(!empty($field['value']))
+                                        <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-download me-1"></i> {{ Str::limit(basename($field['value']), 15) }}
+                                        </a>
+                                        @else
+                                        <span class="text-muted small">No file uploaded</span>
+                                        @endif
+                                        @elseif(is_array($field['value'] ?? null))
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach($field['value'] as $item)
+                                            <span class="badge bg-light text-dark">{{ $item }}</span>
+                                            @endforeach
+                                        </div>
+                                        @else
+                                        <div class="bg-light rounded">{{ $field['value'] ?? 'Not provided' }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endforeach
+                                @else
+                                <div class="alert alert-info">
+                                    <i class="ri-information-line me-2"></i>
+                                    No submission data available
+                                </div>
+                                @endif
+                            </div>
+                            <h6>Submission Review</h6>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> {{ $taskSubmission->review_body }}
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- Dispute Timeline -->
                     <div class="card mb-4">
                         <div class="card-header bg-transparent">
@@ -205,82 +274,46 @@
                             <div class="dispute-timeline">
                                 <div class="timeline-item">
                                     <strong>Dispute Raised</strong>
-                                    <p class="text-muted mb-0 small">Mike Chen raised dispute for poor quality work</p>
-                                    <small class="text-muted">Oct 15, 2023 • 2:30 PM</small>
+                                    <p class="text-muted mb-0 small">{{ $dispute->outcome }}</p>
+                                    <small class="text-muted">{{ $dispute->created_at->format('M d, Y')}} • {{$dispute->created_at->format('h:i A') }}</small>
                                 </div>
+                                @if($dispute->comments->where('isByAdmin',true)->count())
                                 <div class="timeline-item">
                                     <strong>Under Review</strong>
                                     <p class="text-muted mb-0 small">Admin team started reviewing the case</p>
-                                    <small class="text-muted">Oct 15, 2023 • 3:15 PM</small>
+                                    <small class="text-muted">{{ $dispute->comments->firstWhere('isByAdmin',true)->created_at->format('M d, Y')}} • {{$dispute->comments->firstWhere('isByAdmin',true)->created_at->format('h:i A') }}</small>
                                 </div>
+                                @endif
+                                @if($dispute->resolved_at)
                                 <div class="timeline-item">
-                                    <strong>Response Requested</strong>
-                                    <p class="text-muted mb-0 small">Both parties asked to provide additional information</p>
-                                    <small class="text-muted">Oct 15, 2023 • 4:00 PM</small>
+                                    <strong>Dispute Resolved</strong>
+                                    <p class="text-muted mb-0 small">Resolution: {{ $dispute->resolution_instruction }}</p>
+                                    <small class="text-muted">{{ $dispute->resolved_at->format('M d, Y')}} • {{$dispute->resolved_at->format('h:i A') }}</small>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
 
-                    <!-- Resolution Options -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-transparent">
-                            <h6 class="mb-0">Possible Resolutions</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="resolutionOption" id="option1">
-                                    <label class="form-check-label" for="option1">
-                                        Full refund to poster ($45)
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="resolutionOption" id="option2">
-                                    <label class="form-check-label" for="option2">
-                                        Partial refund ($25 to poster, $20 to worker)
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="resolutionOption" id="option3">
-                                    <label class="form-check-label" for="option3">
-                                        Worker revises work (3-day extension)
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="resolutionOption" id="option4">
-                                    <label class="form-check-label" for="option4">
-                                        Full payment to worker ($45)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Admin Actions (Visible only to admin) -->
-                    <div class="card">
+                    <div class="card mb-4">
                         <div class="card-header bg-transparent">
                             <h6 class="mb-0">Admin Actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm">
+                                <!-- <button class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-download"></i> Download All Files
                                 </button>
                                 <button class="btn btn-outline-warning btn-sm">
                                     <i class="bi bi-clock"></i> Extend Response Time
-                                </button>
+                                </button> -->
                                 <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#resolveModal">
                                     <i class="bi bi-check-circle"></i> Resolve Dispute
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-x-circle"></i> Escalate to Senior
+                                <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#escalationModal">
+                                    <i class="bi bi-x-circle"></i> Escalate to Staff
                                 </button>
                             </div>
                         </div>
@@ -290,43 +323,10 @@
         </div>
     </section>
 
-    <!-- Modals -->
-    <!-- Suggest Resolution Modal -->
-    <div class="modal fade" id="resolutionModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Suggest Resolution</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>What resolution would you suggest for this dispute?</p>
-                    <div class="mb-3">
-                        <label class="form-label">Your Suggestion</label>
-                        <select class="form-select">
-                            <option value="">Select a resolution</option>
-                            <option value="refund">Full refund to me</option>
-                            <option value="partial">Partial refund</option>
-                            <option value="revision">Allow revision of work</option>
-                            <option value="payment">Full payment to worker</option>
-                            <option value="other">Other solution</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Exboosteration</label>
-                        <textarea class="form-control" rows="3" placeholder="Explain why you think this is the fair resolution..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Submit Suggestion</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Resolve Dispute Modal (Admin Only) -->
-    <div class="modal fade" id="resolveModal" tabindex="-1">
+    <div wire:ignore class="modal fade" id="resolveModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -334,39 +334,84 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Final Resolution</label>
-                        <select class="form-select">
-                            <option value="">Select resolution</option>
-                            <option value="full-refund">Full refund to poster</option>
-                            <option value="partial-refund">Partial refund</option>
-                            <option value="revision">Worker revises work</option>
-                            <option value="full-payment">Full payment to worker</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Resolution Details</label>
-                        <textarea class="form-control" rows="4" placeholder="Explain the decision and reasoning..."></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Amount to Poster</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" value="25">
+                    <form id="resolveForm" wire:submit.prevent="resolveDispute">
+                        <div class="mb-3">
+                            <label class="form-label">Final Resolution</label>
+                            <select class="form-select" wire:model="resolution">
+                                <option value="">Select resolution</option>
+                                <option value="full-payment">Full payment to worker</option>
+                                <option value="partial-payment">Partial payment to worker</option>
+                                <option value="resubmission">Full refund to poster</option>
+                            </select>
+                            @error('resolution') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Amount to Worker</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" value="20">
+                        <div class="mb-3">
+                            <label class="form-label">Resolution Details</label>
+                            <textarea class="form-control" rows="4" placeholder="Explain the decision and reasoning..." wire:model="resolutionDetails"></textarea>
+                            @error('resolutionDetails') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
-                    <div class="form-text">Total: $45 (Platform fee waived for disputes)</div>
-                    </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount to Worker</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" wire:model="amountToWorker" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="form-text">Enter as percentage of the task submission budget</div>
+                            @error('amountToWorker') <div class="text-danger">{{ $message }}</div> @enderror
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success">Finalize Resolution</button>
+                    <button type="submit" form="resolveForm" class="btn btn-success" wire:target="resolveDispute" wire:loading.attr="disabled">
+                        <span wire:loading.class="d-none" wire:target="resolveDispute">Finalize Resolution</span>
+                        <span wire:loading.class="d-inline-flex" wire:target="resolveDispute" style="display: none;">Resolving...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore class="modal fade" id="escalationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Escalate Dispute</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="escalationForm" wire:submit.prevent="escalateDispute">
+                        <div class="mb-3">
+                            <label class="form-label">Select Staff</label>
+                            <select class="form-select" id="staffSelect" wire:model="selectedStaff">
+                                <option value=""></option>
+                                @foreach($staff as $s)
+                                <option value="{{ $s->id }}">{{ $s->name }} ({{ $s->username }})</option>
+                                @endforeach
+                            </select>
+                            @error('selectedStaff') <div class="text-danger">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Personal note</label>
+                            <textarea class="form-control" rows="3" placeholder="Personal note to staff" wire:model="escalationNote"></textarea>
+                            @error('escalationNote') <div class="text-danger">{{ $message }}</div> @enderror
+                        </div>
+                    </form>
+                    @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="escalationForm" class="btn btn-success" wire:target="escalateDispute" wire:loading.attr="disabled">
+                        <span wire:loading.class="d-none" wire:target="escalateDispute">Escalate</span>
+                        <span wire:loading.class="d-inline-flex" wire:target="escalateDispute" style="display: none;">Escalating...</span>
+                    </button>
                 </div>
             </div>
         </div>

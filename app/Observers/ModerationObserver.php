@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Http\Traits\HelperTrait;
 use App\Models\User;
 use App\Models\Moderation;
 use App\Notifications\General\Moderation\PostModerationNotification;
@@ -12,6 +13,7 @@ use App\Notifications\General\Moderation\UserVerificationModerationNotification;
 
 class ModerationObserver
 {
+    use HelperTrait;
     /**
      * Handle the Moderation "created" event.
      */
@@ -32,10 +34,7 @@ class ModerationObserver
         }
     }
 
-    public function getAdmin()
-    {
-        return User::where('role_id', 1)->first();
-    }
+    
 
     /**
      * Handle the Moderation "updated" event.

@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Traits;
 
+use App\Models\Role;
+use App\Models\User;
 use Ixudra\Curl\Facades\Curl;
 
 trait HelperTrait
@@ -57,5 +59,16 @@ trait HelperTrait
         $markupPercentage = $user->country->setting->usd_exchange_rate_percentage ?? 0;
         $markup = ($baseRate * $markupPercentage) / 100;
         return $baseRate + $markup;
+    }
+
+    public function getAdmin($role_name = null,$country = null)
+    {
+        $role = Role::where('name',$role_name)->first();
+        if($role){
+            if($user = User::where('role_id',$role->id)->where('country_id',$country)->first()){
+                return $user;
+            }
+        }
+        return User::where('role_id', 1)->first();
     }
 }

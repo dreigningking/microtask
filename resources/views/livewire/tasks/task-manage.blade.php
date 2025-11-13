@@ -189,36 +189,37 @@
                     <!-- Submission Tabs -->
                     <ul class="nav nav-tabs mb-4" id="submissionsTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
-                                Pending <span class="badge bg-secondary ms-1">{{ $task->taskSubmissions->whereNull('reviewed_at', false)->count() }}</span>
+                            <button class="nav-link {{ $activeTab == 'pending' ? 'active' : '' }}" wire:click="$set('activeTab', 'pending')" type="button">
+                                Pending <span class="badge bg-secondary ms-1">{{ $pendingCount }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button">
-                                Approved <span class="badge bg-success ms-1">{{ $task->taskSubmissions->where('accepted', true)->count() }}</span>
+                            <button class="nav-link {{ $activeTab == 'approved' ? 'active' : '' }}" wire:click="$set('activeTab', 'approved')" type="button">
+                                Approved <span class="badge bg-success ms-1">{{ $approvedCount }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button">
-                                Rejected <span class="badge bg-danger ms-1">{{ $task->taskSubmissions->where('accepted', false)->count() }}</span>
+                            <button class="nav-link {{ $activeTab == 'rejected' ? 'active' : '' }}" wire:click="$set('activeTab', 'rejected')" type="button">
+                                Rejected <span class="badge bg-danger ms-1">{{ $rejectedCount }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="disputed-tab" data-bs-toggle="tab" data-bs-target="#disputed" type="button">
-                                Disputed <span class="badge bg-warning ms-1">{{ $task->disputes->where('resolved_at', null)->count() ?? 0 }}</span>
+                            <button class="nav-link {{ $activeTab == 'disputed' ? 'active' : '' }}" wire:click="$set('activeTab', 'disputed')" type="button">
+                                Disputed <span class="badge bg-warning ms-1">{{ $disputedCount }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments" type="button">
-                                Comments <span class="badge bg-primary ms-1">{{ $task->comments->count() }}</span>
+                            <button class="nav-link {{ $activeTab == 'comments' ? 'active' : '' }}" wire:click="$set('activeTab', 'comments')" type="button">
+                                Comments <span class="badge bg-primary ms-1">{{ $commentsCount }}</span>
                             </button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="submissionsTabContent">
                         <!-- Pending Review Tab -->
-                        <div class="tab-pane fade show active" id="pending" role="tabpanel">
-                            @forelse ($task->taskSubmissions->whereNull('reviewed_at') as $submission)
+                        @if($activeTab == 'pending')
+                        <div class="tab-pane fade show active" role="tabpanel">
+                            @forelse ($pendingSubmissions as $submission)
                             @include('components.layouts.submission-card',['submission'=> $submission])
                             @empty
                             <div class="text-center py-5">
@@ -227,11 +228,14 @@
                                 <p class="text-muted">All submissions have been reviewed.</p>
                             </div>
                             @endforelse
+                            {{ $pendingSubmissions->links() }}
                         </div>
+                        @endif
 
                         <!-- Approved Tab -->
-                        <div class="tab-pane fade" id="approved" role="tabpanel">
-                            @forelse ($task->taskSubmissions->where('accepted', true) as $submission)
+                        @if($activeTab == 'approved')
+                        <div class="tab-pane fade show active" role="tabpanel">
+                            @forelse ($approvedSubmissions as $submission)
                             @include('components.layouts.submission-card',['submission'=> $submission])
                             @empty
                             <div class="text-center py-5">
@@ -240,25 +244,31 @@
                                 <p class="text-muted">Approved submissions will appear here.</p>
                             </div>
                             @endforelse
+                            {{ $approvedSubmissions->links() }}
                         </div>
+                        @endif
 
-                        <!-- Disputed Tab -->
-                        <div class="tab-pane fade" id="rejected" role="tabpanel">
-                            @forelse ($task->taskSubmissions->where('accepted', false) as $submission)
+                        <!-- Rejected Tab -->
+                        @if($activeTab == 'rejected')
+                        <div class="tab-pane fade show active" role="tabpanel">
+                            @forelse ($rejectedSubmissions as $submission)
                             @include('components.layouts.submission-card',['submission'=> $submission])
                             @empty
                             <div class="text-center py-5">
-                                <i class="bi bi-check-circle display-1 text-muted"></i>
+                                <i class="bi bi-x-circle display-1 text-muted"></i>
                                 <h4 class="text-muted mt-3">No Rejected Submissions</h4>
                                 <p class="text-muted">Rejected submissions will appear here.</p>
                             </div>
                             @endforelse
+                            {{ $rejectedSubmissions->links() }}
                         </div>
+                        @endif
 
                         <!-- Disputed Tab -->
-                        <div class="tab-pane fade" id="disputed" role="tabpanel">
-                            @forelse ($task->disputes->where('resolved_at', null) as $dispute)
-                            @include('components.layouts.submission-card',['submission'=> $dispute->taskSubmission])
+                        @if($activeTab == 'disputed')
+                        <div class="tab-pane fade show active" role="tabpanel">
+                            @forelse ($disputedSubmissions as $submission)
+                            @include('components.layouts.submission-card',['submission'=> $submission])
                             @empty
                             <div class="text-center py-5">
                                 <i class="bi bi-exclamation-triangle display-1 text-muted"></i>
@@ -266,13 +276,16 @@
                                 <p class="text-muted">Disputed submissions will appear here.</p>
                             </div>
                             @endforelse
+                            {{ $disputedSubmissions->links() }}
                         </div>
+                        @endif
 
                         <!-- Comments Tab -->
-                        <div class="tab-pane fade" id="comments" role="tabpanel">
+                        @if($activeTab == 'comments')
+                        <div class="tab-pane fade show active" role="tabpanel">
                             <!-- Comments List -->
                             <div class="comments-section">
-                                @forelse ($task->comments as $comment)
+                                @forelse ($taskComments as $comment)
                                 <div class="comment-thread card mb-3">
                                     <div class="card-body">
                                         <!-- Original Question -->
@@ -304,21 +317,21 @@
 
                                         <!-- Task Creator Responses -->
                                         @if($comment->children->count() > 0)
-                                        @foreach($comment->children as $response)
-                                        <div class="response ms-5 border-start border-primary border-3 ps-3 mb-3">
-                                            <div class="d-flex mb-2">
-                                                <img src="{{ $response->user->image ?? 'https://placehold.co/35' }}" alt="Task Creator" class="rounded-circle me-2" width="35" height="35">
-                                                <div class="flex-grow-1">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <h6 class="mb-0 me-2">{{ $response->user->username }}</h6>
-                                                        <span class="badge bg-primary">Author</span>
-                                                        <small class="text-muted ms-2">{{ $response->created_at->diffForHumans() }}</small>
+                                            @foreach($comment->children as $response)
+                                                <div class="response ms-5 border-start border-primary border-3 ps-3 mb-3">
+                                                    <div class="d-flex mb-2">
+                                                        <img src="{{ $response->user->image ?? 'https://placehold.co/35' }}" alt="Task Creator" class="rounded-circle me-2" width="35" height="35">
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex align-items-center mb-1">
+                                                                <h6 class="mb-0 me-2">{{ $response->user->username }}</h6>
+                                                                <span class="badge bg-primary">Author</span>
+                                                                <small class="text-muted ms-2">{{ $response->created_at->diffForHumans() }}</small>
+                                                            </div>
+                                                            <p class="mb-0">{{ $response->body }}</p>
+                                                        </div>
                                                     </div>
-                                                    <p class="mb-0">{{ $response->body }}</p>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
+                                            @endforeach
                                         @endif
 
                                         <!-- Response Form -->
@@ -342,7 +355,9 @@
                                 </div>
                                 @endforelse
                             </div>
+                            {{ $taskComments->links() }}
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -460,7 +460,7 @@ a.dont_decorate {
 }
 
 .submission-preview {
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
 }
 

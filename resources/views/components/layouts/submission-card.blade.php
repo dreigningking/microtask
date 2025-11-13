@@ -19,12 +19,12 @@
                 @elseif($submission->accepted)
                 <span class="badge bg-success status-badge">Approved & Paid</span>
                 <div class="text-muted small">Approved at: {{ $submission->paid_at->format('M d, Y H:i') }}</div>
-                @elseif(!$submission->accepted)
-                <span class="badge bg-danger status-badge">Rejected</span>
-                <div class="text-muted small">Rejected at: {{ $submission->reviewed_at->format('M d, Y H:i') }}</div>
                 @elseif($submission->dispute)
                 <span class="badge bg-warning status-badge">Disputed</span>
                 <div class="text-muted small">Disputed on: {{ $submission->dispute->created_at->format('M d, Y H:i') }}</div>
+                @elseif(!$submission->accepted)
+                <span class="badge bg-danger status-badge">Rejected</span>
+                <div class="text-muted small">Rejected at: {{ $submission->reviewed_at->format('M d, Y H:i') }}</div>
                 @endif
             </div>
         </div>
@@ -88,10 +88,13 @@
         <div class="alert alert-warning">
             <i class="bi bi-exclamation-triangle"></i> This submission is under dispute resolution.
             <div class="mt-1">
-                <strong>Worker's Claim:</strong> "The client rejected my work without valid reasons. The submission meets all requirements stated in the task."
+                <strong>Worker's Claim:</strong> {{ $submission->dispute->comments->first()->body }}
             </div>
             <div class="mt-1">
                 <strong>Admin Status:</strong> Under review
+            </div>
+            <div class="mt-1">
+                <a href="{{ route('tasks.dispute',$submission) }}" class="btn btn-sm btn-warning">View Dispute</a> 
             </div>
         </div>
         @endif

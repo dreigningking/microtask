@@ -10,7 +10,8 @@ class TaskDisputeTrail extends Model
     protected $fillable = [
         'task_dispute_id',
         'user_id',
-        'status',
+        'assigned_by',
+        'note',
     ];
 
     /**
@@ -27,5 +28,10 @@ class TaskDisputeTrail extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function assignedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class,'assigned_by');
     }
 }

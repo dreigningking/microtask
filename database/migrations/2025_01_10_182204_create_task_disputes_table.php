@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('task_disputes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('task_submission_id');
+            $table->string('desired_outcome')->nullable();
             $table->timestamp('resolved_at')->nullable();
-            $table->longText('resolution')->nullable(); //worker, taskmaster
+            $table->string('resolution')->nullable(); //full-payment, partial-payment
+            $table->string('resolution_value')->nullable(); //500
             $table->timestamps();
             $table->foreign('task_submission_id')->references('id')->on('task_submissions')->onDelete('cascade');
         

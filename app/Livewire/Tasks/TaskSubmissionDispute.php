@@ -3,12 +3,16 @@
 namespace App\Livewire\Tasks;
 
 use App\Models\Support;
+use App\Models\Comment;
+use App\Models\TaskDisputeTrail;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class TaskSubmissionDispute extends Component
 {
@@ -16,28 +20,28 @@ class TaskSubmissionDispute extends Component
 
     public TaskSubmission $taskSubmission;
     public $task;
-    public $search = '';
-    public $status = 'all';
-    public $showCreateModal = false;
+    public $dispute;
+    // Dispute form properties
+    public $disputeMessage = '';
+    public $disputeAttachments = [];
     
     // Form properties for creating tickets
     public $subject = '';
     public $description = '';
     public $priority = 'normal';
     public $attachments = [];
-    
-    // Stats
-    public $stats = [
-        'total' => 0,
-        'open' => 0,
-        'in_progress' => 0,
-        'closed' => 0
-    ];
+
+    // Escalation properties
+    public $selectedStaff = '';
+    public $escalationNote = '';
+
+    // Resolution properties
+    public $resolution = '';
+    public $resolutionDetails = '';
+    public $amountToWorker = 0;
 
     protected $rules = [
-        'subject' => 'required|min:5|max:255',
-        'description' => 'required|min:20',
-        'priority' => 'required|in:low,normal,high,critical',
+        'disputeMessage' => 'required|min:5',
     ];
 
     protected $messages = [
@@ -51,103 +55,89 @@ class TaskSubmissionDispute extends Component
     public function mount($taskSubmission)
     {
         $this->taskSubmission = $taskSubmission;
+        $this->dispute = $this->taskSubmission->dispute;
         $this->task = $this->taskSubmission->task;
-        $this->loadStats();
     }
 
-    public function loadStats()
-    {
-        $userId = Auth::id();
-        
-        $this->stats['total'] = Support::where('user_id', $userId)->count();
-        $this->stats['open'] = Support::where('user_id', $userId)->where('status', 'open')->count();
-        $this->stats['in_progress'] = Support::where('user_id', $userId)->where('status', 'in_progress')->count();
-        $this->stats['closed'] = Support::where('user_id', $userId)->where('status', 'closed')->count();
-    }
-
-    public function updatedSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedStatus()
-    {
-        $this->resetPage();
-    }
-
-    public function openCreateModal()
-    {
-        $this->showCreateModal = true;
-        $this->resetForm();
-    }
-
-    public function closeCreateModal()
-    {
-        $this->showCreateModal = false;
-        $this->resetForm();
-    }
-
-    public function resetForm()
-    {
-        $this->subject = '';
-        $this->description = '';
-        $this->priority = 'normal';
-        $this->attachments = [];
-        $this->resetErrorBag();
-    }
-
-    public function removeAttachment($index)
-    {
-        if (isset($this->attachments[$index])) {
-            unset($this->attachments[$index]);
-            $this->attachments = array_values($this->attachments);
-        }
-    }
-
-    public function createTicket()
+    public function submitDisputeResponse()
     {
         $this->validate();
 
-        // Validate files manually
-        if (!empty($this->attachments)) {
-            $fileErrors = $this->validateFiles();
-            if (!empty($fileErrors)) {
-                foreach ($fileErrors as $error) {
-                    $this->addError('attachments', $error);
-                }
-                return;
-            }
+        // Process attachments if any
+        $attachmentPaths = [];
+        if (!empty($this->disputeAttachments)) {
+            $processedAttachments = $this->processAttachments($this->disputeAttachments);
+            $attachmentPaths = array_column($processedAttachments, 'path');
         }
 
-        // Create the support ticket
-        $support = Support::create([
+        // Create comment
+        Comment::create([
             'user_id' => Auth::id(),
-            'subject' => $this->subject,
-            'description' => $this->description,
-            'priority' => $this->priority,
-            'status' => 'open'
+            'commentable_type' => 'App\Models\TaskDispute',
+            'commentable_id' => $this->taskSubmission->dispute->id,
+            'body' => $this->disputeMessage,
+            'attachments' => !empty($attachmentPaths) ? $attachmentPaths : null,
         ]);
 
-        // Create the first comment (same as description)
-        $commentData = [
+        // Reset form
+        $this->disputeMessage = '';
+        $this->disputeAttachments = [];
+
+        session()->flash('success', 'Response added successfully!');
+    }
+
+    public function escalateDispute()
+    {
+        $this->validate([
+            'selectedStaff' => 'required|exists:users,id',
+            'escalationNote' => 'nullable|string|max:1000',
+        ]);
+
+        TaskDisputeTrail::create([
+            'task_dispute_id' => $this->dispute->id,
+            'user_id' => $this->selectedStaff,
+            'assigned_by' => Auth::id(),
+            'note' => $this->escalationNote,
+        ]);
+
+        $staff = User::find($this->selectedStaff);
+        Notification::send($staff, new \App\Notifications\Admin\DisputeEscalatedNotification($this->dispute, $this->taskSubmission));
+
+        $this->selectedStaff = '';
+        $this->escalationNote = '';
+
+        session()->flash('success', 'Dispute escalated successfully!');
+    }
+
+    public function resolveDispute()
+    {
+        $this->validate([
+            'resolution' => 'required|in:full-payment,partial-payment,resubmission',
+            'resolutionDetails' => 'required|string|min:10',
+            'amountToWorker' => 'required|numeric|min:0|max:100',
+        ]);
+
+        // Update the dispute
+        $this->dispute->update([
+            'resolved_at' => now(),
+            'resolution' => $this->resolution,
+            'resolution_value' => $this->amountToWorker,
+        ]);
+
+        // Create comment with resolution details
+        Comment::create([
             'user_id' => Auth::id(),
-            'body' => $this->description
-        ];
+            'commentable_type' => 'App\Models\TaskDispute',
+            'commentable_id' => $this->dispute->id,
+            'body' => $this->resolutionDetails,
+        ]);
 
-        // Handle file uploads if any
-        if (!empty($this->attachments)) {
-            $processedAttachments = $this->processAttachments();
-            if (!empty($processedAttachments)) {
-                $commentData['attachments'] = json_encode($processedAttachments);
-            }
-        }
+        // Reset form
+        $this->resolution = '';
+        $this->resolutionDetails = '';
+        $this->amountToWorker = 0;
 
-        $support->comments()->create($commentData);
-
-        $this->closeCreateModal();
-        $this->loadStats();
-        
-        session()->flash('success', 'Support ticket created successfully!');
+        session()->flash('success', 'Dispute resolved successfully!');
     }
 
     private function validateFiles()
@@ -194,15 +184,15 @@ class TaskSubmissionDispute extends Component
         return $errors;
     }
 
-    private function processAttachments()
+    private function processAttachments($files, $folder = 'dispute-attachments')
     {
         $processedFiles = [];
-        
-        foreach ($this->attachments as $file) {
+
+        foreach ($files as $file) {
             if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
                 // Store the file and get the path
-                $path = $file->store('support-attachments', 'public');
-                
+                $path = $file->store($folder, 'public');
+
                 $processedFiles[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => 'storage/' . $path,
@@ -212,33 +202,31 @@ class TaskSubmissionDispute extends Component
                 ];
             }
         }
-        
+
         return $processedFiles;
-    }
-
-    public function getTicketsQuery()
-    {
-        $query = Support::where('user_id', Auth::id())
-            ->when($this->search, function($q) {
-                $q->where('id', 'like', '%' . $this->search . '%')
-                  ->orWhere('subject', 'like', '%' . $this->search . '%');
-            })
-            ->when($this->status !== 'all', function($q) {
-                $q->where('status', $this->status);
-            });
-
-        return $query;
     }
 
     public function render()
     {
-        $tickets = $this->getTicketsQuery()
-            ->with(['user', 'comments'])
+        $disputeComments = Comment::where('commentable_type', 'App\Models\TaskDispute')
+            ->where('commentable_id', $this->taskSubmission->dispute->id)
+            ->with('user')
             ->latest()
-            ->paginate(10);
+            ->get();
 
         return view('livewire.tasks.task-submission-dispute', [
-            'tickets' => $tickets
+            'disputeComments' => $disputeComments,
+            'staff' => $this->getStaff()
         ]);
+    }
+
+    private function getStaff()
+    {
+        return User::whereNotNull('role_id')
+            ->where(function($query) {
+                $query->whereNull('country_id')
+                      ->orWhere('country_id', $this->taskSubmission->user->country_id);
+            })
+            ->get();
     }
 }

@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('task_dispute_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->string('status')->nullable(); //
+            $table->unsignedBigInteger('assigned_by')->nullable(); //
+            $table->text('note')->nullable(); //
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('assigned_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('task_dispute_id')->references('id')->on('task_disputes')->onDelete('set null');
         });
     }

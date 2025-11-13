@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Task as TaskModel;
 
 
 
@@ -20,6 +21,7 @@ class TaskManage extends Component
     public Task $task;
     public $search;
     public $commentResponses = [];
+    public $activeTab = 'pending';
 
 
     public function mount(Task $task)
@@ -72,22 +74,66 @@ class TaskManage extends Component
         $this->loadComments();
     }
 
-    public function getWorkersQuery()
+
+    public function getPendingSubmissionsProperty()
     {
-        return TaskWorker::where('task_id', $this->task->id)
-            ->when($this->search, function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%');
-                });
+        return TaskSubmission::where('task_id', $this->task->id)
+            ->whereNull('reviewed_at')
+            ->with('taskWorker.user')
+            ->paginate(10, ['*'], 'pendingPage');
+    }
+
+    public function getApprovedSubmissionsProperty()
+    {
+        return TaskSubmission::where('task_id', $this->task->id)
+            ->where('accepted', true)
+            ->with('taskWorker.user')
+            ->paginate(10, ['*'], 'approvedPage');
+    }
+
+    public function getRejectedSubmissionsProperty()
+    {
+        return TaskSubmission::where('task_id', $this->task->id)
+            ->where('accepted', false)
+            ->whereDoesntHave('dispute')
+            ->with('taskWorker.user')
+            ->paginate(10, ['*'], 'rejectedPage');
+    }
+
+    public function getDisputedSubmissionsProperty()
+    {
+        return TaskSubmission::where('task_id', $this->task->id)
+            ->whereHas('dispute', function($q) {
+                $q->whereNull('resolved_at');
             })
-            ->with('user');
+            ->with('taskWorker.user', 'dispute')
+            ->paginate(10, ['*'], 'disputedPage');
+    }
+
+    public function getTaskCommentsProperty()
+    {
+        return Comment::where('commentable_type', TaskModel::class)
+            ->where('commentable_id', $this->task->id)
+            ->where('is_flag', false)
+            ->whereNull('parent_id')
+            ->with(['user', 'children.user'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'commentsPage');
     }
 
     public function render()
     {
-        // Get invitees statistics
-
-        return view('livewire.tasks.task-manage', []);
+        return view('livewire.tasks.task-manage', [
+            'pendingSubmissions' => $this->pendingSubmissions,
+            'approvedSubmissions' => $this->approvedSubmissions,
+            'rejectedSubmissions' => $this->rejectedSubmissions,
+            'disputedSubmissions' => $this->disputedSubmissions,
+            'taskComments' => $this->taskComments,
+            'pendingCount' => TaskSubmission::where('task_id', $this->task->id)->whereNull('reviewed_at')->count(),
+            'approvedCount' => TaskSubmission::where('task_id', $this->task->id)->where('accepted', true)->count(),
+            'rejectedCount' => TaskSubmission::where('task_id', $this->task->id)->where('accepted', false)->whereDoesntHave('dispute')->count(),
+            'disputedCount' => TaskSubmission::where('task_id', $this->task->id)->whereHas('dispute', function($q) { $q->whereNull('resolved_at'); })->count(),
+            'commentsCount' => Comment::where('commentable_type', TaskModel::class)->where('commentable_id', $this->task->id)->where('is_flag', false)->whereNull('parent_id')->count(),
+        ]);
     }
 }

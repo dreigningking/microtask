@@ -13,11 +13,12 @@ use Livewire\WithFileUploads;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
-
+use App\Http\Traits\HelperTrait;
+use App\Models\TaskDisputeTrail;
 
 class TaskShow extends Component
 {
-    use GeoLocationTrait, WithFileUploads;
+    use GeoLocationTrait, WithFileUploads,HelperTrait;
 
     public Task $task;
     public $agreementAccepted = false;
@@ -31,6 +32,7 @@ class TaskShow extends Component
     // Dispute
     public $disputeSubmissionId = null;
     public $disputeReason = '';
+    public $desiredOutcome = '';
     public $disputeFiles = [];
 
     
@@ -530,12 +532,14 @@ class TaskShow extends Component
     public function openDispute($submissionId){
         $this->disputeSubmissionId = $submissionId;
         $this->disputeReason = '';
+        $this->desiredOutcome = '';
         $this->disputeFiles = [];
     }
 
     public function submitDispute(){
         $this->validate([
             'disputeReason' => 'required|string|min:10',
+            'desiredOutcome' => 'nullable|string',
             'disputeFiles.*' => 'nullable|file|max:10240', // 10MB max per file
         ]);
 
@@ -558,7 +562,8 @@ class TaskShow extends Component
                 $uploadedFiles[] = $path;
             }
         }
-        $dispute = TaskDispute::create(['task_submission_id'=> $this->disputeSubmissionId]);
+        $dispute = TaskDispute::create(['task_submission_id'=> $this->disputeSubmissionId,'desired_outcome'=> $this->desiredOutcome]);
+        TaskDisputeTrail::create(['task_dispute_id'=> $dispute->id,'user_id'=> $this->getAdmin()->id]);
         $comment = Comment::create([
             'user_id'=> $this->user->id,
             'commentable_id'=> $dispute->id,

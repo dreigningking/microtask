@@ -132,6 +132,10 @@ class Comment extends Model
     {
         return $this->user_id === $user->id;
     }
+    public function getIsByAdminAttribute()
+    {
+        return isset($this->user->role_id);
+    }
 
     public function canBeEditedBy(User $user): bool
     {

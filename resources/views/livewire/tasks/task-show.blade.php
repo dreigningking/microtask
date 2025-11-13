@@ -170,7 +170,7 @@
                                             <div class="">
                                                 <span class="badge bg-danger d-block mb-3">Rejected</span>
 
-                                                <button class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disputeSubmissionModal"  wire:click="openDispute({{ $submission->id }})">
+                                                <button class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disputeSubmissionModal" wire:click="openDispute({{ $submission->id }})">
                                                     <i class="bi bi-person-lines-fill"></i> Dispute
                                                 </button>
                                                 @if(!$submission->accepted && !$submission->taskWorker->submission_restricted_at)
@@ -184,7 +184,7 @@
                                                 <span class="badge bg-warning d-block mb-3">Disputed</span>
                                                 <a href="{{route('tasks.dispute',$submission)}}" class="btn btn-sm btn-outline-warning w-100">
                                                     <i class="bi bi-person-lines-fill"></i> View Dispute
-                                                </a>  
+                                                </a>
                                             </div>
                                             @endif
                                         </div>
@@ -562,6 +562,8 @@
             </div>
         </div>
     </div>
+
+
     <div wire:ignore class="modal fade" id="disputeSubmissionModal" tabindex="-1" role="dialog" aria-labelledby="disputeSubmissionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -586,6 +588,17 @@
                             @error('disputeReason')
                             <div class="text-danger small">{{ $message }}</div>
                             @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label>What resolution outcome do you think is fair for this dispute?</label>
+                            <select wire:model="desiredOutcome" class="form-select">
+                                <option value="">Select a resolution</option>
+                                <option value="full-payment">Full payment to worker</option>
+                                <option value="partial-payment">Partial payment to worker</option>
+                                <option value="resubmission">Allow re-submission of work</option>
+                                <option value="reassessment">Reassessment of submission</option>
+                                <option value="other">Other solution</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="disputeFiles" class="form-label">Attach Files (Optional)</label>

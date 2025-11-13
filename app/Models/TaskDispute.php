@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Comment;
+use App\Models\TaskDisputeTrail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -10,8 +12,10 @@ class TaskDispute extends Model
 {
     protected $fillable = [
         'task_submission_id',
+        'desired_outcome',
         'resolved_at',
         'resolution',
+        'resolution_value',
     ];
 
     protected $casts = [
@@ -29,9 +33,20 @@ class TaskDispute extends Model
     /**
      * Get all dispute trails (comments) for this dispute
      */
-    public function disputeTrails(): MorphMany
+    public function latestTrail()
     {
-        return $this->morphMany(TaskDisputeTrail::class, 'trailable');
+        return $this->hasOne(TaskDisputeTrail::class)->latestOfMany();
+    }
+    
+    public function disputeTrails()
+    {
+        
+        return $this->hasMany(TaskDisputeTrail::class);
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     /**
@@ -56,5 +71,33 @@ class TaskDispute extends Model
     public function scopeResolved($query)
     {
         return $query->whereNotNull('resolved_at');
+    }
+
+    public function getOutcomeAttribute(){
+        switch($this->desired_outcome){
+            case 'full-payment': return 'Worker is seeking full payment for work';
+                break;
+            case 'partial-payment': return 'Worker is seeking partial payment for work';
+                break;
+            case 'resubmission': return 'Worker is seeking resubmission of work';
+                break;
+            case 'reassessment': return 'Worker is seeking reassessment of submission';
+                break;
+            default: return 'Not prodived';
+        }
+        
+    }
+
+    public function getResolutionInstructionAttribute(){
+        switch($this->resolution){
+            case 'full-payment': return 'Full payment awarded to worker';
+                break;
+            case 'partial-payment': return 'Partial payment of '.$this->resolution_value.'% awarded to worker';
+                break;
+            case 'resubmission': return 'Worker was granted resubmission of task';
+                break;
+            default: return 'Not prodived';
+        }
+        
     }
 }

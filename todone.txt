@@ -1,8 +1,9 @@
 Template field upload not working yet during task create 
 
 6. Dispute submission review {
-    dispute task
-    Task creator & admin receives notification of dispute 
+    dispute resolution
+    dispute escalation
+    dispute timeline
 }
  
 Refund notification & Earnings Notification sync
