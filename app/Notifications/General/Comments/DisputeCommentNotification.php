@@ -56,13 +56,14 @@ class DisputeCommentNotification extends Notification
         }elseif($this->sender == 'worker'){
             $result['sender'] = 'Task Worker';
             $result['url'] = $user->role_id ? 
-                                route('support.disputes.index') :
-                                route('tasks.disoute',$this->comment->commentable);
+                                route('admin.support.disputes.index') :
+                                route('tasks.dispute',$this->comment->commentable);
         }else{
             $result['sender'] = 'Task Creator';
             $result['url'] = $user->role_id ? 
-                                route('support.disputes.index') :
-                                route('tasks.disoute',$this->comment->commentable);
+                                route('admin.support.disputes.index') :
+                                route('tasks.dispute',$this->comment->commentable);
         }
+        return $result;
     }
 } 

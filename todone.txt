@@ -1,31 +1,21 @@
-Template field upload not working yet 
+Template field upload not working yet during task create 
 
-if admin does not approve task,{
-   user will edit task ? 
-}  
-
-
-2. Admin Approve/Disapprove Task {
-    if disapprove, what happens{
-        Approve Notification
-        Disapprove Notification
-        Funds Return to wallet
-    }
-}
-3. Browse Task | Apply for Task | Report Task {
-    {
-        Admin notification of report
-    }
-}
-4. Submit Task{
-    Task creator's notification of submisssion
-}
-5. Review Submission{
-    Task worker receive notification of review & payment \ review only
-}
 6. Dispute submission review {
+    dispute task
     Task creator & admin receives notification of dispute 
 }
+ 
+Refund notification & Earnings Notification sync
+
+2. Admin Approve/Disapprove Task {
+    Approve Notification
+    Disapprove Notification
+    if admin does not approve task,{
+        user will edit task || Funds Return to wallet? 
+    } 
+}
+3. Report Task Admin notification of report
+
 7. Arbitrate & Resolve dispute{
     everybody receive message notification 
 }

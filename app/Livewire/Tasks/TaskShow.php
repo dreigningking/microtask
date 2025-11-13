@@ -5,8 +5,11 @@ namespace App\Livewire\Tasks;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Setting;
 use Livewire\Component;
 use App\Models\TaskWorker;
+use App\Models\TaskDispute;
+use Livewire\WithFileUploads;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
@@ -14,7 +17,7 @@ use App\Http\Traits\GeoLocationTrait;
 
 class TaskShow extends Component
 {
-    use GeoLocationTrait;
+    use GeoLocationTrait, WithFileUploads;
 
     public Task $task;
     public $agreementAccepted = false;
@@ -22,7 +25,14 @@ class TaskShow extends Component
     public $hasStarted = false;
     public $countryId;
     public $canStartOrSave = true;
+    public $user;
     public $userReported = false;
+
+    // Dispute
+    public $disputeSubmissionId = null;
+    public $disputeReason = '';
+    public $disputeFiles = [];
+
     
     // Availability tracking
     public $isTaskAvailable = false;
@@ -33,20 +43,28 @@ class TaskShow extends Component
     public $userSubmissions;
     public $userSubmissionCount = 0;
     public $hasUserSubmitted = false;
-    public $canSubmitMore = true;
+    public $cannotSubmitReason = '';
     
     // Report functionality
     public $reportReason = '';
 
+    
     // Comments functionality
     public $question = '';
     public $comments;
     public $similarQuestions = [];
 
+    // Submission functionality
+    public $submissionData = [];
+    public $submissionFiles = [];
+    public $submissionFields = [];
+
     public function mount(Task $task)
     {
-
+        /** @var \App\Models\User $user **/
+        $this->user = Auth::user();
         $this->task = $task->load(['user.country', 'platform', 'platformTemplate', 'taskWorkers','latestModeration']);
+        $this->submissionFields = $this->task->platformTemplate->submission_fields ?? [];
         if (Auth::check()) {
             $this->countryId = Auth::user()->country_id;
         } else {
@@ -99,33 +117,41 @@ class TaskShow extends Component
      */
     public function loadUserState()
     {
-        if (!Auth::check()) {
+        if (!$this->user) {
             return;
         }
-
-        $userId = Auth::id();
-
         // Check if user has applied for this task
         $this->userTaskWorker = TaskWorker::where('task_id', $this->task->id)
-            ->where('user_id', $userId)
+            ->where('user_id', $this->user->id)
             ->first();
 
         $this->hasStarted = $this->userTaskWorker !== null;
 
         // Load user's submissions for this task
         $this->userSubmissions = $this->task->taskSubmissions()
-            ->where('user_id', $userId)
+            ->where('user_id', $this->user->id)
             ->get();
 
         $this->userSubmissionCount = $this->userSubmissions->count();
         $this->hasUserSubmitted = $this->userSubmissionCount > 0;
 
-        // Check if user can submit more (for multiple submissions)
-        if ($this->task->allow_multiple_submissions == 1) {
-            $this->canSubmitMore = true; // Allow multiple
-        } else {
-            $this->canSubmitMore = !$this->hasUserSubmitted; // Only if no submission yet
+        // Collect reasons why user cannot submit
+        $cannotSubmitReasons = [];
+
+        if (!$this->task->allow_multiple_submissions && $this->hasUserSubmitted) {
+            $cannotSubmitReasons[] = 'Only one submission is allowed for this task.';
         }
+
+        if ($this->userTaskWorker && $this->userTaskWorker->submission_restricted_at) {
+            $cannotSubmitReasons[] = 'Your submissions are restricted for this task.';
+        }
+
+        $submitTaskReason = $this->canSubmitTask($this->task);
+        if ($submitTaskReason) {
+            $cannotSubmitReasons[] = $submitTaskReason;
+        }
+
+        $this->cannotSubmitReason = $cannotSubmitReasons[0] ?? '';
     }
 
     /**
@@ -142,7 +168,6 @@ class TaskShow extends Component
     public function getUnavailabilityReasons(): array
     {
         $reasons = [];
-        dd('bla');
         if (!$this->task->is_active) {
             $reasons[] = 'Task is not active';
         }
@@ -162,7 +187,7 @@ class TaskShow extends Component
         }
         
         // Check if user is banned
-        if (Auth::check() && Auth::user()->isBannedFromTasks()) {
+        if ($this->user && $this->user->isBannedFromTasks()) {
             $reasons[] = 'You are currently banned from taking tasks';
         }
         
@@ -171,7 +196,8 @@ class TaskShow extends Component
 
     public function startTask()
     {
-        if (!Auth::check()) {
+
+        if (!$this->user) {
             session()->flash('error', 'You must be logged in to start tasks.');
             return;
         }
@@ -181,7 +207,7 @@ class TaskShow extends Component
             return;
         }
 
-        if (!$this->canStartOrSave) {
+        if ($this->task->taskSubmissions->count() >= $this->task->number_of_submissions) {
             session()->flash('error', 'This task is full and cannot be started.');
             return;
         }
@@ -192,18 +218,18 @@ class TaskShow extends Component
         }
 
         // Check if user is banned from taking tasks
-        /** @var \App\Models\User $user */
-        if (Auth::user()->isBannedFromTasks()) {
+        
+        if ($this->user->isBannedFromTasks()) {
             session()->flash('error', 'You are currently banned from taking tasks. Please contact support for more information.');
             return;
         }
 
         // Check if user can take tasks based on subscription limits
-        // Note: canTakeTask method doesn't exist, removing this check for now
-        // if (!Auth::user()->canTakeTask()) {
-        //     session()->flash('error', 'You have reached your hourly task limit or do not have an active worker subscription.');
-        //     return;
-        // }
+        $cannotTakeReason = $this->canTakeTask();
+        if ($cannotTakeReason) {
+            session()->flash('error', 'You cannot start this task: ' . $cannotTakeReason);
+            return;
+        }
 
         $worker = TaskWorker::firstOrCreate(
             ['task_id' => $this->task->id, 'user_id' => Auth::id()]
@@ -259,16 +285,16 @@ class TaskShow extends Component
     
     public function withdrawSubmission($submissionId)
     {
-        if (!Auth::check()) {
+        if (!$this->user) {
             session()->flash('error', 'You must be logged in to withdraw submissions.');
             return;
         }
 
+
         $submission = TaskSubmission::where('id', $submissionId)
-            ->where('user_id', Auth::id())
+            ->where('user_id', $this->user->id)
             ->where('task_id', $this->task->id)
             ->where('accepted', false)
-            ->whereNull('reviewed_at')
             ->first();
 
         if (!$submission) {
@@ -325,7 +351,225 @@ class TaskShow extends Component
         $this->similarQuestions = [];
         $this->loadComments();
     }
-    
+
+    public function submitWork()
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'You must be logged in to submit work.');
+            return;
+        }
+
+        // Check 1: task is available
+        if (!$this->task->available) {
+            session()->flash('error', 'This task is not available for submission.');
+            return;
+        }
+
+        // Check 2: if user has submitted this task before and task allows multiple submissions
+        $hasSubmittedBefore = $this->userSubmissions->isNotEmpty();
+        if ($hasSubmittedBefore && !$this->task->allow_multiple_submissions) {
+            session()->flash('error', 'You have already submitted for this task and multiple submissions are not allowed.');
+            return;
+        }
+
+        // Check 3: if user can submit task
+        $cannotSubmitReason = $this->canSubmitTask($this->task);
+        if ($cannotSubmitReason) {
+            session()->flash('error', 'You are not allowed to submit at this time: ' . $cannotSubmitReason);
+            return;
+        }
+
+        // Validate submission fields
+        $rules = [];
+        foreach ($this->submissionFields as $field) {
+            if ($field['type'] === 'file') {
+                $key = 'submissionFiles.' . $field['slug'];
+                $rules[$key] = $field['required'] ? 'required|file' : 'nullable|file';
+            } else {
+                $key = 'submissionData.' . $field['slug'];
+                $rule = $field['required'] ? 'required' : '';
+                if ($field['type'] === 'url') {
+                    $rule .= ($rule ? '|' : '') . 'url';
+                } elseif ($field['type'] === 'number') {
+                    $rule .= ($rule ? '|' : '') . 'numeric';
+                }
+                if ($rule) {
+                    $rules[$key] = $rule;
+                }
+            }
+        }
+
+        $this->validate($rules);
+
+        // Handle files and prepare submission details
+        $submissionDetails = [];
+        foreach ($this->submissionFields as $field) {
+            $fieldData = $field; // Copy the field structure
+            if ($field['type'] === 'file') {
+                if (isset($this->submissionFiles[$field['slug']])) {
+                    $file = $this->submissionFiles[$field['slug']];
+                    $path = $file->store('submissions', 'public');
+                    $fieldData['value'] = $path;
+                } else {
+                    $fieldData['value'] = null;
+                }
+            } else {
+                $fieldData['value'] = $this->submissionData[$field['slug']] ?? null;
+            }
+            $submissionDetails[] = $fieldData;
+        }
+
+        // Create submission
+        TaskSubmission::create([
+            'user_id' => Auth::id(),
+            'task_id' => $this->task->id,
+            'task_worker_id' => $this->userTaskWorker->id,
+            'submission_details' => $submissionDetails,
+        ]);
+
+        session()->flash('success', 'Your work has been submitted successfully.');
+
+        // Reset form
+        $this->submissionData = [];
+        $this->submissionFiles = [];
+
+        // Refresh user state
+        $this->loadUserState();
+    }
+
+    /**
+     * Check if user can take tasks based on subscription limits
+     */
+    public function canTakeTask(): ?string
+    {
+        // Check if banned
+        if ($this->user->isBannedFromTasks()) {
+            return 'You are currently banned from taking tasks.';
+        }
+
+        // Obtain variables from database settings
+        $taskApplicationLimitPerDaySetting = Setting::where('name', 'task_application_limit_per_day')->first();
+        $taskApplicationLimitPerDay = $taskApplicationLimitPerDaySetting ? (int) $taskApplicationLimitPerDaySetting->value : 10;
+
+        $maximumTasksAtHandSetting = Setting::where('name', 'maximum_tasks_at_hand')->first();
+        $maximumTasksAtHand = $maximumTasksAtHandSetting ? (int) $maximumTasksAtHandSetting->value : 5;
+
+        // Get active subscriptions
+        $activeSubscriptions = $this->user->activeSubscriptions();
+
+        // Initialize multipliers
+        $taskLimitMultiplier = 1;
+        $taskVolumeMultiplier = 1;
+
+        // Check for task-limit-booster subscription
+        $taskLimitBoosterSub = $activeSubscriptions->whereHas('booster', function($q) {
+            $q->where('slug', 'task-limit-booster');
+        })->first();
+        if ($taskLimitBoosterSub) {
+            $taskLimitMultiplier = $taskLimitBoosterSub->multiplier ?? 1;
+        }
+
+        // Check for task-volume-booster subscription
+        $taskVolumeBoosterSub = $activeSubscriptions->whereHas('booster', function($q) {
+            $q->where('slug', 'task-volume-booster');
+        })->first();
+        if ($taskVolumeBoosterSub) {
+            $taskVolumeMultiplier = $taskVolumeBoosterSub->multiplier ?? 1;
+        }
+
+        // Apply multipliers
+        $taskApplicationLimitPerDay *= $taskLimitMultiplier;
+        $maximumTasksAtHand *= $taskVolumeMultiplier;
+
+        // Check number of tasks applied for today
+        $appliedToday = $this->user->taskWorkers()->whereDate('created_at', today())->count();
+        if ($appliedToday >= $taskApplicationLimitPerDay) {
+            return "You have reached your daily task application limit of {$taskApplicationLimitPerDay}.";
+        }
+
+        // Check number of tasks applied for and not submitted
+        $tasksAtHand = $this->user->taskWorkers()
+            ->whereDoesntHave('taskSubmissions', function($q) {
+                $q->whereNotNull('accepted');
+            })
+            ->count();
+        if ($tasksAtHand >= $maximumTasksAtHand) {
+            return "You have reached your maximum tasks at hand limit of {$maximumTasksAtHand}.";
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if user can submit tasks based on subscription limits
+     */
+    public function canSubmitTask(Task $task): ?string
+    {
+        // Check if banned
+        if ($this->user->isBannedFromTasks()) {
+            return 'You are currently banned from taking tasks.';
+        }
+
+        // Obtain multiple_submission_interval_minutes from settings
+        $intervalSetting = Setting::where('name', 'multiple_submission_interval_minutes')->first();
+        $interval = $intervalSetting ? (int) $intervalSetting->value : 60;
+
+        // Check if user has not submitted this task before
+        $lastSubmission = $this->user->taskSubmissions()->where('task_id', $task->id)->latest('created_at')->first();
+        if ($lastSubmission) {
+            // If submitted before, check if difference between created_at and now is more than interval minutes
+            $diffMinutes = $lastSubmission->created_at->diffInMinutes(now());
+            if ($diffMinutes <= $interval) {
+                return "You must wait {$interval} minutes between submissions for this task.";
+            }
+        }
+
+        return null;
+    }
+
+    public function openDispute($submissionId){
+        $this->disputeSubmissionId = $submissionId;
+        $this->disputeReason = '';
+        $this->disputeFiles = [];
+    }
+
+    public function submitDispute(){
+        $this->validate([
+            'disputeReason' => 'required|string|min:10',
+            'disputeFiles.*' => 'nullable|file|max:10240', // 10MB max per file
+        ]);
+
+        if (!$this->user) {
+            session()->flash('error', 'You must be logged in to submit a dispute.');
+            return;
+        }
+
+        $submission = TaskSubmission::find($this->disputeSubmissionId);
+        if (!$submission || $submission->user_id !== $this->user->id) {
+            session()->flash('error', 'Submission not found or access denied.');
+            return;
+        }
+
+        // Handle file uploads
+        $uploadedFiles = [];
+        if ($this->disputeFiles) {
+            foreach ($this->disputeFiles as $file) {
+                $path = $file->store('disputes', 'public');
+                $uploadedFiles[] = $path;
+            }
+        }
+        $dispute = TaskDispute::create(['task_submission_id'=> $this->disputeSubmissionId]);
+        $comment = Comment::create([
+            'user_id'=> $this->user->id,
+            'commentable_id'=> $dispute->id,
+            'commentable_type'=> get_class($dispute),
+            'body'=> $this->disputeReason,
+            'attachments'=> $uploadedFiles,
+        ]);
+
+        return redirect()->route('tasks.dispute', $submission);
+    }
+
     public function render()
     {
         return view('livewire.tasks.task-show');

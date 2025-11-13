@@ -251,8 +251,8 @@ class CountrySettingsController extends Controller
         $settings->broadcast_rate = $request->input('broadcast_rate', 0);
         $settings->admin_review_cost = $request->input('admin_review_cost', 0);
         $settings->system_review_cost = $request->input('system_review_cost', 0);
-        $settings->invitee_commission_percentage = $request->input('invitee_commission_percentage', 0);
-        $settings->referral_earnings_percentage = $request->input('referral_earnings_percentage', 0);
+        $settings->task_referral_commission_percentage = $request->input('task_referral_commission_percentage', 0);
+        $settings->signup_referral_earnings_percentage = $request->input('signup_referral_earnings_percentage', 0);
         $settings->save();
         return redirect()->route('admin.settings.country', $country)->withInput()->with('success', 'Task settings updated.');
     }

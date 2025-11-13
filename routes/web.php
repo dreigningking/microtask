@@ -16,7 +16,6 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Tasks\TaskCreate;
 use App\Livewire\Tasks\TaskManage;
 use App\Livewire\Tasks\PostedTasks;
-use App\Livewire\Tasks\TaskDispute;
 use App\Livewire\Tasks\AppliedTasks;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\LandingArea\AboutPage;
@@ -25,6 +24,7 @@ use App\Livewire\LandingArea\TopEarners;
 use App\Livewire\LandingArea\ContactPage;
 use App\Livewire\LandingArea\JobCreators;
 use App\Http\Controllers\PaymentController;
+use App\Livewire\Tasks\TaskSubmissionDispute;
 use App\Livewire\DashboardArea\Support\Tickets;
 use App\Livewire\LandingArea\Policies\Disclaimer;
 use App\Livewire\DashboardArea\Support\TicketView;
@@ -35,24 +35,16 @@ use App\Livewire\LandingArea\Policies\DigitalMillenium;
 use App\Livewire\LandingArea\Policies\TermsAndConditions;
 use App\Livewire\DashboardArea\Notifications\ListNotifications;
 use App\Livewire\LandingArea\Policies\PaymentDisputeChargebacks;
-use App\Models\CountrySetting;
+
 
 
 Route::get('run', function () {
-    $settings = CountrySetting::all();
-    foreach($settings as $setting){
-        $setting->banking_settings = json_decode($setting->banking_settings);
-        $setting->banking_fields = json_decode($setting->banking_fields);
-        $setting->verification_fields = json_decode($setting->verification_fields);
-        $setting->verification_settings = json_decode($setting->verification_settings);
-        $setting->promotion_settings = json_decode($setting->promotion_settings);
-        $setting->transaction_settings = json_decode($setting->transaction_settings);
-        $setting->withdrawal_settings = json_decode($setting->withdrawal_settings);
-        $setting->wallet_settings = json_decode($setting->wallet_settings);
-        $setting->referral_settings = json_decode($setting->referral_settings);
-        $setting->review_settings = json_decode($setting->review_settings);
-        $setting->security_settings = json_decode($setting->security_settings);  
-        $setting->save();
+    $moderations = \App\Models\Moderation::all();
+    foreach($moderations as $moderation){
+        $moderation->moderator_id = 2;
+        $moderation->moderated_at = now();
+        $moderation->status = 'approved';
+        $moderation->save();
     }
     return 'done';
 });
@@ -87,7 +79,7 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
             Route::get('create', TaskCreate::class)->name('create');
             Route::get('edit/{task}', TaskEdit::class)->name('edit');
             Route::get('manage/{task}', TaskManage::class)->name('manage');
-            Route::get('dispute/{task}', TaskDispute::class)->name('dispute');
+            Route::get('dispute/{taskSubmission}', TaskSubmissionDispute::class)->name('dispute');
         });
         /* Earnings */
         Route::group(['prefix' => 'earnings', 'as' => 'earnings.'], function () {

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 
-class TaskInviteNonUserNotification extends Notification
+class InvitationNotification extends Notification
 {
     use Queueable;
 

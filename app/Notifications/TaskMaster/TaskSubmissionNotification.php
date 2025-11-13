@@ -2,7 +2,9 @@
 
 namespace App\Notifications\TaskMaster;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
+use App\Models\TaskSubmission;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,13 +13,12 @@ class TaskSubmissionNotification extends Notification
 {
     use Queueable;
 
-    protected $task;
-    protected $worker;
+    protected $taskSubmission;
 
-    public function __construct($task, $worker)
+    public function __construct(TaskSubmission $taskSubmission)
     {
-        $this->task = $task;
-        $this->worker = $worker;
+        $this->taskSubmission = $taskSubmission;
+
     }
 
     public function via($notifiable)
@@ -27,11 +28,16 @@ class TaskSubmissionNotification extends Notification
 
     public function toMail($notifiable)
     {
+        $deadline = null;
+        $setting = Setting::where('name','submission_review_deadline')->first();
+        if($setting && $setting->value){
+            $deadline = $this->taskSubmission->created_at->addDay(intval($setting->value));
+        }
         return (new MailMessage)
-            ->subject('A Worker Has Submitted a Job')
+            ->subject('Task Submission')
             ->greeting('Hello ' . $notifiable->name . ',')
-            ->line($this->worker->name . ' has submitted their work for your task: "' . $this->task->title . '".')
-            ->action('Review Submission', url(route('tasks.manage', $this->task)))
-            ->line('Please review the submission and take the appropriate action.');
+            ->line('You have a task submission that requires your review on task with title: '. $this->taskSubmission->task->title)
+            ->action('Review Submission', url(route('tasks.manage', $this->taskSubmission->task)))
+            ->line($deadline ? 'Please review the submission before the deadline '.$deadline->format('d-M-Y'): '');
     }
 } 

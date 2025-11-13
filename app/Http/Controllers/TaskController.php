@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Country;
+use App\Models\Setting;
 use App\Models\Platform;
 use Illuminate\Http\Request;
-use App\Models\TaskPromotion;
 use App\Models\TaskSubmission;
-use App\Models\Setting;
-use App\Notifications\TaskMaster\TaskApprovedNotification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -353,10 +352,9 @@ class TaskController extends Controller
             'task_id' => 'required|exists:tasks,id',
         ]);
         $task = Task::findOrFail($request->task_id);
-        $task->approved_at = now();
-        $task->approved_by = Auth::id();
+        
         $task->save();
-        $task->user->notify(new TaskApprovedNotification($task));
+
         return back()->with('success', 'Task approved successfully.');
     }
 
@@ -450,35 +448,40 @@ class TaskController extends Controller
         }
 
         $amount = $submission->task->budget_per_submission;
+        DB::beginTransaction();
+        try {
+            // Create settlement record
+            $settlement = \App\Models\Settlement::create([
+                'user_id' => $submission->user_id,
+                'task_id' => $submission->task_id,
+                'task_submission_id' => $submission->id,
+                'amount' => $amount,
+                'currency' => $submission->task->currency,
+                'type' => 'credit',
+                'status' => 'completed',
+                'description' => 'Task completion payment',
+                'processed_at' => now(),
+                'processed_by' => Auth::id(),
+            ]);
 
-        // Create settlement record
-        $settlement = \App\Models\Settlement::create([
-            'user_id' => $submission->user_id,
-            'task_id' => $submission->task_id,
-            'task_submission_id' => $submission->id,
-            'amount' => $amount,
-            'currency' => $submission->task->currency,
-            'type' => 'credit',
-            'status' => 'completed',
-            'description' => 'Task completion payment',
-            'processed_at' => now(),
-            'processed_by' => Auth::id(),
-        ]);
+            // Mark submission as paid
+            $submission->paid_at = now();
+            $submission->save();
 
-        // Mark submission as paid
-        $submission->paid_at = now();
-        $submission->save();
+            // Add to user's wallet
+            $wallet = $submission->user->wallet ?? \App\Models\Wallet::create([
+                'user_id' => $submission->user_id,
+                'balance' => 0,
+                'currency' => $submission->task->currency
+            ]);
 
-        // Add to user's wallet
-        $wallet = $submission->user->wallet ?? \App\Models\Wallet::create([
-            'user_id' => $submission->user_id,
-            'balance' => 0,
-            'currency' => $submission->task->currency
-        ]);
-
-        $wallet->balance += $amount;
-        $wallet->save();
-
+            $wallet->balance += $amount;
+            $wallet->save();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
         // Optional: Send payment notification to worker
 
         return redirect()->back()->with('success', 'Payment disbursed successfully.');

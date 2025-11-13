@@ -73,5 +73,6 @@ class TaskCommentNotification extends Notification
                 $result['url'] = route('explore.task',$this->comment->commentable);
             }
         }
+        return $result;
     }
 } 

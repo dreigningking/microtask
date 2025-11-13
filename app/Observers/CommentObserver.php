@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Moderation;
+use Illuminate\Support\Facades\Log;
 use App\Notifications\General\Comments\TaskCommentNotification;
 use App\Notifications\General\Comments\DisputeCommentNotification;
 use App\Notifications\General\Comments\SupportCommentNotification;
@@ -46,7 +47,7 @@ class CommentObserver
                 }
             break;
 
-            case('App\Models\Dispute'):
+            case('App\Models\TaskDispute'):
                 if($comment->user->role_id){
                     $comment->commentable->taskSubmission->task->user->notify(new DisputeCommentNotification($comment,'admin'));
                     $comment->commentable->taskSubmission->user->notify(new DisputeCommentNotification($comment,'admin'));

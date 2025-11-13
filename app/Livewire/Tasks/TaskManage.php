@@ -29,7 +29,7 @@ class TaskManage extends Component
             'platform',
             'platformTemplate',
             'promotions',
-            'taskSubmissions.task_worker.user',
+            'taskSubmissions.taskWorker.user',
             'comments.user',
             'disputes'
         ]);

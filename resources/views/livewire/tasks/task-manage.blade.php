@@ -143,6 +143,22 @@
                         </div>
                     </div>
 
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Share Task</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <button data-bs-toggle="modal" data-bs-target="#referralModal" class="btn btn-sm btn-primary"><i class="bi bi-share"></i> Share via email</button>
+                                <button class="btn btn-sm btn-danger text-white"><i class="bi bi-instagram"></i></button>
+                                <button class="btn btn-sm btn-info text-white"><i class="bi bi-twitter"></i> </button>
+                                <button class="btn btn-sm btn-primary text-white"><i class="bi bi-linkedin"></i> </button>
+                                <button class="btn btn-sm btn-info text-white"><i class="bi bi-facebook"></i> </button>
+                            </div>
+                           
+                        </div>
+                    </div>
+
                     @if($task->promotions->isNotEmpty())
                     <div class="card">
                         <div class="card-header bg-transparent">
@@ -162,19 +178,11 @@
                                 <span>Clicks:</span>
                                 <strong class="text-warning">7</strong>
                             </div>
-                            <div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <button data-bs-toggle="modal" data-bs-target="#inviteModal" class="btn btn-sm btn-primary"><i class="bi bi-share"></i> Share via email</button>
-                                    <button class="btn btn-sm btn-danger text-white"><i class="bi bi-instagram"></i></button>
-                                    <button class="btn btn-sm btn-info text-white"><i class="bi bi-twitter"></i> </button>
-                                    <button class="btn btn-sm btn-primary text-white"><i class="bi bi-linkedin"></i> </button>
-                                    <button class="btn btn-sm btn-info text-white"><i class="bi bi-facebook"></i> </button>
-                                </div>
-                            </div>
+
                         </div>
-                        @endif
+
                     </div>
+                    @endif
                 </div>
                 <!-- Right Column - Submissions -->
                 <div class="col-lg-8">
@@ -182,7 +190,7 @@
                     <ul class="nav nav-tabs mb-4" id="submissionsTab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
-                                Pending Review <span class="badge bg-warning ms-1">{{ $task->taskSubmissions->where('accepted', false)->count() }}</span>
+                                Pending <span class="badge bg-secondary ms-1">{{ $task->taskSubmissions->whereNull('reviewed_at', false)->count() }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -191,8 +199,13 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button">
+                                Rejected <span class="badge bg-danger ms-1">{{ $task->taskSubmissions->where('accepted', false)->count() }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="disputed-tab" data-bs-toggle="tab" data-bs-target="#disputed" type="button">
-                                Disputed <span class="badge bg-danger ms-1">{{ $task->disputes->where('resolved_at', null)->count() ?? 0 }}</span>
+                                Disputed <span class="badge bg-warning ms-1">{{ $task->disputes->where('resolved_at', null)->count() ?? 0 }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -205,7 +218,7 @@
                     <div class="tab-content" id="submissionsTabContent">
                         <!-- Pending Review Tab -->
                         <div class="tab-pane fade show active" id="pending" role="tabpanel">
-                            @forelse ($task->taskSubmissions->where('accepted', false) as $submission)
+                            @forelse ($task->taskSubmissions->whereNull('reviewed_at') as $submission)
                             @include('components.layouts.submission-card',['submission'=> $submission])
                             @empty
                             <div class="text-center py-5">
@@ -225,6 +238,32 @@
                                 <i class="bi bi-check-circle display-1 text-muted"></i>
                                 <h4 class="text-muted mt-3">No Approved Submissions</h4>
                                 <p class="text-muted">Approved submissions will appear here.</p>
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Disputed Tab -->
+                        <div class="tab-pane fade" id="rejected" role="tabpanel">
+                            @forelse ($task->taskSubmissions->where('accepted', false) as $submission)
+                            @include('components.layouts.submission-card',['submission'=> $submission])
+                            @empty
+                            <div class="text-center py-5">
+                                <i class="bi bi-check-circle display-1 text-muted"></i>
+                                <h4 class="text-muted mt-3">No Rejected Submissions</h4>
+                                <p class="text-muted">Rejected submissions will appear here.</p>
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Disputed Tab -->
+                        <div class="tab-pane fade" id="disputed" role="tabpanel">
+                            @forelse ($task->disputes->where('resolved_at', null) as $dispute)
+                            @include('components.layouts.submission-card',['submission'=> $dispute->taskSubmission])
+                            @empty
+                            <div class="text-center py-5">
+                                <i class="bi bi-exclamation-triangle display-1 text-muted"></i>
+                                <h4 class="text-muted mt-3">No Disputed Submissions</h4>
+                                <p class="text-muted">Disputed submissions will appear here.</p>
                             </div>
                             @endforelse
                         </div>
@@ -304,33 +343,15 @@
                                 @endforelse
                             </div>
                         </div>
-
-                        <!-- Disputed Tab -->
-                        <div class="tab-pane fade" id="disputed" role="tabpanel">
-                            @forelse ($task->disputes->where('resolved_at', null) as $dispute)
-                            @include('components.layouts.submission-card',['submission'=> $dispute->taskSubmission])
-                            @empty
-                            <div class="text-center py-5">
-                                <i class="bi bi-exclamation-triangle display-1 text-muted"></i>
-                                <h4 class="text-muted mt-3">No Disputed Submissions</h4>
-                                <p class="text-muted">Disputed submissions will appear here.</p>
-                            </div>
-                            @endforelse
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
     @livewire('tasks.task-submission-review')
-    @livewire('tasks.task-invitation',[
-        'task'=> $task    
+    @livewire('tasks.task-referrals',[
+    'task'=> $task
     ])
 
+
 </div>
-
-
-@push('scripts')
-
-@endpush

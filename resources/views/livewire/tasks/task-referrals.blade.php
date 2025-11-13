@@ -1,9 +1,9 @@
 <div>
-    <div wire:ignore class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+    <div wire:ignore.self class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true" wire:ignore.self>
+        <div wire:ignore.self class="modal-dialog modal-lg">
+            <div wire:ignore.self class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="inviteModalLabel">Invite Workers to Task</h5>
+                    <h5 class="modal-title" id="referralModalLabel">Refer Workers to this task</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -11,78 +11,63 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="card text-center p-3">
-                                <h4 class="text-primary mb-1">{{ $totalInvitees }}</h4>
-                                <small class="text-muted">Total Invited</small>
+                                <h4 class="text-primary mb-1">{{ $totalReferrals }}</h4>
+                                <small class="text-muted">Total Referred</small>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card text-center p-3">
-                                <h4 class="text-success mb-1">{{ $accepted_invitees }}</h4>
-                                <small class="text-muted">Accepted</small>
+                                <h4 class="text-success mb-1">{{ $completed_referrals }}</h4>
+                                <small class="text-muted">Completed</small>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card text-center p-3">
-                                <h4 class="text-warning mb-1">{{ $pending_invitees }}</h4>
+                                <h4 class="text-warning mb-1">{{ $pending_referrals }}</h4>
                                 <small class="text-muted">Pending</small>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Existing Invitations -->
-                    @if($existingInvitations->count() > 0)
+                    @if($existingReferrals->count() > 0)
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h6 class="mb-0">Existing Invitations</h6>
+                            <h6 class="mb-0">Referred Users</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-sm table-hover">
+                                <table class="table table-sm table-hover overflow-y-auto">
                                     <thead>
                                         <tr>
-                                            <th>Email</th>
+                                            <th>User</th>
                                             <th>Status</th>
-                                            <th>Invited Date</th>
-                                            <th>Expires</th>
+                                            <th>Referred Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($existingInvitations as $invitation)
+                                        @foreach($existingReferrals as $referral)
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                                        <i class="ri-mail-line text-muted fs-6"></i>
-                                                    </div>
+                                                    <img src="{{ $referral->referree->avatar ?? 'https://placehold.co/32' }}" alt="User" class="rounded-circle me-2" width="32" height="32">
                                                     <div>
-                                                        <div class="fw-medium small">{{ $invitation->email }}</div>
-                                                        @if($invitation->invitee)
-                                                        <small class="text-muted">{{ $invitation->invitee->username }}</small>
-                                                        @endif
+                                                        <div class="fw-medium small">{{ $referral->referree->username }}</div>
+                                                        <small class="text-muted">{{ $referral->referree->email }}</small>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                @if($invitation->status === 'accepted')
-                                                <span class="badge bg-success">Accepted</span>
-                                                @elseif($invitation->status === 'invited')
+                                                @if($referral->status === 'completed')
+                                                <span class="badge bg-success">Completed</span>
+                                                @elseif($referral->status === 'pending')
                                                 <span class="badge bg-warning">Pending</span>
                                                 @else
-                                                <span class="badge bg-secondary">{{ ucfirst($invitation->status) }}</span>
+                                                <span class="badge bg-secondary">{{ ucfirst($referral->status) }}</span>
                                                 @endif
                                             </td>
-                                            <td><small>{{ $invitation->created_at->format('M d, Y') }}</small></td>
-                                            <td>
-                                                @if($invitation->expire_at)
-                                                @if($invitation->expire_at->isPast())
-                                                <small class="text-danger">Expired</small>
-                                                @else
-                                                <small>{{ $invitation->expire_at->diffForHumans() }}</small>
-                                                @endif
-                                                @else
-                                                <small class="text-muted">No expiry</small>
-                                                @endif
-                                            </td>
+                                            <td><small>{{ $referral->created_at->format('M d, Y') }}</small></td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -92,20 +77,14 @@
                     </div>
                     @endif
 
-                    <!-- Invite New Users -->
+                    <!-- Refer Users -->
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="mb-0">Invite New Workers</h6>
+                            <h6 class="mb-0">Refer Users</h6>
                         </div>
                         <div class="card-body">
-                            @if (session()->has('message'))
-                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                                {{ session('message') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                            @endif
 
-                            <form wire:submit="inviteUsers">
+                            <form wire:submit="referUsers">
                                 <div class="mb-3">
                                     <label class="form-label">Email Addresses</label>
                                     <div id="email-fields">
@@ -118,15 +97,12 @@
                                                 value="{{ $email }}">
                                             @if(count($emails) > 1)
                                             <button type="button" wire:click="removeEmailField({{ $index }})" class="btn btn-outline-danger btn-sm">
-                                                <i class="ri-delete-bin-line"></i>
+                                                <i class="bi bi-x-circle"></i>
                                             </button>
                                             @endif
                                             @error('emails.' . $index)
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            @if(!empty($email) && \App\Models\Referral::where('task_id', $task->id)->where('email', $email)->where('expire_at', '>', now())->exists())
-                                            <small class="text-warning ms-2">Already invited</small>
-                                            @endif
                                         </div>
                                         @endforeach
                                     </div>
@@ -135,9 +111,10 @@
                                     </button>
                                 </div>
 
-                                @if($inviteSummary)
-                                <div class="alert alert-info mb-3">
-                                    {{ $inviteSummary }}
+                                @if (session()->has('message'))
+                                <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
+                                    {{ session('message') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                                 @endif
                             </form>
@@ -146,15 +123,15 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" wire:click="inviteUsers" wire:loading.attr="disabled" wire:target="inviteUsers" class="btn btn-primary">
-                        <span wire:loading.class="d-none" wire:target="inviteUsers" class="d-inline-flex">
-                            <i class="ri-send-plane-line me-1"></i> Send Invitations
+                    <button type="button" wire:click="referUsers" wire:loading.attr="disabled" wire:target="referUsers" class="btn btn-primary">
+                        <span wire:loading.class="d-none" wire:target="referUsers" class="d-inline-flex">
+                            <i class="ri-send-plane-line me-1"></i> Send Referrals
                         </span>
-                        <span wire:loading.class="d-inline-flex" wire:target="inviteUsers" class="" style="display: none;">
+                        <span wire:loading.class="d-inline-flex" wire:target="referUsers" class="" style="display: none;">
                             <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                             Sending...
                         </span>
-                        
+
                     </button>
                 </div>
             </div>

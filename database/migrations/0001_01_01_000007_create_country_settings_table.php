@@ -23,7 +23,7 @@ return new class extends Migration
             $table->json('transaction_settings')->nullable();// Structure:{ "percentage": 10, "fixed": 10000, "cap": 100000."tax": }          
             $table->json('withdrawal_settings')->nullable();
             $table->json('wallet_settings')->nullable(); //{"wallet_status":enabled/disabled, "usd_exchange_rate_percentage":123}
-            $table->json('referral_settings')->nullable(); //{"referral_earnings_percentage","invitee_commission_percentage"}
+            $table->json('referral_settings')->nullable(); //{"signup_referral_earnings_percentage","task_referral_commission_percentage"}
             $table->json('review_settings')->nullable(); //{"admin_review_cost","system_review_cost"}
             $table->json('security_settings')->nullable();
             $table->timestamps();

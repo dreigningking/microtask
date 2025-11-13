@@ -6,13 +6,16 @@ use App\Models\Support;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Auth;
+use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
-class TaskDispute extends Component
+class TaskSubmissionDispute extends Component
 {
     use WithPagination, WithFileUploads;
 
+    public TaskSubmission $taskSubmission;
+    public $task;
     public $search = '';
     public $status = 'all';
     public $showCreateModal = false;
@@ -45,8 +48,10 @@ class TaskDispute extends Component
         'priority.required' => 'Please select a priority level',
     ];
 
-    public function mount()
+    public function mount($taskSubmission)
     {
+        $this->taskSubmission = $taskSubmission;
+        $this->task = $this->taskSubmission->task;
         $this->loadStats();
     }
 
@@ -232,7 +237,7 @@ class TaskDispute extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.tasks.task-dispute', [
+        return view('livewire.tasks.task-submission-dispute', [
             'tickets' => $tickets
         ]);
     }

@@ -3,13 +3,13 @@
 namespace App\Notifications\TaskWorker;
 
 use App\Models\Task;
+use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-use Illuminate\Support\Str;
 
-class TaskInviteNotification extends Notification
+class TaskReferralNotification extends Notification
 {
     use Queueable;
 
@@ -39,18 +39,18 @@ class TaskInviteNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $url = route('explore.task', $this->task);
-        $inviterName = $this->task->user->name ?? 'A user';
+        $referrerName = $this->task->user->name ?? 'A user';
         $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2);
 
         return (new MailMessage)
-            ->subject("You've Been Invited to a Task: " . $this->task->title)
+            ->subject("A Task has been recommended to you: " . $this->task->title)
             ->greeting('Hello ' . $notifiable->name . ',')
-            ->line("$inviterName has invited you to complete a task on our platform and earn **$reward**.")
+            ->line("$referrerName has referred you to complete a task on our platform and earn **$reward**.")
             ->line('This is a great opportunity to use your skills.')
             ->line('**Task:** ' . $this->task->title)
             ->line('**Description:** ' . Str::limit($this->task->description, 150))
             ->action('View Task Details', $url)
-            ->line('Please note that this invitation will expire. We encourage you to view the task soon.');
+            ->line('Please note that this task is timebound. We encourage you to view the task soon.');
     }
 
     /**
@@ -63,7 +63,7 @@ class TaskInviteNotification extends Notification
         return [
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
-            'message' => 'You have been invited to a new task by ' . ($this->task->user->name ?? 'a user') . '.',
+            'message' => 'You have been referred to a new task by ' . ($this->task->user->name ?? 'a user') . '.',
             'url' => route('explore.task', $this->task),
         ];
     }

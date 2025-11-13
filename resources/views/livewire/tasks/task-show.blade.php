@@ -25,7 +25,6 @@
                             </ol>
                         </nav>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -57,6 +56,7 @@
                                 </div>
                             </div>
                             @endif
+
                             @if($task->template_data && is_array($task->template_data) && count($task->template_data))
                             <div class="mt-4">
                                 @foreach($task->template_data as $field)
@@ -86,18 +86,7 @@
                             </div>
                             @endif
 
-                            @if($task->files && is_array($task->files) && count($task->files))
-                            <div class="mt-4">
-                                <h6>Attachments</h6>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    @foreach($task->files as $file)
-                                    <a href="{{ asset($file['path']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-download me-1"></i> {{ $file['name'] }}
-                                    </a>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
+
 
                             <hr>
 
@@ -107,7 +96,7 @@
                                     <span>Submissions:</span>
                                     <strong>{{ $task->taskSubmissions->count().'/'.$task->number_of_submissions }}</strong>
                                 </div>
-                                
+
                                 <div class="d-flex justify-content-between">
                                     <span>Multiple Submissions:</span>
                                     <strong>{{ $task->allow_multiple_submissions ? 'Allowed': 'Not Allowed' }}</strong>
@@ -134,13 +123,9 @@
                                     <img src="https://placehold.co/60" alt="Poster" class="rounded-circle me-3">
                                     <div class="flex-grow-1">
                                         <h5 class="mb-1">{{ $task->user->username }}</h5>
-                                        <div class="text-warning mb-2">
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star"></i>
-                                            <span class="text-muted">(4.0) • 12 tasks posted</span>
+                                        <div class="text-warning small">
+                                            <span class="text-muted">{{ $task->user->tasks->count() }} tasks posted</span>
+                                            <span class="text-muted">• {{ $task->user->taskSubmissions->where('accepted',true)->count() }} tasks completed</span>
                                         </div>
                                         <p class="text-muted mb-0">Member since {{ $task->user->created_at->format('M Y') }}</p>
                                     </div>
@@ -168,16 +153,39 @@
                                                 <h6 class="mb-1">Submission #{{ $index + 1 }}</h6>
                                                 <p class="text-muted mb-2">Submitted: {{ $submission->created_at->format('F j, Y') }}</p>
                                             </div>
-                                            @if($submission->paid_at)
+                                            @if(!$submission->reviewed_at)
+                                            <div class="">
+                                                <span class="badge bg-secondary d-block mb-3">Pending Review</span>
+                                                @if(!$submission->reviewed_at)
+                                                <button class="btn btn-sm btn-outline-warning w-100" wire:click="withdrawSubmission({{ $submission->id }})">
+                                                    <i class="bi bi-trash"></i> Withdraw
+                                                </button>
+                                                @endif
+                                            </div>
+                                            @elseif($submission->paid_at)
                                             <span class="badge bg-success">Approved & Paid</span>
-                                            @elseif($submission->reviewed_at)
-                                            @if($submission->accepted)
-                                            <span class="badge bg-success">Approved</span>
-                                            @else
-                                            <span class="badge bg-danger">Rejected</span>
-                                            @endif
-                                            @else
-                                            <span class="badge bg-warning">Pending Review</span>
+
+                                            @elseif(!$submission->accepted && !$submission->dispute)
+
+                                            <div class="">
+                                                <span class="badge bg-danger d-block mb-3">Rejected</span>
+
+                                                <button class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disputeSubmissionModal"  wire:click="openDispute({{ $submission->id }})">
+                                                    <i class="bi bi-person-lines-fill"></i> Dispute
+                                                </button>
+                                                @if(!$submission->accepted && !$submission->taskWorker->submission_restricted_at)
+                                                <button class="btn btn-sm btn-outline-warning w-100" wire:click="withdrawSubmission({{ $submission->id }})">
+                                                    <i class="bi bi-trash"></i> Withdraw
+                                                </button>
+                                                @endif
+                                            </div>
+                                            @elseif($submission->dispute)
+                                            <div class="">
+                                                <span class="badge bg-warning d-block mb-3">Disputed</span>
+                                                <a href="{{route('tasks.dispute',$submission)}}" class="btn btn-sm btn-outline-warning w-100">
+                                                    <i class="bi bi-person-lines-fill"></i> View Dispute
+                                                </a>  
+                                            </div>
                                             @endif
                                         </div>
 
@@ -191,18 +199,36 @@
                                         </div>
                                         @endif
 
-                                        <p class="mb-2"><strong>Submission Notes:</strong> {{ $submission->submission_details['notes'] ?? 'No notes provided' }}</p>
-
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i> View Submission
-                                            </button>
-                                            @if(!$submission->reviewed_at)
-                                            <button class="btn btn-sm btn-outline-danger" wire:click="withdrawSubmission({{ $submission->id }})">
-                                                <i class="bi bi-trash"></i> Withdraw
-                                            </button>
-                                            @endif
+                                        @if($submission->submission_details && is_array($submission->submission_details))
+                                        <div class="mb-2">
+                                            @foreach($submission->submission_details as $field)
+                                            <div class="mb-2">
+                                                <strong>{{ $field['title'] }}:</strong>
+                                                @if($field['type'] === 'file')
+                                                @if(!empty($field['value']))
+                                                <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-download me-1"></i> {{ basename($field['value']) }}
+                                                </a>
+                                                @else
+                                                <span class="text-muted small">No file uploaded</span>
+                                                @endif
+                                                @elseif(is_array($field['value'] ?? null))
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach($field['value'] as $item)
+                                                    <span class="badge bg-light text-dark">{{ $item }}</span>
+                                                    @endforeach
+                                                </div>
+                                                @else
+                                                <span>{{ $field['value'] ?? 'Not provided' }}</span>
+                                                @endif
+                                            </div>
+                                            @endforeach
                                         </div>
+                                        @else
+                                        <p class="mb-2"><strong>No Submission Details</strong></p>
+                                        @endif
+
+
                                     </div>
                                     @endforeach
                                 </div>
@@ -286,185 +312,210 @@
 
                 <div class="col-lg-4">
                     @auth
-                        <!-- BEFORE APPLYING -->
-                        <div class="card mb-4" id="beforeApplySection">
-                            <div class="card-header bg-transparent">
-                                <h5 class="mb-0">Apply for this Task</h5>
+                    <!-- BEFORE APPLYING -->
+                    <div class="card mb-4" id="beforeApplySection">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Apply for this Task</h5>
+                        </div>
+                        @if(!$isTaskAvailable)
+                        <!-- Task is not available - show reasons -->
+                        <div class="card-body">
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>This task is not currently available</strong>
                             </div>
-                            @if(!$isTaskAvailable)
-                            <!-- Task is not available - show reasons -->
-                            <div class="card-body">
-                                <div class="alert alert-danger">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                    <strong>This task is not currently available</strong>
-                                </div>
 
-                                @if(count($unavailableReasons) > 0)
-                                <div class="mb-3">
-                                    <h6>Why you cannot apply:</h6>
-                                    <ul class="list-unstyled">
-                                        @foreach($unavailableReasons as $reason)
-                                        <li class="mb-1"><i class="bi bi-x-circle text-danger me-2"></i> {{ $reason }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
-
-                                <button class="btn btn-secondary w-100" disabled>
-                                    <i class="bi bi-lock me-2"></i>
-                                    Apply Not Available
-                                </button>
-                            </div>
-                            @else
-                            <!-- Task is available -->
-                            @if(!$hasStarted)
-                            <div class="card-body">
-                                <div class="form-check">
-                                    <input type="checkbox" wire:model.live="agreementAccepted" class="form-check-input" id="agreement">
-                                    <label class="form-check-label text-muted" for="agreement" style="text-align: justify;">
-                                        I agree to complete this task according to the requirements and submit my work within the estimated time frame.
-                                    </label>
-                                </div>
-                                <button
-                                    wire:click="startTask"
-                                    class="btn btn-primary w-100 mt-3"
-                                    @if(!$agreementAccepted) disabled @endif>
-                                    <i class="fas fa-play me-2"></i>
-                                    Submit Application
-                                </button>
-                            </div>
-                            @else
-                            <div class="card-body">
-                                <div class="alert alert-success">
-                                    <i class="bi bi-check-circle"></i> You have applied for this task! Please submit your work before the deadline.
-                                </div>
-                                <button class="btn btn-outline-secondary w-100 mt-3">
-                                    Withdraw Application
-                                </button>
+                            @if(count($unavailableReasons) > 0)
+                            <div class="mb-3">
+                                <h6>Why you cannot apply:</h6>
+                                <ul class="list-unstyled">
+                                    @foreach($unavailableReasons as $reason)
+                                    <li class="mb-1"><i class="bi bi-x-circle text-danger me-2"></i> {{ $reason }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                             @endif
-                            @endif
+
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="bi bi-lock me-2"></i>
+                                Apply Not Available
+                            </button>
                         </div>
-
-
-                        <div class="card mb-4">
-                            <div class="card-header bg-transparent">
-                                <h5 class="mb-0">Report Task</h5>
+                        @else
+                        <!-- Task is available -->
+                        @if(!$hasStarted)
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input type="checkbox" wire:model.live="agreementAccepted" class="form-check-input" id="agreement">
+                                <label class="form-check-label text-muted" for="agreement" style="text-align: justify;">
+                                    I agree to complete this task according to the requirements and submit my work within the estimated time frame.
+                                </label>
                             </div>
-                            <div class="card-body">
-                                @if($userReported)
-                                <p class="text-muted">
-                                    You have reported this task. We are looking into it critically
-                                </p>
-                                @else
-                                <p class="text-muted">Find something inappropriate in this task?
-                                    Kindly report to admin immediately</p>
-
-                                <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#reportTaskModal">
-                                    Report
-                                </button>
-                                @endif
-                            </div>
+                            <button
+                                wire:click="startTask"
+                                class="btn btn-primary w-100 mt-3"
+                                @if(!$agreementAccepted) disabled @endif>
+                                <i class="fas fa-play me-2"></i>
+                                Submit Application
+                            </button>
                         </div>
-
-                        <!-- Submit Your Work - Only show after user has applied -->
-                        @if($hasStarted)
-                        <div class="card mb-4" id="afterAcceptanceSection">
-                            <div class="card-header bg-transparent">
-                                <h5 class="mb-0">Submit Your Work</h5>
+                        @else
+                        <div class="card-body">
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> You have applied for this task! Please submit your work before the deadline.
                             </div>
-                            <div class="card-body">
-                                @if(!$canSubmitMore)
-                                <!-- Single submission already made -->
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> You have already submitted your work for this task. Only one submission is allowed.
-                                </div>
-                                <button class="btn btn-outline-primary w-100" disabled>
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Submission Already Made
-                                </button>
-                                @else
-                                <!-- Multiple submissions allowed or first submission -->
-                                @if($task->allow_multiple_submissions == 1)
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> Multiple submissions are allowed for this task. You can submit different versions or improvements.
-                                </div>
-                                @else
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> This is a single submission task. You can only submit once, so please ensure your work is complete.
-                                </div>
-                                @endif
 
-                                <div class="submission-form-card p-3">
-                                    <form id="workSubmissionForm">
-                                        <div class="mb-3">
-                                            <label class="form-label">Work Submission *</label>
-                                            <div class="upload-area p-4 text-center" id="uploadArea">
-                                                <i class="bi bi-cloud-arrow-up fs-1 text-muted d-block mb-2"></i>
-                                                <p class="mb-2">Drag & drop your files here or click to browse</p>
-                                                <small class="text-muted">Max file size: 50MB • Supported formats: ZIP, PDF, JPG, PNG, PSD</small>
-                                                <input type="file" class="d-none" id="fileInput" multiple>
-                                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="document.getElementById('fileInput').click()">
-                                                    Select Files
-                                                </button>
-                                            </div>
-                                            <div id="fileList" class="mt-3"></div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Submission Notes *</label>
-                                            <textarea class="form-control" rows="3" placeholder="Describe what you've delivered and any important information..."></textarea>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Links (Optional)</label>
-                                            <input type="url" class="form-control mb-2" placeholder="https://example.com">
-                                            <input type="url" class="form-control" placeholder="https://example.com">
-                                            <div class="form-text">Add links to online work, Google Drive, Dropbox, etc.</div>
-                                        </div>
-
-                                        <div class="alert alert-warning">
-                                            <h6><i class="bi bi-exclamation-triangle"></i> Before Submitting</h6>
-                                            <ul class="mb-0 small">
-                                                <li>Ensure all requirements are met</li>
-                                                <li>Double-check file formats and sizes</li>
-                                                <li>Verify links are accessible</li>
-                                                @if($task->allow_multiple_submissions != 1)
-                                                <li>You can't edit submission after sending (single submission)</li>
-                                                @else
-                                                <li>You can submit multiple times if needed</li>
-                                                @endif
-                                            </ul>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-success w-100">
-                                            <i class="bi bi-send"></i> Submit Work
-                                        </button>
-                                    </form>
-                                </div>
-                                @endif
-                            </div>
                         </div>
                         @endif
+                        @endif
+                    </div>
+
+                    @if(!$hasStarted)
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Report Task</h5>
+                        </div>
+                        <div class="card-body">
+                            @if($userReported)
+                            <p class="text-muted">
+                                You have reported this task. We are looking into it critically
+                            </p>
+                            @else
+                            <p class="text-muted">Find something inappropriate in this task?
+                                Kindly report to admin immediately</p>
+
+                            <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#reportTaskModal">
+                                Report
+                            </button>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    <!-- Submit Your Work - Only show after user has applied -->
+                    @if($hasStarted)
+                    <div class="card mb-4" id="afterAcceptanceSection">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Submit Your Work</h5>
+                        </div>
+                        <div class="card-body">
+                            @if($cannotSubmitReason)
+                            <!-- Cannot submit -->
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> {{ $cannotSubmitReason }}
+                            </div>
+                            <button class="btn btn-outline-primary w-100" disabled>
+                                <i class="bi bi-lock me-2"></i>
+                                Cannot Submit
+                            </button>
+                            @else
+                            <!-- Multiple submissions allowed or first submission -->
+                            @if($task->allow_multiple_submissions == 1)
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Multiple submissions are allowed for this task. You can submit different versions or improvements.
+                            </div>
+                            @else
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> This is a single submission task. You can only submit once, so please ensure your work is complete.
+                            </div>
+                            @endif
+
+                            <div class="submission-form-card p-3">
+                                @if(session('error'))
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+                                </div>
+                                @endif
+                                <form wire:submit="submitWork" id="workSubmissionForm" enctype="multipart/form-data">
+                                    @if($task->platformTemplate && isset($task->platformTemplate->submission_fields))
+                                    @foreach($task->platformTemplate->submission_fields as $field)
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ $field['title'] }} @if($field['required']) * @endif</label>
+                                        @if($field['type'] === 'url')
+                                        <input type="url" wire:model="submissionData.{{ $field['slug'] }}" class="form-control" @if($field['required']) required @endif placeholder="Enter {{ $field['title'] }}">
+                                        @elseif($field['type'] === 'file')
+                                        <input type="file" wire:model="submissionFiles.{{ $field['slug'] }}" class="form-control" @if($field['required']) required @endif>
+                                        @elseif($field['type'] === 'number')
+                                        <input type="number" wire:model="submissionData.{{ $field['slug'] }}" class="form-control" @if($field['required']) required @endif placeholder="Enter {{ $field['title'] }}">
+                                        @else
+                                        <input type="text" wire:model="submissionData.{{ $field['slug'] }}" class="form-control" @if($field['required']) required @endif placeholder="Enter {{ $field['title'] }}">
+                                        @endif
+                                        @if($field['type'] === 'file')
+                                        @error('submissionFiles.' . $field['slug'])
+                                        <div class="text-danger small">{{ $message }}</div>
+                                        @enderror
+                                        @else
+                                        @error('submissionData.' . $field['slug'])
+                                        <div class="text-danger small">{{ $message }}</div>
+                                        @enderror
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                    @endif
+
+                                    <div class="alert alert-warning">
+                                        <h6><i class="bi bi-exclamation-triangle"></i> Before Submitting</h6>
+                                        <ul class="mb-0 small">
+                                            <li>Ensure all requirements are met</li>
+                                            <li>Double-check file formats and sizes</li>
+                                            <li>Verify links are accessible</li>
+                                            @if($task->allow_multiple_submissions != 1)
+                                            <li>You can't edit submission after sending (single submission)</li>
+                                            @else
+                                            <li>You can submit multiple times if needed</li>
+                                            @endif
+                                        </ul>
+                                    </div>
+
+                                    <button type="submit" wire:loading.attr="disabled" wire:loading.class="btn-loading" class="btn btn-success w-100" wire:target="submitWork">
+                                        <span wire:loading.class="d-none" wire:target="submitWork" class="d-inline-flex align-items-center justify-content-center">
+                                            <i class="bi bi-send"></i> Submit Work
+
+                                        </span>
+                                        <span wire:loading.class="d-inline-flex" wire:target="submitWork" class="align-items-center justify-content-center" style="display: none;">
+                                            <i class="bi bi-arrow-repeat me-2"></i>
+                                            Submitting...
+                                        </span>
+
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($hasUserSubmitted && $userSubmissions->where('accepted', true)->isNotEmpty())
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Earn More</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Share this task with others to earn referral bonuses when they complete it!</p>
+                            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#referralModal">
+                                <i class="bi bi-share me-2"></i> Refer Task
+                            </button>
+                        </div>
+                    </div>
+                    @endif
 
                     @else
-                        <div class="card mb-4" id="signInToApplySection">
-                            <div class="card-header bg-transparent">
-                                <h5 class="mb-0">Apply for this Task</h5>
-                            </div>
-                            
-                            
-                            <div class="card-body">
-                                <p class="">
-                                    You must Sign in to apply for this task.
-                                </p>
-                                <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
-                                    Sign In
-                                </a>
-                            </div>
-                            
-                            
+                    <div class="card mb-4" id="signInToApplySection">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Apply for this Task</h5>
                         </div>
+
+
+                        <div class="card-body">
+                            <p class="">
+                                You must Sign in to apply for this task.
+                            </p>
+                            <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
+                                Sign In
+                            </a>
+                        </div>
+
+
+                    </div>
                     @endauth
 
                 </div>
@@ -473,6 +524,7 @@
             </div>
         </div>
     </section>
+
     <div class="modal fade" id="reportTaskModal" tabindex="-1" role="dialog" aria-labelledby="reportTaskModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -508,87 +560,66 @@
                     </div>
                 </form>
             </div>
-        function scrollToQuestion(id) {
-            const element = document.getElementById('question-' + id);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
         </div>
     </div>
+    <div wire:ignore class="modal fade" id="disputeSubmissionModal" tabindex="-1" role="dialog" aria-labelledby="disputeSubmissionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form wire:submit.prevent="submitDispute">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="disputeSubmissionModalLabel">Dispute Submission</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body m-3">
+                        <input type="hidden" wire:model="disputeSubmissionId">
+                        <div class="mb-3">
+                            <label for="disputeReason" class="form-label">Dispute Reason *</label>
+                            <textarea
+                                class="form-control"
+                                id="disputeReason"
+                                rows="4"
+                                placeholder="Please provide details about your dispute..."
+                                wire:model="disputeReason"
+                                required>
+                            </textarea>
+                            @error('disputeReason')
+                            <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="disputeFiles" class="form-label">Attach Files (Optional)</label>
+                            <input type="file" wire:model="disputeFiles" multiple class="form-control" id="disputeFiles">
+                            @error('disputeFiles.*')
+                            <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">You can attach multiple files to support your dispute.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning" wire:loading.attr="disabled">
+                            <span wire:loading.remove>Submit Report</span>
+                            <span wire:loading>Submitting...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @livewire('tasks.task-referrals',[
+    'task'=> $task
+    ])
 </div>
 @push('scripts')
 <script>
-    // File upload functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-
-        // Drag and drop functionality
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+    function scrollToQuestion(id) {
+        const element = document.getElementById('question-' + id);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth'
+            });
         }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight() {
-            uploadArea.classList.add('dragover');
-        }
-
-        function unhighlight() {
-            uploadArea.classList.remove('dragover');
-        }
-
-        uploadArea.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-
-        fileInput.addEventListener('change', function() {
-            handleFiles(this.files);
-        });
-
-        function handleFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const fileItem = document.createElement('div');
-                fileItem.className = 'd-flex justify-content-between align-items-center border rounded p-2 mb-2';
-                fileItem.innerHTML = `
-                        <div>
-                            <i class="bi bi-file-earmark me-2"></i>
-                            ${file.name}
-                            <small class="text-muted d-block">(${(file.size / (1024 * 1024)).toFixed(2)} MB)</small>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    `;
-                fileList.appendChild(fileItem);
-            }
-        }
-
-        // Form submission
-        document.getElementById('workSubmissionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Work submitted successfully! The task poster will review your submission.');
-            // In real implementation, this would send data to server
-        });
-    });
+    }
 </script>
 @endpush

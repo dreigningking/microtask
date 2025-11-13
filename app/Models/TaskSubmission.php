@@ -6,9 +6,12 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\TaskWorker;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Observers\TaskSubmissionObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([TaskSubmissionObserver::class])]
 class TaskSubmission extends Model
 {
     use SoftDeletes;
@@ -21,7 +24,6 @@ class TaskSubmission extends Model
         'accepted',
         'submission_details',
         'review_body',
-        'review_rating',
         'reviewed_at',
     ];
 

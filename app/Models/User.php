@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 
+use App\Models\Setting;
 use App\Models\Support;
 use App\Models\Platform;
 use App\Models\TaskWorker;
@@ -130,11 +131,11 @@ class User extends Authenticatable
 
     public function preferred_locations()
     {
-        return $this->hasMany(PreferredLocation::class);
+        return $this->hasMany(PreferredLocation::class,);
     }
 
     public function preferred_platforms(){
-        return $this->belongsToMany(Platform::class);
+        return $this->belongsToMany(PreferredPlatform::class);
     }
 
     public function country()
@@ -163,7 +164,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(TaskPromotion::class);
     }
-    public function task_workers()
+    public function taskWorkers()
     {
         return $this->hasMany(TaskWorker::class);
     }
@@ -174,31 +175,30 @@ class User extends Authenticatable
     }
     
 
-    public function referrals()
-    {
+    public function referrals(){
+        //people i have referred
         return $this->hasMany(Referral::class);
     }
-    public function settlements()
-    {
+
+    public function referrers(){
+        //all the places where I have been referred
+        return $this->hasMany(Referral::class,'referree_id');
+    }
+
+    public function invitations(){
+        return $this->hasMany(Invitation::class);
+    }
+
+    public function settlements(){
         return $this->hasMany(Settlement::class);
     }
+
     public function wallets(){
         return $this->hasMany(Wallet::class);
     }
 
-    public function role()
-    {
+    public function role(){
         return $this->belongsTo(Role::class);
-    }
-
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_user');
-    }
-
-    public function getFirstRoleAttribute()
-    {
-        return $this->roles->first();
     }
 
     public function subscriptions(){
@@ -479,13 +479,8 @@ class User extends Authenticatable
     public function hasPermission(string $permissionName): bool
     {
         // Assumes Role has a permissions() relationship returning Permission models with a 'name' attribute
-        foreach ($this->roles as $role) {
-            if (
-                method_exists($role, 'permissions') &&
-                $role->permissions->contains('slug', $permissionName)
-            ) {
-                return true;
-            }
+        if($this->role && $this->role->permissions->contains('slug', $permissionName)){
+            return true;
         }
         return false;
     }
@@ -542,75 +537,6 @@ class User extends Authenticatable
         ]);
     }
 
-    /**
-     * Check if user can take tasks based on subscription limits
-     */
-    public function canTakeTask(): bool
-    {
-        // Check if banned
-        if ($this->isBannedFromTasks()) {
-            return false;
-        }
-
-        // Check subscription limits
-        $activeSubscription = $this->activeSubscriptions()
-            ->whereHas('booster', function($q) {
-                $q->where('type', 'worker');
-            })
-            ->first();
-
-        if (!$activeSubscription) {
-            return false; // No active worker subscription
-        }
-
-        $booster = $activeSubscription->booster;
-        $activeTasksPerHour = $booster->active_tasks_per_hour ?? 1;
-
-        // Count ongoing tasks in the last hour
-        $ongoingTasksCount = $this->task_workers()
-            ->whereNotNull('accepted_at')
-            ->whereDoesntHave('taskSubmissions', function($q) {
-                $q->whereNotNull('completed_at');
-            })
-            ->where('accepted_at', '>=', now()->subHour())
-            ->count();
-
-        return $ongoingTasksCount < $activeTasksPerHour;
-    }
-
-    /**
-     * Check if user can submit tasks based on subscription limits
-     */
-    public function canSubmitTask(): bool
-    {
-        // Check if banned
-        if ($this->isBannedFromTasks()) {
-            return false;
-        }
-
-        // Check subscription limits
-        $activeSubscription = $this->activeSubscriptions()
-            ->whereHas('booster', function($q) {
-                $q->where('type', 'worker');
-            })
-            ->first();
-
-        if (!$activeSubscription) {
-            return false; // No active worker subscription
-        }
-
-        $booster = $activeSubscription->booster;
-        $activeTasksPerHour = $booster->active_tasks_per_hour ?? 1;
-
-        // Count submitted tasks in the last hour
-        $submittedTasksCount = $this->taskSubmissions()
-            ->whereNotNull('created_at')
-            ->whereNull('completed_at')
-            ->where('created_at', '>=', now()->subHour())
-            ->count();
-
-        return $submittedTasksCount < $activeTasksPerHour;
-    }
 
     /**
      * Check if the user is active
@@ -643,7 +569,7 @@ class User extends Authenticatable
 
     public function scopeLocalize($query)
     {
-        if (Auth::user()->first_role->name == 'super-admin') {
+        if (Auth::user()->role->name == 'super-admin') {
             return $query;
         }
 
@@ -651,29 +577,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope for users who are task workers (have applied for or worked on tasks)
-     */
-    public function scopeTaskWorkers($query)
-    {
-        return $query->whereHas('task_workers');
-    }
-
-    /**
-     * Scope for users who are task creators (have created tasks)
-     */
-    public function scopeTaskCreators($query)
-    {
-        return $query->whereHas('tasks');
-    }
-
-    /**
      * Scope for users with admin roles
      */
     public function scopeAdminUsers($query)
     {
-        return $query->whereHas('roles', function ($q) {
-            $q->whereIn('name', ['admin', 'super-admin']);
-        });
+        return $query->whereNotNull('role_id');
     }
 
     /**
@@ -681,33 +589,11 @@ class User extends Authenticatable
      */
     public function scopeVerified($query)
     {
-        return $query->where(function ($q) {
-            // Get verification requirements from country settings
-            $countrySettings = \App\Models\CountrySetting::whereNotNull('verification_fields')->get();
-            
-            foreach ($countrySettings as $setting) {
-                $requirements = $setting->verification_fields;
-                if (is_string($requirements)) {
-                    $requirements = json_decode($requirements, true);
-                }
-                
-                if ($requirements && is_array($requirements)) {
-                    // For now, mark users as verified if they have at least one approved verification
-                    $q->orWhereHas('userVerifications', function ($verificationQuery) {
-                        $verificationQuery->where('status', 'approved');
-                    });
-                }
-            }
-        });
-    }
+        return $query->whereHas('userVerifications', function ($verificationQuery) {
+                $verificationQuery->whereHas('moderation',function($mod){
+                    $mod->where('status', 'approved');
+                });               
 
-    /**
-     * Scope for unverified users
-     */
-    public function scopeUnverified($query)
-    {
-        return $query->whereDoesntHave('userVerifications', function ($q) {
-            $q->where('status', 'approved');
         });
     }
 
@@ -726,53 +612,9 @@ class User extends Authenticatable
      */
     public function scopeRecentTaskWorkers($query, $days = 30)
     {
-        return $query->whereHas('task_workers', function ($q) use ($days) {
+        return $query->whereHas('taskWorkers', function ($q) use ($days) {
             $q->where('created_at', '>=', now()->subDays($days));
         });
-    }
-
-    /**
-     * Scope for users with active premium subscriptions
-     */
-    public function scopePremiumUsers($query)
-    {
-        return $query->whereHas('activeSubscriptions', function ($q) {
-            $q->whereHas('booster', function ($boosterQuery) {
-                $boosterQuery->where('type', 'premium');
-            });
-        });
-    }
-
-    /**
-     * Scope for users with active worker subscriptions
-     */
-    public function scopeWorkerSubscriptionUsers($query)
-    {
-        return $query->whereHas('activeSubscriptions', function ($q) {
-            $q->whereHas('booster', function ($boosterQuery) {
-                $boosterQuery->where('type', 'worker');
-            });
-        });
-    }
-
-    /**
-     * Scope for users with active creator subscriptions
-     */
-    public function scopeCreatorSubscriptionUsers($query)
-    {
-        return $query->whereHas('activeSubscriptions', function ($q) {
-            $q->whereHas('booster', function ($boosterQuery) {
-                $boosterQuery->where('type', 'creator');
-            });
-        });
-    }
-
-    /**
-     * Scope for users without active subscriptions
-     */
-    public function scopeNoSubscription($query)
-    {
-        return $query->whereDoesntHave('activeSubscriptions');
     }
 
     /**
@@ -870,10 +712,10 @@ class User extends Authenticatable
 
             case 'relationship':
                 if (($conditions['has_task_workers'] ?? false)) {
-                    $query->taskWorkers();
+                    $query->has('taskWorkers');
                 }
                 if (($conditions['has_tasks'] ?? false)) {
-                    $query->taskCreators();
+                    $query->has('tasks');
                 }
                 break;
 

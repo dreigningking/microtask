@@ -2,6 +2,7 @@
 
 namespace App\Notifications\TaskWorker;
 
+use App\Models\Settlement;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,15 +12,11 @@ class EarningsNotification extends Notification
 {
     use Queueable;
 
-    protected $amount;
-    protected $currency;
-    protected $description;
+    protected $settlement;
 
-    public function __construct($amount, $currency, $description)
+    public function __construct(Settlement $settlement)
     {
-        $this->amount = $amount;
-        $this->currency = $currency;
-        $this->description = $description;
+        $this->settlement = $settlement;
     }
 
     public function via($notifiable)
@@ -32,9 +29,9 @@ class EarningsNotification extends Notification
         return (new MailMessage)
             ->subject('You Have Earned Money!')
             ->greeting('Congratulations ' . $notifiable->name . ',')
-            ->line('You have just earned ' . $this->currency . number_format($this->amount, 2) . '.')
-            ->line('Earning Source: ' . $this->description)
-            ->action('View Earnings', url('/my-earnings'))
+            ->line('You have just earned ' . $this->settlement->currency . number_format($this->settlement->amount, 2) . '.')
+            ->line('Earning Source: ' . $this->settlement->description)
+            ->action('View Earnings', route('earnings.settlements'))
             ->line('Keep up the great work!');
     }
 } 

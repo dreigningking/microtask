@@ -12,8 +12,8 @@ use App\Http\Traits\HelperTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\TaskWorker\TaskInviteNotification;
-use App\Notifications\Guest\TaskInviteNonUserNotification;
+use App\Notifications\TaskWorker\TaskReferralNotification;
+use App\Notifications\Guest\InvitationNotification;
 use App\Notifications\TaskMaster\TaskSubmissionNotification;
 
 
@@ -30,7 +30,7 @@ class ViewTask extends Component
     public $taskRating = 0;
     public $taskReview = '';
 
-    public $showInviteModal = false;
+    public $showreferralModal = false;
     public $inviteEmail = '';
     public $inviteSummary = '';
 
@@ -57,14 +57,14 @@ class ViewTask extends Component
         
     }
 
-    public function openInviteModal()
+    public function openreferralModal()
     {
-        $this->showInviteModal = true;
+        $this->showreferralModal = true;
     }
 
-    public function closeInviteModal()
+    public function closereferralModal()
     {
-        $this->showInviteModal = false;
+        $this->showreferralModal = false;
         $this->reset(['inviteEmail', 'inviteSummary']);
     }
 
@@ -136,7 +136,7 @@ class ViewTask extends Component
                 'status' => 'invited',
                 'expire_at' => $expireAt,
             ]);
-            $user->notify(new TaskInviteNotification($this->task));
+            $user->notify(new TaskReferralNotification($this->task));
             $invited++;
         }
 
@@ -149,7 +149,7 @@ class ViewTask extends Component
                 'expire_at' => $expireAt,
             ]);
             Notification::route('mail', $email)
-                ->notify(new TaskInviteNonUserNotification($this->task, $email));
+                ->notify(new InvitationNotification($this->task, $email));
             $registered++;
         }
 

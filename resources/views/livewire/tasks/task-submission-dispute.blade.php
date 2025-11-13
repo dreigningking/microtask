@@ -31,62 +31,81 @@
             <div class="row">
                 <!-- Left Column - Dispute Details & Communication -->
                 <div class="col-lg-8">
-                    <!-- Dispute Status -->
+                    <!-- Task Details -->
                     <div class="card mb-4">
-                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Dispute Details</h5>
-                            <span class="badge bg-warning">Under Admin Review</span>
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Task Details</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>Dispute Information</h6>
-                                    <div class="mb-2">
-                                        <strong>Reason:</strong> Poor Quality Work
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Raised By:</strong> Mike Chen (Task Poster)
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Raised On:</strong> October 15, 2023
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6>Task Information</h6>
-                                    <div class="mb-2">
-                                        <strong>Task:</strong> Create 5 Instagram Posts
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Worker:</strong> Sarah Johnson
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Amount:</strong> $45
-                                    </div>
+                            <h6>Description</h6>
+                            <p>{{ $task->description }}</p>
+
+                            @if(is_array($task->requirements) && count($task->requirements))
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6>Requirements</h6>
+                                    <ul class="list-unstyled">
+                                        @foreach($task->requirements as $requirement)
+                                        <li><i class="bi bi-check-circle text-success me-2"></i> {{ $requirement }}</li>
+                                        @endforeach
+                                    </ul>
                                 </div>
                             </div>
+                            @endif
 
+                            @if($task->template_data && is_array($task->template_data) && count($task->template_data))
                             <div class="mt-4">
-                                <h6>Dispute Description</h6>
-                                <p>"The submitted work doesn't meet the quality standards outlined in the task requirements. The images are low resolution and don't follow the brand guidelines provided. The captions are generic and don't engage the target audience as requested."</p>
+                                @foreach($task->template_data as $field)
+                                <p class="">
+                                <h6 class="fw-medium mb-2">{{ $field['title'] ?? 'Field' }}</h6>
+                                @if(isset($field['type']) && $field['type'] === 'file')
+                                @if(!empty($field['value']))
+                                <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download me-1"></i> {{ basename($field['value']) }}
+                                </a>
+                                @else
+                                <span class="text-muted small">No file uploaded</span>
+                                @endif
+                                @else
+                                @if(is_array($field['value'] ?? null))
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach($field['value'] as $item)
+                                    <span class="badge bg-light text-dark">{{ $item }}</span>
+                                    @endforeach
+                                </div>
+                                @else
+                                <p class="mb-0 small">{{ $field['value'] ?? 'Not provided' }}</p>
+                                @endif
+                                @endif
+                                </p>
+                                @endforeach
                             </div>
+                            @endif
+
+
+
+                            <hr>
 
                             <div class="mt-4">
-                                <h6>Evidence</h6>
-                                <div class="d-flex gap-3">
-                                    <div class="border rounded p-3 text-center">
-                                        <i class="bi bi-file-earmark-text fs-1 text-muted"></i>
-                                        <div class="small">submitted_work.zip</div>
-                                        <button class="btn btn-sm btn-outline-primary mt-2">Download</button>
+                                <h6>Parties Involved in this Dispute</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://placehold.co/60" alt="Poster" class="rounded-circle me-3">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">{{ $task->user->username }}</h6>
+                                                <p class="text-muted mb-0">Task Poster</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="border rounded p-3 text-center">
-                                        <i class="bi bi-image fs-1 text-muted"></i>
-                                        <div class="small">screenshot_1.png</div>
-                                        <button class="btn btn-sm btn-outline-primary mt-2">View</button>
-                                    </div>
-                                    <div class="border rounded p-3 text-center">
-                                        <i class="bi bi-image fs-1 text-muted"></i>
-                                        <div class="small">screenshot_2.png</div>
-                                        <button class="btn btn-sm btn-outline-primary mt-2">View</button>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://placehold.co/60" alt="Worker" class="rounded-circle me-3">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">{{ $taskSubmission->user->username }}</h6>
+                                                <p class="text-muted mb-0">Worker</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -99,32 +118,8 @@
                             <h5 class="mb-0">Dispute Communication</h5>
                         </div>
                         <div class="card-body">
-                            <div class="message-card message-user p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <strong>Mike Chen (Poster)</strong>
-                                    <small class="text-muted">2 hours ago</small>
-                                </div>
-                                <p class="mb-0">The submitted images are only 500x500px instead of the required 1080x1080px. Also, the brand colors were not used as specified in the guidelines.</p>
-                            </div>
-
-                            <div class="message-card message-other p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <strong>Sarah Johnson (Worker)</strong>
-                                    <small class="text-muted">1 hour ago</small>
-                                </div>
-                                <p class="mb-0">I used the correct dimensions but the files might have been compressed during upload. I can provide higher resolution versions. Regarding colors, I used shades close to the specified ones as they worked better visually.</p>
-                            </div>
-
-                            <div class="message-card message-admin p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <strong>Admin (Support Team)</strong>
-                                    <small class="text-muted">30 minutes ago</small>
-                                </div>
-                                <p class="mb-0">We're reviewing the submitted work against the task requirements. Both parties, please provide any additional evidence or clarification within 24 hours.</p>
-                            </div>
-
                             <!-- Response Form -->
-                            <div class="mt-4">
+                            <div class="mb-4">
                                 <form id="disputeResponseForm">
                                     <div class="mb-3">
                                         <label class="form-label">Add to Discussion</label>
@@ -142,6 +137,58 @@
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+
+                            <!-- Messages -->
+                            <div class="messages-container" style="max-height: 400px; overflow-y: auto;">
+                                <div class="message-card message-user p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <strong>Mike Chen (Poster)</strong>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                    <p class="mb-2">The submitted images are only 500x500px instead of the required 1080x1080px. Also, the brand colors were not used as specified in the guidelines.</p>
+                                    <div class="evidence-section">
+                                        <h6>Evidence</h6>
+                                        <div class="d-flex gap-3">
+                                            <div class="border rounded p-3 text-center">
+                                                <i class="bi bi-file-earmark-text fs-1 text-muted"></i>
+                                                <div class="small">submitted_work.zip</div>
+                                                <button class="btn btn-sm btn-outline-primary mt-2">Download</button>
+                                            </div>
+                                            <div class="border rounded p-3 text-center">
+                                                <i class="bi bi-image fs-1 text-muted"></i>
+                                                <div class="small">screenshot_1.png</div>
+                                                <button class="btn btn-sm btn-outline-primary mt-2">View</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="message-card message-other p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <strong>Sarah Johnson (Worker)</strong>
+                                        <small class="text-muted">1 hour ago</small>
+                                    </div>
+                                    <p class="mb-2">I used the correct dimensions but the files might have been compressed during upload. I can provide higher resolution versions. Regarding colors, I used shades close to the specified ones as they worked better visually.</p>
+                                    <div class="evidence-section">
+                                        <h6>Evidence</h6>
+                                        <div class="d-flex gap-3">
+                                            <div class="border rounded p-3 text-center">
+                                                <i class="bi bi-image fs-1 text-muted"></i>
+                                                <div class="small">screenshot_2.png</div>
+                                                <button class="btn btn-sm btn-outline-primary mt-2">View</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="message-card message-admin p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <strong>Admin (Support Team)</strong>
+                                        <small class="text-muted">30 minutes ago</small>
+                                    </div>
+                                    <p class="mb-0">We're reviewing the submitted work against the task requirements. Both parties, please provide any additional evidence or clarification within 24 hours.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

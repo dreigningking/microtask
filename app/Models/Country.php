@@ -420,9 +420,9 @@ class Country extends Model
 
         if (!$referralSettings || !is_array($referralSettings)) return false;
 
-        // Must have referral_earnings_percentage and invitee_commission_percentage
-        return isset($referralSettings['referral_earnings_percentage'])
-            && isset($referralSettings['invitee_commission_percentage']);
+        // Must have signup_referral_earnings_percentage and task_referral_commission_percentage
+        return isset($referralSettings['signup_referral_earnings_percentage'])
+            && isset($referralSettings['task_referral_commission_percentage']);
     }
 
     /**

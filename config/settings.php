@@ -62,8 +62,8 @@ return [
             "usd_exchange_rate_percentage"=>'double'
         ],
         "referral_settings" => [
-            "referral_earnings_percentage"=> 'double',
-            "invitee_commission_percentage"=> 'double'
+            "signup_referral_earnings_percentage"=> 'double',
+            "task_referral_commission_percentage"=> 'double'
         ],
         "review_settings" => [
             "admin_review_cost"=> 'double',

@@ -11,16 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /*
+            just for recommending people to task.. you will get something small.
+            you can only refer people on the site
+        */
         Schema::create('referrals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('referrer_id')->nullable();
-            $table->string('email');
-            $table->unsignedBigInteger('task_id')->nullable();
-            $table->string('status')->default('pending'); //pending, invited, accepted
-            $table->timestamp('expire_at')->nullable();
+            $table->unsignedBigInteger('user_id'); //referrer
+            $table->unsignedBigInteger('referree_id');
+            $table->unsignedBigInteger('task_id');
+            $table->string('status')->default('pending'); //pending, completed
             $table->timestamps();
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
-            $table->foreign('referrer_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('referree_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

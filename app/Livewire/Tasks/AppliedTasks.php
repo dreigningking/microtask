@@ -16,6 +16,7 @@ class AppliedTasks extends Component
     public $search = '';
     public $status = 'all'; // 'all', 'accepted', 'saved', 'submitted', 'completed', 'cancelled'
     public $sortBy = 'latest';
+    public $user;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -25,6 +26,7 @@ class AppliedTasks extends Component
 
     public function mount()
     {
+        $this->user = Auth::user();
         // Set status based on the current route
         $routeName = request()->route()->getName();
         switch ($routeName) {
@@ -73,35 +75,37 @@ class AppliedTasks extends Component
 
     public function getTasksQuery()
     {
-        $query = TaskWorker::where('user_id', Auth::id())
-                           ->with(['task.user.country', 'task.platform', 'task.template']);
+        $query = Task::with(['user.country', 'platform', 'platformTemplate'])->whereHas('taskWorkers',function($workers){
+            $workers->where('user_id', $this->user->id);
+        });
+                           
 
         if ($this->search) {
-            $query->whereHas('task', function ($q) {
-                $q->where('title', 'like', '%' . $this->search . '%')
+            $query->where('title', 'like', '%' . $this->search . '%')
                   ->orWhere('description', 'like', '%' . $this->search . '%');
-            });
         }
 
         switch ($this->status) {
             case 'accepted':
                 $query->whereDoesntHave('taskSubmissions', function($q) {
-                          $q->whereNotNull('paid_at');
+                          $q->where('user_id',$this->user->id)->whereNotNull('paid_at');
                       });
                 break;
             case 'submitted':
                 $query->whereHas('taskSubmissions', function($q) {
-                          $q->whereNull('paid_at');
+                          $q->where('user_id',$this->user->id)->whereNull('paid_at');
                       });
                 break;
             case 'completed':
                 $query->whereHas('taskSubmissions', function($q) {
-                    $q->whereNotNull('paid_at');
+                    $q->where('user_id',$this->user->id)->whereNotNull('paid_at');
                 });
                 break;
             case 'cancelled':
                 // Cancelled tasks are soft deleted records, so we need to include them
-                $query->withTrashed()->whereNotNull('deleted_at');
+                $query->whereHas('taskWorkers',function($cancelled){
+                    $cancelled->withTrashed()->where('user_id',$this->user->id)->whereNotNull('deleted_at');
+                });
                 break;
             case 'all':
             default:
@@ -129,31 +133,30 @@ class AppliedTasks extends Component
 
     public function render()
     {
-        $tasks = $this->getTasksQuery()->paginate(10);
-
+        $tasks = $this->getTasksQuery()->get();
         // Get stats using the new TaskSubmission structure
-        $totalTasks = TaskWorker::where('user_id', Auth::id())->count();
+        $totalTasks = TaskWorker::where('user_id', $this->user->id)->count();
         
-        $acceptedTasks = TaskWorker::where('user_id', Auth::id())
+        $acceptedTasks = TaskWorker::where('user_id', $this->user->id)
             
             ->whereDoesntHave('taskSubmissions', function($q) {
                 $q->whereNotNull('paid_at');
             })
             ->count();
             
-        $submittedTasks = TaskWorker::where('user_id', Auth::id())
+        $submittedTasks = TaskWorker::where('user_id', $this->user->id)
             ->whereHas('taskSubmissions', function($q) {
                 $q->whereNull('paid_at');
             })
             ->count();
             
-        $completedTasks = TaskWorker::where('user_id', Auth::id())
+        $completedTasks = TaskWorker::where('user_id', $this->user->id)
             ->whereHas('taskSubmissions', function($q) {
                 $q->whereNotNull('paid_at');
             })
             ->count();
             
-        $cancelledTasks = TaskWorker::where('user_id', Auth::id())
+        $cancelledTasks = TaskWorker::where('user_id', $this->user->id)
             ->withTrashed()
             ->whereNotNull('deleted_at')
             ->count();

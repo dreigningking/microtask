@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('settlements', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->string('description')->nullable();
             $table->morphs('settlementable'); 
             $table->string('amount');
             $table->string('currency');

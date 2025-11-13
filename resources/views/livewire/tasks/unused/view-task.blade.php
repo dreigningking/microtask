@@ -335,7 +335,7 @@
                         <h6 class="alert-heading">Want to help others earn?</h6>
                         <p class="mb-0">There are still {{ $peopleRemaining }} spots left for this task. Share it with your friends and earn a commission when they complete it!</p>
                     </div>
-                    <button wire:click="openInviteModal" class="btn btn-warning w-100">
+                    <button wire:click="openreferralModal" class="btn btn-warning w-100">
                         <i class="ri-share-line me-1"></i> Invite People to do Task
                     </button>
                 </div>
@@ -533,11 +533,11 @@
     </div>
     @endif
     <!-- Invite Modal -->
-    <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="inviteModalLabel">Invite People to do Task</h5>
+                    <h5 class="modal-title" id="referralModalLabel">Invite People to do Task</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -565,12 +565,12 @@
 @push('scripts')
 <script>
     document.addEventListener('livewire:init', () => {
-        Livewire.on('openInviteModal', () => {
-            new bootstrap.Modal(document.getElementById('inviteModal')).show();
+        Livewire.on('openreferralModal', () => {
+            new bootstrap.Modal(document.getElementById('referralModal')).show();
         });
 
-        Livewire.on('closeInviteModal', () => {
-            bootstrap.Modal.getInstance(document.getElementById('inviteModal')).hide();
+        Livewire.on('closereferralModal', () => {
+            bootstrap.Modal.getInstance(document.getElementById('referralModal')).hide();
         });
     });
 </script>

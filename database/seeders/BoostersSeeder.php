@@ -70,6 +70,14 @@ class BoostersSeeder extends Seeder
                 'minimum_duration_days' => 30,
                 'is_active' => true,
             ],
+            [
+                'name' => 'Task Volume Booster',
+                'slug' => 'task-volume-booster',
+                'description' => 'Increase number of task you can hold',
+                'minimum_duration_days' => 30,
+                'is_active' => true,
+            ],
+            
         ];
 
         foreach ($boosters as $booster) {

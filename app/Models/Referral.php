@@ -6,14 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Referral extends Model
 {
-    public $fillable = ['referrer_id', 'task_id', 'email', 'type', 'status', 'expire_at'];
-    public $casts = ['expire_at'=> 'datetime'];
+    public $fillable = ['user_id','referree_id','task_id','status'];
+    
     /**
      * Get the user who made the referral.
      */
-    public function referrer()
+
+    public function user()
     {
-        return $this->belongsTo(User::class, 'referrer_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function referree()
+    {
+        return $this->belongsTo(User::class, 'referree_id');
     }
 
     /**

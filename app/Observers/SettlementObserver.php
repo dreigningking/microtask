@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Settlement;
-use Illuminate\Support\Facades\DB;
 use App\Notifications\TaskWorker\EarningsNotification;
 
 class SettlementObserver
@@ -13,25 +12,10 @@ class SettlementObserver
      */
     public function created(Settlement $settlement): void
     {
-        $user = $settlement->user;
-        $currency = $settlement->currency;
-        $amount = (float) $settlement->amount;
-
-        DB::transaction(function () use ($user, $currency, $amount) {
-            $wallet = $user->wallets()->where('currency', $currency)->lockForUpdate()->first();
-            if ($wallet) {
-                $wallet->increment('balance', $amount);
-            } else {
-                $user->wallets()->create([
-                    'currency' => $currency,
-                    'balance' => $amount,
-                ]);
-            }
-        });
-
-        // Send earnings notification
-        $description = $this->getEarningDescription($settlement);
-        $user->notify(new EarningsNotification($amount, $currency, $description));
+        if($settlement->status == 'paid'){
+            $settlement->user->notify(new EarningsNotification($settlement));
+        }
+        
     }
 
     /**
@@ -66,20 +50,4 @@ class SettlementObserver
         //
     }
 
-    /**
-     * Get a description of the earning based on the settlement type
-     */
-    private function getEarningDescription(Settlement $settlement): string
-    {
-        $type = $settlement->settlementable_type;
-        
-        if (str_contains($type, 'Referral')) {
-            return 'Referral Bonus';
-        } elseif (str_contains($type, 'Task')) {
-            $task = $settlement->settlementable;
-            return $task ? 'Task: ' . $task->title : 'Task Completion';
-        }
-        
-        return 'Earning';
-    }
 }
