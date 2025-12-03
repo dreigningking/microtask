@@ -16,7 +16,7 @@ class TaskList extends Component
     public $search = '';
     public $selectedPlatforms = [];
     public $minPrice = 0;
-    public $maxPrice = 1000;
+    public $maxPrice = 1000000;
     public $selectedDurations = [];
     public $selectedDeadline = '';
     public $sortBy = 'latest';
@@ -28,7 +28,7 @@ class TaskList extends Component
         'search' => ['except' => ''],
         'selectedPlatforms' => ['except' => []],
         'minPrice' => ['except' => 0],
-        'maxPrice' => ['except' => 1000],
+        'maxPrice' => ['except' => 1000000],
         'selectedDurations' => ['except' => []],
         'selectedDeadline' => ['except' => ''],
         'sortBy' => ['except' => 'latest'],
@@ -56,7 +56,7 @@ class TaskList extends Component
         $this->hasActiveFilters = !empty($this->search)
             || !empty($this->selectedPlatforms)
             || $this->minPrice > 0
-            || $this->maxPrice < 1000
+            || $this->maxPrice < 1000000
             || !empty($this->selectedDurations)
             || !empty($this->selectedDeadline);
     }
@@ -99,7 +99,7 @@ class TaskList extends Component
         $query = Task::query()
             ->with(['user.country', 'platform','latestModeration'])
             ->listable($countryId);
-
+        
         // Search
         if ($this->search) {
             $query->where(function($q) {
@@ -112,10 +112,10 @@ class TaskList extends Component
         if (!empty($this->selectedPlatforms)) {
             $query->whereIn('platform_id', $this->selectedPlatforms);
         }
-
+        
         // Price Range
         $query->whereBetween('budget_per_submission', [$this->minPrice, $this->maxPrice]);
-
+        
         // Duration
         if (!empty($this->selectedDurations)) {
             $query->where(function($q) {

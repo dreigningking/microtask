@@ -55,8 +55,8 @@
                                 <div class="mb-3">
                                     <input type="range" wire:model="maxPrice" min="0" max="1000" class="form-range" id="priceRange">
                                     <div class="d-flex justify-content-between text-sm text-muted mt-1">
-                                        <span>${{ $minPrice }}</span>
-                                        <span>${{ $maxPrice }}</span>
+                                        <span>{{ $minPrice }}</span>
+                                        <span>{{ $maxPrice }}</span>
                                     </div>
                                 </div>
                             </div>

@@ -131,7 +131,7 @@ class TaskManage extends Component
             'taskComments' => $this->taskComments,
             'pendingCount' => TaskSubmission::where('task_id', $this->task->id)->whereNull('reviewed_at')->count(),
             'approvedCount' => TaskSubmission::where('task_id', $this->task->id)->where('accepted', true)->count(),
-            'rejectedCount' => TaskSubmission::where('task_id', $this->task->id)->where('accepted', false)->whereDoesntHave('dispute')->count(),
+            'rejectedCount' => TaskSubmission::where('task_id', $this->task->id)->whereNotNull('reviewed_at')->where('accepted', false)->whereDoesntHave('dispute')->count(),
             'disputedCount' => TaskSubmission::where('task_id', $this->task->id)->whereHas('dispute', function($q) { $q->whereNull('resolved_at'); })->count(),
             'commentsCount' => Comment::where('commentable_type', TaskModel::class)->where('commentable_id', $this->task->id)->where('is_flag', false)->whereNull('parent_id')->count(),
         ]);

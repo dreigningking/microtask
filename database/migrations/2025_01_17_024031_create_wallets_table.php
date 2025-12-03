@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('balance')->nullable();
             $table->string('currency');
-            $table->boolean('is_frozen');
+            $table->boolean('is_frozen')->default(0);
             $table->timestamps();
         });
     }

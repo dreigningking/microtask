@@ -6,6 +6,8 @@ use App\Models\Support;
 use App\Models\Comment;
 use App\Models\TaskDisputeTrail;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\Settlement;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -38,7 +40,7 @@ class TaskSubmissionDispute extends Component
     // Resolution properties
     public $resolution = '';
     public $resolutionDetails = '';
-    public $amountToWorker = 0;
+    public $percentToWorker = 0;
 
     protected $rules = [
         'disputeMessage' => 'required|min:5',
@@ -112,16 +114,16 @@ class TaskSubmissionDispute extends Component
     public function resolveDispute()
     {
         $this->validate([
-            'resolution' => 'required|in:full-payment,partial-payment,resubmission',
+            'resolution' => 'required|in:full-payment,partial-payment,resubmission,do-nothing',
             'resolutionDetails' => 'required|string|min:10',
-            'amountToWorker' => 'required|numeric|min:0|max:100',
+            'percentToWorker' => 'required|numeric|min:0|max:100',
         ]);
 
         // Update the dispute
         $this->dispute->update([
             'resolved_at' => now(),
             'resolution' => $this->resolution,
-            'resolution_value' => $this->amountToWorker,
+            'resolution_value' => $this->percentToWorker,
         ]);
 
         // Create comment with resolution details
@@ -132,10 +134,46 @@ class TaskSubmissionDispute extends Component
             'body' => $this->resolutionDetails,
         ]);
 
+        // Implement the resolution
+        if ($this->resolution === 'resubmission') {
+            $this->taskSubmission->taskWorker->update(['submission_restricted_at' => null]);
+        } elseif (in_array($this->resolution, ['full-payment', 'partial-payment'])) {
+            $amount = ($this->percentToWorker / 100) * $this->task->budget_per_submission;
+
+            $wallet = Wallet::firstOrNew([
+                'user_id' => $this->taskSubmission->user_id,
+                'currency' => $this->task->user->country->currency
+            ]);
+            if ($wallet) {
+                $old_balance = $wallet->balance ?? 0;
+                $new_balance = $old_balance + $amount;
+                $wallet->balance = $new_balance;
+                $wallet->save();
+            }
+
+            Settlement::create([
+                'user_id' => $this->taskSubmission->user_id,
+                'settlementable_id' => $this->taskSubmission->id,
+                'settlementable_type' => get_class($this->taskSubmission),
+                'amount' => $amount,
+                'description' => 'Task Submission Reward',
+                'currency' => $this->task->user->country->currency,
+                'status' => 'paid'
+            ]);
+
+            $this->taskSubmission->accepted = true;
+            $this->taskSubmission->reviewed_at = now();
+            $this->taskSubmission->paid_at = now();
+            $this->taskSubmission->review_body = $this->resolutionDetails;
+            $this->taskSubmission->save();
+        } elseif ($this->resolution === 'do-nothing') {
+            // do nothing
+        }
+
         // Reset form
         $this->resolution = '';
         $this->resolutionDetails = '';
-        $this->amountToWorker = 0;
+        $this->percentToWorker = 0;
 
         session()->flash('success', 'Dispute resolved successfully!');
     }

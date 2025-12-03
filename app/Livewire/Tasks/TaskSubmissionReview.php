@@ -132,12 +132,11 @@ class TaskSubmissionReview extends Component
                 'currency' => $this->task->user->country->currency,
                 'status' => 'paid'
             ]);
-            $this->selectedSubmission->update([
-                'accepted' => true,
-                'reviewed_at' => now(),
-                'paid_at' => now(),
-                'review_body' => $this->reviewText,
-            ]);
+            $this->selectedSubmission->accepted = true;
+            $this->selectedSubmission->reviewed_at = now();
+            $this->selectedSubmission->paid_at = now();
+            $this->selectedSubmission->review_body = $this->reviewText;
+            $this->selectedSubmission->save();
 
             // Reset form
             $this->reset(['reviewText', 'password']);

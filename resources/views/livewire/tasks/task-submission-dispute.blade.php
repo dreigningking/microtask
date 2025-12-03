@@ -136,7 +136,7 @@
                             <h5 class="mb-0">Dispute Communication</h5>
                         </div>
                         <div class="card-body">
-                            <!-- Response Form -->
+                            @if(!$dispute->resolved_at)
                             <div class="mb-4">
                                 <form wire:submit.prevent="submitDisputeResponse">
                                     <div class="mb-3">
@@ -163,7 +163,7 @@
                                     </div>
                                 </form>
                             </div>
-
+                            @endif
                             <!-- Messages -->
                             <div class="messages-container" style="max-height: 400px; overflow-y: auto;">
                                 @forelse($disputeComments as $comment)
@@ -302,6 +302,7 @@
 
 
                     <!-- Admin Actions (Visible only to admin) -->
+                    @if(Auth::user()->role_id && !$dispute->resolved_at)
                     <div class="card mb-4">
                         <div class="card-header bg-transparent">
                             <h6 class="mb-0">Admin Actions</h6>
@@ -323,6 +324,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -346,7 +348,8 @@
                                 <option value="">Select resolution</option>
                                 <option value="full-payment">Full payment to worker</option>
                                 <option value="partial-payment">Partial payment to worker</option>
-                                <option value="resubmission">Full refund to poster</option>
+                                <option value="resubmission">Allow Resubmission</option>
+                                <option value="do-nothing">Do nothing</option>
                             </select>
                             @error('resolution') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
@@ -359,11 +362,11 @@
                         <div class="mb-3">
                             <label class="form-label">Amount to Worker</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" wire:model="amountToWorker" min="0" max="100">
+                                <input type="number" class="form-control" wire:model="percentToWorker" min="0" max="100">
                                 <span class="input-group-text">%</span>
                             </div>
                             <div class="form-text">Enter as percentage of the task submission budget</div>
-                            @error('amountToWorker') <div class="text-danger">{{ $message }}</div> @enderror
+                            @error('percentToWorker') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
                     </form>
                 </div>

@@ -81,8 +81,6 @@ class TaskDispute extends Model
                 break;
             case 'resubmission': return 'Worker is seeking resubmission of work';
                 break;
-            case 'reassessment': return 'Worker is seeking reassessment of submission';
-                break;
             default: return 'Not prodived';
         }
         

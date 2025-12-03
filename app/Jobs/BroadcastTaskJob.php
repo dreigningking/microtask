@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\TaskPromotion;
 use App\Models\Task;
 use App\Models\PreferredLocation;
-use App\Models\PlatformUser;
+use App\Models\PreferredPlatform;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -45,10 +45,10 @@ class BroadcastTaskJob implements ShouldQueue
         $preferredLocationIds = PreferredLocation::where('country_id', $countryId)->pluck('user_id')->toArray();
         if (empty($preferredLocationIds)) return;
         // Step 6: platform_user
-        $platformUserIds = PlatformUser::where('platform_id', $platformId)->pluck('user_id')->toArray();
-        if (empty($platformUserIds)) return;
+        $preferredPlatformIds = PreferredPlatform::where('platform_id', $platformId)->pluck('user_id')->toArray();
+        if (empty($preferredPlatformIds)) return;
         // Step 7: intersection
-        $notifyUserIds = array_values(array_intersect($preferredLocationIds, $platformUserIds));
+        $notifyUserIds = array_values(array_intersect($preferredLocationIds, $preferredPlatformIds));
         if (empty($notifyUserIds)) return;
 
         // Step 7b: Limit to number_of_submissions

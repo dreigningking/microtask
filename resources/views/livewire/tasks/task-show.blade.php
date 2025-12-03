@@ -158,7 +158,7 @@
                                                 <span class="badge bg-secondary d-block mb-3">Pending Review</span>
                                                 @if(!$submission->reviewed_at)
                                                 <button class="btn btn-sm btn-outline-warning w-100" wire:click="withdrawSubmission({{ $submission->id }})">
-                                                    <i class="bi bi-trash"></i> Withdraw
+                                                    <i class="bi bi-trash"></i> Delete
                                                 </button>
                                                 @endif
                                             </div>
@@ -170,19 +170,19 @@
                                             <div class="">
                                                 <span class="badge bg-danger d-block mb-3">Rejected</span>
 
-                                                <button class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disputeSubmissionModal" wire:click="openDispute({{ $submission->id }})">
+                                                <button class="btn btn-sm btn-outline-danger w-100 mb-2" data-bs-toggle="modal" data-bs-target="#disputeSubmissionModal" wire:click="openDispute({{ $submission->id }})">
                                                     <i class="bi bi-person-lines-fill"></i> Dispute
                                                 </button>
                                                 @if(!$submission->accepted && !$submission->taskWorker->submission_restricted_at)
-                                                <button class="btn btn-sm btn-outline-warning w-100" wire:click="withdrawSubmission({{ $submission->id }})">
-                                                    <i class="bi bi-trash"></i> Withdraw
+                                                <button class="btn btn-sm btn-outline-warning w-100 mb-2" wire:click="withdrawSubmission({{ $submission->id }})">
+                                                    <i class="bi bi-trash"></i> Delete
                                                 </button>
                                                 @endif
                                             </div>
                                             @elseif($submission->dispute)
                                             <div class="">
                                                 <span class="badge bg-warning d-block mb-3">Disputed</span>
-                                                <a href="{{route('tasks.dispute',$submission)}}" class="btn btn-sm btn-outline-warning w-100">
+                                                <a href="{{route('tasks.dispute',$submission)}}" class="btn btn-sm btn-outline-warning w-100 mb-2">
                                                     <i class="bi bi-person-lines-fill"></i> View Dispute
                                                 </a>
                                             </div>
@@ -596,7 +596,6 @@
                                 <option value="full-payment">Full payment to worker</option>
                                 <option value="partial-payment">Partial payment to worker</option>
                                 <option value="resubmission">Allow re-submission of work</option>
-                                <option value="reassessment">Reassessment of submission</option>
                                 <option value="other">Other solution</option>
                             </select>
                         </div>
