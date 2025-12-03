@@ -235,10 +235,11 @@
                 <input type="file"
                     accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp4,.mov,.avi,.wmv,.mkv"
                     class="form-control {{ $hasError ? 'is-invalid' : '' }}"
-                    wire:model.live="templateData.{{ $field['slug'] }}.value"
+                    wire:model="templateData.{{ $field['slug'] }}.value"
+                    wire:change="updateFile('{{ $field['slug'] }}')"
                     @if($field['required'] ?? false) required @endif>
 
-                <div wire:loading wire:target="templateData.{{ $field['slug'] }}.value" class="mt-2">
+                <div wire:loading.class="d-block" wire:target="templateData.{{ $field['slug'] }}.value" class="mt-2" style="display: none;">
                     <div class="d-flex align-items-center">
                         <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
                             <span class="visually-hidden">Loading...</span>

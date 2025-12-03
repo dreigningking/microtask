@@ -55,7 +55,7 @@ class TaskModerationNotification extends Notification
             $result['subject'] = 'Task Moderation Needed';
             $result['intro'] = 'A task requires your attention';
             $result['body'] = 'Title: '.$this->moderation->moderatable->title;
-            $result['url'] = route('admin.task.show', $this->moderation->moderatable);
+            $result['url'] = route('admin.tasks.show', $this->moderation->moderatable);
         } elseif ($this->moderation->status == 'approved') {
             $result['subject'] = 'Your task is approved';
             $result['intro'] = 'Your task with title: ' . $this->moderation->moderatable->title . ' has been approved and listed';

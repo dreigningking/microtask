@@ -56,7 +56,7 @@ class TaskCommentNotification extends Notification
             if($this->receiver == 'admin'){
                 $result['subject'] = 'Task Flagged on Wonegig';
                 $result['intro'] = 'Task with title'.$this->comment->commentable->title.' has been flagged. The details reported are as follows:';
-                $result['url'] = route('admin.task.show',$this->comment->commentable);
+                $result['url'] = route('admin.tasks.show',$this->comment->commentable);
             }else{
                 $result['subject'] = 'Task with title'.$this->comment->commentable->title.' has been flagged. The details reported are as follows:';
                 $result['intro'] = '';

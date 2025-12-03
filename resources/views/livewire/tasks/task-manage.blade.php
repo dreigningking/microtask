@@ -73,12 +73,13 @@
                                 <h6 class="fw-medium mb-2">{{ $field['title'] ?? 'Field' }}</h6>
                                 @if(isset($field['type']) && $field['type'] === 'file')
                                 @if(!empty($field['value']))
-                                <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-download me-1"></i> {{ basename($field['value']) }}
+                                <a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-download me-1"></i> {{ Str::limit(basename($field['value']), 15) }}
                                 </a>
                                 @else
-                                <span class="text-muted small">No file uploaded</span>
+                                    <span class="text-muted small">No file uploaded</span>
                                 @endif
+                                
                                 @else
                                 @if(is_array($field['value'] ?? null))
                                 <div class="d-flex flex-wrap gap-1">

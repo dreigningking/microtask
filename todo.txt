@@ -1,4 +1,4 @@
-Template field upload not working yet during task create 
+Job templates should show platform image
 
 Dispute submission review {
     dispute resolution
@@ -68,7 +68,7 @@ Verification Request
 User
 -----------------------------------------------------
 Submit Task one time & multiple times
-Job templates should show platform image
+
 vpn block
 Logs of activities e.g accepted terms
 

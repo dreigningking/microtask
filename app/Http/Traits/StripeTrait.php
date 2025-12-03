@@ -40,7 +40,7 @@ trait StripeTrait
                   [
                       "items" => [
                           [
-                              "name" => "Payment on Expiringsoon",
+                              "name" => "Payment on Wonegig",
                               "description" => "Payment for ".($user->role->name == 'shopper' ? 'Orders':'Subscription/Adverts'),
                               "quantity" => "1",
                               "unit_amount" => [

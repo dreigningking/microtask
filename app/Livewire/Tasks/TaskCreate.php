@@ -18,6 +18,7 @@ use Livewire\WithFileUploads;
 use App\Http\Traits\PaymentTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class TaskCreate extends Component
@@ -542,84 +543,148 @@ class TaskCreate extends Component
     
     public function saveAsDraft()
     {
-        // Only require template_id and platform_id (from template)
-        if (!$this->template_id) {
-            $this->addError('template_id', 'Please select a template.');
+        try {
+            // Only require template_id and platform_id (from template)
+            if (!$this->template_id) {
+                $this->addError('template_id', 'Please select a template.');
+                return;
+            }
+            $template = PlatformTemplate::find($this->template_id);
+            if (!$template) {
+                $this->addError('template_id', 'Invalid template selected.');
+                return;
+            }
+
+            DB::beginTransaction();
+            
+            $task = $this->saveTask(false, false);
+
+            // Save promotions if selected
+            if ($this->featured) {
+                $promotion = $this->createPromotion($task->id, 'featured');
+            }
+            if ($this->broadcast) {
+                $promotion = $this->createPromotion($task->id, 'broadcast');
+            }
+            
+            DB::commit();
+            
+            Log::info('Task saved as draft successfully', [
+                'task_id' => $task->id,
+                'user_id' => Auth::id(),
+                'template_id' => $this->template_id
+            ]);
+            
+            return redirect()->route('tasks.posted');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Failed to save task as draft', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'template_id' => $this->template_id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $this->addError('general', 'Failed to save draft. ' . $e->getMessage());
             return;
         }
-        $template = PlatformTemplate::find($this->template_id);
-        if (!$template) {
-            $this->addError('template_id', 'Invalid template selected.');
-            return;
-        }
-
-        $task = $this->saveTask(false, false);
-
-        // Save promotions if selected
-        if ($this->featured) {
-            $promotion = $this->createPromotion($task->id, 'featured');
-        }
-        if ($this->broadcast) {
-            $promotion = $this->createPromotion($task->id, 'broadcast');
-        }
-        return redirect()->route('tasks.posted');
     }
     
     public function submitJob()
     {
-        $this->validate($this->getStepRules());
+        try {
+            $this->validate($this->getStepRules());
 
-        // Calculate total budget based on per person budget
-        $this->updateTotals();
+            // Calculate total budget based on per person budget
+            $this->updateTotals();
 
-        // Create the task
-        $task = $this->saveTask(true, true);
+            DB::beginTransaction();
 
-        $order = Order::create(['user_id' => Auth::id()]);
-        OrderItem::create([
-            'order_id' => $order->id,
-            'orderable_id' => $task->id,
-            'orderable_type' => get_class($task),
-            'amount' => $this->total - ($this->featured_amount + $this->broadcast_amount),
-        ]);
+            // Create the task
+            $task = $this->saveTask(true, true);
 
-        // If promotions are selected, create them
-        if ($this->featured) {
-            $promotion = $this->createPromotion($task->id, 'featured');
+            $order = Order::create(['user_id' => Auth::id()]);
             OrderItem::create([
                 'order_id' => $order->id,
-                'orderable_id' => $promotion->id,
-                'orderable_type' => get_class($promotion),
-                'amount' => $this->featured_amount,
+                'orderable_id' => $task->id,
+                'orderable_type' => get_class($task),
+                'amount' => $this->total - ($this->featured_amount + $this->broadcast_amount),
             ]);
-        }
 
-        if ($this->broadcast) {
-            $promotion = $this->createPromotion($task->id, 'broadcast');
-            OrderItem::create([
+            // If promotions are selected, create them
+            if ($this->featured) {
+                $promotion = $this->createPromotion($task->id, 'featured');
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'orderable_id' => $promotion->id,
+                    'orderable_type' => get_class($promotion),
+                    'amount' => $this->featured_amount,
+                ]);
+            }
+
+            if ($this->broadcast) {
+                $promotion = $this->createPromotion($task->id, 'broadcast');
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'orderable_id' => $promotion->id,
+                    'orderable_type' => get_class($promotion),
+                    'amount' => $this->broadcast_amount,
+                ]);
+            }
+
+            $payment = Payment::create([
+                'user_id' => Auth::id(),
                 'order_id' => $order->id,
-                'orderable_id' => $promotion->id,
-                'orderable_type' => get_class($promotion),
-                'amount' => $this->broadcast_amount,
+                'reference' => 'SUB-' . Str::random(10) . '-' . time(),
+                'currency' => $this->currency,
+                'amount' => $this->total,
+                'vat_value' => $this->tax,
+                'gateway' => $this->countrySetting->gateway,
+                'status' => 'pending',
             ]);
-        }
+            
+            $link = $this->initializePayment($payment);
+            
+            if (!$link) {
+                throw new \Exception('Failed to initiate payment. Please try again.');
+            }
 
-        $payment = Payment::create([
-            'user_id' => Auth::id(),
-            'order_id' => $order->id,
-            'reference' => 'SUB-' . Str::random(10) . '-' . time(),
-            'currency' => $this->currency,
-            'amount' => $this->total,
-            'vat_value' => $this->tax,
-            'gateway' => $this->countrySetting->gateway,
-            'status' => 'pending',
-        ]);
-        $link = $this->initializePayment($payment);
-        if($link){
+            DB::commit();
+            
+            Log::info('Task submitted successfully', [
+                'task_id' => $task->id,
+                'order_id' => $order->id,
+                'payment_id' => $payment->id,
+                'user_id' => Auth::id()
+            ]);
+            
             // Redirect to payment gateway
             return redirect()->to($link);
-        }else{
-            return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            
+            Log::error('Validation failed during job submission', [
+                'errors' => $e->validator->errors()->toArray(),
+                'user_id' => Auth::id()
+            ]);
+            
+            $this->dispatch('validationErrors', $e->validator->errors()->toArray());
+            throw $e;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Failed to submit job', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'template_id' => $this->template_id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $this->addError('general', 'Failed to submit job. ' . $e->getMessage());
+            return redirect()->back();
         }
     }
 
@@ -645,7 +710,26 @@ class TaskCreate extends Component
         $task->is_active = $isActive;
         
         if (!empty($this->templateData)) {
-            $task->template_data = $this->templateData;
+            // Sanitize template data - ensure file fields contain only string paths, not file objects
+            $sanitizedTemplateData = [];
+            foreach ($this->templateData as $fieldKey => $fieldData) {
+                $sanitizedTemplateData[$fieldKey] = $fieldData;
+                
+                // If this is a file field with an object value, it means the file wasn't properly processed
+                if (isset($fieldData['type']) && $fieldData['type'] === 'file' && isset($fieldData['value'])) {
+                    if (is_object($fieldData['value'])) {
+                        Log::warning("File field '{$fieldKey}' contains unpersisted file object, clearing value", [
+                            'field_key' => $fieldKey,
+                            'object_class' => get_class($fieldData['value'])
+                        ]);
+                        $sanitizedTemplateData[$fieldKey]['value'] = '';
+                    } elseif (!is_string($fieldData['value']) || empty($fieldData['value'])) {
+                        // Ensure file fields have valid string paths
+                        $sanitizedTemplateData[$fieldKey]['value'] = '';
+                    }
+                }
+            }
+            $task->template_data = $sanitizedTemplateData;
         }
         $task->save();
         return $task;

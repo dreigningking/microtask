@@ -105,14 +105,14 @@ class Task extends Model
         return $this->morphMany(Moderation::class, 'moderatable');
     }
 
-    public function comments(): MorphMany
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
     public function latestModeration(): MorphOne
     {
         return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     public function disputes(){
@@ -148,11 +148,13 @@ class Task extends Model
     {
         if($this->is_active &&
             (!$this->expiry_date || $this->expiry_date >= now()) &&
-            $this->taskSubmissions->where('accepted',true)->count() < $this->number_of_submissions
+            $this->taskSubmissions->where('accepted',true)->count() < $this->number_of_submissions && 
+            $this->latestModeration && $this->latestModeration->status === 'approved'
         )
         return true;
         return false;
     }
+    
     public function getIsCompletedAttribute()
     {
         if($this->is_active &&

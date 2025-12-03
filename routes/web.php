@@ -1,40 +1,37 @@
 <?php
 
-use GuzzleHttp\Client;
 use App\Livewire\Welcome;
 use App\Livewire\Boosters;
+use App\Livewire\AboutPage;
 use App\Livewire\Dashboard;
-use GuzzleHttp\Psr7\Request;
-use Ixudra\Curl\Facades\Curl;
+use App\Livewire\TopEarners;
+use App\Livewire\ContactPage;
+use App\Livewire\JobCreators;
+use App\Livewire\ListEarnings;
 use App\Livewire\Transactions;
 use App\Livewire\Blog\BlogIndex;
 use App\Livewire\Tasks\TaskEdit;
 use App\Livewire\Tasks\TaskList;
 use App\Livewire\Tasks\TaskShow;
 use App\Livewire\Blog\BlogSingle;
+use App\Livewire\Support\Tickets;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Tasks\TaskCreate;
 use App\Livewire\Tasks\TaskManage;
 use App\Livewire\Tasks\PostedTasks;
+use App\Livewire\Support\TicketView;
 use App\Livewire\Tasks\AppliedTasks;
+use App\Livewire\Policies\Disclaimer;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\LandingArea\AboutPage;
 use App\Http\Controllers\HomeController;
-use App\Livewire\LandingArea\TopEarners;
-use App\Livewire\LandingArea\ContactPage;
-use App\Livewire\LandingArea\JobCreators;
+use App\Livewire\Policies\PrivacyPolicy;
+use App\Livewire\InviteesList;
 use App\Http\Controllers\PaymentController;
+use App\Livewire\Policies\DigitalMillenium;
+use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
-use App\Livewire\DashboardArea\Support\Tickets;
-use App\Livewire\LandingArea\Policies\Disclaimer;
-use App\Livewire\DashboardArea\Support\TicketView;
-use App\Livewire\LandingArea\Policies\PrivacyPolicy;
-use App\Livewire\DashboardArea\Earnings\ListEarnings;
-use App\Livewire\DashboardArea\Referrals\InviteesList;
-use App\Livewire\LandingArea\Policies\DigitalMillenium;
-use App\Livewire\LandingArea\Policies\TermsAndConditions;
-use App\Livewire\DashboardArea\Notifications\ListNotifications;
-use App\Livewire\LandingArea\Policies\PaymentDisputeChargebacks;
+use App\Livewire\Notifications\ListNotifications;
+use App\Livewire\Policies\PaymentDisputeChargebacks;
 
 
 
@@ -50,10 +47,11 @@ Route::get('run', function () {
 });
 
 Route::get('/', Welcome::class)->name('index');
+Route::get('about', AboutPage::class)->name('about');
 Route::get('browse', TaskList::class)->name('explore');
 Route::get('task/{task}', TaskShow::class)->name('explore.task');
 Route::get('creators', JobCreators::class)->name('creators');
-Route::get('about', AboutPage::class)->name('about');
+
 Route::get('contact', ContactPage::class)->name('contact');
 Route::get('blog', BlogIndex::class)->name('blog');
 Route::get('blog/post/{post}', BlogSingle::class)->name('blog.show');

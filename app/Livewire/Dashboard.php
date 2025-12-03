@@ -8,7 +8,8 @@ use Livewire\Component;
 use App\Models\Platform;
 use App\Models\Settlement;
 use App\Models\TaskWorker;
-use Livewire\Attributes\Layout;
+use App\Models\Invitation;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TaskSubmission;
@@ -37,13 +38,20 @@ class Dashboard extends Component
     public $taskmasterUpgradeSuggestion;
     public $workerPendingSubscription;
     public $taskmasterPendingSubscription;
+    public $activeSubscriptions = [];
+    public $recentInvitees = [];
+    public $creatorStats = [];
+    public $workerStats = [];
+    public $emails = [''];
+    public $totalInvitations = 0;
+    public $allInvitees = []; // @var array
 
     public function mount()
     {
-        // $this->userData = Auth::user();
-        // $this->activeView = $this->userData->dashboard_view ?? 'tasks';
-        // $this->loadDashboardData();
-        // $this->loadSubscriptionData();
+        $this->userData = Auth::user();
+        $this->activeView = $this->userData->dashboard_view ?? 'tasks';
+        $this->loadDashboardData();
+        $this->loadSubscriptionData();
     }
 
     public function loadDashboardData()
@@ -113,6 +121,23 @@ class Dashboard extends Component
         $this->referralEarnings = Settlement::where('user_id', $user->id)
             ->where('settlementable_type', 'App\Models\Referral')
             ->sum('amount');
+        
+        // Provision worker stats
+        $appliedCount = TaskWorker::where('user_id', $user->id)->count();
+        $completedCount = $this->completedTasks->count();
+        $submissions = TaskSubmission::where('user_id', $user->id)->get();
+        $acceptedSubmissionsCount = $submissions->where('accepted', true)->count();
+        $rejectedSubmissionsCount = $submissions->whereNotNull('reviewed_at')->where('accepted', false)->count();
+        $pendingReview = $submissions->whereNull('reviewed_at')->count();
+        
+        $this->workerStats = [
+            'applied' => $appliedCount,
+            'completed' => $completedCount,
+            'active' => $this->ongoingTasks->count(),
+            'submissions' => $appliedCount > 0 ? round(($acceptedSubmissionsCount / $appliedCount) * 100) : 0,
+            'pending_review' => $pendingReview,
+            'rejected' => $rejectedSubmissionsCount,
+        ];
     }
 
     public function loadJobsData()
@@ -185,6 +210,20 @@ class Dashboard extends Component
             ->groupBy('month')
             ->pluck('count')
             ->toArray();
+        
+        // Provision creator stats
+        $this->creatorStats = [
+            'posted' => $totalJobs,
+            'completed' => $completedJobs,
+            'in_progress' => $activeJobs,
+            'rating' => round($totalWorkers > 0 ? 4.5 : 0, 1),
+            'pending_review' => TaskSubmission::whereHas('task', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->where('accepted', false)->count(),
+            'refundable' => TaskSubmission::whereHas('task', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->where('accepted', false)->count(),
+        ];
     }
 
     public function loadSidebarData()
@@ -250,10 +289,25 @@ class Dashboard extends Component
 
     public function loadSubscriptionData()
     {
-        $activeSubscriptions = $this->userData->activeSubscriptions()->with('booster')->get();
-        $pendingSubscriptions = $this->userData->pendingSubscriptions()->with('booster')->get();
+        $user = $this->userData;
+        
+        // Get all active subscriptions
+        $this->activeSubscriptions = Subscription::where('user_id', $user->id)
+            ->where('expires_at', '>', now())
+            ->with('booster')
+            ->get()
+            ->toArray();
+        
+        $activeSubscriptions = Subscription::where('user_id', $user->id)
+            ->where('expires_at', '>', now())
+            ->with('booster')
+            ->get();
+        $pendingSubscriptions = Subscription::where('user_id', $user->id)
+            ->where('expires_at', '<=', now())
+            ->with('booster')
+            ->get();
 
-        $this->workerSubscription = $activeSubscriptions->firstWhere('booster.is_status', 'worker');
+        $this->workerSubscription = $activeSubscriptions->firstWhere('booster.type', 'worker');
         $this->taskmasterSubscription = $activeSubscriptions->firstWhere('booster.type', 'taskmaster');
 
         $this->workerPendingSubscription = $pendingSubscriptions->firstWhere('booster.type', 'worker');
@@ -282,6 +336,90 @@ class Dashboard extends Component
         } else {
             // Suggest the first taskmaster booster if none is active
             $this->taskmasterUpgradeSuggestion = Booster::where('is_active', true)->orderBy('id')->first();
+        }
+        
+        // Load recent invitees
+        $this->loadRecentInvitees();
+    }
+    
+    public function loadRecentInvitees()
+    {
+        $user = $this->userData;
+        
+        $this->recentInvitees = Invitation::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function($invitation) {
+                return (object)[
+                    'id' => $invitation->id,
+                    'email' => $invitation->email,
+                    'status' => $invitation->status ?? 'pending',
+                    'created_at' => $invitation->created_at,
+                ];
+            });
+        
+        // Load all invitees for modal
+        $this->allInvitees = Invitation::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($invitation) {
+                return (object)[
+                    'id' => $invitation->id,
+                    'email' => $invitation->email,
+                    'status' => $invitation->status ?? 'pending',
+                    'created_at' => $invitation->created_at,
+                ];
+            });
+        
+        $this->totalInvitations = $this->allInvitees->count();
+    }
+    
+    public function addEmailField()
+    {
+        $this->emails[] = '';
+    }
+    
+    public function removeEmailField($index)
+    {
+        unset($this->emails[$index]);
+        $this->emails = array_values($this->emails);
+    }
+    
+    public function sendInvitations()
+    {
+        $user = $this->userData;
+        $validEmails = array_filter($this->emails, fn($email) => !empty($email));
+        
+        if (empty($validEmails)) {
+            $this->addError('emails', 'Please enter at least one email address.');
+            return;
+        }
+        
+        try {
+            foreach ($validEmails as $email) {
+                $this->validate(['emails.*' => 'email']);
+                
+                // Check if invitation already exists
+                $exists = Invitation::where('user_id', $user->id)
+                    ->where('email', $email)
+                    ->exists();
+                
+                if (!$exists) {
+                    Invitation::create([
+                        'user_id' => $user->id,
+                        'email' => $email,
+                        'status' => 'pending',
+                        'expire_at' => now()->addDays(30),
+                    ]);
+                }
+            }
+            
+            $this->emails = [''];
+            $this->loadRecentInvitees();
+            session()->flash('message', 'Invitations sent successfully!');
+        } catch (\Exception $e) {
+            $this->addError('general', 'Failed to send invitations: ' . $e->getMessage());
         }
     }
 

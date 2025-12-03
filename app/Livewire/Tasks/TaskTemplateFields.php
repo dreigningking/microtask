@@ -113,6 +113,58 @@ class TaskTemplateFields extends Component
     }
 
     /**
+     * Handle file upload explicitly with wire:change event
+     */
+    public function updateFile($fieldKey)
+    {
+        if (isset($this->templateData[$fieldKey]['value'])) {
+            $fileValue = $this->templateData[$fieldKey]['value'];
+            
+            // Check if it's a file object (TemporaryUploadedFile or UploadedFile)
+            if (is_object($fileValue) && method_exists($fileValue, 'getClientOriginalName')) {
+                Log::info("Processing file upload for field: {$fieldKey}", [
+                    'original_name' => $fileValue->getClientOriginalName(),
+                    'size' => $fileValue->getSize(),
+                ]);
+                
+                try {
+                    // Validate file
+                    $this->validate([
+                        "templateData.$fieldKey.value" => 'file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,mp4,mov,avi,wmv,mkv'
+                    ], [
+                        "templateData.$fieldKey.value.mimes" => "Invalid file type for {$this->templateData[$fieldKey]['title']}"
+                    ]);
+                    
+                    // Store file and get permanent path
+                    $path = $fileValue->store('tasks/template-fields', 'public');
+                    $permanentPath = 'storage/' . $path;
+                    
+                    // Update templateData with permanent path (string, not object)
+                    $this->templateData[$fieldKey]['value'] = $permanentPath;
+                    
+                    Log::info("File successfully stored and path set", [
+                        'field_key' => $fieldKey,
+                        'permanent_path' => $permanentPath,
+                        'original_name' => $fileValue->getClientOriginalName()
+                    ]);
+                    
+                    // Clear validation errors
+                    if (isset($this->validationErrors["templateData.{$fieldKey}.value"])) {
+                        unset($this->validationErrors["templateData.{$fieldKey}.value"]);
+                    }
+                    
+                    // Dispatch event to notify parent component with permanent path
+                    $this->dispatch('templateFieldUpdated', $fieldKey, $permanentPath, $this->templateData)->to(TaskCreate::class);
+                    
+                } catch (\Exception $e) {
+                    Log::error("File upload failed for field {$fieldKey}: " . $e->getMessage());
+                    $this->addError("templateData.$fieldKey.value", "Failed to upload file: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
      * Handle updates to templateData property for file uploads
      */
     public function updatedTemplateData($value, $key)
@@ -124,7 +176,8 @@ class TaskTemplateFields extends Component
             
             // Check if this is a file upload
             if (isset($this->templateData[$fieldKey]) && isset($this->templateData[$fieldKey]['type']) && $this->templateData[$fieldKey]['type'] === 'file') {
-                if ($value instanceof \Livewire\TemporaryUploadedFile) {
+                // Check if value is a file object (has getClientOriginalName method)
+                if (is_object($value) && method_exists($value, 'getClientOriginalName')) {
                     Log::info("File upload detected via updatedTemplateData for field: {$fieldKey}", [
                         'original_name' => $value->getClientOriginalName(),
                         'size' => $value->getSize(),
