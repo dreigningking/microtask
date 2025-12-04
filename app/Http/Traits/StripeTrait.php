@@ -1,123 +1,141 @@
 <?php
 namespace App\Http\Traits;
 
-use App\Models\Payout;
+use App\Models\User;
 use App\Models\Payment;
+use App\Models\Profile;
+use App\Models\Settlement;
+use App\Models\Withdrawal;
 use Ixudra\Curl\Facades\Curl;
 
 
 trait StripeTrait
 {
 
-  protected function get_token(){
-      $id = base64_encode(config('services.paypal.client'));
-      $secret = base64_encode(config('services.paypal.secret'));
-      $response = Curl::to('https://api-m.sandbox.paypal.com/v1/oauth2/token')
-          ->withHeader("Authorization: Basic ".$id.":".$secret)
-          ->withHeader('Content-Type: application/x-www-form-urlencoded')
-          ->withData(["grant_type"=>"client_credentials"])
-          ->asJsonResponse()
-          ->post();
-      if($response && $response->access_token)
-      return $response->access_token;
-      else return false;
-  }
-
-  protected function initiateStripe(Payment $payment){
-      $user = auth()->user();
-      $token = config('services.paypal.token');
-      // $token = $this->get_token();
-      if(!$token){
-          return "Something is wrong, please contact the admin";
-      }
-      // dd($token);
-      $response = Curl::to(config('services.paypal.url')."/checkout/orders")
-          ->withHeader('Authorization: Bearer '.$token)
-          ->withHeader('PayPal-Request-Id: '.uniqid())
-          ->withData([
-              "intent" => "CAPTURE",
-              "purchase_units" => [
-                  [
-                      "items" => [
-                          [
-                              "name" => "Payment on Wonegig",
-                              "description" => "Payment for ".($user->role->name == 'shopper' ? 'Orders':'Subscription/Adverts'),
-                              "quantity" => "1",
-                              "unit_amount" => [
-                                  "currency_code" => $payment->currency->code,
-                                  "value" => $payment->amount,
-                              ],
-                          ],
-                      ],
-                      "amount" => [
-                          "currency_code" => $payment->currency->code,
-                          "value" => $payment->amount,
-                          "breakdown" => [
-                              "item_total" => [
-                                  "currency_code" => $payment->currency->code,
-                                  "value" => $payment->amount,
-                              ],
-                          ],
-                      ],
-                  ],
-              ],
-              "application_context" => [
-                  "return_url" => route('home'),
-                  "cancel_url" => route('home'),
-              ],
-          ])
-          ->asJson()
-          ->post();
-      //dd($response);
-      if($response && $response->status == 'CREATED' && $response->links[1]->href){
-          return redirect()->to($response->links[1]->href);
-      }
-      
-  }
-
-
-    
-
-    protected function verifyPapalPayment($value){
-        $paymentDetails = Curl::to('https://api.paystack.co/transaction/verify/'.$value)
-         ->withHeader('Authorization: Bearer '.config('services.paystack.secret'))
-         ->asJson()
-         ->get();
-        return $paymentDetails;
-    }
-
-    
-
-    protected function payoutPaypal(Payout $payout){
-        $response = Curl::to('https://api.paystack.co/transfer')
-        ->withHeader('Authorization: Bearer '.config('services.paystack.secret'))
-        ->withHeader('Content-Type: application/json')
-        ->withData( array("source" => "balance", "reason"=> "Withdrawal Payout", "amount"=> $payout->amount * 100, "recipient"=> $payout->user->payout_account,
-        "currency"=> $payout->currency->code,"reference"=> $payout->reference ) )
-        ->asJson()                
-        ->post();
-        //dd($response);
-        if($response &&  isset($response->status) && $response->status)
-          return true;
+    public function initiateStripe(Payment $payment){
+        $items = [];
+        $items[] = [  'price_data' => 
+                                [ 'currency' => strtolower($payment->currency), 'unit_amount' => $payment->total *100, 
+                                'product_data' => [ 'name' => 'Order',  'description' => 'Payment for Task Order','images' => [] ],
+                                ], 
+                                'quantity' => 1, 
+                            ];
+        
+        $response = Curl::to('https://api.stripe.com/v1/checkout/sessions')
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->withData( array('customer_email' => $payment->user->email,'currency'=> strtolower($payment->currency),
+                            'success_url'=> route('payment.callback',with(['tx_ref'=> $payment->reference,'reference'=> $payment->reference,'status'=> 'success'])),
+                            'cancel_url'=> route('payment.callback',with(['tx_ref'=> $payment->reference,'reference'=> $payment->reference,'status'=> 'cancelled'])),
+                            'client_reference_id'=> uniqid(),'mode'=> 'payment',
+                            'line_items' => $items
+                            ) )
+            ->asJsonResponse()
+            ->post();
+        if($response && $response->url){
+            $payment->request_id = $response->id;
+            $payment->save();
+            return $response->url;
+        }
+            
         else return false;
+      }
+  
+      protected function verifyStripePayment($stripe_session_id){
+        $response = Curl::to('https://api.stripe.com/v1/checkout/sessions/'.$stripe_session_id)
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->asJsonResponse()
+            ->get();
+        return $response;
+    }
+    public function refundStripe(Payment $payment){
+        $stripe_session_id = $payment->request_id;
+        $session = Curl::to("https://api.stripe.com/v1/checkout/sessions/$stripe_session_id")
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->asJsonResponse()
+            ->get();
+
+        $response = Curl::to('https://api.stripe.com/v1/refunds')
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->withData( array('amount'=> $payment->amount * 100,'payment_intent'=> $session->payment_intent ,'reason' => 'requested_by_customer'))
+            ->asJsonResponse()
+            ->post();
+        if($response &&  isset($response->status) && $response->status == "succeeded")
+         return true;
+         else return false;
     }
 
-    protected function verifyPayoutPaypal(Payout $payout){
-      $response = Curl::to("https://api.paystack.co/transfer/verify/$payout->reference")
-          ->withHeader('Authorization: Bearer '.config('services.paystack.secret'))
-          ->asJson()
-          ->get();
-      //check the status and update
-  }
-    
-    
+    // public function retrieveAccount($bank_details){
+    //     $response = Curl::to("https://api.stripe.com/v1/accounts/$bank_details")
+    //         ->withHeader('Content-Type: application/x-www-form-urlencoded')
+    //         ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+    //         ->asJsonResponse()
+    //         ->get();
+    //     // acct_1OpTfgGgPcnGNIQ2, acct_1OuekSGazRDBDWQi
+    //     
+    //     return false;
+    // }
+  
+    public function connectStripe(User $user){
+        $response = Curl::to('https://api.stripe.com/v1/accounts')
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->withData( array('type'=> 'express','country'=> $user->country->iso ,'email' => $user->email))
+            ->asJsonResponse()
+            ->post();
+        // acct_1OpTfgGgPcnGNIQ2
+        if($response && $response->id){
+            $user->bank_details = $response->id;
+            $user->save();
+            return $response->id;
+        }else return false;
+    }
 
-    protected function retryPaypal(Payout $payout){
-        $response = Curl::to("https://api.paystack.com/v3/transfers/$payout->transfer_id/retries")
-            ->withHeader('Authorization: Bearer '.config('services.flutter.secret'))
-            ->asJson()
-            ->get();
-        //check the status and update
+    public function accountLink($bank_details){
+        $response = Curl::to('https://api.stripe.com/v1/account_links')
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->withData( array('account'=> $bank_details,'type'=> 'account_onboarding',
+            'refresh_url'=> route('stripe.onboarding') ,'return_url' => route('stripe.postboarding')))
+            ->asJsonResponse()
+            ->post();
+        if($response && $response->url){
+            return $response->url;
+        }else return false;
+    }
+
+    public function payoutStripe(Settlement $settlement){
+        $response = Curl::to('https://api.stripe.com/v1/payouts')
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->withData( array('amount'=> $settlement->amount * 100,'currency'=> $settlement->currency ,'destination'=> $settlement->profile->bank_details))
+            ->asJsonResponse()
+            ->post();
+        if($response && $response->status && $response->status == 'pending'){
+            $settlement->transfer_id = $response->id; 
+            $settlement->status = 'processing'; 
+            $settlement->save();
+        }else {
+            $settlement->transfer_id = $response->id ?? '';
+            $settlement->status = 'failed';
+            $settlement->save();
+        }
+    }
+
+    public function verifyPayoutStripe(Settlement $settlement){
+        $response = Curl::to("https://api.stripe.com/v1/payouts/$settlement->transfer_id")
+            ->withHeader('Content-Type: application/x-www-form-urlencoded')
+            ->withHeader('Authorization: Bearer '.config('services.stripe.secret'))
+            ->asJsonResponse()
+            ->get(); 
+            if($response && $response->status && $response->status == 'success'){
+                $settlement->status = 'paid';
+                $settlement->paid_at = now();
+                $settlement->save();
+            }
     }
 
 

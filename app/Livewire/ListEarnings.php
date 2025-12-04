@@ -18,12 +18,7 @@ class ListEarnings extends Component
     use WithPagination;
     use HelperTrait;
 
-    // Tab management
-    public $activeTab = 'settlements';
-
-    // Withdrawal modal
-    public $showWithdrawModal = false;
-    public $withdrawCurrency = '';
+    // Withdrawal form
     public $withdrawAmount = '';
     public $availableBalance = 0;
     public $minWithdrawal = 10;
@@ -32,10 +27,10 @@ class ListEarnings extends Component
     public $netAmount = 0;
     public $withdrawalCharges = [];
 
-    // Exchange modal
-    public $showExchangeModal = false;
+    // Exchange form
     public $fromCurrency = '';
     public $toCurrency = '';
+    public $toCurrencySymbol = '';
     public $amount = '';
     public $exchangeRate = 0;
     public $targetAmount = 0;
@@ -44,6 +39,8 @@ class ListEarnings extends Component
     // Wallet freeze logic
     public $walletsAreFrozen = false;
     public $frozenReason = '';
+    public $exchangeDisabled = false;
+    public $withdrawalDisabled = false;
 
     protected function rules()
     {
@@ -76,49 +73,32 @@ class ListEarnings extends Component
 
     public function mount()
     {
-        // Set active tab based on the current route
-        $routeName = request()->route()->getName();
-        switch ($routeName) {
-            case 'earnings.withdrawals':
-                $this->activeTab = 'withdrawals';
-                break;
-            case 'earnings.exchanges':
-                $this->activeTab = 'exchanges';
-                break;
-            case 'earnings.settlements':
-            default:
-                $this->activeTab = 'settlements';
-                break;
-        }
-
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $this->toCurrency = $user->country->currency;
-
+        $this->toCurrencySymbol = $user->country->currency_symbol;
         // Wallet freeze logic
-        $globalFreeze = Setting::firstWhere('name', 'freeze_wallets_globally')->value('value');
+        $globalFreeze = Setting::firstWhere('name', 'freeze_wallets_globally')->value('value') == 1;
         $countrySetting = $user->country->setting ?? null;
-        $walletStatus = $countrySetting ? $countrySetting->wallet_status : null;
-        $anyWalletFrozen = $user->wallets()->where('is_frozen', 1)->exists();
+        $walletSettings = $countrySetting ? $countrySetting->wallet_settings : null;
+        $countryFreeze = is_null($countrySetting) || is_null($walletSettings) || !$walletSettings['wallet_status'];
+        $withdrawalSettingsExist = $countrySetting && isset($countrySetting->withdrawal_settings);
+        $walletSettingsExist = $countrySetting && isset($countrySetting->wallet_settings);
 
-        // Add verification check
-        if (
-            ($globalFreeze == 1) ||
-            ($walletStatus === 'disabled' || is_null($walletStatus)) ||
-            $anyWalletFrozen ||
-            !$user->is_verified
-        ) {
-            $this->walletsAreFrozen = true;
+        $this->exchangeDisabled = $globalFreeze || $countryFreeze || !$walletSettingsExist || !$user->is_verified;
+        $this->withdrawalDisabled = $globalFreeze || $countryFreeze || !$withdrawalSettingsExist || !$user->is_verified || !$user->bank_account;
+        $this->walletsAreFrozen = $this->exchangeDisabled || $this->withdrawalDisabled;
 
-            if ($globalFreeze == 1) {
-                $this->frozenReason = 'Wallet operations are temporarily disabled for all users.';
-            } elseif ($walletStatus === 'disabled' || is_null($walletStatus)) {
-                $this->frozenReason = 'Wallet operations are currently disabled in your country.';
-            } elseif ($anyWalletFrozen) {
-                $this->frozenReason = 'One or more of your wallets are frozen. Please contact support.';
-            } elseif (!$user->is_verified) {
-                $this->frozenReason = 'Please complete all required verifications to enable withdrawals and exchanges.';
-            }
+        if ($globalFreeze) {
+            $this->frozenReason = 'Wallet operations are temporarily disabled for all users.';
+        } elseif ($countryFreeze) {
+            $this->frozenReason = 'Wallet operations are currently disabled in your country.';
+        } elseif (!$user->is_verified) {
+            $this->frozenReason = 'Please complete all required verifications to enable withdrawals and exchanges.';
+        } elseif (!$user->bank_account) {
+            $this->frozenReason = 'Please set up your bank account details in your profile to enable withdrawals.';
+        } elseif (!$withdrawalSettingsExist || !$walletSettingsExist) {
+            $this->frozenReason = 'Country settings are not properly configured. Please contact support.';
         }
 
         // Load withdrawal charges from country settings
@@ -155,12 +135,6 @@ class ListEarnings extends Component
         $this->calculateExchange();
     }
 
-    public function updated($propertyName)
-    {
-        if (in_array($propertyName, ['fromCurrency'])) {
-            $this->calculateExchange();
-        }
-    }
 
     private function calculateExchange()
     {
@@ -195,21 +169,7 @@ class ListEarnings extends Component
     }
 
     // Withdrawal methods
-    public function openWithdrawModal($currency)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $this->withdrawCurrency = $currency;
-        $wallet = $user->wallets()->where('currency', $currency)->first();
-        $this->availableBalance = $wallet ? $wallet->balance : 0;
-        $this->showWithdrawModal = true;
-    }
-
-    public function closeWithdrawModal()
-    {
-        $this->showWithdrawModal = false;
-        $this->reset(['withdrawCurrency', 'withdrawAmount', 'availableBalance', 'withdrawalFee', 'netAmount']);
-    }
+    
 
     public function updatedWithdrawAmount()
     {
@@ -243,7 +203,13 @@ class ListEarnings extends Component
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $wallet = $user->wallets()->where('currency', $this->withdrawCurrency)->first();
+
+        if (!$user->bank_account) {
+            session()->flash('error', 'Please set up your bank account details first.');
+            return;
+        }
+
+        $wallet = $user->wallets()->where('currency', $this->toCurrency)->first();
         
         if (!$wallet) {
             session()->flash('error', 'Wallet not found.');
@@ -266,10 +232,9 @@ class ListEarnings extends Component
         // Create withdrawal record
         $withdrawal = Withdrawal::create([
             'user_id' => $user->id,
-            'currency' => $this->withdrawCurrency,
+            'currency' => $this->toCurrency,
             'amount' => $this->withdrawAmount,
             'reference' => 'WD' . time() . $user->id,
-            'status' => 'pending',
             'meta' => [
                 'fee' => $this->withdrawalFee,
                 'net_amount' => $this->netAmount,
@@ -287,7 +252,6 @@ class ListEarnings extends Component
         $wallet->decrement('balance', $this->withdrawAmount);
         $wallet->increment('total_withdrawn', $this->withdrawAmount);
 
-        $this->closeWithdrawModal();
         session()->flash('message', 'Withdrawal request submitted successfully.');
     }
 
@@ -299,13 +263,6 @@ class ListEarnings extends Component
         $this->fromCurrency = $currency;
         $wallet = $user->wallets()->where('currency', $currency)->first();
         $this->exchangeAvailableBalance = $wallet ? $wallet->balance : 0;
-        $this->showExchangeModal = true;
-    }
-
-    public function closeExchangeModal()
-    {
-        $this->showExchangeModal = false;
-        $this->reset(['fromCurrency', 'amount', 'exchangeRate', 'targetAmount', 'exchangeAvailableBalance']);
     }
 
     public function getExchangeAmount()
@@ -373,7 +330,6 @@ class ListEarnings extends Component
         $fromWallet->decrement('balance', $this->amount);
         $toWallet->increment('balance', $this->targetAmount);
 
-        $this->closeExchangeModal();
         session()->flash('message', 'Currency exchange completed successfully.');
     }
 
@@ -382,23 +338,8 @@ class ListEarnings extends Component
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $wallets = $user->wallets;
-
-        // Eager load totals to avoid N+1 problem
-        $totalEarned = Settlement::where('user_id', $user->id)
-            ->groupBy('currency')
-            ->selectRaw('currency, sum(amount) as total')
-            ->pluck('total', 'currency');
-
-        $totalWithdrawn = Withdrawal::where('user_id', $user->id)
-            ->whereNotNull('paid_at')
-            ->groupBy('currency')
-            ->selectRaw('currency, sum(amount) as total')
-            ->pluck('total', 'currency');
-
-        foreach ($wallets as $wallet) {
-            $wallet->total_earned = $totalEarned[$wallet->currency] ?? 0;
-            $wallet->total_withdrawn = $totalWithdrawn[$wallet->currency] ?? 0;
-        }
+        $homeWallet = $wallets->where('currency', $this->toCurrency)->first();
+        $countrySetting = $user->country->setting ?? null;
 
         $settlements = Settlement::where('user_id', $user->id)
             ->with(['settlementable'])
@@ -413,12 +354,24 @@ class ListEarnings extends Component
             ->latest()
             ->paginate(10);
 
+        $totalWithdrawn = Withdrawal::where('user_id', $user->id)->whereNotNull('paid_at')->sum('amount');
+        $pendingWithdrawals = Withdrawal::where('user_id', $user->id)->whereNull('paid_at')->sum('amount');
+        $rejectedWithdrawals = Withdrawal::where('user_id', $user->id)->whereHas('moderations',function($query){$query->where('status', '!=', 'rejected');})->sum('amount');
+
         return view('livewire.list-earnings', [
             'wallets' => $wallets,
             'settlements' => $settlements,
             'withdrawals' => $withdrawals,
             'exchanges' => $exchanges,
-            'availableCurrencies' => $wallets->pluck('currency')->toArray()
+            'availableCurrencies' => $wallets->pluck('currency')->toArray(),
+            'homeWallet' => $homeWallet,
+            'homeCurrency' => $this->toCurrency,
+            'homeCurrencySymbol' => $this->toCurrencySymbol,
+            'otherWallets' => $wallets->where('currency', '!=', $this->toCurrency),
+            'countrySetting' => $countrySetting,
+            'totalWithdrawn' => $totalWithdrawn,
+            'pendingWithdrawals' => $pendingWithdrawals,
+            'rejectedWithdrawals' => $rejectedWithdrawals
         ]);
     }
 }

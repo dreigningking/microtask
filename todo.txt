@@ -1,116 +1,30 @@
-Job templates should show platform image
-
-Dispute submission review {
-    dispute resolution
-    dispute escalation
-    dispute timeline
-}
- 
 Refund notification & Earnings Notification sync
+if admin does not approve task,{
+    user will edit task || Funds Return to wallet? 
+} 
+Task approval
+Submission Review: Check submissions that should have been reviewed, if late, allow admin to review them
+Late Subsubmission Review Notification
 
-2. Admin Approve/Disapprove Task {
-    Approve Notification
-    Disapprove Notification
-    if admin does not approve task,{
-        user will edit task || Funds Return to wallet? 
-    } 
-}
+Broadcast Jobs: show number of emails to be sent.. let user reduce amount
+BroadcastJob Notification
 
-notifications
- - welcome
- - invitation
- - otp
- - booster subscription expiry
- - 
-
-8. Task review after payment (worker reviews task){
-    Task creator receives notification
-}
-----------------------------------------------------------------------
-
-
-
------------------------------------------------ 
-Notifications
----------------------------------------------
-Taskmaster{
-Job Approved
-    
-    Late Subsubmission Review Notification
-    Disbursement Notification if admin initiated it
-    
-}
-Worker{
-    BroadcastJob Notification
-    EarningNotification
-    Withdrawal Complete 
-    Exchange Complete 
-    
-}
-General{
-    Blog Subscription Notification 24hours after post creation
-    JobInvite
-    SupportReplyNotification
-    Verification Result
-    Subscription Expiring/Expiry
-}
-
-
----ADMIN Notification---
-TaskReportNotification
-Withdrawal Request 
-Support Notification - new, closed, 
-SupportEscalation
-Verification Request
-
-
------------------------------------------------------
-User
------------------------------------------------------
-Submit Task one time & multiple times
-
+Withdrawal Complete 
+Exchange Complete 
+Blog Subscription Notification 24hours after post creation
+JobInvite notification
+Referral notification
+Verification Result notification
+booster Subscription Expiring/Expiry notification
+Support Notification for admin - new, closed, 
+SupportReplyNotification
 vpn block
 Logs of activities e.g accepted terms
-
-
-
-JOBS
 refund taskmaster the admin-review fee is no intervention was found
-
 Featured Jobs - identify places to show featured jobs"
-worker subscription - add feature to receive notification from people you follow
-
-
 2factor
 ---------------------------------------------------------
-REVIEW
--------------------------------
-- task master review submission
-    - marks submission good 
-        - reviews submission/worker
-        - pays worker - agrees to terms
-        - user receives money in wallet
-        - user receives email: Task Submission Review - review + payment + advise for withdrawal + review taskmaster
-    - flags submission as bad
-        - admin receives flag notification
-        - admin checks submission
-            - admin bans user from taking task
-            - admin notifies task master to unflag the submission & pay worker
-            AdminToUserNotification
-    - Task master: minutes on submission & request something in addition to submission
-
-after job submission review - worker
-
-- worker reviews task & taskmaster
-- user raise dispute over task masters decision
-- admin & task master receives dispute email 
-- admin reviews dispute claims
-- admin judges and issues verdict
-- admin verdict is executed 
-    - pay worker and mark submission good
-    - mark submission bad & flag worker 
-
------------------------------------------------------
+REVIEW: review taskmaster
 Guest
 -----------------------------------------------------
 Top Earners

@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('task_dispute_trails', function (Blueprint $table) {
+        Schema::create('trails', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('task_dispute_id')->nullable();
+            $table->unsignedBigInteger('trailable_id');
+            $table->string('trailable_type');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('assigned_by')->nullable(); //
             $table->text('note')->nullable(); //
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('assigned_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('task_dispute_id')->references('id')->on('task_disputes')->onDelete('set null');
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('task_dispute_trails');
+        Schema::dropIfExists('trails');
     }
 };

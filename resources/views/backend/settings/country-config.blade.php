@@ -203,7 +203,7 @@
                                                             <label class="form-label">USD Exchange Rate Markup</label>
                                                             <div class="input-group">
                                                                 <span class="input-group-text">$1 +</span>
-                                                                <input type="number" class="form-control" name="usd_exchange_rate_percentage" value="{{ old('usd_exchange_rate_percentage', $settings->usd_exchange_rate_percentage) }}" step="0.0001">
+                                                                <input type="number" class="form-control" name="usd_exchange_rate" value="{{ old('usd_exchange_rate', $settings->usd_exchange_rate) }}" step="0.0001">
                                                                 <span class="input-group-text">%</span>
                                                                 @php
                                                                 $markup = old('usd_exchange_rate_percentage', $settings->usd_exchange_rate_percentage ?? 0);

@@ -148,7 +148,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="ri-group-line text-lg text-primary"></i>
-                        <span>{{ $selectedTask->workers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_submissions }} spots filled</span>
+                        <span>{{ $selectedtask->taskWorkers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_submissions }} spots filled</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="ri-time-line text-lg text-primary"></i>

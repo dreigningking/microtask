@@ -27,6 +27,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     [
                         'name' => 'Country Manager', 
@@ -40,6 +42,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     [
                         'name' => 'User Support', 
@@ -53,6 +57,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     [
                         'name' => 'Financial Analyst', 
@@ -66,6 +72,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     [
                         'name' => 'John Doe', 
@@ -79,6 +87,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     [
                         'name' => 'Bob Alice', 
@@ -92,6 +102,8 @@ class UsersSeeder extends Seeder
                         'is_active'=> 1,
                         'dashboard_view'=> 'tasks',
                         'two_factor_enabled'=> 1,
+                        'created_at'=> now(),
+                        'updated_at'=> now()
                     ],
                     // add more users where role_id is null. 
                     // add users with country_ids 233 (USA), 39 (Canada), 232 (UK), 161 (Nigeria), 113 (Kenya), 83 (Ghana), 101 (India), 14 (Australia)

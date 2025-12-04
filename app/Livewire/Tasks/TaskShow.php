@@ -14,7 +14,7 @@ use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 use App\Http\Traits\HelperTrait;
-use App\Models\TaskDisputeTrail;
+use App\Models\Trail;
 
 class TaskShow extends Component
 {
@@ -563,7 +563,7 @@ class TaskShow extends Component
             }
         }
         $dispute = TaskDispute::create(['task_submission_id'=> $this->disputeSubmissionId,'desired_outcome'=> $this->desiredOutcome]);
-        TaskDisputeTrail::create(['task_dispute_id'=> $dispute->id,'user_id'=> $this->getAdmin()->id]);
+        Trail::create(['trailable_id'=> $dispute->id,'trailable_type'=> get_class($dispute),'user_id'=> $this->getAdmin()->id]);
         $comment = Comment::create([
             'user_id'=> $this->user->id,
             'commentable_id'=> $dispute->id,

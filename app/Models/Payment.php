@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -38,6 +39,11 @@ class Payment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function getTotalAttribute(): float
+    {
+        return $this->amount + $this->vat_value;
     }
 
     /**
@@ -110,5 +116,18 @@ class Payment extends Model
     public function scopeByCurrency($query, $currency)
     {
         return $query->where('currency', $currency);
+    }
+
+    public function scopeLocalize($query)
+    {
+        if (Auth::user()->role->name == 'super-admin') {
+            return $query;
+        }
+
+        return $query->where(function ($q) {
+            $q->whereHas('user', function ($q) {
+                $q->where('country_id', Auth::user()->country_id);
+            });
+        });
     }
 }

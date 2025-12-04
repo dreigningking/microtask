@@ -4,7 +4,7 @@ namespace App\Livewire\Tasks;
 
 use App\Models\Support;
 use App\Models\Comment;
-use App\Models\TaskDisputeTrail;
+use App\Models\Trail;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Settlement;
@@ -95,8 +95,9 @@ class TaskSubmissionDispute extends Component
             'escalationNote' => 'nullable|string|max:1000',
         ]);
 
-        TaskDisputeTrail::create([
-            'task_dispute_id' => $this->dispute->id,
+        Trail::create([
+            'trailable_id' => $this->dispute->id,
+            'trailable_type' => get_class($this->dispute),
             'user_id' => $this->selectedStaff,
             'assigned_by' => Auth::id(),
             'note' => $this->escalationNote,

@@ -51,7 +51,7 @@ class EarningController extends Controller
         }
 
         // Country filter for super-admin users
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -62,7 +62,7 @@ class EarningController extends Controller
         
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->first_role->name === 'super-admin') {
+        if (Auth::user()->role->name === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
         $settlements = $query->orderBy('id', 'desc')->paginate(20);
@@ -105,7 +105,7 @@ class EarningController extends Controller
         }
 
         // Country filter for super-admin users
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -122,7 +122,7 @@ class EarningController extends Controller
         
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->first_role->name === 'super-admin') {
+        if (Auth::user()->role->name === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
 
@@ -165,7 +165,7 @@ class EarningController extends Controller
         }
 
         // Country filter for super-admin users
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -192,7 +192,7 @@ class EarningController extends Controller
         
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->first_role->name === 'super-admin') {
+        if (Auth::user()->role->name === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
 
@@ -234,7 +234,7 @@ class EarningController extends Controller
         // }
 
         // Country filter for super-admin users
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -251,7 +251,7 @@ class EarningController extends Controller
         
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->first_role->name === 'super-admin') {
+        if (Auth::user()->role->name === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
 

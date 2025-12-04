@@ -84,7 +84,7 @@
             </div>
         </div>
         @endif
-        @if($submission->reviewed_at && $submission->dispute)
+        @if($submission->reviewed_at && $submission->dispute && !$submission->accepted)
         <div class="alert alert-warning">
             <i class="bi bi-exclamation-triangle"></i> This submission is under dispute resolution.
             <div class="mt-1">

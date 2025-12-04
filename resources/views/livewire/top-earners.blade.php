@@ -49,7 +49,7 @@
                                     <i class="bi bi-star-fill"></i>
                                     <span class="text-muted ms-1">(4.9)</span>
                                 </div>
-                                <small class="text-muted">{{ $earner->task_workers_count }} tasks completed</small>
+                                <small class="text-muted">{{ $earner->taskWorkers_count }} tasks completed</small>
                             </div>
                             <div class="mb-3">
                                 <span class="skill-tag">Skill 1</span>
@@ -88,7 +88,7 @@
                                     <i class="bi bi-star-fill"></i>
                                     <span class="text-muted ms-1">(4.9)</span>
                                 </div>
-                                <small class="text-muted">{{ $earner->task_workers_count }} tasks completed</small>
+                                <small class="text-muted">{{ $earner->taskWorkers_count }} tasks completed</small>
                             </div>
                             <div class="mb-3">
                                 <span class="skill-tag">Skill 1</span>

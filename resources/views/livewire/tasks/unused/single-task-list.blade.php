@@ -21,13 +21,13 @@
                 <p class="text-muted mb-2">{{ $task->user->username }}</p>
                 <div class="d-flex flex-wrap mb-3">
                     <span class="text-muted me-3 mb-1">
-                        <i class="fas fa-tasks me-1"></i>{{ $task->template->name ?? 'N/A' }}
+                        <i class="fas fa-tasks me-1"></i>{{ $task->platformTemplate->name ?? 'N/A' }}
                     </span>
                     <span class="text-muted me-3 mb-1">
                         <i class="fas fa-clock me-1"></i>{{ $task->created_at->diffForHumans() }}
                     </span>
                     <span class="text-muted mb-1">
-                        <i class="fas fa-users me-1"></i>{{ $task->workers->whereNotNull('accepted_at')->count() }}/{{ $task->number_of_submissions }}
+                        <i class="fas fa-users me-1"></i>{{ $task->taskWorkers->whereNotNull('accepted_at')->count() }}/{{ $task->number_of_submissions }}
                     </span>
                 </div>
                 <p class="text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">

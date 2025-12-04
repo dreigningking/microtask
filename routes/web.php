@@ -36,15 +36,14 @@ use App\Livewire\Policies\PaymentDisputeChargebacks;
 
 
 Route::get('run', function () {
-    $moderations = \App\Models\Moderation::all();
-    foreach($moderations as $moderation){
-        $moderation->moderator_id = 2;
-        $moderation->moderated_at = now();
-        $moderation->status = 'approved';
-        $moderation->save();
+    $permissions = \App\Models\Permission::all();
+    foreach($permissions as $permission){
+        $permission->slug = strtolower(explode(' ',$permission->name)[0]).'_'.strtolower(explode(' ',$permission->name)[1]);
+        $permission->save();
     }
     return 'done';
 });
+// Route::get('payment/test', [PaymentController::class, 'test']);
 
 Route::get('/', Welcome::class)->name('index');
 Route::get('about', AboutPage::class)->name('about');

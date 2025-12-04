@@ -1,18 +1,16 @@
 <?php
 namespace App\Http\Traits;
-use App\Models\Coupon;
+
 use App\Models\Payment;
 use App\Models\Settlement;
-use App\Models\PaymentItem;
-use App\Http\Traits\OrderTrait;
 use App\Http\Traits\PaypalTrait;
 use App\Http\Traits\PaystackTrait;
 use App\Http\Traits\FlutterwaveTrait;
-use App\Models\BankAccount;
+use App\Http\Traits\StripeTrait;
 
 trait PaymentTrait
 {
-    use PaystackTrait,FlutterwaveTrait,PaypalTrait;
+    use PaystackTrait,FlutterwaveTrait,PaypalTrait,StripeTrait;
 
     public function initializePayment(Payment $payment){
         switch($payment->gateway){
@@ -32,7 +30,7 @@ trait PaymentTrait
                 return $result;
             break;
             case 'stripe': $link = $this->initiateStripe($payment);
-                return true;
+                return $link;
             break;
             default: return false;
         }
@@ -82,7 +80,11 @@ trait PaymentTrait
                         'amount'=> $details->purchase_units[0]->payments->captures[0]->amount->value,
                         ];
             break;
-            case 'stripe': $details =  $this->verifyStripePayment($payment->reference);
+            case 'stripe': $details =  $this->verifyStripePayment($payment->request_id);
+                        return ['status'=> $details->payment_status == 'paid'? true:false,
+                        'trx_status'=> $details->status == 'complete' ? 'success':'failed',
+                        'amount'=> $details->amount_total,
+                        ];
             break;
         }
     }
@@ -97,10 +99,10 @@ trait PaymentTrait
                 return $this->banksByFlutter($country);
             break;
             case 'paypal': 
-                return $this->banksByPaypal($country);
+                return false;
             break;
             case 'stripe':
-                return $this->banksByStripe($country);
+                return false;
             break;
             default: return false;
         }

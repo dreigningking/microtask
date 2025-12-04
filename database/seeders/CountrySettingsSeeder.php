@@ -48,7 +48,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 5.0, 'task_referral_commission_percentage' => 3.0],
                 'review_settings' => ['admin_review_cost' => 0.50, 'system_review_cost' => 0.25],
                 'security_settings' => [
@@ -86,7 +86,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 5.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 5.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.5, 'task_referral_commission_percentage' => 2.8],
                 'review_settings' => ['admin_review_cost' => 0.45, 'system_review_cost' => 0.22],
                 'security_settings' => [
@@ -124,7 +124,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 10.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 10.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.0, 'task_referral_commission_percentage' => 2.5],
                 'review_settings' => ['admin_review_cost' => 0.40, 'system_review_cost' => 0.20],
                 'security_settings' => [
@@ -162,7 +162,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => true
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 15.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 15.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 3.0, 'task_referral_commission_percentage' => 2.0],
                 'review_settings' => ['admin_review_cost' => 50.00, 'system_review_cost' => 25.00],
                 'security_settings' => [
@@ -200,7 +200,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => false,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 20.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 20.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.5, 'task_referral_commission_percentage' => 1.5],
                 'review_settings' => ['admin_review_cost' => 25.00, 'system_review_cost' => 12.50],
                 'security_settings' => [
@@ -238,7 +238,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => false,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 18.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 18.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.0, 'task_referral_commission_percentage' => 1.25],
                 'review_settings' => ['admin_review_cost' => 20.00, 'system_review_cost' => 10.00],
                 'security_settings' => [
@@ -276,7 +276,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 22.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 22.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.75, 'task_referral_commission_percentage' => 1.75],
                 'review_settings' => ['admin_review_cost' => 10.00, 'system_review_cost' => 5.00],
                 'security_settings' => [
@@ -314,7 +314,7 @@ class CountrySettingsSeeder extends Seeder
                     'weekend_payout' => true,
                     'holiday_payout' => false
                 ],
-                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate_percentage' => 8.0],
+                'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 8.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.25, 'task_referral_commission_percentage' => 2.75],
                 'review_settings' => ['admin_review_cost' => 0.55, 'system_review_cost' => 0.28],
                 'security_settings' => [

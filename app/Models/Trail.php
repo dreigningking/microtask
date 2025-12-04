@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TaskDisputeTrail extends Model
+class Trail extends Model
 {
     protected $fillable = [
-        'task_dispute_id',
+        'trailable_id',
+        'trailable_type',
         'user_id',
         'assigned_by',
         'note',

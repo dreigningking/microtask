@@ -54,6 +54,8 @@ class User extends Authenticatable
         'ban_expires_at',
         'ban_reason',
         'banned_by',
+        'created_at',
+        'updated_at'
     ];
 
     /**
@@ -384,7 +386,7 @@ class User extends Authenticatable
         }
 
         // Fetch all user verifications (approved) and key by document_name
-        $approvedVerifications = $this->hasMany(\App\Models\UserVerification::class)
+        $approvedVerifications = $this->hasMany(UserVerification::class)
             ->where('status', 'approved')
             ->get()
             ->keyBy('document_name');
@@ -436,13 +438,8 @@ class User extends Authenticatable
         if (!$requirements || !is_array($requirements)) {
             return false;
         }
-
         // Fetch all user verifications (approved) and key by document_name
-        $approvedVerifications = $this->hasMany(\App\Models\UserVerification::class)
-            ->where('status', 'approved')
-            ->get()
-            ->keyBy('document_name');
-
+        
         foreach ($requirements as $docType => $req) {
             $docs = $req['docs'] ?? [];
             $mode = $req['mode'] ?? 'all';
@@ -466,6 +463,18 @@ class User extends Authenticatable
                 if (!$hasOne) {
                     return false;
                 }
+            }
+        }
+        if($this->userVerifications()->count() == 0){
+            return false;
+        }
+        $userVerifications = $this->userVerifications();
+        foreach($userVerifications as $uv){
+            if(!$uv->moderations->isEmpty()){
+                return false;
+            }
+            if($uv->moderations->where('status','approved')->isEmpty()){
+                return false;
             }
         }
         return true;

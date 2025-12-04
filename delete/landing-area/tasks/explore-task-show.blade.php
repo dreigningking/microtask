@@ -19,7 +19,7 @@
                         </span>
                         <span class="d-flex align-items-center gap-2">
                             <i class="fas fa-tasks text-primary"></i>
-                            <span>{{ $task->template->name ?? 'N/A' }}</span>
+                            <span>{{ $task->platformTemplate->name ?? 'N/A' }}</span>
                         </span>
                         <span class="d-flex align-items-center gap-2">
                             <i class="fas fa-clock text-primary"></i>
@@ -55,9 +55,9 @@
                     <!-- Submission Fields -->
                     <div class="mb-4">
                         <h3 class="h5 fw-semibold text-dark mb-3">Submission Requirements</h3>
-                        @if($task->template && $task->template->submission_fields)
+                        @if($task->platformTemplate && $task->platformTemplate->submission_fields)
                             <ul class="list-unstyled text-muted">
-                                @foreach($task->template->submission_fields as $field)
+                                @foreach($task->platformTemplate->submission_fields as $field)
                                     <li class="mb-2">
                                         <i class="fas fa-arrow-right text-primary me-2"></i>
                                         {{ $field['title'] }}
@@ -127,7 +127,7 @@
                     <div class="row g-3">
                         <div class="col-6">
                             <div class="text-center p-3 bg-light rounded">
-                                <div class="h4 fw-bold text-primary mb-1">{{ $task->workers->whereNotNull('accepted_at')->count() }}</div>
+                                <div class="h4 fw-bold text-primary mb-1">{{ $task->taskWorkers->whereNotNull('accepted_at')->count() }}</div>
                                 <div class="small text-muted">Enrolled</div>
                             </div>
                         </div>

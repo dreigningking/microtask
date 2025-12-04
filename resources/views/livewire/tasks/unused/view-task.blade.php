@@ -90,7 +90,7 @@
                     </div>
                     <h3 class="fw-bold mb-0">
                         @php
-                        $acceptedWorkersCount = $taskWorker->task->workers->whereNotNull('accepted_at')->count();
+                        $acceptedWorkersCount = $taskWorker->task->taskWorkers->whereNotNull('accepted_at')->count();
                         $peopleRemaining = $taskWorker->task->number_of_submissions - $acceptedWorkersCount;
                         @endphp
                         {{ $peopleRemaining > 0 ? $peopleRemaining : 'None' }}
@@ -125,7 +125,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted mb-2">Template</h6>
-                            <p class="fw-semibold mb-0">{{ $taskWorker->task->template->name ?? 'N/A' }}</p>
+                            <p class="fw-semibold mb-0">{{ $taskWorker->task->platformTemplate->name ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted mb-2">Expected Time</h6>

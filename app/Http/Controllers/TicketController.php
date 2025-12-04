@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Trail;
 use App\Models\Support;
 use App\Models\Permission;
+use App\Models\TaskDispute;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -141,9 +142,10 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function disputes()
     {
-        //
+        $disputes = TaskDispute::orderBy('resolved_at','asc')->get();
+        return view('backend.support.disputes.list',compact('disputes'));
     }
 
     /**

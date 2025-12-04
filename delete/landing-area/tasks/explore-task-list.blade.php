@@ -170,7 +170,7 @@
                             </div>
                             <div class="d-flex align-items-center mb-2">
                                 <i class="fas fa-users text-primary me-2"></i>
-                                <span>{{ $selectedTask->workers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_submissions }} spots filled</span>
+                                <span>{{ $selectedtask->taskWorkers->whereNotNull('accepted_at')->count() }} of {{ $selectedTask->number_of_submissions }} spots filled</span>
                             </div>
                         </div>
                         <div class="col-md-6">

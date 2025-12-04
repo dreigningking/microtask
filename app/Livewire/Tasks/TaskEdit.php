@@ -250,7 +250,7 @@ class TaskEdit extends Component
         $this->isPaid = $payment && $payment->status === 'success';
         
         // Check if task has workers
-        $this->hasWorkers = $this->task->workers()->count() > 0;
+        $this->hasWorkers = $this->task->taskWorkers()->count() > 0;
 
         // Determine edit permissions - jobs can only be edited if not paid for
         if (!$this->isPaid) {

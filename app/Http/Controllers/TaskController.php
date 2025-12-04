@@ -38,7 +38,7 @@ class TaskController extends Controller
         }
 
         // Country filter (only for super admins)
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -117,7 +117,7 @@ class TaskController extends Controller
      */
     public function submissions(Request $request)
     {
-        $query = TaskSubmission::with(['task.user', 'task.platform', 'user', 'task_worker']);
+        $query = TaskSubmission::with(['task.user', 'task.platform', 'user', 'taskWorker']);
 
         // Apply localization scope (country filter for non-super admins)
         $query->whereHas('task', function($q) {
@@ -242,7 +242,7 @@ class TaskController extends Controller
             });
         }
 
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });

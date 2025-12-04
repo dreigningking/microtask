@@ -20,6 +20,11 @@ class Platform extends Model
         'is_active' => 'boolean',
     ];
 
+    // public function getImageAttribute($value)
+    // {
+    //     return $value ? config('app.url').'storage/platforms/'.$value : null;
+    // }
+
     /**
      * Get all platform templates for this platform
      */

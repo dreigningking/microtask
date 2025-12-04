@@ -269,7 +269,7 @@ class Task extends Model
 
     public function scopeLocalize($query)
     {
-        if (Auth::user()->first_role->name == 'super-admin') {
+        if (Auth::user()->role->name == 'super-admin') {
             return $query;
         }
 

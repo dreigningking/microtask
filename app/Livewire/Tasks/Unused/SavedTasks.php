@@ -99,10 +99,10 @@ class SavedTasks extends Component
                 $query->oldest();
                 break;
             case 'budget_desc':
-                $query->orderBy(Task::select('budget_per_submission')->whereColumn('tasks.id', 'task_workers.task_id'), 'desc');
+                $query->orderBy(Task::select('budget_per_submission')->whereColumn('tasks.id', 'taskWorkers.task_id'), 'desc');
                 break;
             case 'budget_asc':
-                $query->orderBy(Task::select('budget_per_submission')->whereColumn('tasks.id', 'task_workers.task_id'), 'asc');
+                $query->orderBy(Task::select('budget_per_submission')->whereColumn('tasks.id', 'taskWorkers.task_id'), 'asc');
                 break;
         }
 

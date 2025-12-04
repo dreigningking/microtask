@@ -15,6 +15,12 @@ class PaymentController extends Controller
         
     }
 
+    // public function test(){
+    //     $payment = Payment::find(8);
+    //     $link = $this->initiateStripe($payment);
+    //     return redirect()->to($link);
+    // }
+
     public function paymentcallback(){       
         $user = auth()->user();
         //dd(request()->query());
@@ -35,7 +41,7 @@ class PaymentController extends Controller
             }else \abort(404);
         }
         $details = $this->verifyPayment($payment);
-        if(!$details['status'] || $details['trx_status'] != 'success' || $details['amount'] < $payment->amount){
+        if(!$details['status'] || $details['trx_status'] != 'success' || $details['amount'] < $payment->total){
             if(request()->expectsJson()){
                 return response()->json([
                     'status' => false,

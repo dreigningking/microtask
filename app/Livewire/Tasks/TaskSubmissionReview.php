@@ -83,7 +83,7 @@ class TaskSubmissionReview extends Component
 
     public function viewSubmissionDetails($submissionId)
     {
-        $this->selectedSubmission = $this->task->taskSubmissions()->with('task_worker.user')->find($submissionId);
+        $this->selectedSubmission = $this->task->taskSubmissions()->with('taskWorker.user')->find($submissionId);
         $this->reset(['reviewReason', 'reviewText']);
         $this->dispatch('openSubmissionDetailsModal');
     }

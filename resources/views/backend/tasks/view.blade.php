@@ -10,7 +10,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.tasks.applied') }}">Tasks</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.tasks.index') }}">Tasks</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ $task->title }}</li>
                 </ol>
             </nav>
@@ -101,7 +101,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h1 class="mt-1 mb-3">{{ $task->workers->count() }} / {{ $task->number_of_submissions }}</h1>
+                        <h1 class="mt-1 mb-3">{{ $task->taskWorkers->count() }} / {{ $task->number_of_submissions }}</h1>
                         <div class="mb-0">
                             <span class="text-muted">Positions filled</span>
                         </div>
@@ -162,17 +162,17 @@
                             </div>
                         </div>
                         @php
-                            $completedWorkers = $task->workers->filter(function($worker) {
+                            $completedWorkers = $task->taskWorkers->filter(function($worker) {
                                 return $worker->completed_at !== null;
                             })->count();
                             
-                            $completionRate = $task->workers->count() > 0 
-                                ? round(($completedWorkers / $task->workers->count()) * 100) 
+                            $completionRate = $task->taskWorkers->count() > 0 
+                                ? round(($completedWorkers / $task->taskWorkers->count()) * 100) 
                                 : 0;
                         @endphp
                         <h1 class="mt-1 mb-3">{{ $completionRate }}%</h1>
                         <div class="mb-0">
-                            <span class="text-muted">{{ $completedWorkers }} completed out of {{ $task->workers->count() }}</span>
+                            <span class="text-muted">{{ $completedWorkers }} completed out of {{ $task->taskWorkers->count() }}</span>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <span class="text-muted">Template</span>
-                                                        <span class="text-body">{{ $task->template->name }}</span>
+                                                        <span class="text-body">{{ $task->platformTemplate->name }}</span>
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <span class="text-muted">Status</span>
@@ -372,12 +372,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if($task->workers->isEmpty())
+                                            @if($task->taskWorkers->isEmpty())
                                                 <tr>
                                                     <td colspan="7" class="text-center">No workers assigned to this task yet.</td>
                                                 </tr>
                                             @else
-                                                @foreach($task->workers as $worker)
+                                                @foreach($task->taskWorkers as $worker)
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
@@ -431,13 +431,13 @@
                                 
                                 <h4 class="card-title mt-5 mb-4">Submissions</h4>
                                 
-                                @if($task->workers->whereNotNull('submitted_at')->isEmpty())
+                                @if($task->taskWorkers->whereNotNull('submitted_at')->isEmpty())
                                     <div class="alert alert-info">
                                         No submissions have been made for this task yet.
                                     </div>
                                 @else
                                     <div class="row">
-                                        @foreach($task->workers->whereNotNull('submitted_at') as $worker)
+                                        @foreach($task->taskWorkers->whereNotNull('submitted_at') as $worker)
                                             <div class="col-md-6 mb-4">
                                                 <div class="card">
                                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -546,7 +546,7 @@
                                                     <div class="card-body p-3">
                                                         <h6 class="card-subtitle text-muted mb-1">Total Paid</h6>
                                                         @php
-                                                            $totalPaid = $task->workers->whereNotNull('paid_at')->count() * $task->budget_per_submission;
+                                                            $totalPaid = $task->taskWorkers->whereNotNull('paid_at')->count() * $task->budget_per_submission;
                                                         @endphp
                                                         <h3 class="mb-0">{{ $task->currency }} {{ $totalPaid }}</h3>
                                                     </div>
@@ -568,12 +568,12 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @if($task->workers->isEmpty())
+                                                    @if($task->taskWorkers->isEmpty())
                                                         <tr>
                                                             <td colspan="6" class="text-center">No payment records for this task yet.</td>
                                                         </tr>
                                                     @else
-                                                        @foreach($task->workers as $worker)
+                                                        @foreach($task->taskWorkers as $worker)
                                                         <tr>
                                                             <td>
                                                                 <div class="d-flex align-items-center">
@@ -605,7 +605,7 @@
                                         </div>
                                         
                                         @php
-                                            $completedUnpaidWorkers = $task->workers->filter(function($worker) {
+                                            $completedUnpaidWorkers = $task->taskWorkers->filter(function($worker) {
                                                 return $worker->taskSubmissions->whereNotNull('completed_at')->isNotEmpty() && 
                                                        $worker->taskSubmissions->whereNotNull('paid_at')->isEmpty();
                                             });

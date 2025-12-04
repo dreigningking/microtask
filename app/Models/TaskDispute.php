@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Trail;
 use App\Models\Comment;
-use App\Models\TaskDisputeTrail;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -33,15 +34,16 @@ class TaskDispute extends Model
     /**
      * Get all dispute trails (comments) for this dispute
      */
-    public function latestTrail()
+    public function latestTrail(): MorphOne
     {
-        return $this->hasOne(TaskDisputeTrail::class)->latestOfMany();
+        return $this->morphOne(Trail::class,'trailable')->latestOfMany();
     }
     
-    public function disputeTrails()
+    
+    public function trails(): MorphMany
     {
         
-        return $this->hasMany(TaskDisputeTrail::class);
+        return $this->morphMany(Trail::class,'trailable');
     }
 
     public function comments(): MorphMany
@@ -81,7 +83,7 @@ class TaskDispute extends Model
                 break;
             case 'resubmission': return 'Worker is seeking resubmission of work';
                 break;
-            default: return 'Not prodived';
+            default: return 'Not provided';
         }
         
     }
@@ -94,7 +96,7 @@ class TaskDispute extends Model
                 break;
             case 'resubmission': return 'Worker was granted resubmission of task';
                 break;
-            default: return 'Not prodived';
+            default: return 'Not provided';
         }
         
     }

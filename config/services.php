@@ -42,6 +42,10 @@ return [
         'secret'=> env('PAYSTACK_SECRET'),
         'public'=> env('PAYSTACK_PUBLIC'),
     ],
+    'stripe'=>[
+        'secret'=> env('STRIPE_SECRET'),
+        // 'public'=> env('STRIPE_PUBLIC'),
+    ],
     'paypal'=>[
         'secret'=> env('PAYPAL_SECRET'),
         'client'=> env('PAYPAL_CLIENT'),

@@ -131,7 +131,7 @@
                                         <tbody>
                                             @foreach($roles as $role)
                                             <tr>
-                                                <td>{{ $role->description }}</td>
+                                                <td>{{ $role->name }}</td>
                                                 <td>
                                                     @foreach($role->permissions as $perm)
                                                     <span class="badge badge-info">{{ $perm->name }}</span>
@@ -169,7 +169,7 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <label for="addRoleName">Role Name</label>
-                                                <input type="text" class="form-control" id="addRoleName" name="description" required>
+                                                <input type="text" class="form-control" id="addRoleName" name="name" required>
                                             </div>
                                             <div class="form-group">
                                                 <label>Permissions</label>
@@ -210,7 +210,7 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <label for="editRoleName{{ $role->id }}">Role Name</label>
-                                                <input type="text" class="form-control" id="editRoleName{{ $role->id }}" name="description" value="{{ $role->description }}" required>
+                                                <input type="text" class="form-control" id="editRoleName{{ $role->id }}" name="name" value="{{ $role->name }}" required>
                                             </div>
                                             <div class="form-group">
                                                 <label>Permissions</label>
@@ -331,9 +331,9 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $user->email }}</td>
-                                                <td>{{ $user->first_role->name ?? '-' }}</td>
+                                                <td>{{ $user->role->name ?? '-' }}</td>
                                                 <td>
-                                                    @if($user->first_role && $user->first_role->id == 1)
+                                                    @if($user->role && $user->role->id == 1)
                                                     Global
                                                     @elseif($user->country)
                                                     {{ $user->country->name }}

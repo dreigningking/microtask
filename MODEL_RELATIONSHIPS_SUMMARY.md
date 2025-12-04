@@ -125,7 +125,7 @@ These relationships are typically used when you want to access a model through a
 - `task->taskWorkers()` - Task hasMany TaskWorker
 - `taskWorker->taskSubmissions()` - TaskWorker hasMany TaskSubmission
 - `taskSubmission->taskDispute()` - TaskSubmission hasOne TaskDispute
-- `taskDispute->disputeTrails()` - TaskDispute hasMany TaskDisputeTrail
+- `taskDispute->trails()` - TaskDispute hasMany Trail
 
 ### Order-Payment-Fulfillment Chain  
 - `order->orderItems()` - Order hasMany OrderItem

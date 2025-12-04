@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booster;
 use App\Models\Role;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Booster;
 use App\Models\Country;
 use App\Models\Setting;
 use App\Models\Platform;
 use App\Models\Permission;
 use Illuminate\Support\Str;
-use App\Models\TaskTemplate;
 use Illuminate\Http\Request;
+use App\Models\PlatformTemplate;
 use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
@@ -26,7 +26,7 @@ class SettingController extends Controller
         $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
         // Load users who have at least one role
-        $staff = User::whereHas('roles')->with('roles')->get();
+        $staff = User::whereNotNull('role_id')->with('role')->get();
         $countries = Country::all();
         return view('backend.settings.index', compact('settings', 'roles', 'permissions', 'staff','countries'));
     }
@@ -86,10 +86,10 @@ class SettingController extends Controller
     public function storeRole(Request $request)
     {
         $data = $request->validate([
-            'description' => 'required|string|unique:roles,description',
+            'name' => 'required|string|unique:roles,name',
             'permissions' => 'array',
         ]);
-        $role = Role::create(['description' => $data['description']]);
+        $role = Role::create(['name' => $data['name']]);
         if (!empty($data['permissions'])) {
             $role->permissions()->sync($data['permissions']);
         }
@@ -99,10 +99,10 @@ class SettingController extends Controller
     public function updateRole(Request $request, Role $role)
     {
         $data = $request->validate([
-            'description' => 'required|string|unique:roles,description,' . $role->id,
+            'name' => 'required|string|unique:roles,name,' . $role->id,
             'permissions' => 'array',
         ]);
-        $role->update(['description' => $data['description']]);
+        $role->update(['name' => $data['name']]);
         $role->permissions()->sync($data['permissions'] ?? []);
         return back()->with('success', 'Role updated successfully.');
     }
@@ -115,7 +115,7 @@ class SettingController extends Controller
 
     public function templates()
     {
-        $templates = TaskTemplate::orderBy('name','asc')->get();
+        $templates = PlatformTemplate::orderBy('name','asc')->get();
         $platforms = Platform::orderBy('name','asc')->get();
         return view('backend.settings.templates', compact('templates','platforms'));
     }
@@ -168,7 +168,7 @@ class SettingController extends Controller
         }
 
         // Create new template
-        $template = new TaskTemplate();
+        $template = new PlatformTemplate();
         $template->name = $request->name;
         $template->platform_id = $request->platform_id;
         $template->description = $request->description;
@@ -186,7 +186,7 @@ class SettingController extends Controller
     public function update_templates(Request $request)
     {
         // Find the template
-        $template = TaskTemplate::findOrFail($request->id);
+        $template = PlatformTemplate::findOrFail($request->id);
         
         // Validate request data
         $request->validate([
@@ -247,7 +247,7 @@ class SettingController extends Controller
      */
     public function destroy_templates(Request $request)
     {
-        $template = TaskTemplate::findOrFail($request->id);
+        $template = PlatformTemplate::findOrFail($request->id);
         
         // Check if the template is being used by any tasks
         $tasksUsingTemplate = Task::where('template_id', $template->id)->count();

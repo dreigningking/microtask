@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Traits;
 
-use App\Models\Payout;
+use App\Models\Withdrawal;
 use App\Models\Payment;
 use App\Models\Settlement;
 use Ixudra\Curl\Facades\Curl;
@@ -122,46 +122,46 @@ trait PaypalTrait
     }
     
 
-    protected function payoutPaypal(Payout $payout){
+    protected function withdrawalPaypal(Withdrawal $withdrawal){
         $token = cache('paypal_token');
         if(!$token){
             $token = $this->get_token();
         }
-        $response = Curl::to('https://api-m.sandbox.paypal.com/v1/payments/payouts')
+        $response = Curl::to('https://api-m.sandbox.paypal.com/v1/payments/withdrawals')
         ->withHeader('Authorization: Bearer '.$token)
         ->withHeader('Content-Type: application/json')
         ->withData( 
             [
                 'sender_batch_header'=> [
-                    "sender_batch_id"=> 'Payoutz_'.$payout->reference,
-                    "email_subject"=> "You have a payout!",
-                    "email_message"=> "You have received a withdrawal payout! Thanks for using our service!"
+                    "sender_batch_id"=> 'Withdrawalz_'.$withdrawal->reference,
+                    "email_subject"=> "You have a withdrawal!",
+                    "email_message"=> "You have received a withdrawal withdrawal! Thanks for using our service!"
                 ],
                 "items"=> [
                     [
                       "recipient_type"=> "EMAIL",
                       "amount"=> [
-                        "value"=> $payout->amount,
-                        "currency"=> $payout->currency->iso
+                        "value"=> $withdrawal->amount,
+                        "currency"=> $withdrawal->currency->iso
                       ],
                       "note"=> "Thanks for your patronage!",
-                      "sender_item_id"=> $payout->reference,
-                      "receiver"=> $payout->user->payout_account,
+                      "sender_item_id"=> $withdrawal->reference,
+                      "receiver"=> $withdrawal->user->withdrawal_account,
                     ]
                   ]
             ])
         ->asJson()                
         ->post();
         if($response &&  isset($response->batch_header)){
-            $payout->transfer_id = $response->batch_header->payout_batch_id;
-            $payout->save();
+            $withdrawal->transfer_id = $response->batch_header->withdrawal_batch_id;
+            $withdrawal->save();
             return true;
         }
         return false;
     }
 
-    protected function verifyPayoutPaypal(Payout $payout){
-      $response = Curl::to("https://api.paystack.co/transfer/verify/$payout->reference")
+    protected function verifyWithdrawalPaypal(Withdrawal $withdrawal){
+      $response = Curl::to("https://api.paystack.co/transfer/verify/$withdrawal->reference")
           ->withHeader('Authorization: Bearer '.config('services.paystack.secret'))
           ->asJson()
           ->get();
@@ -170,8 +170,8 @@ trait PaypalTrait
     
     
 
-    protected function retryPayoutPaypal(Payout $payout){
-        $response = Curl::to("https://api.paystack.com/v3/transfers/$payout->transfer_id/retries")
+    protected function retryWithdrawalPaypal(Withdrawal $withdrawal){
+        $response = Curl::to("https://api.paystack.com/v3/transfers/$withdrawal->transfer_id/retries")
             ->withHeader('Authorization: Bearer '.config('services.flutter.secret'))
             ->asJson()
             ->get();

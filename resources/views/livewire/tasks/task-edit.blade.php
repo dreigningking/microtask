@@ -66,7 +66,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="template_id" class="form-label fw-medium mb-1">Task Template</label>
-                        <input type="text" value="{{ $task->template->name ?? 'N/A' }}" class="form-control bg-light" readonly>
+                        <input type="text" value="{{ $task->platformTemplate->name ?? 'N/A' }}" class="form-control bg-light" readonly>
                         <div class="form-text">Template cannot be changed</div>
                     </div>
                     <div class="col-md-6">

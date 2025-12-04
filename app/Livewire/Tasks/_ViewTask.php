@@ -37,11 +37,11 @@ class ViewTask extends Component
     public function mount($task)
     {
         $this->task = $task->load(['user.country', 'platform', 'template', 'workers']);
-        $this->taskWorker = $this->task->workers->firstWhere('user_id', Auth::id());
+        $this->taskWorker = $this->task->taskWorkers->firstWhere('user_id', Auth::id());
         
         // Initialize submission fields if they exist in the template
-        if ($this->task->template && $this->task->template->submission_fields) {
-            $this->submissionFields = $this->task->template->submission_fields;
+        if ($this->task->platformTemplate && $this->task->platformTemplate->submission_fields) {
+            $this->submissionFields = $this->task->platformTemplate->submission_fields;
         }
         
         // Initialize submittedData with existing values
@@ -178,7 +178,7 @@ class ViewTask extends Component
         }
 
         // Check if task is still available (not full)
-        $acceptedWorkersCount = $this->task->workers->count();
+        $acceptedWorkersCount = $this->task->taskWorkers->count();
         if ($acceptedWorkersCount >= $this->task->number_of_submissions) {
             session()->flash('error', 'This task is full and cannot be started.');
             return;
@@ -317,7 +317,7 @@ class ViewTask extends Component
     {
         $submissions = collect();
         if ($this->taskWorker) {
-            $submissions = TaskSubmission::where('task_worker_id', $this->taskWorker->id)
+            $submissions = TaskSubmission::where('taskWorker_id', $this->taskWorker->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }

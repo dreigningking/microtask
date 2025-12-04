@@ -136,7 +136,7 @@
 						<h5 class="card-title">Search & Filters</h5>
 					</div>
 					<div class="card-body">
-						<form method="GET" action="{{ route('admin.tasks.applied') }}" id="taskFiltersForm">
+						<form method="GET" action="{{ route('admin.tasks.index') }}" id="taskFiltersForm">
 							<div class="row g-3">
 								<!-- Search Input -->
 								<div class="col-md-4">
@@ -146,7 +146,7 @@
 								</div>
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->first_role->name === 'super-admin')
+								@if(auth()->user()->role->name === 'super-admin')
 								<div class="col-md-3">
 									<label for="country_id" class="form-label">Country</label>
 									<select class="form-select" id="country_id" name="country_id">
@@ -249,7 +249,7 @@
 										<button type="submit" class="btn btn-primary" id="applyFiltersBtn">
 											<i class="ri-search-line me-1"></i>Apply Filters
 										</button>
-										<a href="{{ route('admin.tasks.applied') }}" class="btn btn-secondary">
+										<a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary">
 											<i class="ri-refresh-line me-1"></i>Clear Filters
 										</a>
 										<button type="button" class="btn btn-outline-info" id="exportBtn">
@@ -276,16 +276,16 @@
 							@if(request('search'))
 							<span class="badge bg-primary d-flex align-items-center gap-1 quick-filter-badge">
 								Search: "{{ request('search') }}"
-								<a href="{{ route('admin.tasks.applied', request()->except('search')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except('search')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
 							@endif
 
-							@if(request('country_id') && auth()->user()->first_role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.applied', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -294,7 +294,7 @@
 							@if(request('platform_id'))
 							<span class="badge bg-success d-flex align-items-center gap-1 quick-filter-badge">
 								Platform: {{ $platforms->firstWhere('id', request('platform_id'))->name ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.applied', request()->except('platform_id')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except('platform_id')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -303,7 +303,7 @@
 							@if(request('review_type'))
 							<span class="badge bg-warning d-flex align-items-center gap-1 quick-filter-badge">
 								Review: {{ $reviewTypes[request('review_type')] ?? 'Unknown' }}
-								<a href="{{ route('admin.tasks.applied', request()->except('review_type')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except('review_type')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -312,7 +312,7 @@
 							@if(request('status'))
 							<span class="badge bg-secondary d-flex align-items-center gap-1 quick-filter-badge">
 								Status: {{ ucfirst(str_replace('_', ' ', request('status'))) }}
-								<a href="{{ route('admin.tasks.applied', request()->except('status')) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except('status')) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -321,7 +321,7 @@
 							@if(request('date_from') || request('date_to'))
 							<span class="badge bg-dark d-flex align-items-center gap-1 quick-filter-badge">
 								Date: {{ request('date_from', 'Any') }} to {{ request('date_to', 'Any') }}
-								<a href="{{ route('admin.tasks.applied', request()->except(['date_from', 'date_to'])) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except(['date_from', 'date_to'])) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
@@ -330,13 +330,13 @@
 							@if(request('budget_min') || request('budget_max'))
 							<span class="badge bg-primary d-flex align-items-center gap-1 quick-filter-badge">
 								Budget: {{ request('budget_min', 'Any') }} to {{ request('budget_max', 'Any') }}
-								<a href="{{ route('admin.tasks.applied', request()->except(['budget_min', 'budget_max'])) }}" class="text-white text-decoration-none ms-1">
+								<a href="{{ route('admin.tasks.index', request()->except(['budget_min', 'budget_max'])) }}" class="text-white text-decoration-none ms-1">
 									<i class="ri-close-line"></i>
 								</a>
 							</span>
 							@endif
 
-							<a href="{{ route('admin.tasks.applied') }}" class="badge bg-danger text-decoration-none quick-filter-badge">
+							<a href="{{ route('admin.tasks.index') }}" class="badge bg-danger text-decoration-none quick-filter-badge">
 								Clear All Filters
 							</a>
 						</div>
@@ -362,7 +362,7 @@
 							@if(request('search'))
 								• Search: "{{ request('search') }}"
 							@endif
-							@if(request('country_id') && auth()->user()->first_role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
 								• Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 							@endif
 							@if(request('platform_id'))
@@ -523,7 +523,7 @@
 											<div class="d-flex flex-column">
 												<div class="fw-bold">{{ $task->user->name ?? 'N/A' }}</div>
 												<div class="text-muted small">
-													@if(auth()->user()->first_role->name === 'super-admin' && $task->user)
+													@if(auth()->user()->role->name === 'super-admin' && $task->user)
 														{{ $task->user->country->name ?? 'Unknown Country' }}
 													@endif
 												</div>
@@ -539,7 +539,7 @@
 										<td>
 											<div class="text-center">
 												<span class="badge bg-primary fs-6">
-													{{ $task->workers()->whereNotNull('accepted_at')->count() }} / {{ $task->number_of_submissions }}
+													{{ $task->taskWorkers->count() }} / {{ $task->number_of_submissions }}
 												</span>
 											</div>
 										</td>
@@ -678,7 +678,7 @@
 				// Create a temporary form for export
 				const exportForm = document.createElement('form');
 				exportForm.method = 'POST';
-				exportForm.action = '{{ route("admin.tasks.applied") }}';
+				exportForm.action = '{{ route("admin.tasks.index") }}';
 				exportForm.target = '_blank';
 				
 				// Add CSRF token

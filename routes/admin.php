@@ -8,7 +8,6 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EarningController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\CountrySettingsController;

@@ -66,7 +66,7 @@
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-					<li class="breadcrumb-item"><a href="{{ route('admin.tasks.applied') }}">Tasks</a></li>
+					<li class="breadcrumb-item"><a href="{{ route('admin.tasks.index') }}">Tasks</a></li>
 					<li class="breadcrumb-item active" aria-current="page">Submissions</li>
 					<li class="breadcrumb-item active">List</li>
 				</ol>
@@ -155,7 +155,7 @@
 								</div>
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->first_role->name === 'super-admin')
+								@if(auth()->user()->role->name === 'super-admin')
 								<div class="col-md-3">
 									<label for="country_id" class="form-label">Country</label>
 									<select class="form-select" id="country_id" name="country_id">
@@ -264,7 +264,7 @@
 							</span>
 							@endif
 
-							@if(request('country_id') && auth()->user()->first_role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 								<a href="{{ route('admin.tasks.submissions', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
@@ -335,7 +335,7 @@
 							@if(request('search'))
 								• Search: "{{ request('search') }}"
 							@endif
-							@if(request('country_id') && auth()->user()->first_role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
 								• Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 							@endif
 							@if(request('platform_id'))

@@ -17,7 +17,7 @@ trait PaystackTrait
       ->withHeader('Authorization: Bearer ' . config('services.paystack.secret'))
       ->withData(array(
         'email' => $payment->user->email,
-        'amount' => intval($payment->amount * 100),
+        'amount' => intval($payment->total * 100),
         'currency' => strtoupper($payment->currency),
         'reference' => $payment->reference,
         'callback_url' => route('payment.callback')

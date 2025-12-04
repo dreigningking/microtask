@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::whereDoesntHave('roles');
+        $query = User::whereNull('role_id');
 
         // Apply filters
         if ($request->filled('name')) {
@@ -49,13 +49,13 @@ class UserController extends Controller
         }
 
         // Country filter for super-admin users
-        if (Auth::user()->first_role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->where('country_id', $request->country_id);
         }
 
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->first_role->name === 'super-admin') {
+        if (Auth::user()->role->name === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
 
@@ -66,19 +66,19 @@ class UserController extends Controller
             // Tasks completed: TaskSubmission where user_id = user, paid_at not null
             $tasksCompleted = $user->taskSubmissions()->whereNotNull('paid_at')->count();
             // Tasks on hand: TaskWorker where user_id = user (all tasks assigned)
-            $tasksOnHand = $user->task_workers()->count();
+            $tasksOnHand = $user->taskWorkers()->count();
             $user->tasks_completed = $tasksCompleted;
             $user->tasks_on_hand = $tasksOnHand;
 
             // Jobs completed: Tasks posted by user where all required workers have completed
             $jobsPosted = $user->tasks()->count();
-            $jobsCompleted = $user->tasks()->whereHas('workers', function($q) {
+            $jobsCompleted = $user->tasks()->whereHas('taskWorkers', function($q) {
                 $q->whereHas('taskSubmissions', function($subQ) {
                     $subQ->whereNotNull('paid_at');
                 });
             })->get()->filter(function($task) {
                 // A job is completed if number of workers with completed submissions >= number_of_submissions
-                return $task->workers()->whereHas('taskSubmissions', function($q) {
+                return $task->taskWorkers()->whereHas('taskSubmissions', function($q) {
                     $q->whereNotNull('paid_at');
                 })->count() >= $task->number_of_submissions;
             })->count();
@@ -157,7 +157,7 @@ class UserController extends Controller
         $user->load([
             'wallets',
             'tasks', // jobs posted
-            'task_workers.task', // jobs done
+            'taskWorkers.task', // jobs done
             'settlements', // earnings
         ]);
 
@@ -165,10 +165,10 @@ class UserController extends Controller
         $totalEarnings = $user->settlements()->sum('amount');
 
         // Jobs posted (tasks created by user)
-        $jobsPosted = $user->tasks()->withCount('workers')->get();
+        $jobsPosted = $user->tasks()->withCount('taskWorkers')->get();
 
         // Jobs done (tasks user worked on)
-        $jobsDone = $user->task_workers()->with('task')->get();
+        $jobsDone = $user->taskWorkers()->with('task')->get();
 
         // Payments made
         $payments = Payment::where('user_id', $user->id)->latest()->get();
@@ -181,11 +181,11 @@ class UserController extends Controller
         $currentSubscription = $subscriptions->where('status', 'active')->first();
 
         // Ratings (as worker and as job poster)
-        $workerRatings = $user->task_workers()->whereNotNull('task_rating')->pluck('task_rating');
+        $workerRatings = $user->taskWorkers()->whereNotNull('worker_rating')->pluck('worker_rating');
         $averageWorkerRating = $workerRatings->avg();
         $posterRatings = TaskWorker::whereHas('task', function($q) use ($user) {
             $q->where('user_id', $user->id);
-        })->whereNotNull('task_rating')->pluck('task_rating');
+        })->whereNotNull('worker_rating')->pluck('worker_rating');
         $averagePosterRating = $posterRatings->avg();
 
         // Wallet freeze status (if available)

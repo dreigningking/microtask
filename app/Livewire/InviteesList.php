@@ -30,7 +30,7 @@ class InviteesList extends Component
         //     if (!$inviteeUser) {
         //         $ref->invitee_status = 'Pending Registration';
         //     } elseif ($ref->task_id && $ref->task) {
-        //         if ($ref->task->workers && $ref->task->workers->where('user_id', $inviteeUser->id)->whereHas('taskSubmissions', function($q) {
+        //         if ($ref->task->taskWorkers && $ref->task->taskWorkers->where('user_id', $inviteeUser->id)->whereHas('taskSubmissions', function($q) {
         //             $q->whereNotNull('paid_at');
         //         })->count()) {
         //             $ref->invitee_status = 'Completed';
