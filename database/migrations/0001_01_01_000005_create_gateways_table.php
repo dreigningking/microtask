@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('gateways', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug')->nullable();
             $table->enum('bank_account_storage', ['on_premises', 'off_premises']);
             $table->json('banking_fields');
             $table->timestamps();

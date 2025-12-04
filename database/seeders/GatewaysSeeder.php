@@ -29,10 +29,11 @@ class GatewaysSeeder extends Seeder
                 'banking_fields' => [
                     ['title' => 'Account Name', 'slug' => 'account_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter account holder name'],
                     ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
+                    ['title' => 'Bank', 'slug' => 'bank_code', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select bank'],
                     ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 10, 'max_length' => 10, 'placeholder' => 'Enter account number'],
                     ['title' => 'BVN', 'slug' => 'bvn', 'type' => 'number', 'default' => null, 'min_length' => 11, 'max_length' => 11, 'placeholder' => 'Enter BVN'],
                     ['title' => 'Phone Number', 'slug' => 'phone_number', 'type' => 'tel', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number'],
-                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'options', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number']
+                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number']
                 ]
             ],
             [
@@ -56,7 +57,7 @@ class GatewaysSeeder extends Seeder
                     ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
                     ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 8, 'max_length' => 15, 'placeholder' => 'Enter account number'],
                     ['title' => 'Phone Number', 'slug' => 'phone_number', 'type' => 'tel', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number'],
-                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'options', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number']
+                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number']
                 ]
             ],
             [

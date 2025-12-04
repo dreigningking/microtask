@@ -22,7 +22,7 @@ return [
         ],
         "banking_settings"=> [
             'account_length'=> 'number',
-            'require_account_verification'=> 'boolean',
+            'account_verification_required'=> 'boolean',
             'account_verification_method'=> ['manual','gateway'],
             'bank_account_storage' => ['on_premises','off_premises']
         ],

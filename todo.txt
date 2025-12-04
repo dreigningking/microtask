@@ -1,3 +1,4 @@
+Admin edit gateway
 Refund notification & Earnings Notification sync
 if admin does not approve task,{
     user will edit task || Funds Return to wallet? 

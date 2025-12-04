@@ -20,6 +20,7 @@
                     </div>
                     <div class="list-group list-group-flush" role="tablist">
                         <a class="list-group-item list-group-item-action active" data-toggle="list" href="#core" role="tab">Core Settings</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#gateways" role="tab">Gateways</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#roles" role="tab">Roles & Permissions</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#notifications" role="tab">Notifications</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#staff" role="tab">Staff</a>
@@ -111,6 +112,183 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Gateways Tab -->
+                    <div class="tab-pane fade" id="gateways" role="tabpanel">
+                        <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Payment Gateways</h5>
+                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addGatewayModal"><i class="fas fa-plus"></i> Add Gateway</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Account Storage</th>
+                                                <th>Fields Count</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($gateways as $gateway)
+                                            <tr>
+                                                <td>{{ $gateway->name }}</td>
+                                                <td>
+                                                    <span class="badge badge-{{ $gateway->bank_account_storage === 'on_premises' ? 'success' : 'warning' }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $gateway->bank_account_storage)) }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ count($gateway->banking_fields ?? []) }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary edit-gateway-btn" data-toggle="modal" data-target="#editGatewayModal{{ $gateway->id }}"><i class="fas fa-edit"></i> Edit</button>
+                                                    <form action="{{ route('admin.settings.gateways.destroy', $gateway) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to delete this gateway?');">
+                                                        @csrf
+                                                        
+                                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add Gateway Modal -->
+                        <div class="modal fade" id="addGatewayModal" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <form action="{{ route('admin.settings.gateways.store') }}" method="POST">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Add New Gateway</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="addGatewayName">Gateway Name</label>
+                                                        <input type="text" class="form-control" id="addGatewayName" name="name" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="addGatewayStorage">Account Storage</label>
+                                                        <select class="form-control" id="addGatewayStorage" name="bank_account_storage" required>
+                                                            <option value="on_premises">On-Premises</option>
+                                                            <option value="off_premises">Off-Premises (Gateway)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Banking Fields</label>
+                                                        <div id="addGatewayFields">
+                                                            <!-- Dynamic fields will be added here -->
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addFieldBtn">Add Field</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Add Gateway</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Edit Gateway Modal -->
+                        @foreach($gateways as $gateway)
+                        <div class="modal fade" id="editGatewayModal{{ $gateway->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <form action="{{ route('admin.settings.gateways.update', $gateway) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Gateway</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="editGatewayName{{ $gateway->id }}">Gateway Name</label>
+                                                        <input type="text" class="form-control" id="editGatewayName{{ $gateway->id }}" name="name" value="{{ $gateway->name }}" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="editGatewayStorage{{ $gateway->id }}">Account Storage</label>
+                                                        <select class="form-control" id="editGatewayStorage{{ $gateway->id }}" name="bank_account_storage" required>
+                                                            <option value="on_premises" {{ $gateway->bank_account_storage === 'on_premises' ? 'selected' : '' }}>On-Premises</option>
+                                                            <option value="off_premises" {{ $gateway->bank_account_storage === 'off_premises' ? 'selected' : '' }}>Off-Premises (Gateway)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Banking Fields</label>
+                                                        <div id="editGatewayFields{{ $gateway->id }}">
+                                                            @if($gateway->banking_fields)
+                                                                @foreach($gateway->banking_fields as $index => $field)
+                                                                <div class="field-row mb-2 p-2 border rounded" data-field-index="{{ $index }}">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3">
+                                                                            <input type="text" class="form-control form-control-sm" name="banking_fields[{{ $index }}][title]" value="{{ $field['title'] ?? '' }}" placeholder="Title" required>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <input type="text" class="form-control form-control-sm" name="banking_fields[{{ $index }}][slug]" value="{{ $field['slug'] ?? '' }}" placeholder="Slug" required>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <select class="form-control form-control-sm field_types" name="banking_fields[{{ $index }}][type]" required>
+                                                                                <option value="text" {{ ($field['type'] ?? '') === 'text' ? 'selected' : '' }}>Text</option>
+                                                                                <option value="number" {{ ($field['type'] ?? '') === 'number' ? 'selected' : '' }}>Number</option>
+                                                                                <option value="email" {{ ($field['type'] ?? '') === 'email' ? 'selected' : '' }}>Email</option>
+                                                                                <option value="tel" {{ ($field['type'] ?? '') === 'tel' ? 'selected' : '' }}>Phone</option>
+                                                                                <option value="select" {{ ($field['type'] ?? '') === 'select' ? 'selected' : '' }}>Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <input type="number" class="form-control form-control-sm" name="banking_fields[{{ $index }}][min_length]" value="{{ $field['min_length'] ?? '' }}" placeholder="Min">
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <input type="number" class="form-control form-control-sm" name="banking_fields[{{ $index }}][max_length]" value="{{ $field['max_length'] ?? '' }}" placeholder="Max">
+                                                                        </div>
+                                                                        <div class="col-md-1">
+                                                                            <button type="button" class="btn btn-sm btn-danger remove-field-btn">×</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" class="form-control form-control-sm" name="banking_fields[{{ $index }}][placeholder]" value="{{ $field['placeholder'] ?? '' }}" placeholder="Placeholder text">
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" class="form-control form-control-sm default_field" name="banking_fields[{{ $index }}][default]" value="{{ $field['default'] ?? '' }}" placeholder="{{$field['type'] == 'select' ? 'Options': 'Default' }}">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                @endforeach
+                                                            @endif
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-edit-field-btn" data-gateway-id="{{ $gateway->id }}">Add Field</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                     <!-- Roles & Permissions Tab -->
                     <div class="tab-pane fade" id="roles" role="tabpanel">
                         <div class="card mb-4">
@@ -142,7 +320,7 @@
                                                     @if($role->users->count() === 0)
                                                     <form action="{{ route('admin.settings.roles.destroy', $role) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to delete this role?');">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        
                                                         <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Delete</button>
                                                     </form>
                                                     @endif
@@ -200,7 +378,7 @@
                                 <div class="modal-content">
                                     <form action="{{ route('admin.settings.roles.update', $role) }}" method="POST">
                                         @csrf
-                                        @method('PUT')
+                                        
                                         <div class="modal-header">
                                             <h5 class="modal-title">Edit Role</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -345,7 +523,7 @@
                                                     <button class="btn btn-sm btn-primary edit-staff-btn" data-toggle="modal" data-target="#editStaffModal{{ $user->id }}"><i class="fas fa-edit"></i> Edit</button>
                                                     <form action="{{ route('admin.settings.staff.destroy', $user) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to delete this staff member?');">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        
                                                         <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Delete</button>
                                                     </form>
                                                 </td>
@@ -419,7 +597,7 @@
                                 <div class="modal-content">
                                     <form action="{{ route('admin.settings.staff.update', $user) }}" method="POST">
                                         @csrf
-                                        @method('PUT')
+                                        
                                         <div class="modal-header">
                                             <h5 class="modal-title">Edit Staff</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -484,6 +662,128 @@
 <script>
     $(document).ready(function() {
         $('.select2').select2();
+
+        // Add field functionality for add gateway modal
+        $('#addFieldBtn').click(function() {
+            // Find the next available index
+            var nextIndex = 0;
+            $('#addGatewayFields .field-row').each(function() {
+                var currentIndex = parseInt($(this).data('field-index') || 0);
+                if (currentIndex >= nextIndex) {
+                    nextIndex = currentIndex + 1;
+                }
+            });
+
+            var fieldHtml = `
+                <div class="field-row mb-2 p-2 border rounded" data-field-index="${nextIndex}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][title]" placeholder="Title" required>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][slug]" placeholder="Slug" required>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control form-control-sm field_types" name="banking_fields[${nextIndex}][type]" required>
+                                <option value="text">Text</option>
+                                <option value="number">Number</option>
+                                <option value="email">Email</option>
+                                <option value="tel">Phone</option>
+                                <option value="select">Select</option>
+
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" name="banking_fields[${nextIndex}][min_length]" placeholder="Min">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" name="banking_fields[${nextIndex}][max_length]" placeholder="Max">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-sm btn-danger remove-field-btn">×</button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][placeholder]" placeholder="Placeholder text">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm default_field" name="banking_fields[${nextIndex}][default]" placeholder="Default">
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#addGatewayFields').append(fieldHtml);
+        });
+
+        // Add field functionality for edit gateway modals
+        $(document).on('click', '.add-edit-field-btn', function() {
+            var gatewayId = $(this).data('gateway-id');
+
+            // Find the next available index for this gateway
+            var nextIndex = 0;
+            $('#editGatewayFields' + gatewayId + ' .field-row').each(function() {
+                var currentIndex = parseInt($(this).data('field-index') || 0);
+                if (currentIndex >= nextIndex) {
+                    nextIndex = currentIndex + 1;
+                }
+            });
+
+            var fieldHtml = `
+                <div class="field-row mb-2 p-2 border rounded" data-field-index="${nextIndex}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][title]" placeholder="Title" required>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][slug]" placeholder="Slug" required>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control form-control-sm field_types" name="banking_fields[${nextIndex}][type]" required>
+                                <option value="text">Text</option>
+                                <option value="number">Number</option>
+                                <option value="email">Email</option>
+                                <option value="tel">Phone</option>
+                                <option value="select">Select</option>
+
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" name="banking_fields[${nextIndex}][min_length]" placeholder="Min">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" name="banking_fields[${nextIndex}][max_length]" placeholder="Max">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-sm btn-danger remove-field-btn">×</button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm" name="banking_fields[${nextIndex}][placeholder]" placeholder="Placeholder text">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm default_field" name="banking_fields[${nextIndex}][default]" placeholder="Default">
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#editGatewayFields' + gatewayId).append(fieldHtml);
+        });
+
+        // Remove field functionality
+        $(document).on('click', '.remove-field-btn', function() {
+            $(this).closest('.field-row').remove();
+        });
+        $(document).on('change', '.field_types', function() {
+            let value = $(this).val()
+            if(value == 'select')
+            $(this).closest('.field-row').find('.default_field').attr('placeholder','Options e.g abc, xyz, 123');
+            else
+            $(this).closest('.field-row').find('.default_field').attr('placeholder','Default');
+            
+            
+        });
     });
 </script>
 @endpush

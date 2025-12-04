@@ -118,8 +118,8 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
             Route::post('core', [SettingController::class, 'saveCoreSettings'])->name('core.save');
             Route::post('notifications', [SettingController::class, 'saveNotificationSettings'])->name('notifications.save');
             Route::post('roles', [SettingController::class, 'storeRole'])->name('roles.store');
-            Route::put('roles/{role}', [SettingController::class, 'updateRole'])->name('roles.update');
-            Route::delete('roles/{role}', [SettingController::class, 'destroyRole'])->name('roles.destroy');
+            Route::post('roles/{role}', [SettingController::class, 'updateRole'])->name('roles.update');
+            Route::post('roles/destroy/{role}', [SettingController::class, 'destroyRole'])->name('roles.destroy');
 
             Route::get('boosters', [SettingController::class, 'boosters'])->name('boosters');
             Route::post('boosters/store', [SettingController::class, 'store_boosters'])->name('boosters.store');
@@ -135,23 +135,20 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
             Route::post('platforms/store', [SettingController::class, 'store_platforms'])->name('platforms.store');
             Route::post('platforms/update', [SettingController::class, 'update_platforms'])->name('platforms.update');
             Route::post('platforms/delete', [SettingController::class, 'destroy_platforms'])->name('platforms.destroy');
+
+            Route::post('gateways/store', [SettingController::class, 'gatewayStore'])->name('gateways.store');
+            Route::post('gateways/update/{gateway}', [SettingController::class, 'gatewayUpdate'])->name('gateways.update');
+            Route::post('gateways/destroy/{gateway}', [SettingController::class, 'gatewayDestroy'])->name('gateways.destroy');
         });
         Route::group(['middleware' => ['permission:staff_management']], function () {
             Route::post('staff', [SettingController::class, 'staffStore'])->name('staff.store');
-            Route::put('staff/{user}', [SettingController::class, 'staffUpdate'])->name('staff.update');
-            Route::delete('staff/{user}', [SettingController::class, 'staffDestroy'])->name('staff.destroy');
+            Route::post('staff/{user}', [SettingController::class, 'staffUpdate'])->name('staff.update');
+            Route::post('staff/destroy/{user}', [SettingController::class, 'staffDestroy'])->name('staff.destroy');
         });
         Route::group(['middleware' => ['permission:country_settings']], function () {
             Route::get('countries', [CountrySettingsController::class, 'countries'])->name('countries');
             Route::get('country/config/{country}', [CountrySettingsController::class, 'country'])->name('country');
-            Route::post('countries/banking', [CountrySettingsController::class, 'saveBanking'])->name('countries.banking');
-            Route::post('countries/transactions', [CountrySettingsController::class, 'saveTransactions'])->name('countries.transactions');
-            Route::post('countries/tasks', [CountrySettingsController::class, 'saveTasks'])->name('countries.tasks');
-            Route::post('countries/notification-emails', [CountrySettingsController::class, 'saveNotificationEmails'])->name('countries.notification_emails');
-            Route::post('countries/template-prices', [CountrySettingsController::class, 'saveTemplatePrices'])->name('countries.template_prices');
-            Route::post('countries/booster-prices', [CountrySettingsController::class, 'saveBoosterPrices'])->name('countries.booster_prices');
-            Route::post('countries/verification-settings', [CountrySettingsController::class, 'saveVerificationSettings'])->name('countries.verification_settings');
-        
+            Route::post('country/update', [CountrySettingsController::class, 'update'])->name('countries.update');
         });
 
 

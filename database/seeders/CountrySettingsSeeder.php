@@ -21,12 +21,10 @@ class CountrySettingsSeeder extends Seeder
             233 => [ // USA
                 'gateway_id' => 1,
                 'banking_settings' => [
-                    'account_length' => '10',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'routing_number', 'swift_code'],
+                'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
                     'verifications_can_expire' => true
@@ -59,12 +57,10 @@ class CountrySettingsSeeder extends Seeder
             39 => [ // Canada
                 'gateway_id' => 1,
                 'banking_settings' => [
-                    'account_length' => '8',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'routing_number'],
+                'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
                     'verifications_can_expire' => true
@@ -97,12 +93,12 @@ class CountrySettingsSeeder extends Seeder
             232 => [ // UK
                 'gateway_id' => 6,
                 'banking_settings' => [
-                    'account_length' => '8',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'sort_code', 'iban_number'],
+                'banking_fields' => [
+                    ['title' => 'Paypal Email', 'slug' => 'paypal_email', 'type' => 'email', 'default' => null, 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter paypal email'],
+                ],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
                     'verifications_can_expire' => true
@@ -135,12 +131,15 @@ class CountrySettingsSeeder extends Seeder
             161 => [ // Nigeria
                 'gateway_id' => 2,
                 'banking_settings' => [
-                    'account_length' => '10',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'bvn'],
+                'banking_fields' => [
+                    ['title' => 'Bank', 'slug' => 'bank_code', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select Bank'],
+                    ['title' => 'Account Name', 'slug' => 'account_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter account holder name'],
+                    ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
+                    ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 10, 'max_length' => 10, 'placeholder' => 'Enter account number'],
+                ],
                 'verification_settings' => [
                     'verification_provider' => 'manual',
                     'verifications_can_expire' => true
@@ -173,12 +172,12 @@ class CountrySettingsSeeder extends Seeder
             113 => [ // Kenya
                 'gateway_id' => 3,
                 'banking_settings' => [
-                    'account_length' => '6',
-                    'require_account_verification' => false,
-                    'account_verification_method' => 'manual',
-                    'bank_account_storage' => 'on_premises'
+                    'account_verification_required' => true,
+                    'account_verification_method' => 'gateway',
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'swift_code'],
+                'banking_fields' => [
+                    ['title' => 'Phone Number', 'slug' => 'phone_number', 'type' => 'tel', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number'],
+                ],
                 'verification_settings' => [
                     'verification_provider' => 'manual',
                     'verifications_can_expire' => true
@@ -211,12 +210,16 @@ class CountrySettingsSeeder extends Seeder
             83 => [ // Ghana
                 'gateway_id' => 4,
                 'banking_settings' => [
-                    'account_length' => '8',
-                    'require_account_verification' => true,
-                    'account_verification_method' => 'manual',
-                    'bank_account_storage' => 'on_premises'
+                    'account_verification_required' => true,
+                    'account_verification_method' => 'gateway',
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number'],
+                'banking_fields' => [
+                    ['title' => 'Bank', 'slug' => 'bank_code', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select Bank'],
+                    ['title' => 'Account Name', 'slug' => 'account_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter account holder name'],
+                    ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
+                    ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 10, 'max_length' => 10, 'placeholder' => 'Enter account number'],
+                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select Branch']
+                ],
                 'verification_settings' => [
                     'verification_provider' => 'manual',
                     'verifications_can_expire' => true
@@ -249,12 +252,18 @@ class CountrySettingsSeeder extends Seeder
             101 => [ // India
                 'gateway_id' => 5,
                 'banking_settings' => [
-                    'account_length' => '11',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'ifsc_code'],
+                'banking_fields' => [
+                    ['title' => 'Bank', 'slug' => 'bank_code', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select Bank'],
+                    ['title' => 'Account Name', 'slug' => 'account_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter account holder name'],
+                    ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
+                    ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 10, 'max_length' => 10, 'placeholder' => 'Enter account number'],
+                    ['title' => 'Sort Code', 'slug' => 'sort_code', 'type' => 'text', 'default' => '', 'min_length' => 11, 'max_length' => 11, 'placeholder' => 'Enter Sort Code'],
+                    ['title' => 'Phone Number', 'slug' => 'phone_number', 'type' => 'tel', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter phone number'],
+                    ['title' => 'Branch', 'slug' => 'branch', 'type' => 'select', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Select Branch']
+                ],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
                     'verifications_can_expire' => true
@@ -287,12 +296,10 @@ class CountrySettingsSeeder extends Seeder
             14 => [ // Australia
                 'gateway_id' => 1,
                 'banking_settings' => [
-                    'account_length' => '6',
-                    'require_account_verification' => true,
+                    'account_verification_required' => true,
                     'account_verification_method' => 'gateway',
-                    'bank_account_storage' => 'on_premises'
                 ],
-                'banking_fields' => ['account_name', 'bank_name', 'account_number', 'bsb_code'],
+                'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
                     'verifications_can_expire' => true

@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\Booster;
 use App\Models\Country;
+use App\Models\Gateway;
 use App\Models\Setting;
 use App\Models\Platform;
 use App\Models\Permission;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PlatformTemplate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class SettingController extends Controller
 {
@@ -28,7 +30,8 @@ class SettingController extends Controller
         // Load users who have at least one role
         $staff = User::whereNotNull('role_id')->with('role')->get();
         $countries = Country::all();
-        return view('backend.settings.index', compact('settings', 'roles', 'permissions', 'staff','countries'));
+        $gateways = Gateway::orderBy('name')->get();
+        return view('backend.settings.index', compact('settings', 'roles', 'permissions', 'staff','countries', 'gateways'));
     }
 
     /**
@@ -489,5 +492,103 @@ class SettingController extends Controller
     {
         $user->delete();
         return back()->with('success', 'Staff member deleted successfully.');
+    }
+
+    /**
+     * Store a new gateway.
+     */
+    public function gatewayStore(Request $request)
+    {
+        
+        // Validate main fields first
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'bank_account_storage' => 'required|in:on_premises,off_premises',
+        ]);
+
+        // Re-index banking fields to ensure sequential indices
+        $bankingFields = [];
+        if ($request->has('banking_fields') && is_array($request->banking_fields)) {
+            $bankingFields = array_values($request->banking_fields);
+        }
+
+        // Validate banking fields separately
+        $bankingValidator = Validator::make(['banking_fields' => $bankingFields], [
+            'banking_fields' => 'nullable|array',
+            'banking_fields.*.title' => 'required|string|max:255',
+            'banking_fields.*.slug' => 'required|string|max:255',
+            'banking_fields.*.type' => 'required|in:text,number,email,tel,select',
+            'banking_fields.*.min_length' => 'nullable|integer|min:1',
+            'banking_fields.*.max_length' => 'nullable|integer|min:1',
+            'banking_fields.*.placeholder' => 'nullable|string|max:255',
+            'banking_fields.*.default' => 'nullable|string|max:255',
+        ]);
+
+        if($bankingValidator->fails()){
+            return back()->withErrors($bankingValidator)->withInput();
+        }
+
+        $gateway = new Gateway();
+        $gateway->name = $request->name;
+        $gateway->bank_account_storage = $request->bank_account_storage;
+        $gateway->banking_fields = $bankingFields;
+        $gateway->save();
+
+        return back()->with('success', 'Gateway created successfully.');
+    }
+
+    /**
+     * Update an existing gateway.
+     */
+    public function gatewayUpdate(Request $request, Gateway $gateway)
+    {
+        // Validate main fields first
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'bank_account_storage' => 'required|in:on_premises,off_premises',
+        ]);
+
+        // Re-index banking fields to ensure sequential indices
+        $bankingFields = [];
+        if ($request->has('banking_fields') && is_array($request->banking_fields)) {
+            $bankingFields = array_values($request->banking_fields);
+        }
+
+        // Validate banking fields separately
+        $bankingValidator = Validator::make(['banking_fields' => $bankingFields], [
+            'banking_fields' => 'nullable|array',
+            'banking_fields.*.title' => 'required|string|max:255',
+            'banking_fields.*.slug' => 'required|string|max:255',
+            'banking_fields.*.type' => 'required|in:text,number,email,tel,select',
+            'banking_fields.*.min_length' => 'nullable|integer|min:1',
+            'banking_fields.*.max_length' => 'nullable|integer|min:1',
+            'banking_fields.*.placeholder' => 'nullable|string|max:255',
+            'banking_fields.*.default' => 'nullable|string|max:255',
+        ]);
+
+        if($bankingValidator->fails()){
+            return back()->withErrors($bankingValidator)->withInput();
+        }
+
+        $gateway->name = $request->name;
+        $gateway->bank_account_storage = $request->bank_account_storage;
+        $gateway->banking_fields = $bankingFields;
+        $gateway->save();
+
+        return back()->with('success', 'Gateway updated successfully.');
+    }
+
+    /**
+     * Delete a gateway.
+     */
+    public function gatewayDestroy(Gateway $gateway)
+    {
+        // Check if gateway is being used by any countries
+        if ($gateway->countries()->count() > 0) {
+            return back()->with('error', 'Cannot delete gateway. It is being used by ' . $gateway->countries()->count() . ' countries.');
+        }
+
+        $gateway->delete();
+        return back()->with('success', 'Gateway deleted successfully.');
     }
 }

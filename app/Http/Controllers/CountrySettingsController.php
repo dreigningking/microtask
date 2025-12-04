@@ -66,17 +66,25 @@ class CountrySettingsController extends Controller
 
     public function update(Request $request)
     {
+        dd($request->all());
         $countryId = $request->input('country_id');
         $country = Country::findOrFail($countryId);
         
         $settings = CountrySetting::where('country_id', $countryId)->first();
-        
+
         if (!$settings) {
             $settings = new CountrySetting();
             $settings->country_id = $countryId;
         }
-        
-        // Handle Banking Fields
+
+        // Banking settings
+        $settings->gateway_id = $request->input('gateway_id');
+        $settings->banking_settings = array_merge($settings->banking_settings ?? [], [
+            'account_verification_required' => $request->has('account_verification_required'),
+            'account_verification_method' => $request->input('account_verification_method', 'manual'),
+        ]);
+
+        // Banking fields
         if ($request->has('banking_fields')) {
             $bankingFields = $request->input('banking_fields');
             if (is_string($bankingFields)) {
@@ -85,79 +93,83 @@ class CountrySettingsController extends Controller
                 $settings->banking_fields = $bankingFields;
             }
         }
-        
-        // Handle Transaction Charges
-        if ($request->has('transaction_charges')) {
-            $transactionCharges = $request->input('transaction_charges');
-            if (is_string($transactionCharges)) {
-                $settings->transaction_charges = json_decode($transactionCharges, true);
-            } else {
-                $settings->transaction_charges = $transactionCharges;
-            }
-        }
-        
-        // Handle Withdrawal Charges
-        if ($request->has('withdrawal_charges')) {
-            $withdrawalCharges = $request->input('withdrawal_charges');
-            if (is_string($withdrawalCharges)) {
-                $settings->withdrawal_charges = json_decode($withdrawalCharges, true);
-            } else {
-                $settings->withdrawal_charges = $withdrawalCharges;
-            }
-        }
-        
-        // Handle Feature Rates
-        if ($request->has('feature_rates')) {
-            $featureRates = $request->input('feature_rates');
-            if (is_string($featureRates)) {
-                $settings->feature_rates = json_decode($featureRates, true);
-            } else {
-                $settings->feature_rates = $featureRates;
-            }
-        }
-        
-        // Handle Broadcast Rates
-        if ($request->has('broadcast_rates')) {
-            $broadcastRates = $request->input('broadcast_rates');
-            if (is_string($broadcastRates)) {
-                $settings->broadcast_rates = json_decode($broadcastRates, true);
-            } else {
-                $settings->broadcast_rates = $broadcastRates;
-            }
-        }
-        
-        // Handle Notification Emails
-        if ($request->has('notification_emails')) {
-            $notificationEmails = $request->input('notification_emails');
-            // Validate each email if present
-            foreach ($notificationEmails as $key => $email) {
-                if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    return back()->withInput()->withErrors(["notification_emails.$key" => "Invalid email address for $key notification."]);
-                }
-            }
-            $settings->notification_emails = $notificationEmails;
-        }
-        
-        // Update nested array structures
+
+        // Wallet settings
         $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
-            'usd_exchange_rate' => $request->input('usd_exchange_rate', 0),
+            'wallet_status' => $request->input('wallet_status') === 'enabled',
+            'usd_exchange_rate' => $request->input('usd_exchange_rate_percentage', 0),
         ]);
 
+        // Transaction settings
+        $settings->transaction_settings = array_merge($settings->transaction_settings ?? [], [
+            'charges' => [
+                'percentage' => $request->input('transaction_percentage', 2),
+                'fixed' => $request->input('transaction_fixed', 100),
+                'cap' => $request->input('transaction_cap', 2000),
+            ],
+            'tax' => [
+                'percentage' => $request->input('tax_percentage', 0),
+                'apply' => $request->has('tax_apply'),
+            ],
+        ]);
+
+        // Withdrawal settings
+        $settings->withdrawal_settings = array_merge($settings->withdrawal_settings ?? [], [
+            'charges' => [
+                'percentage' => $request->input('withdrawal_percentage', 1),
+                'fixed' => $request->input('withdrawal_fixed', 50),
+                'cap' => $request->input('withdrawal_cap', 1000),
+            ],
+            'min_withdrawal' => $request->input('min_withdrawal', 10),
+            'max_withdrawal' => $request->input('max_withdrawal', 5000),
+            'method' => $request->input('payout_method', 'manual'),
+            'weekend_payout' => $request->has('weekend_payout'),
+            'holiday_payout' => $request->has('holiday_payout'),
+        ]);
+
+        // Promotion settings
         $settings->promotion_settings = array_merge($settings->promotion_settings ?? [], [
             'feature_rate' => $request->input('feature_rate', 0),
             'broadcast_rate' => $request->input('broadcast_rate', 0),
         ]);
 
+        // Review settings
         $settings->review_settings = array_merge($settings->review_settings ?? [], [
             'admin_review_cost' => $request->input('admin_review_cost', 0),
             'system_review_cost' => $request->input('system_review_cost', 0),
         ]);
 
+        // Referral settings
         $settings->referral_settings = array_merge($settings->referral_settings ?? [], [
             'signup_referral_earnings_percentage' => $request->input('signup_referral_earnings_percentage', 0),
             'task_referral_commission_percentage' => $request->input('task_referral_commission_percentage', 0),
         ]);
 
+        // Verification settings
+        $settings->verification_settings = array_merge($settings->verification_settings ?? [], [
+            'verification_provider' => $request->input('verification_provider', 'manual'),
+            'verifications_can_expire' => $request->has('verifications_can_expire'),
+        ]);
+
+        // Verification fields
+        $fields = $request->input('verification_fields', []);
+        $verificationFields = [
+            'govt_id' => [
+                'file' => $fields['govt_id']['docs'] ?? [],
+                'require' => $fields['govt_id']['mode'] ?? 'one',
+                'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
+                'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
+            ],
+            'address' => [
+                'file' => $fields['address']['docs'] ?? [],
+                'require' => $fields['address']['mode'] ?? 'one',
+                'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
+                'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
+            ],
+        ];
+        $settings->verification_fields = $verificationFields;
+
+        // Security settings
         $settings->security_settings = array_merge($settings->security_settings ?? [], [
             'ban_settings' => [
                 'auto_ban_on_flag_count' => $request->input('auto_ban_on_flag_count', 5),
@@ -183,6 +195,7 @@ class CountrySettingsController extends Controller
                 );
             }
         }
+
         // Handle Country Prices for Boosters
         if ($request->has('booster_prices')) {
             foreach ($request->input('booster_prices') as $boosterId => $amount) {
@@ -212,8 +225,8 @@ class CountrySettingsController extends Controller
         // Banking settings
         $settings->banking_settings = [
             'account_length' => $request->input('account_length', 10),
-            'require_account_verification' => $request->has('bank_verification_required'),
-            'account_verification_method' => $request->input('bank_verification_method', 'manual'),
+            'account_verification_required' => $request->has('account_verification_required'),
+            'account_verification_method' => $request->input('account_verification_method', 'manual'),
             'bank_account_storage' => $request->input('bank_account_storage', 'on_premises'),
         ];
 
