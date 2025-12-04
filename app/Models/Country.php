@@ -178,7 +178,7 @@ class Country extends Model
      */
     public function supportsPayments()
     {
-        return $this->status && $this->hasTransactionSettings() && $this->hasWithdrawalSettings();
+        return $this->hasBankingSettings() && $this->hasTransactionSettings();
     }
 
     /**
@@ -237,8 +237,11 @@ class Country extends Model
             case 'payments':
                 return $query->whereHas('setting', function ($q) {
                     $q->whereNotNull('gateway_id')
+                      ->whereNotNull('banking_settings')
+                      ->whereNotNull('banking_fields')
                       ->whereNotNull('transaction_settings')
-                      ->whereNotNull('withdrawal_settings');
+                      ->whereNotNull('withdrawal_settings')
+                      ->whereNotNull('wallet_settings');
                 });
             case 'wallets':
                 return $query->whereHas('setting', function ($q) {
@@ -287,6 +290,7 @@ class Country extends Model
     {
         $settings = $this->setting;
         if (!$settings) return false;
+        if (!$settings->gateway_id) return false;
 
         if (!$settings->banking_settings) return false;
         if (!$settings->banking_fields) return false;
@@ -350,7 +354,8 @@ class Country extends Model
         $settings = $this->setting;
         if (!$settings) return false;
         if (!$settings->transaction_settings) return false;
-        if (!$settings->gateway_id) return false;
+        if (!$settings->withdrawal_settings) return false;
+        if (!$settings->wallet_settings) return false;
 
         $transactionSettings = is_string($settings->transaction_settings)
             ? json_decode($settings->transaction_settings, true)
@@ -358,10 +363,11 @@ class Country extends Model
 
         if (!$transactionSettings || !is_array($transactionSettings)) return false;
 
-        // Must have percentage, fixed, and cap
-        return isset($transactionSettings['percentage'])
-            && isset($transactionSettings['fixed'])
-            && isset($transactionSettings['cap']);
+        // Must have charges array with percentage, fixed, and cap
+        return isset($transactionSettings['charges'])
+            && isset($transactionSettings['charges']['percentage'])
+            && isset($transactionSettings['charges']['fixed'])
+            && isset($transactionSettings['charges']['cap']);
     }
 
     /**
@@ -509,20 +515,18 @@ class Country extends Model
      */
     public function getStatusAttribute()
     {
-        // Core required settings for a country to be considered "ready"
+        // Core required settings for a country to be considered "ready" (matches tab order)
         $requiredSettings = [
-            'hasBankingSettings',
-            'hasVerificationSettings',
-            'hasPromotionSettings',
-            'hasTransactionSettings',
-            // 'hasWithdrawalSettings',
-            // 'hasReferralSettings',
-            // 'hasReviewSettings'
+            'hasBankingSettings',      // Banking Settings tab
+            'hasVerificationSettings', // Verification Settings tab
+            'hasTransactionSettings',  // Transactions tab (includes withdrawal & wallet settings)
+            'hasPromotionSettings',    // Tasks tab
         ];
 
         // Optional settings (country can function without these)
         $optionalSettings = [
-            'hasWalletSettings',
+            'hasReferralSettings',
+            'hasReviewSettings',
             'hasSecuritySettings',
             'hasBoosterPrices',
             'hasTemplatePrices'
@@ -565,10 +569,8 @@ class Country extends Model
         $checks = [
             'banking_settings' => $this->hasBankingSettings(),
             'verification_settings' => $this->hasVerificationSettings(),
-            'promotion_settings' => $this->hasPromotionSettings(),
             'transaction_settings' => $this->hasTransactionSettings(),
-            'withdrawal_settings' => $this->hasWithdrawalSettings(),
-            'wallet_settings' => $this->hasWalletSettings(),
+            'promotion_settings' => $this->hasPromotionSettings(),
             'referral_settings' => $this->hasReferralSettings(),
             'review_settings' => $this->hasReviewSettings(),
             'security_settings' => $this->hasSecuritySettings(),
@@ -587,11 +589,10 @@ class Country extends Model
             'individual_checks' => $checks,
             'missing_settings' => $missingSettings,
             'required_missing' => array_intersect($missingSettings, [
-                'banking_settings', 'verification_settings', 'promotion_settings',
-                'transaction_settings', 'withdrawal_settings', 'referral_settings', 'review_settings'
+                'banking_settings', 'verification_settings', 'transaction_settings', 'promotion_settings'
             ]),
             'optional_missing' => array_intersect($missingSettings, [
-                'wallet_settings', 'security_settings', 'booster_prices', 'template_prices'
+                'referral_settings', 'review_settings', 'security_settings', 'booster_prices', 'template_prices'
             ])
         ];
     }

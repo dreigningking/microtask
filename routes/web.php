@@ -37,11 +37,7 @@ use App\Livewire\Policies\PaymentDisputeChargebacks;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
-    foreach($countries as $country){
-        $gateway = \App\Models\Gateway::where('slug',$country->gateway)->first();
-        $country->gateway_id = $gateway ? $gateway->id: 1;
-        $country->save();
-    }
+    
     return 'done';
 });
 // Route::get('payment/test', [PaymentController::class, 'test']);

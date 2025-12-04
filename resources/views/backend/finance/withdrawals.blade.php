@@ -169,7 +169,7 @@
 											</td>
 											<td>
 												<div class="small">
-													<div><span class="badge bg-info">{{ ucfirst($withdrawal->gateway->name) }}</span></div>
+													<div><span class="badge bg-info">{{ ucfirst($withdrawal->gateway) }}</span></div>
 													<div class="text-muted">{{ ucfirst($withdrawal->payment_method) }}</div>
 												</div>	
 											</td>

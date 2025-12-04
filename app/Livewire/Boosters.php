@@ -189,7 +189,7 @@ class Boosters extends Component
                 'currency' => $this->location->currency,
                 'amount' => $this->totalAmount,
                 'vat_value' => $this->tax,
-                'gateway' => $this->countrySetting->gateway,
+                'gateway_id' => $this->countrySetting->gateway_id,
                 'status' => 'pending',
             ]);
 

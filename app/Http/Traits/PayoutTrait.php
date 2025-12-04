@@ -9,7 +9,7 @@ trait PayoutTrait
 {
     protected function initializePayout(Withdrawal $withdrawal){
         $user = $withdrawal->user;
-        $gateway = $user->country->setting->gateway ?? 'manual';
+        $gateway = $user->country->gateway ?? 'manual';
         
         try {
             switch($gateway){
@@ -49,7 +49,7 @@ trait PayoutTrait
     }
 
     protected function verifyPayout(Withdrawal $withdrawal){
-        $gateway = $withdrawal->user->country->setting->gateway ?? 'manual';
+        $gateway = $withdrawal->user->country->gateway ?? 'manual';
         
         try {
             switch($gateway){
@@ -79,7 +79,7 @@ trait PayoutTrait
 
     protected function retryPayout(Withdrawal $withdrawal){
         $user = $withdrawal->user;
-        $gateway = $user->country->setting->gateway ?? 'manual';
+        $gateway = $user->country->gateway ?? 'manual';
         
         try {
             switch($gateway){
@@ -109,7 +109,7 @@ trait PayoutTrait
 
     public function verifybankaccount($bank_code, $account_number){
         $user = Auth::user();
-        $gateway = $user->country->setting->gateway ?? 'paystack';
+        $gateway = $user->country->gateway ?? 'paystack';
         
         try {
             switch($gateway){

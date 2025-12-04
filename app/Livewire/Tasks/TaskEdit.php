@@ -476,7 +476,7 @@ class TaskEdit extends Component
             'currency' => $this->currency,
             'amount' => $this->total,
             'vat_value' => $this->tax,
-            'gateway' => $this->countrySetting->gateway,
+            'gateway_id' => $this->countrySetting->gateway_id,
             'status' => 'pending',
         ]);
         

@@ -179,8 +179,8 @@
 												{{ number_format($payment->vat_value ?? 0, 2) }}
 											</td>
 											<td>
-												@if($payment->gateway)
-													<span class="badge bg-info">{{ $payment->gateway }}</span>
+												@if($payment->gateway_id)
+													<span class="badge bg-info">{{ $payment->gateway->name }}</span>
 												@else
 													<span class="text-muted">-</span>
 												@endif

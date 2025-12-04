@@ -43,7 +43,7 @@ class Withdrawal extends Model
     public function getGatewayAttribute()
     {
         $country_settings = CountrySetting::where('country_id', $this->user->country_id)->first();
-        return $country_settings->gateway;
+        return $country_settings->gateway->name;
     }
 
     public function getPaymentMethodAttribute()
