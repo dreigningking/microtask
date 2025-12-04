@@ -28,13 +28,10 @@
 							<thead>
 								<tr>
 									<th>Country</th>
-									<th>Banking</th>
-									<th>Transactions</th>
-									<th>Tasks</th>
-									<th>Booster Prices</th>
-									<th>Template Prices</th>
-									<th>Notification Emails</th>
-									<th>Verification</th>
+									<th>Ready for Production</th>
+									<th>Supports Payment</th>
+									<th>Wallet Status</th>
+									<th>Status</th>
 									<th>Actions</th>
 								</tr>
 							</thead>
@@ -43,54 +40,34 @@
 								<tr>
 									<td>{{ $country->name }}</td>
 									<td>
-										@if($country->hasBankingSettings())
-											<span class="badge bg-success">Set</span>
+										@if($country->isReadyForProduction())
+											<span class="badge bg-success">Ready</span>
 										@else
-											<span class="badge bg-danger">Not Set</span>
+											<span class="badge bg-danger">Not Ready</span>
 										@endif
 									</td>
 									<td>
-										@if($country->hasTransactionSettings())
-											<span class="badge bg-success">Set</span>
+										@if($country->supportsPayments())
+											<span class="badge bg-success">Yes</span>
 										@else
-											<span class="badge bg-danger">Not Set</span>
+											<span class="badge bg-danger">Not Yet</span>
 										@endif
 									</td>
 									<td>
-										@if($country->hasTaskSettings())
-											<span class="badge bg-success">Set</span>
+										@if($country->supportsWallets())
+											<span class="badge bg-success">Active</span>
 										@else
-											<span class="badge bg-danger">Not Set</span>
+											<span class="badge bg-danger">Disabled</span>
 										@endif
 									</td>
 									<td>
-										@if($country->hasBoosterPrices())
+										@if($country->status)
 											<span class="badge bg-success">Set</span>
 										@else
 											<span class="badge bg-danger">Not Set</span>
 										@endif
 									</td>
-									<td>
-										@if($country->hasTemplatePrices())
-											<span class="badge bg-success">Set</span>
-										@else
-											<span class="badge bg-danger">Not Set</span>
-										@endif
-									</td>
-									<td>
-										@if($country->hasNotificationEmails())
-											<span class="badge bg-success">Set</span>
-										@else
-											<span class="badge bg-danger">Not Set</span>
-										@endif
-									</td>
-									<td>
-										@if($country->hasVerificationSettings())
-											<span class="badge bg-success">Set</span>
-										@else
-											<span class="badge bg-danger">Not Set</span>
-										@endif
-									</td>
+									
 									<td>
 										<a href="{{ route('admin.settings.country', $country) }}" class="btn btn-sm btn-primary">
 											<i class="align-middle" data-feather="settings"></i> Config
@@ -112,16 +89,7 @@
 	$(function() {
 		// Datatables basic
 		$('#datatables-basic').DataTable({
-			responsive: true,
-			pageLength: 25,
-			order: [[0, 'asc']],
-			columnDefs: [
-				{ width: '20%', targets: 0 },
-				{ width: '8%', targets: [1, 2, 3] },
-				{ width: '15%', targets: 4 },
-				{ width: '10%', targets: [5, 6, 7] },
-				{ width: '9%', targets: 8 }
-			]
+			responsive: true
 		});
 	});
 </script>

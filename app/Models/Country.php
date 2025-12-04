@@ -50,7 +50,7 @@ class Country extends Model
      */
     public function getGatewayAttribute()
     {
-        return $this->setting ? $this->setting->gateway : null;
+        return $this->setting && $this->setting->gateway_id ? $this->setting->gateway->slug : null;
     }
 
     /**
@@ -236,7 +236,7 @@ class Country extends Model
         switch ($feature) {
             case 'payments':
                 return $query->whereHas('setting', function ($q) {
-                    $q->whereNotNull('gateway')
+                    $q->whereNotNull('gateway_id')
                       ->whereNotNull('transaction_settings')
                       ->whereNotNull('withdrawal_settings');
                 });
@@ -350,7 +350,7 @@ class Country extends Model
         $settings = $this->setting;
         if (!$settings) return false;
         if (!$settings->transaction_settings) return false;
-        if (!$settings->gateway) return false;
+        if (!$settings->gateway_id) return false;
 
         $transactionSettings = is_string($settings->transaction_settings)
             ? json_decode($settings->transaction_settings, true)
@@ -515,9 +515,9 @@ class Country extends Model
             'hasVerificationSettings',
             'hasPromotionSettings',
             'hasTransactionSettings',
-            'hasWithdrawalSettings',
-            'hasReferralSettings',
-            'hasReviewSettings'
+            // 'hasWithdrawalSettings',
+            // 'hasReferralSettings',
+            // 'hasReviewSettings'
         ];
 
         // Optional settings (country can function without these)

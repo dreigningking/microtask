@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Traits\HelperTrait;
 use App\Models\Booster;
 use App\Models\Country;
+use App\Models\Gateway;
 use App\Models\CountryPrice;
-use App\Models\TaskTemplate;
 use Illuminate\Http\Request;
 use App\Models\CountrySetting;
+use App\Http\Traits\HelperTrait;
+use App\Models\PlatformTemplate;
 
 class CountrySettingsController extends Controller
 {
@@ -38,13 +39,13 @@ class CountrySettingsController extends Controller
     public function country(Country $country)
     {
         $settings = $country->setting;
-        
+        $gateways = Gateway::all();
         if (!$settings) {
             $settings = new CountrySetting();
             $settings->country_id = $country->id;
         }
         
-        $templates = TaskTemplate::where('is_active', true)->orderBy('name', 'asc')->get();
+        $templates = PlatformTemplate::where('is_active', true)->orderBy('name', 'asc')->get();
         $boosters = Booster::where('is_active',true)->get();
         // Fetch all country prices for this country
         $countryPrices = CountryPrice::where('country_id', $country->id)->get();
@@ -60,7 +61,7 @@ class CountrySettingsController extends Controller
         } catch (\Exception $e) {
             $exchangeRate = 1;
         }
-        return view('backend.settings.country-config', compact('country', 'settings', 'templates','boosters', 'countryPricesByKey', 'exchangeRate'));
+        return view('backend.settings.country-config', compact('country','gateways', 'settings', 'templates','boosters', 'countryPricesByKey', 'exchangeRate'));
     }
 
     public function update(Request $request)
@@ -137,19 +138,34 @@ class CountrySettingsController extends Controller
             $settings->notification_emails = $notificationEmails;
         }
         
-        // Update other fields
-        $settings->platform_fee = $request->input('platform_fee', 0);
-        $settings->tax_rate = $request->input('tax_rate', 0);
-        $settings->usd_exchange_rate = $request->input('usd_exchange_rate', 1);
-        $settings->verification_required = $request->has('verification_required');
-        $settings->verification_method = $request->input('verification_method', 'manual');
-        $settings->account_length = $request->input('account_length', 0);
-        $settings->payout_method = $request->input('payout_method', 'manual');
-        $settings->weekend_payout = $request->has('weekend_payout');
-        $settings->holiday_payout = $request->has('holiday_payout');
-        $settings->gateway = $request->input('gateway');
-        $settings->feature_rate = $request->input('feature_rate', 0);
-        $settings->broadcast_rate = $request->input('broadcast_rate', 0);
+        // Update nested array structures
+        $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
+            'usd_exchange_rate' => $request->input('usd_exchange_rate', 0),
+        ]);
+
+        $settings->promotion_settings = array_merge($settings->promotion_settings ?? [], [
+            'feature_rate' => $request->input('feature_rate', 0),
+            'broadcast_rate' => $request->input('broadcast_rate', 0),
+        ]);
+
+        $settings->review_settings = array_merge($settings->review_settings ?? [], [
+            'admin_review_cost' => $request->input('admin_review_cost', 0),
+            'system_review_cost' => $request->input('system_review_cost', 0),
+        ]);
+
+        $settings->referral_settings = array_merge($settings->referral_settings ?? [], [
+            'signup_referral_earnings_percentage' => $request->input('signup_referral_earnings_percentage', 0),
+            'task_referral_commission_percentage' => $request->input('task_referral_commission_percentage', 0),
+        ]);
+
+        $settings->security_settings = array_merge($settings->security_settings ?? [], [
+            'ban_settings' => [
+                'auto_ban_on_flag_count' => $request->input('auto_ban_on_flag_count', 5),
+                'ban_duration' => $request->input('ban_duration', 'week'),
+            ],
+            'ip_blacklist' => $request->input('ip_blacklist', []),
+        ]);
+
         $settings->save();
 
         // Handle Country Prices for Templates
@@ -158,7 +174,7 @@ class CountrySettingsController extends Controller
                 \App\Models\CountryPrice::updateOrCreate(
                     [
                         'country_id' => $countryId,
-                        'priceable_type' => TaskTemplate::class,
+                        'priceable_type' => PlatformTemplate::class,
                         'priceable_id' => $templateId,
                     ],
                     [
@@ -193,6 +209,14 @@ class CountrySettingsController extends Controller
         $country = Country::findOrFail($countryId);
         $settings = CountrySetting::firstOrNew(['country_id' => $countryId]);
 
+        // Banking settings
+        $settings->banking_settings = [
+            'account_length' => $request->input('account_length', 10),
+            'require_account_verification' => $request->has('bank_verification_required'),
+            'account_verification_method' => $request->input('bank_verification_method', 'manual'),
+            'bank_account_storage' => $request->input('bank_account_storage', 'on_premises'),
+        ];
+
         // Banking fields
         if ($request->has('banking_fields')) {
             $bankingFields = $request->input('banking_fields');
@@ -202,12 +226,12 @@ class CountrySettingsController extends Controller
                 $settings->banking_fields = $bankingFields;
             }
         }
-        $settings->bank_account_storage = $request->input('bank_account_storage', 'on_premises');
-        $settings->account_length = $request->input('account_length', 0);
-        $settings->tax_rate = $request->input('tax_rate', 0);
-        $settings->bank_verification_required = $request->has('bank_verification_required');
-        $settings->bank_verification_method = $request->input('bank_verification_method', 'manual');
-        $settings->usd_exchange_rate_percentage = $request->input('usd_exchange_rate_percentage', 0);
+
+        // Wallet settings
+        $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
+            'usd_exchange_rate' => $request->input('usd_exchange_rate_percentage', 0),
+        ]);
+
         $settings->save();
         return redirect()->route('admin.settings.country', $country)->withInput()->with('success', 'Banking settings updated.');
     }
@@ -218,25 +242,38 @@ class CountrySettingsController extends Controller
         $country = Country::findOrFail($countryId);
         $settings = CountrySetting::firstOrNew(['country_id' => $countryId]);
 
-        // Transaction Charges
-        $settings->transaction_charges = [
-            'percentage' => $request->input('transaction_percentage', 2),
-            'fixed' => $request->input('transaction_fixed', 100),
-            'cap' => $request->input('transaction_cap', 2000),
+        // Transaction settings
+        $settings->transaction_settings = [
+            'charges' => [
+                'percentage' => $request->input('transaction_percentage', 2),
+                'fixed' => $request->input('transaction_fixed', 100),
+                'cap' => $request->input('transaction_cap', 2000),
+            ],
+            'tax' => [
+                'percentage' => $request->input('tax_percentage', 0),
+                'apply' => $request->has('tax_apply'),
+            ],
         ];
-        // Withdrawal Charges
-        $settings->withdrawal_charges = [
-            'percentage' => $request->input('withdrawal_percentage', 1),
-            'fixed' => $request->input('withdrawal_fixed', 50),
-            'cap' => $request->input('withdrawal_cap', 1000),
+
+        // Withdrawal settings
+        $settings->withdrawal_settings = [
+            'charges' => [
+                'percentage' => $request->input('withdrawal_percentage', 1),
+                'fixed' => $request->input('withdrawal_fixed', 50),
+                'cap' => $request->input('withdrawal_cap', 1000),
+            ],
+            'min_withdrawal' => $request->input('min_withdrawal', 10),
+            'max_withdrawal' => $request->input('max_withdrawal', 5000),
+            'method' => $request->input('payout_method', 'manual'),
+            'weekend_payout' => $request->has('weekend_payout'),
+            'holiday_payout' => $request->has('holiday_payout'),
         ];
-        $settings->min_withdrawal = $request->input('min_withdrawal', 0);
-        $settings->max_withdrawal = $request->input('max_withdrawal', 0);
-        $settings->gateway = $request->input('gateway');
-        $settings->wallet_status = $request->input('wallet_status');
-        $settings->payout_method = $request->input('payout_method', 'manual');
-        $settings->weekend_payout = $request->has('weekend_payout');
-        $settings->holiday_payout = $request->has('holiday_payout');
+
+        $settings->gateway_id = $request->input('gateway_id');
+        $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
+            'wallet_status' => $request->input('wallet_status') === 'enabled',
+        ]);
+
         $settings->save();
         return redirect()->route('admin.settings.country', $country)->withInput()->with('success', 'Transaction settings updated.');
     }
@@ -247,12 +284,21 @@ class CountrySettingsController extends Controller
         $country = Country::findOrFail($countryId);
         $settings = CountrySetting::firstOrNew(['country_id' => $countryId]);
 
-        $settings->feature_rate = $request->input('feature_rate', 0);
-        $settings->broadcast_rate = $request->input('broadcast_rate', 0);
-        $settings->admin_review_cost = $request->input('admin_review_cost', 0);
-        $settings->system_review_cost = $request->input('system_review_cost', 0);
-        $settings->task_referral_commission_percentage = $request->input('task_referral_commission_percentage', 0);
-        $settings->signup_referral_earnings_percentage = $request->input('signup_referral_earnings_percentage', 0);
+        $settings->promotion_settings = array_merge($settings->promotion_settings ?? [], [
+            'feature_rate' => $request->input('feature_rate', 0),
+            'broadcast_rate' => $request->input('broadcast_rate', 0),
+        ]);
+
+        $settings->review_settings = array_merge($settings->review_settings ?? [], [
+            'admin_review_cost' => $request->input('admin_review_cost', 0),
+            'system_review_cost' => $request->input('system_review_cost', 0),
+        ]);
+
+        $settings->referral_settings = array_merge($settings->referral_settings ?? [], [
+            'signup_referral_earnings_percentage' => $request->input('signup_referral_earnings_percentage', 0),
+            'task_referral_commission_percentage' => $request->input('task_referral_commission_percentage', 0),
+        ]);
+
         $settings->save();
         return redirect()->route('admin.settings.country', $country)->withInput()->with('success', 'Task settings updated.');
     }
@@ -285,7 +331,7 @@ class CountrySettingsController extends Controller
                 \App\Models\CountryPrice::updateOrCreate(
                     [
                         'country_id' => $countryId,
-                        'priceable_type' => \App\Models\TaskTemplate::class,
+                        'priceable_type' => \App\Models\PlatformTemplate::class,
                         'priceable_id' => $templateId,
                     ],
                     [
@@ -324,18 +370,25 @@ class CountrySettingsController extends Controller
         $country = Country::findOrFail($countryId);
         $settings = CountrySetting::firstOrNew(['country_id' => $countryId]);
 
-        $settings->verification_provider = $request->input('verification_provider', 'manual');
-        $settings->verifications_can_expire = $request->has('verifications_can_expire');
+        $settings->verification_settings = [
+            'verification_provider' => $request->input('verification_provider', 'manual'),
+            'verifications_can_expire' => $request->has('verifications_can_expire'),
+        ];
+
         $fields = $request->input('verification_fields', []);
-        // Ensure structure for gov_id and address
+        // Match seeder structure
         $verificationFields = [
-            'gov_id' => [
-                'mode' => $fields['gov_id']['mode'] ?? 'one',
-                'docs' => $fields['gov_id']['docs'] ?? [],
+            'govt_id' => [
+                'file' => $fields['govt_id']['docs'] ?? [],
+                'require' => $fields['govt_id']['mode'] ?? 'one',
+                'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
+                'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
             ],
             'address' => [
-                'mode' => $fields['address']['mode'] ?? 'one',
-                'docs' => $fields['address']['docs'] ?? [],
+                'file' => $fields['address']['docs'] ?? [],
+                'require' => $fields['address']['mode'] ?? 'one',
+                'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
+                'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
             ],
         ];
         $settings->verification_fields = $verificationFields;

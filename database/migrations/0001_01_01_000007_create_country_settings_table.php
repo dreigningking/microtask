@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('country_settings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('country_id');
-            $table->string('gateway')->nullable();
+            $table->unsignedBigInteger('gateway_id')->nullable();
             $table->json('banking_settings')->nullable();
             $table->json('banking_fields')->nullable();
             $table->json('verification_fields')->nullable();

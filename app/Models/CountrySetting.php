@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Gateway;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CountrySetting extends Model
 {
@@ -12,7 +13,7 @@ class CountrySetting extends Model
 
     protected $fillable = [
         'country_id',
-        'gateway',
+        'gateway_id',
         'banking_settings',
         'banking_fields',
         'verification_fields',
@@ -46,5 +47,9 @@ class CountrySetting extends Model
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function gateway(){
+        return $this->belongsTo(Gateway::class);
     }
 }

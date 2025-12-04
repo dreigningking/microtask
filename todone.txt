@@ -1,1 +1,10 @@
+dynamic settings
+
+select type, e.g text
+default value
+placeholder
+max-length
+options
+title
+
 

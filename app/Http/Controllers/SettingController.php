@@ -380,32 +380,14 @@ class SettingController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|in:taskmaster,worker',
-            'is_active' => 'nullable|boolean',
-            // type-specific validation
-            'featured_promotion' => 'nullable|boolean',
-            'broadcast_promotion' => 'nullable|boolean',
-            'active_tasks_per_hour' => 'nullable|numeric|min:1',
-            'withdrawal_maximum_multiplier' => 'nullable|numeric|min:1',
+            'minimum_duration_days' => 'required|numeric|min:1',
         ]);
 
         $booster = new Booster();
         $booster->name = $request->name;
         $booster->description = $request->description;
-        $booster->type = $request->type;
+        $booster->minimum_duration_days = $request->minimum_duration_days;
         $booster->is_active = $request->has('is_active') ? true : false;
-
-        if ($request->type === 'taskmaster') {
-            $booster->featured_promotion = $request->has('featured_promotion') ? true : false;
-            $booster->broadcast_promotion = $request->has('broadcast_promotion') ? true : false;
-            $booster->active_tasks_per_hour = 1;
-            $booster->withdrawal_maximum_multiplier = 1;
-        } else {
-            $booster->featured_promotion = false;
-            $booster->broadcast_promotion = false;
-            $booster->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
-            $booster->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
-        }
         $booster->save();
 
         return redirect()->back()->with('success', 'Booster created successfully.');
@@ -417,32 +399,14 @@ class SettingController extends Controller
             'id' => 'required|exists:boosters,id',
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|in:taskmaster,worker',
-            'is_active' => 'nullable|boolean',
-            // type-specific validation
-            'featured_promotion' => 'nullable|boolean',
-            'broadcast_promotion' => 'nullable|boolean',
-            'active_tasks_per_hour' => 'nullable|numeric|min:1',
-            'withdrawal_maximum_multiplier' => 'nullable|numeric|min:1',
+            'minimum_duration_days' => 'required|numeric|min:1',
         ]);
 
         $booster = Booster::findOrFail($request->id);
         $booster->name = $request->name;
         $booster->description = $request->description;
-        $booster->type = $request->type;
+        $booster->minimum_duration_days = $request->minimum_duration_days;
         $booster->is_active = $request->has('is_active') ? true : false;
-
-        if ($request->type === 'taskmaster') {
-            $booster->featured_promotion = $request->has('featured_promotion') ? true : false;
-            $booster->broadcast_promotion = $request->has('broadcast_promotion') ? true : false;
-            $booster->active_tasks_per_hour = 1;
-            $booster->withdrawal_maximum_multiplier = 1;
-        } else {
-            $booster->featured_promotion = false;
-            $booster->broadcast_promotion = false;
-            $booster->active_tasks_per_hour = $request->input('active_tasks_per_hour', 1);
-            $booster->withdrawal_maximum_multiplier = $request->input('withdrawal_maximum_multiplier', 1);
-        }
         $booster->save();
 
         return redirect()->back()->with('success', 'Booster updated successfully.');
@@ -484,8 +448,8 @@ class SettingController extends Controller
         $user->password = bcrypt($data['password']);
         $user->country_id = $data['country_id'] ?? null;
         $user->is_active = $request->has('is_active') ? (bool)$data['is_active'] : true;
+        $user->role_id = $data['role_id'];
         $user->save();
-        $user->roles()->sync([$data['role_id']]);
 
         return back()->with('success', 'Staff member created successfully.');
     }
@@ -511,8 +475,9 @@ class SettingController extends Controller
         }
         $user->country_id = $data['country_id'] ?? null;
         $user->is_active = $request->has('is_active') ? (bool)$data['is_active'] : false;
+        $user->role_id = $data['role_id'];
         $user->save();
-        $user->roles()->sync([$data['role_id']]);
+      
 
         return back()->with('success', 'Staff member updated successfully.');
     }
@@ -522,7 +487,6 @@ class SettingController extends Controller
      */
     public function staffDestroy(User $user)
     {
-        $user->roles()->detach();
         $user->delete();
         return back()->with('success', 'Staff member deleted successfully.');
     }

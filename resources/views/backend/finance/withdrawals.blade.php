@@ -60,19 +60,7 @@
 									</select>
 								</div>
 								
-								<div class="col-md-2 mb-3">
-									<label for="payout_method" class="form-label">Payout Method</label>
-									<select class="form-select" id="payout_method" name="payout_method">
-										<option value="">All Methods</option>
-										@if($payoutMethods && $payoutMethods->count() > 0)
-											@foreach($payoutMethods as $method)
-												<option value="{{ $method }}" {{ request('payout_method') === $method ? 'selected' : '' }}>
-													{{ ucfirst($method) }}
-												</option>
-											@endforeach
-										@endif
-									</select>
-								</div>
+								
 								
 								<div class="col-md-2 mb-3">
 									<label for="amount_min" class="form-label">Min Amount</label>
@@ -181,7 +169,7 @@
 											</td>
 											<td>
 												<div class="small">
-													<div><span class="badge bg-info">{{ ucfirst($withdrawal->gateway) }}</span></div>
+													<div><span class="badge bg-info">{{ ucfirst($withdrawal->gateway->name) }}</span></div>
 													<div class="text-muted">{{ ucfirst($withdrawal->payment_method) }}</div>
 												</div>	
 											</td>

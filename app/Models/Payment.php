@@ -16,7 +16,7 @@ class Payment extends Model
         'currency',
         'amount',
         'vat_value',
-        'gateway',
+        'gateway_id',
         'status',
     ];
 
@@ -45,6 +45,12 @@ class Payment extends Model
     {
         return $this->amount + $this->vat_value;
     }
+
+    public function gateway(){
+        return $this->belongsTo(Gateway::class);
+    }
+
+    
 
     /**
      * Check if payment is pending

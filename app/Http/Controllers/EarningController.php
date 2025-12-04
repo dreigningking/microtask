@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
-use App\Models\CountrySetting;
+use App\Models\Gateway;
 use App\Models\Payment;
 use App\Models\Exchange;
 use App\Models\Settlement;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\CountrySetting;
 use App\Http\Traits\PayoutTrait;
+use Illuminate\Support\Facades\Auth;
 
 class EarningController extends Controller
 {
@@ -100,8 +101,8 @@ class EarningController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('gateway')) {
-            $query->where('gateway', 'like', '%' . $request->gateway . '%');
+        if ($request->filled('gateway_id')) {
+            $query->where('gateway_id',$request->gateway_id);
         }
 
         // Country filter for super-admin users
@@ -227,12 +228,6 @@ class EarningController extends Controller
             $query->where('status', $request->status);
         }
 
-        // if ($request->filled('payout_method')) {
-        //     $query->whereHas('user.country.setting', function ($q) use ($request) {
-        //         $q->where('payout_method', $request->payout_method);
-        //     });
-        // }
-
         // Country filter for super-admin users
         if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function ($q) use ($request) {
@@ -247,7 +242,7 @@ class EarningController extends Controller
         $statuses = Withdrawal::distinct()->pluck('status')->filter()->sort()->values();
         
         // Get unique payout methods for filter dropdown
-        $payoutMethods = CountrySetting::whereNotNull('gateway')->distinct('gateway')->get()->pluck('gateway');
+        $payoutMethods = Gateway::all();
         
         // Get countries for super-admin filter
         $countries = null;

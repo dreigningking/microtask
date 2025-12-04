@@ -19,7 +19,7 @@ class CountrySettingsSeeder extends Seeder
 
         $countries = [
             233 => [ // USA
-                'gateway' => 'stripe',
+                'gateway_id' => 1,
                 'banking_settings' => [
                     'account_length' => '10',
                     'require_account_verification' => true,
@@ -57,7 +57,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             39 => [ // Canada
-                'gateway' => 'stripe',
+                'gateway_id' => 1,
                 'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
@@ -95,7 +95,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             232 => [ // UK
-                'gateway' => 'stripe',
+                'gateway_id' => 6,
                 'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
@@ -133,7 +133,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             161 => [ // Nigeria
-                'gateway' => 'paystack',
+                'gateway_id' => 2,
                 'banking_settings' => [
                     'account_length' => '10',
                     'require_account_verification' => true,
@@ -171,7 +171,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             113 => [ // Kenya
-                'gateway' => 'mpesa',
+                'gateway_id' => 3,
                 'banking_settings' => [
                     'account_length' => '6',
                     'require_account_verification' => false,
@@ -209,7 +209,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             83 => [ // Ghana
-                'gateway' => 'flutterwave',
+                'gateway_id' => 4,
                 'banking_settings' => [
                     'account_length' => '8',
                     'require_account_verification' => true,
@@ -247,7 +247,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             101 => [ // India
-                'gateway' => 'razorpay',
+                'gateway_id' => 5,
                 'banking_settings' => [
                     'account_length' => '11',
                     'require_account_verification' => true,
@@ -285,7 +285,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
             ],
             14 => [ // Australia
-                'gateway' => 'stripe',
+                'gateway_id' => 1,
                 'banking_settings' => [
                     'account_length' => '6',
                     'require_account_verification' => true,

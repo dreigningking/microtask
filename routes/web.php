@@ -36,10 +36,11 @@ use App\Livewire\Policies\PaymentDisputeChargebacks;
 
 
 Route::get('run', function () {
-    $permissions = \App\Models\Permission::all();
-    foreach($permissions as $permission){
-        $permission->slug = strtolower(explode(' ',$permission->name)[0]).'_'.strtolower(explode(' ',$permission->name)[1]);
-        $permission->save();
+    $countries = \App\Models\CountrySetting::all();
+    foreach($countries as $country){
+        $gateway = \App\Models\Gateway::where('slug',$country->gateway)->first();
+        $country->gateway_id = $gateway ? $gateway->id: 1;
+        $country->save();
     }
     return 'done';
 });

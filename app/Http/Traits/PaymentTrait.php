@@ -13,7 +13,8 @@ trait PaymentTrait
     use PaystackTrait,FlutterwaveTrait,PaypalTrait,StripeTrait;
 
     public function initializePayment(Payment $payment){
-        switch($payment->gateway){
+        $gateway = $payment->gateway->slug;
+        switch($gateway){
             case 'paystack': 
                 $link = $this->initiatePaystack($payment);
                 return $link;
@@ -39,7 +40,7 @@ trait PaymentTrait
 
     public function initializeRefund(Settlement $settlement){
         
-        $gateway = $settlement->receiver->country->payment_gateway;
+        $gateway = $settlement->receiver->country->gateway;
         switch($gateway){
             case 'paystack': return $this->refundPaystack($settlement);
             break;
@@ -53,7 +54,7 @@ trait PaymentTrait
     }
 
     public function verifyPayment(Payment $payment){
-        $gateway = $payment->gateway;
+        $gateway = $payment->gateway->slug;
         switch($gateway){
             case 'paystack': 
                 $details = $this->verifyPaystackPayment($payment->reference);

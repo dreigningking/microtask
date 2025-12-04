@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         
         $this->call([
             SettingsSeeder::class,
+            GatewaysSeeder::class,
             BoostersSeeder::class,
             PlatformsSeeder::class,
             PlatformTemplatesSeeder::class,
