@@ -72,102 +72,98 @@
                                     <form action="{{ route('admin.settings.countries.update') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="country_id" value="{{ $country->id }}">
+                                        <h5 class="card-title">Banking Configuration</h5>
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <h5 class="card-title">Banking Configuration</h5>
-
+                                            <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label class="form-label">Select Payment Gateway</label>
-                                                    <select class="form-control" name="gateway_id">
+                                                    <select class="form-control" name="gateway_id" id="gateway_select">
                                                         <option value="">None</option>
                                                         @foreach($gateways as $gateway)
-                                                        <option value="{{ $gateway->id }}" {{ $settings->gateway_id == $gateway->id ? 'selected' : '' }}>{{ $gateway->name }}</option>
+                                                        <option value="{{ $gateway->id }}"
+                                                            {{ $settings->gateway_id == $gateway->id ? 'selected' : '' }}
+                                                            data-banking-fields="{{ htmlspecialchars(json_encode($gateway->banking_fields)) }}">
+                                                            {{ $gateway->name }}
+                                                        </option>
                                                         @endforeach
-
                                                     </select>
-                                                    <small class="text-muted">Gateway will determine the banking fields.</small>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Bank Account Verification</label>
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="account_verification_required" name="banking_settings[account_verification_required]" {{ old('account_verification_required', $settings->banking_settings['account_verification_required'] ?? false) ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="account_verification_required">Require Account Verification</label>
-                                                    </div>
-                                                    <small class="text-muted d-block mt-1">Account details will be verified before activation</small>
-                                                </div>
 
-                                                <div class="mb-4">
-                                                    <label class="form-label">Bank Account Verification Method</label>
-                                                    <select class="form-control" name="banking_settings[account_verification_method]">
-                                                        <option value="manual" {{ old('account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual Verification</option>
-                                                        <option value="gateway" {{ old('account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'gateway' ? 'selected' : '' }}>Gateway Verification</option>
-                                                    </select>
                                                 </div>
                                             </div>
-
-                                            <div class="col-md-6">
-                                                <h5 class="card-title">Wallet and Exchange</h5>
+                                            <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">USD Exchange Rate Markup</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">$1 +</span>
-                                                        <input type="number" class="form-control" name="wallet_settings[usd_exchange_rate_percentage]" value="{{ old('usd_exchange_rate_percentage', $settings->wallet_settings['usd_exchange_rate'] ?? 0) }}" step="0.0001">
-                                                        <span class="input-group-text">%</span>
-                                                        @php
-                                                        $markup = old('usd_exchange_rate_percentage', $settings->wallet_settings['usd_exchange_rate'] ?? 0);
-                                                        $total = $exchangeRate * (1 + ($markup / 100));
-                                                        @endphp
-                                                        <span class="input-group-text">= {{ $country->currency_symbol }}{{ number_format($total,1) }}</span>
-                                                    </div>
-                                                    <small class="text-muted">Current rate: {{ $country->currency_symbol }}{{ number_format($exchangeRate, 1) }} . Markup is applied as a percentage.</small>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Wallet Status</label>
-                                                    <div class="d-flex">
-                                                        <div class="form-check mr-auto">
-                                                            <input class="form-check-input" type="radio" name="wallet_settings[wallet_status]" id="enable_wallets" value="enabled" {{ old('wallet_status', ($settings->wallet_settings['wallet_status'] ?? true) ? 'enabled' : 'disabled') == 'enabled' ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="enable_wallets">
-                                                                Enable Wallets
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="wallet_settings[wallet_status]" id="disable_wallets" value="disabled" {{ old('wallet_status', ($settings->wallet_settings['wallet_status'] ?? true) ? 'enabled' : 'disabled') == 'disabled' ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="disable_wallets">
-                                                                Freeze Wallets
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <small class="text-muted">Control whether users can access their wallets in this country</small>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Payout Method</label>
-                                                    <select class="form-control" name="withdrawal_settings[method]">
-                                                        <option value="manual" {{ ($settings->withdrawal_settings['method'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual</option>
-                                                        <option value="gateway" {{ ($settings->withdrawal_settings['method'] ?? 'manual') == 'gateway' ? 'selected' : '' }}>Gateway</option>
+                                                    <label class="form-label">Account Verification</label>
+                                                    <select class="form-control" name="banking_settings[account_verification_required]">
+                                                        <option value="1" {{ old('banking_settings.account_verification_required', $settings->banking_settings['account_verification_required'] ?? 0) ? 'selected' : '' }}>Required</option>
+                                                        <option value="0" {{ old('banking_settings.account_verification_required', $settings->banking_settings['account_verification_required'] ?? 0) ? 'selected' : '' }}>Not Required</option>
                                                     </select>
+
+
                                                 </div>
-
-                                                <div class="mb-4 row px-3">
-                                                    <div class="col-md-6 form-check form-switch mb-2">
-                                                        <input class="form-check-input" type="checkbox" id="weekend_payout" name="withdrawal_settings[weekend_payout]" {{ ($settings->withdrawal_settings['weekend_payout'] ?? false) ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="weekend_payout">Weekend Payout</label>
-                                                    </div>
-
-                                                    <div class="col-md-6 form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="holiday_payout" name="withdrawal_settings[holiday_payout]" {{ ($settings->withdrawal_settings['holiday_payout'] ?? false) ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="holiday_payout">Holiday Payout</label>
-                                                    </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-4">
+                                                    <label class="form-label">Verification Method</label>
+                                                    <select class="form-control" name="banking_settings[account_verification_method]">
+                                                        <option value="manual" {{ old('banking_settings.account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual Verification</option>
+                                                        <option value="gateway" {{ old('banking_settings.account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'gateway' ? 'selected' : '' }}>Gateway Verification</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div id="banking_fields_config my-3">
+                                            <h6 class="mb-3">Configure Banking Fields </h6>
+                                            <div id="banking_fields_container">
+                                                @if($settings->gateway_id)
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        @foreach($settings->gateway->banking_fields as $field)
+                                                        @php
+                                                        $existingConfig = collect($settings->banking_fields ?? [])->firstWhere('slug', $field['slug']) ?? [];
+                                                        @endphp
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                <h6 class="mb-3">{{ $field['title'] }}</h6>
+                                                            </div>
+                                                            <div class="col-md-3">
+
+                                                                <div class="form-check form-switch mb-2">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        id="field_enabled_{{ $field['slug'] }}"
+                                                                        name="banking_fields[{{ $field['slug'] }}][enabled]"
+                                                                        @if(isset($existingConfig['required']) || isset($existingConfig['title'])) checked @endif>
+                                                                    <label class="form-check-label" for="field_enabled_{{ $field['slug'] }}">
+                                                                        Enable this field
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <div class="form-check form-switch mb-3">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        id="field_required_{{ $field['slug'] }}"
+                                                                        name="banking_fields[{{ $field['slug'] }}][required]"
+                                                                        @if($existingConfig['required'] ?? false) checked @endif>
+                                                                    <label class="form-check-label" for="field_required_{{ $field['slug'] }}">
+                                                                        Required field
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+
                                         <button type="submit" class="btn btn-primary">Save changes</button>
                                     </form>
                                 </div>
                             </div>
                             <div class="card mb-4">
-                                
+
                                 <div class="card-body">
                                     <form action="{{ route('admin.settings.countries.update') }}" method="POST">
                                         @csrf
@@ -220,7 +216,39 @@
                                                             </div>
                                                         </div>
 
+                                                        <div class="mb-3">
+                                                            <label class="form-label">USD Exchange Rate Markup</label>
+                                                            <div class="input-group">
+                                                                <span class="input-group-text">$1 +</span>
+                                                                <input type="number" class="form-control" name="wallet_settings[usd_exchange_rate]" value="{{ old('wallet_settings.usd_exchange_rate', $settings->wallet_settings['usd_exchange_rate'] ?? 0) }}" step="0.0001">
+                                                                <span class="input-group-text">%</span>
+                                                                @php
+                                                                $markup = old('wallet_settings.usd_exchange_rate', $settings->wallet_settings['usd_exchange_rate'] ?? 0);
+                                                                $total = $exchangeRate * (1 + ($markup / 100));
+                                                                @endphp
+                                                                <span class="input-group-text">= {{ $country->currency_symbol }}{{ number_format($total,1) }}</span>
+                                                            </div>
+                                                            <small class="text-muted">Current rate: {{ $country->currency_symbol }}{{ number_format($exchangeRate, 1) }} . Markup is applied as a percentage.</small>
+                                                        </div>
 
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Wallet Status</label>
+                                                            <div class="d-flex">
+                                                                <div class="form-check mr-auto">
+                                                                    <input class="form-check-input" type="radio" name="wallet_settings[wallet_status]" id="enable_wallets" value="true" {{ old('wallet_settings.wallet_status', ($settings->wallet_settings['wallet_status'] ?? true) ? 'true' : 'false') == 'true' ? 'checked' : '' }}>
+                                                                    <label class="form-check-label" for="enable_wallets">
+                                                                        Enable Wallets
+                                                                    </label>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="wallet_settings[wallet_status]" id="disable_wallets" value="false" {{ old('wallet_settings.wallet_status', ($settings->wallet_settings['wallet_status'] ?? true) ? 'true' : 'false') == 'false' ? 'checked' : '' }}>
+                                                                    <label class="form-check-label" for="disable_wallets">
+                                                                        Freeze Wallets
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <small class="text-muted">Control whether users can access their wallets in this country</small>
+                                                        </div>
 
 
                                                     </div>
@@ -233,7 +261,7 @@
                                                         <h5 class="mb-4">Withdrawal Charges</h5>
 
                                                         <div class="mb-3">
-                            
+
                                                             <div class="row">
                                                                 <div class="col-md-5">
                                                                     <div class="input-group mb-2">
@@ -274,6 +302,25 @@
                                                             </div>
                                                         </div>
 
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Payout Method</label>
+                                                            <select class="form-control" name="withdrawal_settings[method]">
+                                                                <option value="manual" {{ ($settings->withdrawal_settings['method'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual</option>
+                                                                <option value="gateway" {{ ($settings->withdrawal_settings['method'] ?? 'manual') == 'gateway' ? 'selected' : '' }}>Gateway</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mb-4 row pl-3">
+                                                            <div class="col-md-6 form-check form-switch mb-2">
+                                                                <input class="form-check-input" type="checkbox" id="withdrawal_settings_weekend_payout" name="withdrawal_settings[weekend_payout]" {{ ($settings->withdrawal_settings['weekend_payout'] ?? false) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="withdrawal_settings_weekend_payout">Weekend Payout</label>
+                                                            </div>
+
+                                                            <div class="col-md-6 form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox" id="withdrawal_settings_holiday_payout" name="withdrawal_settings[holiday_payout]" {{ ($settings->withdrawal_settings['holiday_payout'] ?? false) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="withdrawal_settings_holiday_payout">Holiday Payout</label>
+                                                            </div>
+                                                        </div>
 
                                                     </div>
                                                 </div>
@@ -304,25 +351,25 @@
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
                                     <div class="mb-3">
                                         <label class="form-label">Verification Provider</label>
-                                        <select class="form-control" name="verification_provider" id="verification_provider_select">
-                                            <option value="manual" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual</option>
-                                            <option value="smileid" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'smileid' ? 'selected' : '' }}>SmileID</option>
-                                            <option value="passbase" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'passbase' ? 'selected' : '' }}>Passbase</option>
-                                            <option value="verifyme" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'verifyme' ? 'selected' : '' }}>VerifyMe</option>
-                                            <option value="identitypass" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'identitypass' ? 'selected' : '' }}>IdentityPass</option>
-                                            <option value="shuftipro" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'shuftipro' ? 'selected' : '' }}>ShuftiPro</option>
-                                            <option value="veriff" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'veriff' ? 'selected' : '' }}>Veriff</option>
-                                            <option value="onfido" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'onfido' ? 'selected' : '' }}>Onfido</option>
-                                            <option value="sumsub" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'sumsub' ? 'selected' : '' }}>Sumsub</option>
-                                            <option value="yoti" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'yoti' ? 'selected' : '' }}>Yoti</option>
-                                            <option value="idnow" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'idnow' ? 'selected' : '' }}>IDnow</option>
-                                            <option value="persona" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'persona' ? 'selected' : '' }}>Persona</option>
-                                            <option value="trulioo" {{ old('verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'trulioo' ? 'selected' : '' }}>Trulioo</option>
+                                        <select class="form-control" name="verification_settings[verification_provider]" id="verification_provider_select">
+                                            <option value="manual" {{ old('verification_settings.verification_provider', ($settings->verification_settings['verification_provider'] ?? 'manual')) == 'manual' ? 'selected' : '' }}>Manual</option>
+                                            <option value="smileid" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'smileid' ? 'selected' : '' }}>SmileID</option>
+                                            <option value="passbase" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'passbase' ? 'selected' : '' }}>Passbase</option>
+                                            <option value="verifyme" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'verifyme' ? 'selected' : '' }}>VerifyMe</option>
+                                            <option value="identitypass" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'identitypass' ? 'selected' : '' }}>IdentityPass</option>
+                                            <option value="shuftipro" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'shuftipro' ? 'selected' : '' }}>ShuftiPro</option>
+                                            <option value="veriff" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'veriff' ? 'selected' : '' }}>Veriff</option>
+                                            <option value="onfido" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'onfido' ? 'selected' : '' }}>Onfido</option>
+                                            <option value="sumsub" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'sumsub' ? 'selected' : '' }}>Sumsub</option>
+                                            <option value="yoti" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'yoti' ? 'selected' : '' }}>Yoti</option>
+                                            <option value="idnow" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'idnow' ? 'selected' : '' }}>IDnow</option>
+                                            <option value="persona" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'persona' ? 'selected' : '' }}>Persona</option>
+                                            <option value="trulioo" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'trulioo' ? 'selected' : '' }}>Trulioo</option>
                                         </select>
                                     </div>
                                     <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox" id="verifications_can_expire" name="verifications_can_expire" {{ old('verifications_can_expire', $settings->verification_settings['verifications_can_expire'] ?? false) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="verifications_can_expire">Verifications can expire</label>
+                                        <input class="form-check-input" type="checkbox" id="verification_settings_verifications_can_expire" name="verification_settings[verifications_can_expire]" {{ old('verification_settings.verifications_can_expire', ($settings->verification_settings['verifications_can_expire'] ?? false)) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="verification_settings_verifications_can_expire">Verifications can expire</label>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -425,7 +472,7 @@
                                                         <label class="form-label">Feature Rate per day</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="feature_rate" value="{{ old('feature_rate', $settings->promotion_settings['feature_rate'] ?? 0) }}" step="0.01">
+                                                            <input type="number" class="form-control" name="promotion_settings[feature_rate]" value="{{ old('promotion_settings.feature_rate', $settings->promotion_settings['feature_rate'] ?? 0) }}" step="0.01">
                                                         </div>
                                                         <small class="text-muted">Cost to feature a job posting per day</small>
                                                     </div>
@@ -434,7 +481,7 @@
                                                         <label class="form-label">Broadcast Rate per email </label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="broadcast_rate" value="{{ old('broadcast_rate', $settings->promotion_settings['broadcast_rate'] ?? 0) }}" step="0.01">
+                                                            <input type="number" class="form-control" name="promotion_settings[broadcast_rate]" value="{{ old('promotion_settings.broadcast_rate', $settings->promotion_settings['broadcast_rate'] ?? 0) }}" step="0.01">
                                                         </div>
                                                         <small class="text-muted">Cost to send broadcast email per recipient</small>
                                                     </div>
@@ -451,7 +498,7 @@
                                                         <label class="form-label">Admin Review Cost</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="admin_review_cost" value="{{ old('admin_review_cost', $settings->review_settings['admin_review_cost'] ?? 0) }}" step="0.01">
+                                                            <input type="number" class="form-control" name="review_settings[admin_review_cost]" value="{{ old('review_settings.admin_review_cost', $settings->review_settings['admin_review_cost'] ?? 0) }}" step="0.01">
                                                         </div>
                                                         <small class="text-muted">Cost for admin-monitored tasks</small>
                                                     </div>
@@ -460,7 +507,7 @@
                                                         <label class="form-label">System Review Cost</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">{{ $country->currency_symbol }}</span>
-                                                            <input type="number" class="form-control" name="system_review_cost" value="{{ old('system_review_cost', $settings->review_settings['system_review_cost'] ?? 0) }}" step="0.01">
+                                                            <input type="number" class="form-control" name="review_settings[system_review_cost]" value="{{ old('review_settings.system_review_cost', $settings->review_settings['system_review_cost'] ?? 0) }}" step="0.01">
                                                         </div>
                                                         <small class="text-muted">Cost for system-automated review</small>
                                                     </div>
@@ -478,7 +525,7 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Invitee Commission Percentage</label>
                                                         <div class="input-group">
-                                                            <input type="number" class="form-control" name="task_referral_commission_percentage" value="{{ old('task_referral_commission_percentage', $settings->referral_settings['task_referral_commission_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
+                                                            <input type="number" class="form-control" name="referral_settings[task_referral_commission_percentage]" value="{{ old('referral_settings.task_referral_commission_percentage', $settings->referral_settings['task_referral_commission_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
                                                         <small class="text-muted">Percentage commission for invited workers</small>
@@ -487,7 +534,7 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Referral Earnings Percentage</label>
                                                         <div class="input-group">
-                                                            <input type="number" class="form-control" name="signup_referral_earnings_percentage" value="{{ old('signup_referral_earnings_percentage', $settings->referral_settings['signup_referral_earnings_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
+                                                            <input type="number" class="form-control" name="referral_settings[signup_referral_earnings_percentage]" value="{{ old('referral_settings.signup_referral_earnings_percentage', $settings->referral_settings['signup_referral_earnings_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
                                                         <small class="text-muted">Percentage earnings for successful referrals</small>
@@ -661,6 +708,10 @@
 @push('scripts')
 
 <script>
+    // Pass existing banking fields configuration to JavaScript
+</script>
+
+<script>
     $(function() {
         $('#verification_provider_select').on('change', function() {
             if ($(this).val() === 'provider') {
@@ -669,6 +720,109 @@
                 $('#verification_provider_group').hide();
             }
         });
+
+        // Function to handle banking fields display
+        function updateBankingFields() {
+            var selectedOption = $('#gateway_select').find('option:selected');
+            var gatewayValue = selectedOption.val();
+            var bankingFields = selectedOption.data('banking-fields');
+
+            if (gatewayValue && bankingFields && bankingFields.length > 0) {
+                renderBankingFields(bankingFields);
+            }
+        }
+
+        // Handle gateway selection change
+        $('#gateway_select').on('change', function() {
+            updateBankingFields();
+        });
+
+
+
+        function renderBankingFields(fields) {
+            var container = $('#banking_fields_container');
+            container.empty();
+
+            // Create a map of existing fields by slug for easy lookup
+            var existingFieldsMap = {};
+            existingBankingFields.forEach(function(existingField) {
+                existingFieldsMap[existingField.slug] = existingField;
+            });
+
+            fields.forEach(function(field, index) {
+                // Merge with existing configuration if available
+                var existingConfig = existingFieldsMap[field.slug] || {};
+                var isEnabled = existingConfig.hasOwnProperty('required') || existingConfig.title !== undefined;
+                var isRequired = existingConfig.required || false;
+                var fieldTitle = existingConfig.title || field.title;
+                var fieldPlaceholder = existingConfig.placeholder || field.placeholder || '';
+
+                var fieldHtml = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">${field.title}</h6>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="field_enabled_${index}"
+                                               name="banking_fields[${index}][enabled]"
+                                               ${isEnabled ? 'checked' : ''}>
+                                        <label class="form-check-label" for="field_enabled_${index}">
+                                            Enable this field
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="field_required_${index}"
+                                               name="banking_fields[${index}][required]"
+                                               ${isRequired ? 'checked' : ''}>
+                                        <label class="form-check-label" for="field_required_${index}">
+                                            Required field
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Field Title</label>
+                                        <input type="text" class="form-control"
+                                               name="banking_fields[${index}][title]"
+                                               value="${fieldTitle}"
+                                               placeholder="Field title">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Placeholder</label>
+                                        <input type="text" class="form-control"
+                                               name="banking_fields[${index}][placeholder]"
+                                               value="${fieldPlaceholder}"
+                                               placeholder="Field placeholder">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Min Length</label>
+                                            <input type="number" class="form-control"
+                                                   name="banking_fields[${index}][min_length]"
+                                                   value="${existingConfig.min_length || field.min_length || ''}"
+                                                   placeholder="Min length">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Max Length</label>
+                                            <input type="number" class="form-control"
+                                                   name="banking_fields[${index}][max_length]"
+                                                   value="${existingConfig.max_length || field.max_length || ''}"
+                                                   placeholder="Max length">
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="banking_fields[${index}][slug]" value="${field.slug}">
+                                    <input type="hidden" name="banking_fields[${index}][type]" value="${field.type}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.append(fieldHtml);
+            });
+        }
     });
 </script>
 @endpush
