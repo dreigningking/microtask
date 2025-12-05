@@ -24,7 +24,6 @@ class CountrySetting extends Model
         'wallet_settings',
         'referral_settings',
         'review_settings',
-        'security_settings',
     ];
 
     protected $casts = [
@@ -38,7 +37,6 @@ class CountrySetting extends Model
         'wallet_settings' => 'array',
         'referral_settings' => 'array',
         'review_settings' => 'array',
-        'security_settings' => 'array',
     ];
 
     /**

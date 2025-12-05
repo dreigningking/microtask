@@ -82,7 +82,7 @@
                                                         @foreach($gateways as $gateway)
                                                         <option value="{{ $gateway->id }}"
                                                             {{ $settings->gateway_id == $gateway->id ? 'selected' : '' }}
-                                                            data-banking-fields="{{ htmlspecialchars(json_encode($gateway->banking_fields)) }}">
+                                                            data-banking-fields="{{ json_encode($gateway->banking_fields) }}">
                                                             {{ $gateway->name }}
                                                         </option>
                                                         @endforeach
@@ -94,8 +94,8 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Account Verification</label>
                                                     <select class="form-control" name="banking_settings[account_verification_required]">
-                                                        <option value="1" {{ old('banking_settings.account_verification_required', $settings->banking_settings['account_verification_required'] ?? 0) ? 'selected' : '' }}>Required</option>
-                                                        <option value="0" {{ old('banking_settings.account_verification_required', $settings->banking_settings['account_verification_required'] ?? 0) ? 'selected' : '' }}>Not Required</option>
+                                                        <option value="1" {{ ($settings->banking_settings['account_verification_required'] ?? false) ? 'selected' : '' }}>Required</option>
+                                                        <option value="0" {{ !($settings->banking_settings['account_verification_required'] ?? false) ? 'selected' : '' }}>Not Required</option>
                                                     </select>
 
 
@@ -106,7 +106,7 @@
                                                     <label class="form-label">Verification Method</label>
                                                     <select class="form-control" name="banking_settings[account_verification_method]">
                                                         <option value="manual" {{ old('banking_settings.account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual Verification</option>
-                                                        <option value="gateway" {{ old('banking_settings.account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'manual') == 'gateway' ? 'selected' : '' }}>Gateway Verification</option>
+                                                        <option value="gateway" {{ old('banking_settings.account_verification_method', $settings->banking_settings['account_verification_method'] ?? 'gateway') == 'gateway' ? 'selected' : '' }}>Gateway Verification</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -119,19 +119,18 @@
                                                     <div class="card-body">
                                                         @foreach($settings->gateway->banking_fields as $field)
                                                         @php
-                                                        $existingConfig = collect($settings->banking_fields ?? [])->firstWhere('slug', $field['slug']) ?? [];
+                                                            $existingConfig = collect($settings->banking_fields ?? [])->firstWhere('slug', $field['slug']) ?? [];
                                                         @endphp
                                                         <div class="row">
                                                             <div class="col-md-3">
                                                                 <h6 class="mb-3">{{ $field['title'] }}</h6>
                                                             </div>
                                                             <div class="col-md-3">
-
                                                                 <div class="form-check form-switch mb-2">
                                                                     <input class="form-check-input" type="checkbox"
                                                                         id="field_enabled_{{ $field['slug'] }}"
-                                                                        name="banking_fields[{{ $field['slug'] }}][enabled]"
-                                                                        @if(isset($existingConfig['required']) || isset($existingConfig['title'])) checked @endif>
+                                                                        name="banking_fields[{{ $field['slug'] }}][enabled]" value="1"
+                                                                        @if(isset($existingConfig['required']) || isset($existingConfig['enabled'])) checked @endif>
                                                                     <label class="form-check-label" for="field_enabled_{{ $field['slug'] }}">
                                                                         Enable this field
                                                                     </label>
@@ -148,8 +147,6 @@
                                                                     </label>
                                                                 </div>
                                                             </div>
-
-
                                                         </div>
                                                         @endforeach
                                                     </div>
@@ -367,10 +364,7 @@
                                             <option value="trulioo" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'trulioo' ? 'selected' : '' }}>Trulioo</option>
                                         </select>
                                     </div>
-                                    <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox" id="verification_settings_verifications_can_expire" name="verification_settings[verifications_can_expire]" {{ old('verification_settings.verifications_can_expire', ($settings->verification_settings['verifications_can_expire'] ?? false)) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="verification_settings_verifications_can_expire">Verifications can expire</label>
-                                    </div>
+                                    
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
@@ -378,32 +372,32 @@
                                                 <div class="input-group mb-2">
                                                     <label class="input-group-text">Require</label>
                                                     <select class="form-select" name="verification_fields[govt_id][mode]">
-                                                        <option value="all" {{ (old('verification_fields.govt_id.mode', $settings->verification_fields['govt_id']['require'] ?? 'one') == 'all') ? 'selected' : '' }}>All</option>
-                                                        <option value="one" {{ (old('verification_fields.govt_id.mode', $settings->verification_fields['govt_id']['require'] ?? 'one') == 'one') ? 'selected' : '' }}>One</option>
+                                                        <option value="all" {{ (old('verification_fields.govt_id.mode', (($settings->verification_fields ?? [])['govt_id']['require'] ?? 'one')) == 'all') ? 'selected' : '' }}>All</option>
+                                                        <option value="one" {{ (old('verification_fields.govt_id.mode', (($settings->verification_fields ?? [])['govt_id']['require'] ?? 'one')) == 'one') ? 'selected' : '' }}>One</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="national_id" id="field_national_id" {{ in_array('national_id', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="national_id" id="field_national_id" {{ in_array('national_id', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_national_id">National ID Card</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="drivers_license" id="field_drivers_license" {{ in_array('drivers_license', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="drivers_license" id="field_drivers_license" {{ in_array('drivers_license', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_drivers_license">Driver's License</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="adhar_card" id="field_adhar_card" {{ in_array('adhar_card', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="adhar_card" id="field_adhar_card" {{ in_array('adhar_card', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_adhar_card">Adhar Card</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="nin" id="field_nin" {{ in_array('nin', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="nin" id="field_nin" {{ in_array('nin', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_nin">NIN</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="voters_card" id="field_voters_card" {{ in_array('voters_card', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="voters_card" id="field_voters_card" {{ in_array('voters_card', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_voters_card">Voter's Card</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="passport" id="field_passport" {{ in_array('passport', old('verification_fields.govt_id.docs', $settings->verification_fields['govt_id']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[govt_id][docs][]" value="passport" id="field_passport" {{ in_array('passport', old('verification_fields.govt_id.docs', (($settings->verification_fields ?? [])['govt_id']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_passport">Passport</label>
                                                 </div>
                                             </div>
@@ -414,24 +408,24 @@
                                                 <div class="input-group mb-2">
                                                     <label class="input-group-text">Require</label>
                                                     <select class="form-select" name="verification_fields[address][mode]">
-                                                        <option value="all" {{ (old('verification_fields.address.mode', $settings->verification_fields['address']['require'] ?? 'one') == 'all') ? 'selected' : '' }}>All</option>
-                                                        <option value="one" {{ (old('verification_fields.address.mode', $settings->verification_fields['address']['require'] ?? 'one') == 'one') ? 'selected' : '' }}>One</option>
+                                                        <option value="all" {{ (old('verification_fields.address.mode', (($settings->verification_fields ?? [])['address']['require'] ?? 'one')) == 'all') ? 'selected' : '' }}>All</option>
+                                                        <option value="one" {{ (old('verification_fields.address.mode', (($settings->verification_fields ?? [])['address']['require'] ?? 'one')) == 'one') ? 'selected' : '' }}>One</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="electricity_bill" id="field_electricity_bill" {{ in_array('electricity_bill', old('verification_fields.address.docs', $settings->verification_fields['address']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="electricity_bill" id="field_electricity_bill" {{ in_array('electricity_bill', old('verification_fields.address.docs', (($settings->verification_fields ?? [])['address']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_electricity_bill">Electricity Bill</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="waste_bill" id="field_waste_bill" {{ in_array('waste_bill', old('verification_fields.address.docs', $settings->verification_fields['address']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="waste_bill" id="field_waste_bill" {{ in_array('waste_bill', old('verification_fields.address.docs', (($settings->verification_fields ?? [])['address']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_waste_bill">Waste Bill</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="internet_bill" id="field_internet_bill" {{ in_array('internet_bill', old('verification_fields.address.docs', $settings->verification_fields['address']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="internet_bill" id="field_internet_bill" {{ in_array('internet_bill', old('verification_fields.address.docs', (($settings->verification_fields ?? [])['address']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_internet_bill">Internet Bill</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="bank_statement" id="field_bank_statement" {{ in_array('bank_statement', old('verification_fields.address.docs', $settings->verification_fields['address']['file'] ?? [])) ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" name="verification_fields[address][docs][]" value="bank_statement" id="field_bank_statement" {{ in_array('bank_statement', old('verification_fields.address.docs', (($settings->verification_fields ?? [])['address']['file'] ?? []))) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="field_bank_statement">Bank Statement</label>
                                                 </div>
                                             </div>
@@ -523,21 +517,21 @@
                                                     <h5 class="mb-4">Commission Settings</h5>
 
                                                     <div class="mb-3">
-                                                        <label class="form-label">Invitee Commission Percentage</label>
+                                                        <label class="form-label">Task Referral Commission Percentage</label>
                                                         <div class="input-group">
                                                             <input type="number" class="form-control" name="referral_settings[task_referral_commission_percentage]" value="{{ old('referral_settings.task_referral_commission_percentage', $settings->referral_settings['task_referral_commission_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
-                                                        <small class="text-muted">Percentage commission for invited workers</small>
+                                                        
                                                     </div>
 
                                                     <div class="mb-3">
-                                                        <label class="form-label">Referral Earnings Percentage</label>
+                                                        <label class="form-label">Sign-up Referral Earnings Percentage</label>
                                                         <div class="input-group">
                                                             <input type="number" class="form-control" name="referral_settings[signup_referral_earnings_percentage]" value="{{ old('referral_settings.signup_referral_earnings_percentage', $settings->referral_settings['signup_referral_earnings_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
-                                                        <small class="text-muted">Percentage earnings for successful referrals</small>
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -707,9 +701,6 @@
 
 @push('scripts')
 
-<script>
-    // Pass existing banking fields configuration to JavaScript
-</script>
 
 <script>
     $(function() {
@@ -721,101 +712,59 @@
             }
         });
 
-        // Function to handle banking fields display
-        function updateBankingFields() {
+        $('#gateway_select').on('change', function() {
             var selectedOption = $('#gateway_select').find('option:selected');
             var gatewayValue = selectedOption.val();
             var bankingFields = selectedOption.data('banking-fields');
-
+            var container = $('#banking_fields_container');
+            container.empty();
+            //console.log(bankingFields)
             if (gatewayValue && bankingFields && bankingFields.length > 0) {
                 renderBankingFields(bankingFields);
             }
-        }
-
-        // Handle gateway selection change
-        $('#gateway_select').on('change', function() {
-            updateBankingFields();
         });
-
-
+        // Handle gateway selection change
 
         function renderBankingFields(fields) {
+            console.log(fields)
             var container = $('#banking_fields_container');
-            container.empty();
-
             // Create a map of existing fields by slug for easy lookup
             var existingFieldsMap = {};
-            existingBankingFields.forEach(function(existingField) {
+            fields.forEach(function(existingField) {
                 existingFieldsMap[existingField.slug] = existingField;
             });
 
-            fields.forEach(function(field, index) {
+            fields.forEach(function(field) {
                 // Merge with existing configuration if available
                 var existingConfig = existingFieldsMap[field.slug] || {};
-                var isEnabled = existingConfig.hasOwnProperty('required') || existingConfig.title !== undefined;
+                var isEnabled = existingConfig.hasOwnProperty('enabled') && existingConfig.enabled;
                 var isRequired = existingConfig.required || false;
-                var fieldTitle = existingConfig.title || field.title;
-                var fieldPlaceholder = existingConfig.placeholder || field.placeholder || '';
 
                 var fieldHtml = `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="mb-3">${field.title}</h6>
-                                    <div class="form-check form-switch mb-2">
-                                        <input class="form-check-input" type="checkbox"
-                                               id="field_enabled_${index}"
-                                               name="banking_fields[${index}][enabled]"
-                                               ${isEnabled ? 'checked' : ''}>
-                                        <label class="form-check-label" for="field_enabled_${index}">
-                                            Enable this field
-                                        </label>
-                                    </div>
-                                    <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox"
-                                               id="field_required_${index}"
-                                               name="banking_fields[${index}][required]"
-                                               ${isRequired ? 'checked' : ''}>
-                                        <label class="form-check-label" for="field_required_${index}">
-                                            Required field
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Field Title</label>
-                                        <input type="text" class="form-control"
-                                               name="banking_fields[${index}][title]"
-                                               value="${fieldTitle}"
-                                               placeholder="Field title">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Placeholder</label>
-                                        <input type="text" class="form-control"
-                                               name="banking_fields[${index}][placeholder]"
-                                               value="${fieldPlaceholder}"
-                                               placeholder="Field placeholder">
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Min Length</label>
-                                            <input type="number" class="form-control"
-                                                   name="banking_fields[${index}][min_length]"
-                                                   value="${existingConfig.min_length || field.min_length || ''}"
-                                                   placeholder="Min length">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Max Length</label>
-                                            <input type="number" class="form-control"
-                                                   name="banking_fields[${index}][max_length]"
-                                                   value="${existingConfig.max_length || field.max_length || ''}"
-                                                   placeholder="Max length">
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="banking_fields[${index}][slug]" value="${field.slug}">
-                                    <input type="hidden" name="banking_fields[${index}][type]" value="${field.type}">
-                                </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6 class="mb-3">${field.title}</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox"
+                                       id="field_enabled_${field.slug}"
+                                       name="banking_fields[${field.slug}][enabled]" value="1"
+                                       ${isEnabled ? 'checked' : ''}>
+                                <label class="form-check-label" for="field_enabled_${field.slug}">
+                                    Enable this field
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox"
+                                       id="field_required_${field.slug}"
+                                       name="banking_fields[${field.slug}][required]"
+                                       ${isRequired ? 'checked' : ''}>
+                                <label class="form-check-label" for="field_required_${field.slug}">
+                                    Required field
+                                </label>
                             </div>
                         </div>
                     </div>

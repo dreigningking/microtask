@@ -66,6 +66,7 @@ class CountrySettingsController extends Controller
 
     public function update(Request $request)
     {
+        //dd($request->all());
         $countryId = $request->input('country_id');
         $country = Country::findOrFail($countryId);
 
@@ -77,118 +78,122 @@ class CountrySettingsController extends Controller
         }
 
         // Banking settings
-        $settings->gateway_id = $request->input('gateway_id');
-        $settings->banking_settings = array_merge($settings->banking_settings ?? [], [
-            'account_verification_required' => $request->boolean('banking_settings.account_verification_required'),
-            'account_verification_method' => $request->input('banking_settings.account_verification_method', 'manual'),
-        ]);
+        if($request->has('gateway_id')){
+            $settings->gateway_id = $request->input('gateway_id');
+        }
+
+        if($request->has('banking_settings')){
+            $settings->banking_settings = array_merge($settings->banking_settings ?? [], [
+                'account_verification_required' => $request->boolean('banking_settings.account_verification_required'),
+                'account_verification_method' => $request->input('banking_settings.account_verification_method', 'manual'),
+            ]);
+        }
 
         // Banking fields configuration
         if ($request->has('banking_fields')) {
             $bankingFieldsInput = $request->input('banking_fields');
             $configuredFields = [];
 
-            foreach ($bankingFieldsInput as $fieldData) {
-                if (isset($fieldData['enabled']) && $fieldData['enabled']) {
-                    $configuredFields[] = [
-                        'title' => $fieldData['title'] ?? '',
-                        'slug' => $fieldData['slug'] ?? '',
-                        'type' => $fieldData['type'] ?? 'text',
-                        'required' => isset($fieldData['required']) && $fieldData['required'],
-                        'min_length' => $fieldData['min_length'] ?? '',
-                        'max_length' => $fieldData['max_length'] ?? '',
-                        'placeholder' => $fieldData['placeholder'] ?? '',
-                        'default' => $fieldData['default'] ?? null,
-                    ];
-                }
+            foreach ($bankingFieldsInput as $key => $fieldData) {
+                $configuredFields[] = [
+                    'slug'=> $key,
+                    'enable'=> isset($fieldData['enabled']) && $fieldData['enabled'], 
+                    'required'=> isset($fieldData['required']) && $fieldData['required']
+                ];
             }
 
             $settings->banking_fields = $configuredFields;
         }
 
         // Wallet settings
-        $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
-            'wallet_status' => $request->boolean('wallet_settings.wallet_status'),
-            'usd_exchange_rate' => $request->input('wallet_settings.usd_exchange_rate', 0),
-        ]);
+        if($request->has('wallet_settings')){
+            $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
+                'wallet_status' => $request->boolean('wallet_settings.wallet_status'),
+                'usd_exchange_rate' => $request->input('wallet_settings.usd_exchange_rate', 0),
+            ]);
+        }
 
         // Transaction settings
-        $settings->transaction_settings = array_merge($settings->transaction_settings ?? [], [
-            'charges' => [
-                'percentage' => $request->input('transaction_settings.charges.percentage', 2),
-                'fixed' => $request->input('transaction_settings.charges.fixed', 100),
-                'cap' => $request->input('transaction_settings.charges.cap', 2000),
-            ],
-            'tax' => [
-                'percentage' => $request->input('transaction_settings.tax.percentage', 0),
-                'apply' => $request->boolean('transaction_settings.tax.apply'),
-            ],
-        ]);
+        if($request->has('transaction_settings')){
+            $settings->transaction_settings = array_merge($settings->transaction_settings ?? [], [
+                'charges' => [
+                    'percentage' => $request->input('transaction_settings.charges.percentage', 2),
+                    'fixed' => $request->input('transaction_settings.charges.fixed', 100),
+                    'cap' => $request->input('transaction_settings.charges.cap', 2000),
+                ],
+                'tax' => [
+                    'percentage' => $request->input('transaction_settings.tax.percentage', 0),
+                    'apply' => $request->boolean('transaction_settings.tax.apply'),
+                ],
+            ]);
+        }
 
         // Withdrawal settings
-        $settings->withdrawal_settings = array_merge($settings->withdrawal_settings ?? [], [
-            'charges' => [
-                'percentage' => $request->input('withdrawal_settings.charges.percentage', 1),
-                'fixed' => $request->input('withdrawal_settings.charges.fixed', 50),
-                'cap' => $request->input('withdrawal_settings.charges.cap', 1000),
-            ],
-            'min_withdrawal' => $request->input('withdrawal_settings.min_withdrawal', 10),
-            'max_withdrawal' => $request->input('withdrawal_settings.max_withdrawal', 5000),
-            'method' => $request->input('withdrawal_settings.method', 'manual'),
-            'weekend_payout' => $request->boolean('withdrawal_settings.weekend_payout'),
-            'holiday_payout' => $request->boolean('withdrawal_settings.holiday_payout'),
-        ]);
+        if($request->has('withdrawal_settings')){
+            $settings->withdrawal_settings = array_merge($settings->withdrawal_settings ?? [], [
+                'charges' => [
+                    'percentage' => $request->input('withdrawal_settings.charges.percentage', 1),
+                    'fixed' => $request->input('withdrawal_settings.charges.fixed', 50),
+                    'cap' => $request->input('withdrawal_settings.charges.cap', 1000),
+                ],
+                'min_withdrawal' => $request->input('withdrawal_settings.min_withdrawal', 10),
+                'max_withdrawal' => $request->input('withdrawal_settings.max_withdrawal', 5000),
+                'method' => $request->input('withdrawal_settings.method', 'manual'),
+                'weekend_payout' => $request->boolean('withdrawal_settings.weekend_payout'),
+                'holiday_payout' => $request->boolean('withdrawal_settings.holiday_payout'),
+            ]);
+        }
 
         // Promotion settings
-        $settings->promotion_settings = array_merge($settings->promotion_settings ?? [], [
-            'feature_rate' => $request->input('promotion_settings.feature_rate', 0),
-            'broadcast_rate' => $request->input('promotion_settings.broadcast_rate', 0),
-        ]);
+        if($request->has('promotion_settings')){
+            $settings->promotion_settings = array_merge($settings->promotion_settings ?? [], [
+                'feature_rate' => $request->input('promotion_settings.feature_rate', 0),
+                'broadcast_rate' => $request->input('promotion_settings.broadcast_rate', 0),
+            ]);
+        }
 
         // Review settings
-        $settings->review_settings = array_merge($settings->review_settings ?? [], [
-            'admin_review_cost' => $request->input('review_settings.admin_review_cost', 0),
-            'system_review_cost' => $request->input('review_settings.system_review_cost', 0),
-        ]);
+        if($request->has('review_settings')){
+            $settings->review_settings = array_merge($settings->review_settings ?? [], [
+                'admin_review_cost' => $request->input('review_settings.admin_review_cost', 0),
+                'system_review_cost' => $request->input('review_settings.system_review_cost', 0),
+            ]);
+        }
 
         // Referral settings
-        $settings->referral_settings = array_merge($settings->referral_settings ?? [], [
-            'signup_referral_earnings_percentage' => $request->input('referral_settings.signup_referral_earnings_percentage', 0),
-            'task_referral_commission_percentage' => $request->input('referral_settings.task_referral_commission_percentage', 0),
-        ]);
+        if($request->has('referral_settings')){
+            $settings->referral_settings = array_merge($settings->referral_settings ?? [], [
+                'signup_referral_earnings_percentage' => $request->input('referral_settings.signup_referral_earnings_percentage', 0),
+                'task_referral_commission_percentage' => $request->input('referral_settings.task_referral_commission_percentage', 0),
+            ]);
+        }
 
         // Verification settings
-        $settings->verification_settings = array_merge($settings->verification_settings ?? [], [
-            'verification_provider' => $request->input('verification_settings.verification_provider', 'manual'),
-            'verifications_can_expire' => $request->boolean('verification_settings.verifications_can_expire'),
-        ]);
+        if($request->has('verification_settings')){
+            $settings->verification_settings = array_merge($settings->verification_settings ?? [], [
+                'verification_provider' => $request->input('verification_settings.verification_provider', 'manual'),
+            ]);
+        }
 
         // Verification fields
-        $fields = $request->input('verification_fields', []);
-        $verificationFields = [
-            'govt_id' => [
-                'file' => $fields['govt_id']['docs'] ?? [],
-                'require' => $fields['govt_id']['mode'] ?? 'one',
-                'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
-                'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
-            ],
-            'address' => [
-                'file' => $fields['address']['docs'] ?? [],
-                'require' => $fields['address']['mode'] ?? 'one',
-                'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
-                'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
-            ],
-        ];
-        $settings->verification_fields = $verificationFields;
-
-        // Security settings
-        $settings->security_settings = array_merge($settings->security_settings ?? [], [
-            'ban_settings' => [
-                'auto_ban_on_flag_count' => $request->input('auto_ban_on_flag_count', 5),
-                'ban_duration' => $request->input('ban_duration', 'week'),
-            ],
-            'ip_blacklist' => $request->input('ip_blacklist', []),
-        ]);
+        if($request->has('verification_fields')){
+            $fields = $request->input('verification_fields', []);
+            $verificationFields = [
+                'govt_id' => [
+                    'file' => $fields['govt_id']['docs'] ?? [],
+                    'require' => $fields['govt_id']['mode'] ?? 'one',
+                    'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
+                    'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
+                ],
+                'address' => [
+                    'file' => $fields['address']['docs'] ?? [],
+                    'require' => $fields['address']['mode'] ?? 'one',
+                    'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
+                    'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
+                ],
+            ];
+            $settings->verification_fields = $verificationFields;
+        }
 
         $settings->save();
 
@@ -224,7 +229,7 @@ class CountrySettingsController extends Controller
             }
         }
 
-        return redirect()->route('admin.settings.countries')
+        return redirect()->back()
             ->with('success', "Settings for {$country->name} have been updated successfully.");
     }
 
@@ -397,7 +402,6 @@ class CountrySettingsController extends Controller
 
         $settings->verification_settings = [
             'verification_provider' => $request->input('verification_provider', 'manual'),
-            'verifications_can_expire' => $request->has('verifications_can_expire'),
         ];
 
         $fields = $request->input('verification_fields', []);

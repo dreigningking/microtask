@@ -27,7 +27,7 @@ class CountrySettingsSeeder extends Seeder
                 'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
@@ -49,10 +49,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 5.0, 'task_referral_commission_percentage' => 3.0],
                 'review_settings' => ['admin_review_cost' => 0.50, 'system_review_cost' => 0.25],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             39 => [ // Canada
                 'gateway_id' => 1,
@@ -63,7 +60,7 @@ class CountrySettingsSeeder extends Seeder
                 'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
@@ -85,10 +82,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 5.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.5, 'task_referral_commission_percentage' => 2.8],
                 'review_settings' => ['admin_review_cost' => 0.45, 'system_review_cost' => 0.22],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             232 => [ // UK
                 'gateway_id' => 6,
@@ -99,9 +93,10 @@ class CountrySettingsSeeder extends Seeder
                 'banking_fields' => [
                     ['title' => 'Paypal Email', 'slug' => 'paypal_email', 'type' => 'email', 'default' => null, 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter paypal email'],
                 ],
+
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['passport', 'national_id'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
@@ -123,10 +118,6 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 10.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.0, 'task_referral_commission_percentage' => 2.5],
                 'review_settings' => ['admin_review_cost' => 0.40, 'system_review_cost' => 0.20],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
-                    'ip_blacklist' => []
-                ],
             ],
             161 => [ // Nigeria
                 'gateway_id' => 2,
@@ -140,15 +131,6 @@ class CountrySettingsSeeder extends Seeder
                     ['title' => 'Bank Name', 'slug' => 'bank_name', 'type' => 'text', 'default' => '', 'min_length' => '', 'max_length' => '', 'placeholder' => 'Enter bank name'],
                     ['title' => 'Account Number', 'slug' => 'account_number', 'type' => 'number', 'default' => null, 'min_length' => 10, 'max_length' => 10, 'placeholder' => 'Enter account number'],
                 ],
-                'verification_settings' => [
-                    'verification_provider' => 'manual',
-                    'verifications_can_expire' => true
-                ],
-                'verification_fields' => [
-                    'govt_id' => ['file' => ['national_id', 'nin', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
-                    'address' => ['file' => ['utility_bill', 'waste_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
-                ],
-                'promotion_settings' => ['feature_rate' => 1.00, 'broadcast_rate' => 0.75],
                 'transaction_settings' => [
                     'charges' => ['percentage' => 2.0, 'fixed' => 15.00, 'cap' => 2000.00],
                     'tax' => ['percentage' => 7.5, 'apply' => true]
@@ -162,12 +144,18 @@ class CountrySettingsSeeder extends Seeder
                     'holiday_payout' => true
                 ],
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 15.0],
+                'verification_settings' => [
+                    'verification_provider' => 'manual',
+                    
+                ],
+                'verification_fields' => [
+                    'govt_id' => ['file' => ['national_id', 'nin', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
+                    'address' => ['file' => ['utility_bill', 'waste_bill'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false]
+                ],
+                'promotion_settings' => ['feature_rate' => 1.00, 'broadcast_rate' => 0.75],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 3.0, 'task_referral_commission_percentage' => 2.0],
                 'review_settings' => ['admin_review_cost' => 50.00, 'system_review_cost' => 25.00],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 3, 'ban_duration' => 'day'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             113 => [ // Kenya
                 'gateway_id' => 3,
@@ -180,7 +168,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
                 'verification_settings' => [
                     'verification_provider' => 'manual',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
@@ -202,10 +190,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 20.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.5, 'task_referral_commission_percentage' => 1.5],
                 'review_settings' => ['admin_review_cost' => 25.00, 'system_review_cost' => 12.50],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             83 => [ // Ghana
                 'gateway_id' => 4,
@@ -222,7 +207,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
                 'verification_settings' => [
                     'verification_provider' => 'manual',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
@@ -244,10 +229,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 18.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.0, 'task_referral_commission_percentage' => 1.25],
                 'review_settings' => ['admin_review_cost' => 20.00, 'system_review_cost' => 10.00],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             101 => [ // India
                 'gateway_id' => 5,
@@ -266,7 +248,7 @@ class CountrySettingsSeeder extends Seeder
                 ],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['national_id', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => false],
@@ -288,10 +270,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 22.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 2.75, 'task_referral_commission_percentage' => 1.75],
                 'review_settings' => ['admin_review_cost' => 10.00, 'system_review_cost' => 5.00],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 4, 'ban_duration' => 'day'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
             14 => [ // Australia
                 'gateway_id' => 1,
@@ -302,7 +281,7 @@ class CountrySettingsSeeder extends Seeder
                 'banking_fields' => [],
                 'verification_settings' => [
                     'verification_provider' => 'veriff',
-                    'verifications_can_expire' => true
+                    
                 ],
                 'verification_fields' => [
                     'govt_id' => ['file' => ['drivers_license', 'passport'], 'require' => 'one', 'issue_date' => true, 'expiry_date' => 'date'],
@@ -324,10 +303,7 @@ class CountrySettingsSeeder extends Seeder
                 'wallet_settings' => ['wallet_status' => true, 'usd_exchange_rate' => 8.0],
                 'referral_settings' => ['signup_referral_earnings_percentage' => 4.25, 'task_referral_commission_percentage' => 2.75],
                 'review_settings' => ['admin_review_cost' => 0.55, 'system_review_cost' => 0.28],
-                'security_settings' => [
-                    'ban_settings' => ['auto_ban_on_flag_count' => 5, 'ban_duration' => 'week'],
-                    'ip_blacklist' => []
-                ],
+                
             ],
         ];
 

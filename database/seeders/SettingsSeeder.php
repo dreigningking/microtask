@@ -60,6 +60,11 @@ class SettingsSeeder extends Seeder
                 'value' => '1',
                 'data_type' => 'boolean',
             ],
+            [
+                'name' => 'auto_ban_on_flag_hours_count',
+                'value'=> 72,
+                'data_type' => 'integer',
+            ],
         ];
 
         foreach ($globalSettings as $setting) {
