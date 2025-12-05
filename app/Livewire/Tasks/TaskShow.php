@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Setting;
+use App\Models\Moderation;
 use Livewire\Component;
 use App\Models\TaskWorker;
 use App\Models\TaskDispute;
@@ -49,6 +50,9 @@ class TaskShow extends Component
     
     // Report functionality
     public $reportReason = '';
+
+    // Moderation functionality
+    public $rejectNotes = '';
 
     
     // Comments functionality
@@ -573,6 +577,61 @@ class TaskShow extends Component
         ]);
 
         return redirect()->route('tasks.dispute', $submission);
+    }
+
+    public function approveTask()
+    {
+        if (!auth()->user()->hasPermission('task_management')) {
+            session()->flash('error', 'Unauthorized.');
+            return;
+        }
+
+        $moderation = $this->task->latestModeration;
+        if (!$moderation) {
+            $moderation = new Moderation([
+                'moderatable_id' => $this->task->id,
+                'moderatable_type' => Task::class,
+                'purpose' => 'task_approval',
+            ]);
+        }
+        $moderation->moderator_id = auth()->id();
+        $moderation->status = 'approved';
+        $moderation->notes = 'Task approved';
+        $moderation->moderated_at = now();
+        $moderation->save();
+
+        session()->flash('success', 'Task approved successfully.');
+        $this->task->refresh();
+    }
+
+    public function confirmReject()
+    {
+        if (!auth()->user()->hasPermission('task_management')) {
+            session()->flash('error', 'Unauthorized.');
+            return;
+        }
+
+        $this->validate([
+            'rejectNotes' => 'required|string|min:10',
+        ]);
+
+        $moderation = $this->task->latestModeration;
+        if (!$moderation) {
+            $moderation = new Moderation([
+                'moderatable_id' => $this->task->id,
+                'moderatable_type' => Task::class,
+                'purpose' => 'task_approval',
+            ]);
+        }
+        $moderation->moderator_id = auth()->id();
+        $moderation->status = 'rejected';
+        $moderation->notes = $this->rejectNotes;
+        $moderation->moderated_at = now();
+        $moderation->save();
+
+        session()->flash('success', 'Task rejected successfully.');
+        $this->rejectNotes = '';
+        $this->task->refresh();
     }
 
     public function render()

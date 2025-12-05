@@ -24,18 +24,33 @@ class BankAccounts extends Component
     public $branch_code;
     public $swift_code;
     public $iban;
+    public $phone_number;
+    public $bvn;
+    public $branch;
+    public $sort_code;
+    public $ifsc_code;
+    public $routing_number;
+    public $iban_number;
+    public $paypal_email;
 
     public $required_fields = [];
     public $banks = [];
 
     public function mount()
     {
-        $this->storage_location = Auth::user()->country->setting->bank_account_storage ?? 'on_premises';
+        $user = Auth::user();
+        $countrySetting = $user->country->setting;
+        $gateway = $countrySetting->gateway;
+
+        $this->storage_location = $gateway->bank_account_storage ?? 'on_premises';
+        dd($gateway);
         $this->loadBankAccount();
-        $this->loadRequiredFields();
+
         if ($this->storage_location === 'on_premises') {
+            $this->loadEnabledBankingFields($gateway, $countrySetting);
             $this->loadBanks();
         }
+
         $this->loadVerificationSettings();
     }
 
@@ -45,14 +60,23 @@ class BankAccounts extends Component
         $user = Auth::user();
         $this->bankAccount = $user->bank_account;
 
-        if ($this->bankAccount) {
-            $this->account_name = $this->bankAccount->account_name;
-            $this->account_number = $this->bankAccount->account_number;
-            $this->bank_name = $this->bankAccount->bank_name;
-            $this->bank_code = $this->bankAccount->bank_code;
-            $this->branch_code = $this->bankAccount->branch_code;
-            $this->swift_code = $this->bankAccount->swift_code;
-            $this->iban = $this->bankAccount->iban;
+        if ($this->bankAccount && $this->bankAccount->details) {
+            $details = $this->bankAccount->details;
+            $this->account_name = $details['account_name'] ?? null;
+            $this->account_number = $details['account_number'] ?? null;
+            $this->bank_name = $details['bank_name'] ?? null;
+            $this->bank_code = $details['bank_code'] ?? null;
+            $this->branch_code = $details['branch_code'] ?? null;
+            $this->swift_code = $details['swift_code'] ?? null;
+            $this->iban = $details['iban'] ?? null;
+            $this->phone_number = $details['phone_number'] ?? null;
+            $this->bvn = $details['bvn'] ?? null;
+            $this->branch = $details['branch'] ?? null;
+            $this->sort_code = $details['sort_code'] ?? null;
+            $this->ifsc_code = $details['ifsc_code'] ?? null;
+            $this->routing_number = $details['routing_number'] ?? null;
+            $this->iban_number = $details['iban_number'] ?? null;
+            $this->paypal_email = $details['paypal_email'] ?? null;
         }
     }
 
@@ -83,14 +107,20 @@ class BankAccounts extends Component
         }
     }
     
-    public function loadRequiredFields()
+    public function loadEnabledBankingFields($gateway, $countrySetting)
     {
-        $countrySetting = CountrySetting::where('country_id', Auth::user()->country_id)->first();
-        if ($countrySetting && isset($countrySetting->banking_fields)) {
-            $this->required_fields = $countrySetting->banking_fields;
-        } else {
-            $this->required_fields = ['bank_name', 'account_name', 'account_number'];
+        $gatewayFields = $gateway->banking_fields ?? [];
+        $countryFields = $countrySetting->banking_fields ?? [];
+
+        $enabledFields = [];
+        foreach ($gatewayFields as $field) {
+            $countryField = collect($countryFields)->firstWhere('slug', $field['slug']);
+            if ($countryField && ($countryField['enabled'] ?? false)) {
+                $enabledFields[] = $field;
+            }
         }
+
+        $this->required_fields = $enabledFields;
     }
 
     public function toggleEditMode()
@@ -102,22 +132,35 @@ class BankAccounts extends Component
     {
         $rules = [];
         foreach ($this->required_fields as $field) {
-            if ($field !== 'bank_name') {
-                $rules[$field] = 'required|string|max:255';
+            $slug = $field['slug'];
+            $rules[$slug] = 'required';
+            if ($field['type'] === 'number') {
+                $rules[$slug] .= '|numeric';
+                if (isset($field['min_length'])) {
+                    $rules[$slug] .= '|min:' . $field['min_length'];
+                }
+                if (isset($field['max_length'])) {
+                    $rules[$slug] .= '|max:' . $field['max_length'];
+                }
+            } elseif ($field['type'] === 'email') {
+                $rules[$slug] .= '|email';
+            } elseif ($field['type'] === 'text' || $field['type'] === 'tel') {
+                $rules[$slug] .= '|string|max:255';
             }
         }
-        $rules['bank_code'] = 'required';
 
         $validated = $this->validate($rules);
-        
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $selectedBank = collect($this->banks)->firstWhere('code', $this->bank_code);
-        $validated['bank_name'] = $selectedBank['name'] ?? null;
+        if (isset($validated['bank_code'])) {
+            $selectedBank = collect($this->banks)->firstWhere('code', $validated['bank_code']);
+            $validated['bank_name'] = $selectedBank['name'] ?? null;
+        }
 
-        $user->bank_account()->updateOrCreate(['user_id' => $user->id], $validated);
-        
+        $user->bank_account()->updateOrCreate(['user_id' => $user->id], ['details' => $validated]);
+
         session()->flash('status', 'Bank account details saved successfully.');
         $this->loadBankAccount();
         $this->isEditMode = false;

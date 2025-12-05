@@ -19,7 +19,8 @@ Route::group(['prefix' => 'admin','as'=> 'admin.'], function () {
 
 Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check_user_active']], function () {
     
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('moderations', [HomeController::class, 'moderations'])->name('moderations');
     Route::group(['prefix' => 'tasks','as' => 'tasks.','middleware' => ['permission:task_management']], function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
         Route::get('submissions', [TaskController::class, 'submissions'])->name('submissions');

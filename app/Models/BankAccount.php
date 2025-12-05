@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Gateway;
 use Illuminate\Database\Eloquent\Model;
 
 class BankAccount extends Model
@@ -10,10 +12,18 @@ class BankAccount extends Model
     
     protected $fillable = [
         'user_id',
-        'bank_name',
-        'bank_code',
-        'account_name',
-        'account_number',
+        'gateway_id',
+        'details',
         'verified_at'
     ];
+
+    protected $casts = ['details'=> 'array'];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function gateway(){
+        return $this->belongsTo(Gateway::class);
+    }
 }

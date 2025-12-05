@@ -518,6 +518,35 @@
                     </div>
                     @endauth
 
+                    @if(auth()->user()->hasPermission('task_management'))
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Task Moderation</h5>
+                        </div>
+                        <div class="card-body">
+                            @if($task->latestModeration)
+                            <p>Status: <strong>{{ ucfirst($task->latestModeration->status) }}</strong></p>
+                            <p>Moderated by: {{ $task->latestModeration->moderator->name ?? 'N/A' }}</p>
+                            <p>Notes: {{ $task->latestModeration->notes }}</p>
+                            @if($task->latestModeration->status == 'pending')
+                            <button wire:click="approveTask" wire:loading.attr="disabled" class="btn btn-success me-2">
+                                <span wire:loading.remove>Approve</span>
+                                <span wire:loading>Approving...</span>
+                            </button>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</button>
+                            @endif
+                            @else
+                            <p>No moderation yet.</p>
+                            <button wire:click="approveTask" wire:loading.attr="disabled" class="btn btn-success me-2">
+                                <span wire:loading.remove>Approve</span>
+                                <span wire:loading>Approving...</span>
+                            </button>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</button>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
 
 
@@ -622,6 +651,34 @@
     @livewire('tasks.task-referrals',[
     'task'=> $task
     ])
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejectNotes" class="form-label">Reason for rejection *</label>
+                        <textarea class="form-control" id="rejectNotes" wire:model="rejectNotes" rows="4" placeholder="Please provide details about why this task is being rejected..."></textarea>
+                        @error('rejectNotes')
+                        <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" wire:click="confirmReject" wire:loading.attr="disabled" data-bs-dismiss="modal">
+                        <span wire:loading.remove>Reject Task</span>
+                        <span wire:loading>Rejecting...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @push('scripts')
 <script>

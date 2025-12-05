@@ -71,4 +71,26 @@ class Moderation extends Model
     {
         return $query->where('moderatable_type', $type);
     }
+
+    /**
+     * Get the target URL for the moderatable
+     */
+    public function getTargetAttribute()
+    {
+        $moderatable = $this->moderatable;
+
+        if ($moderatable instanceof \App\Models\Task) {
+            return route('explore.task', $moderatable);
+        } elseif ($moderatable instanceof \App\Models\UserVerification) {
+            return route('admin.user.verification.show', $moderatable);
+        } elseif ($moderatable instanceof \App\Models\Withdrawal) {
+            return route('admin.withdrawal.show', $moderatable);
+        } elseif ($moderatable instanceof \App\Models\Post) {
+            return route('post.show', $moderatable);
+        } elseif ($moderatable instanceof \App\Models\Comment) {
+            return route('comment.show', $moderatable);
+        }
+
+        return '#'; // fallback
+    }
 }

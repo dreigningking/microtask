@@ -23,6 +23,12 @@
                         <span class="align-middle">Dashboard</span>
                     </a>
                 </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('admin.moderations') }}">
+                        <i class="align-middle mr-2 fas fa-fw fa-tools"></i> 
+                        <span class="align-middle">Moderations</span>
+                    </a>
+                </li>
                 @if(auth()->user()->hasPermission('task_management'))
                 <li class="sidebar-item">
                     <a href="#tasks" data-toggle="collapse" class="sidebar-link collapsed">

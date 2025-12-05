@@ -7,6 +7,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\TopEarners;
 use App\Livewire\ContactPage;
 use App\Livewire\JobCreators;
+use App\Livewire\InviteesList;
 use App\Livewire\ListEarnings;
 use App\Livewire\Transactions;
 use App\Livewire\Blog\BlogIndex;
@@ -19,21 +20,22 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Tasks\TaskCreate;
 use App\Livewire\Tasks\TaskManage;
 use App\Livewire\Tasks\PostedTasks;
+use App\Livewire\Settings\Interests;
 use App\Livewire\Support\TicketView;
 use App\Livewire\Tasks\AppliedTasks;
 use App\Livewire\Policies\Disclaimer;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Settings\BankAccounts;
 use App\Http\Controllers\HomeController;
 use App\Livewire\Policies\PrivacyPolicy;
-use App\Livewire\InviteesList;
+use App\Livewire\Settings\Verifications;
 use App\Http\Controllers\PaymentController;
 use App\Livewire\Policies\DigitalMillenium;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
-
-
+use App\Livewire\Settings\DeleteAccount;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
@@ -84,11 +86,19 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         /* General */
         Route::get('notifications', ListNotifications::class)->name('notifications');
         Route::get('dashboard', Dashboard::class)->name('dashboard');
-        Route::get('profile', Profile::class)->name('profile');
         Route::get('invitees', InviteesList::class)->name('invitees');
         Route::get('transactions', Transactions::class)->name('transactions');
         Route::get('payment/callback', [PaymentController::class, 'paymentcallback'])->name('payment.callback');
         Route::get('account-booster', Boosters::class)->name('boosters');
+        
+        Route::get('profile', Profile::class)->name('profile');
+        Route::get('profile/bank-account', BankAccounts::class)->name('profile.bank-account');
+        Route::get('profile/verifications', Verifications::class)->name('profile.verifications');
+        Route::get('profile/interests', Interests::class)->name('profile.interests');
+        Route::get('profile/security', Interests::class)->name('profile.security');
+        Route::get('profile/notifications', Interests::class)->name('profile.notifications');
+        Route::get('profile/delete', DeleteAccount::class)->name('profile.delete');
+        
 
         Route::get('support', Tickets::class)->name('support');
         Route::get('support/ticket/{ticket}', TicketView::class)->name('support.ticket');

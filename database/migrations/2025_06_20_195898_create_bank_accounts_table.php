@@ -14,13 +14,8 @@ return new class extends Migration
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
-            $table->string('bank_name');
-            $table->string('bank_code')->nullable();
-            $table->string('account_name');
-            $table->string('account_number');
-            $table->string('routing_number')->nullable();
-            $table->string('swift_code')->nullable();
-            $table->string('branch_code')->nullable();
+            $table->unsignedBigInteger('gateway_id');
+            $table->json('details')->nullable();
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
