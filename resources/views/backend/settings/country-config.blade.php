@@ -119,7 +119,7 @@
                                                     <div class="card-body">
                                                         @foreach($settings->gateway->banking_fields as $field)
                                                         @php
-                                                            $existingConfig = collect($settings->banking_fields ?? [])->firstWhere('slug', $field['slug']) ?? [];
+                                                        $existingConfig = collect($settings->banking_fields ?? [])->firstWhere('slug', $field['slug']) ?? [];
                                                         @endphp
                                                         <div class="row">
                                                             <div class="col-md-3">
@@ -364,7 +364,7 @@
                                             <option value="trulioo" {{ old('verification_settings.verification_provider', $settings->verification_settings['verification_provider'] ?? '') == 'trulioo' ? 'selected' : '' }}>Trulioo</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
@@ -443,9 +443,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="transactions" role="tabpanel">
 
-                    </div>
                     <div class="tab-pane fade" id="tasks_related" role="tabpanel">
                         <div class="card mb-4">
                             <div class="card-header">
@@ -522,7 +520,7 @@
                                                             <input type="number" class="form-control" name="referral_settings[task_referral_commission_percentage]" value="{{ old('referral_settings.task_referral_commission_percentage', $settings->referral_settings['task_referral_commission_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
-                                                        
+
                                                     </div>
 
                                                     <div class="mb-3">
@@ -531,7 +529,7 @@
                                                             <input type="number" class="form-control" name="referral_settings[signup_referral_earnings_percentage]" value="{{ old('referral_settings.signup_referral_earnings_percentage', $settings->referral_settings['signup_referral_earnings_percentage'] ?? 0) }}" step="0.01" min="0" max="100">
                                                             <span class="input-group-text">%</span>
                                                         </div>
-                                                        
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -560,37 +558,46 @@
                                     @csrf
                                     <input type="hidden" name="country_id" value="{{ $country->id }}">
                                     @if($boosters->count() > 0)
-                                    <div class="row">
-                                        @foreach($boosters as $booster)
-                                        <div class="col-md-6 col-lg-4 mb-4">
-                                            <div class="card h-100">
-                                                <div class="card-header">
-                                                    <h6 class="card-title mb-0">{{ $booster->name }}</h6>
-                                                    <small class="text-muted">{{ ucfirst($booster->type) }} Booster</small>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p class="card-text text-muted small mb-3">
-                                                        {{ Str::limit($booster->description, 100) }}
-                                                    </p>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Booster Price</label>
-                                                        <div class="input-group">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 30%">Name</th>
+                                                    <th style="width: 45%">Description</th>
+                                                    <th style="width: 25%">Price ({{ $country->currency_symbol }})</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($boosters as $booster)
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ $booster->name }}</strong>
+                                                        
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-muted small">
+                                                            {{ Str::limit($booster->description, 100) }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-md">
                                                             <span class="input-group-text">{{ $country->currency_symbol }}</span>
                                                             <input type="number"
-                                                                class="form-control"
-                                                                name="booster_prices[{{ $booster->id }}]"
-                                                                value="{{ old('booster_prices.' . $booster->id, isset($countryPricesByKey[App\Models\Booster::class][$booster->id]) ? $countryPricesByKey[App\Models\Booster::class][$booster->id]->amount : '') }}"
-                                                                step="0.01"
-                                                                min="0"
-                                                                placeholder="0.00">
+                                                                    class="form-control"
+                                                                    name="booster_prices[{{ $booster->id }}]"
+                                                                    value="{{ old('booster_prices.' . $booster->id, isset($countryPricesByKey[App\Models\Booster::class][$booster->id]) ? $countryPricesByKey[App\Models\Booster::class][$booster->id]->amount : '') }}"
+                                                                    step="0.01"
+                                                                    min="0"
+                                                                    placeholder="0.00">
                                                         </div>
-                                                        <small class="text-muted">Set the price for this booster in {{ $country->currency_symbol }}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
+                                                        <small class="text-muted">Price for {{ $booster->minimum_duration_days }} days</small>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
+
                                     <div class="mt-4 d-flex justify-content-between align-items-center">
                                         <div class="text-muted small">
                                             <i class="fas fa-info-circle"></i>
@@ -654,7 +661,7 @@
                                                             <input type="number"
                                                                 class="form-control"
                                                                 name="template_prices[{{ $template->id }}]"
-                                                                value="{{ old('template_prices.' . $template->id, isset($countryPricesByKey[App\Models\TaskTemplate::class][$template->id]) ? $countryPricesByKey[App\Models\TaskTemplate::class][$template->id]->amount : '') }}"
+                                                                value="{{ old('template_prices.' . $template->id, isset($countryPricesByKey[App\Models\PlatformTemplate::class][$template->id]) ? $countryPricesByKey[App\Models\PlatformTemplate::class][$template->id]->amount : '') }}"
                                                                 step="0.01"
                                                                 min="0"
                                                                 placeholder="0.00">

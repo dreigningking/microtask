@@ -200,7 +200,7 @@ class CountrySettingsController extends Controller
         // Handle Country Prices for Templates
         if ($request->has('template_prices')) {
             foreach ($request->input('template_prices') as $templateId => $amount) {
-                \App\Models\CountryPrice::updateOrCreate(
+                CountryPrice::updateOrCreate(
                     [
                         'country_id' => $countryId,
                         'priceable_type' => PlatformTemplate::class,
