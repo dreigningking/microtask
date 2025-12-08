@@ -2,11 +2,12 @@
 
 namespace App\Observers;
 
-use App\Http\Traits\HelperTrait;
 use App\Models\User;
 use App\Models\Moderation;
+use App\Http\Traits\HelperTrait;
 use App\Notifications\General\Moderation\PostModerationNotification;
 use App\Notifications\General\Moderation\TaskModerationNotification;
+use App\Notifications\General\Moderation\BankAccountModerationNotification;
 use App\Notifications\General\Moderation\PostCommentModerationNotification;
 use App\Notifications\General\Moderation\UserVerificationModerationNotification;
 
@@ -30,6 +31,9 @@ class ModerationObserver
             break;
             case('App\Models\UserVerification'):
                 $this->getAdmin()->notify(new UserVerificationModerationNotification($moderation,'admin'));
+            break;
+            case('App\Models\BankAccount'):
+                $this->getAdmin()->notify(new BankAccountModerationNotification($moderation,'admin'));
             break;
         }
     }
@@ -60,6 +64,9 @@ class ModerationObserver
                     break;
                 case('App\Models\UserVerification'):
                         $moderation->moderatable->user->notify(new UserVerificationModerationNotification($moderation,'author'));
+                    break;
+                case('App\Models\BankAccount'):
+                        $moderation->moderatable->user->notify(new BankAccountModerationNotification($moderation,'author'));
                     break;
             }
         }

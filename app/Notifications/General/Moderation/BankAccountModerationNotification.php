@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Moderation;
 
-class UserVerificationModerationNotification extends Notification
+class BankAccountModerationNotification extends Notification
 {
     use Queueable;
 
@@ -51,17 +51,17 @@ class UserVerificationModerationNotification extends Notification
     {
         $result = [];
         if ($this->receiver == 'admin') {
-            $result['subject'] = 'User Verification Moderation Needed';
-            $result['body'] = $this->moderation->moderatable->document_name.' requires your moderation';
-            $result['url'] = route('admin.users.verification.index', $this->moderation->moderatable);
+            $result['subject'] = 'Bank Account Moderation Needed';
+            $result['body'] = 'User bank account details requires your moderation';
+            $result['url'] = route('admin.users.show', $this->moderation->moderatable->user);
         } elseif ($this->moderation->status == 'approved') {
-            $result['subject'] = 'Your document is approved';
-            $result['body'] = 'Your '.$this->moderation->moderatable->document_name.' document has been approved';
-            $result['url'] = route('profile.verifications');
+            $result['subject'] = 'Verified Bank account';
+            $result['body'] = 'Your bank account has been verified';
+            $result['url'] = route('profile.bank-account');
         } elseif ($this->moderation->status == 'rejected') {
-            $result['subject'] = 'Your document is rejected';
-            $result['body'] = 'Your '.$this->moderation->moderatable->document_name.' document has been rejected.'.$this->moderation->note;
-            $result['url'] = route('profile.verifications');
+            $result['subject'] = 'Your bank account verification failed';
+            $result['body'] = 'Your bank account verification was not successful';
+            $result['url'] = route('profile.bank-account');
         }
 
         return $result;

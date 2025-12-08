@@ -25,17 +25,17 @@ use App\Livewire\Support\TicketView;
 use App\Livewire\Tasks\AppliedTasks;
 use App\Livewire\Policies\Disclaimer;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Settings\BankAccounts;
 use App\Http\Controllers\HomeController;
 use App\Livewire\Policies\PrivacyPolicy;
+use App\Livewire\Settings\DeleteAccount;
 use App\Livewire\Settings\Verifications;
 use App\Http\Controllers\PaymentController;
 use App\Livewire\Policies\DigitalMillenium;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
+use App\Livewire\Settings\BankAccountSettings;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
-use App\Livewire\Settings\DeleteAccount;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
@@ -92,7 +92,7 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         Route::get('account-booster', Boosters::class)->name('boosters');
         
         Route::get('profile', Profile::class)->name('profile');
-        Route::get('profile/bank-account', BankAccounts::class)->name('profile.bank-account');
+        Route::get('profile/bank-account', BankAccountSettings::class)->name('profile.bank-account');
         Route::get('profile/verifications', Verifications::class)->name('profile.verifications');
         Route::get('profile/interests', Interests::class)->name('profile.interests');
         Route::get('profile/security', Interests::class)->name('profile.security');
