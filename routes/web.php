@@ -28,12 +28,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Livewire\Policies\PrivacyPolicy;
 use App\Livewire\Settings\DeleteAccount;
-use App\Livewire\Settings\Verifications;
 use App\Http\Controllers\PaymentController;
 use App\Livewire\Policies\DigitalMillenium;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
 use App\Livewire\Settings\BankAccountSettings;
+use App\Livewire\Settings\VerificationSettings;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
 
@@ -93,7 +93,7 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         
         Route::get('profile', Profile::class)->name('profile');
         Route::get('profile/bank-account', BankAccountSettings::class)->name('profile.bank-account');
-        Route::get('profile/verifications', Verifications::class)->name('profile.verifications');
+        Route::get('profile/verifications', VerificationSettings::class)->name('profile.verifications');
         Route::get('profile/interests', Interests::class)->name('profile.interests');
         Route::get('profile/security', Interests::class)->name('profile.security');
         Route::get('profile/notifications', Interests::class)->name('profile.notifications');

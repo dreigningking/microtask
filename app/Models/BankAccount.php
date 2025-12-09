@@ -26,4 +26,8 @@ class BankAccount extends Model
     public function gateway(){
         return $this->belongsTo(Gateway::class);
     }
+
+    public function moderations(){
+        return $this->morphMany(\App\Models\Moderation::class, 'moderatable');
+    }
 }

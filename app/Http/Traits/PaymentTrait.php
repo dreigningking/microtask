@@ -3,10 +3,11 @@ namespace App\Http\Traits;
 
 use App\Models\Payment;
 use App\Models\Settlement;
+use Illuminate\Support\Str;
 use App\Http\Traits\PaypalTrait;
+use App\Http\Traits\StripeTrait;
 use App\Http\Traits\PaystackTrait;
 use App\Http\Traits\FlutterwaveTrait;
-use App\Http\Traits\StripeTrait;
 
 trait PaymentTrait
 {
@@ -111,19 +112,23 @@ trait PaymentTrait
     }
 
     public function verifyBankAccount($gateway,$bank_code, $account_number,$account_name){
+        if(!$gateway){
+            return false;
+        }
         switch($gateway){
             case 'paystack': 
                 $gateway_account_name = $this->resolveBankAccountByPaystack($bank_code, $account_number);
-                if ($gateway_account_name && str_contains(strtolower($gateway_account_name), strtolower($account_name))) {
+                if ($gateway_account_name && Str::contains(strtolower($gateway_account_name),explode(' ',$account_name)) ) {
                     return true;
                 }
                 break;
             case 'flutterwave': 
                 $gateway_account_name = $this->resolveBankAccountByFlutter($bank_code, $account_number);
-                if ($gateway_account_name && str_contains(strtolower($gateway_account_name), strtolower($account_name))) {
+                if ($gateway_account_name && Str::contains(strtolower($gateway_account_name), explode(' ',$account_name))) {
                     return true;
                 }
                 break;
+            default: return true;
         }
         return false;
     }

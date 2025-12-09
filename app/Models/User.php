@@ -350,14 +350,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Bank accounts relationship
-     */
-    public function bankAccounts()
-    {
-        return $this->hasMany(BankAccount::class);
-    }
-
-    /**
      * Task promotions created by user
      */
     public function taskPromotions()

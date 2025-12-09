@@ -59,7 +59,11 @@
                                             @foreach($req['docs'] as $docName)
                                             @php
                                             $verification = $userVerifications[$docName] ?? null;
-                                            $status = $verification->status ?? 'not_submitted';
+                                            if (!$verification) {
+                                            $status = 'not_submitted';
+                                            } else {
+                                            $status = $verification->latestModeration->status ?? 'pending';
+                                            }
                                             $statusClasses = [
                                             'not_submitted' => 'border-secondary',
                                             'pending' => 'border-warning',
@@ -83,7 +87,7 @@
                                                 <div class="card {{ $statusClasses[$status] }} border-start border-4">
                                                     <div class="card-body">
                                                         <div class="row align-items-center">
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-12 d-flex justify-content-between mb-3">
                                                                 <h6 class="card-title mb-1">
                                                                     {{ \Illuminate\Support\Str::title(str_replace('_', ' ', $docName)) }}
                                                                     <small class="text-muted">({{ $category }})</small>
@@ -92,29 +96,72 @@
                                                                     {{ $statusText[$status] }}
                                                                 </span>
                                                             </div>
-                                                            @if($status !== 'approved')
-                                                            <div class="col-md-6">
-                                                                <form wire:submit.prevent="saveVerification('{{ $docName }}')">
-                                                                    <div class="d-flex gap-2">
-                                                                        <input type="file" wire:model="uploads.{{ $docName }}"
-                                                                            id="{{ $docName }}_upload"
-                                                                            class="form-control form-control-sm">
-                                                                        <button type="submit" class="btn btn-primary btn-sm"
-                                                                            wire:loading.attr="disabled"
-                                                                            wire:target="uploads.{{ $docName }}">
-                                                                            <span wire:loading.remove wire:target="uploads.{{ $docName }}">
-                                                                                <i class="ri-upload-line me-1"></i>Submit
-                                                                            </span>
-                                                                            <span wire:loading wire:target="uploads.{{ $docName }}">
-                                                                                <i class="ri-loader-4-line me-1"></i>Uploading...
-                                                                            </span>
-                                                                        </button>
+                                                            <div class="col-md-12">
+                                                                @if($status !== 'approved')
+                                                                <form wire:submit.prevent="saveVerification('{{ $docName }}')" class="row g-1">
+                                                                    <div class="col-md-3">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label" for="{{ $docName }}_upload">Select File</label>
+                                                                            <input type="file" wire:model="uploads.{{ $docName }}"
+                                                                                id="{{ $docName }}_upload"
+                                                                                class="form-control form-control-sm">
+                                                                        </div>
                                                                     </div>
-                                                                    <small class="text-muted">Accepted file types: JPG, PNG, PDF. Max size: 2MB.</small>
-                                                                    @error('uploads.' . $docName) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                                                    <div class="col-md-2">
+                                                                        <div class="mb-3">
+                                                                            <label for="issued_at_{{ $docName }}" class="form-label">Issue Date</label>
+                                                                            <input type="date" wire:model="issued_at.{{ $docName }}"
+                                                                                id="issued_at_{{ $docName }}"
+                                                                                class="form-control form-control-sm">
+                                                                            @error('issued_at.' . $docName) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="mb-3">
+                                                                            <label for="expiry_at_{{ $docName }}" class="form-label">Expiry Date</label>
+                                                                            <input type="date" wire:model="expiry_at.{{ $docName }}"
+                                                                                id="expiry_at_{{ $docName }}"
+                                                                                class="form-control form-control-sm"
+                                                                                {{ $never_expires[$docName] ?? false ? 'disabled' : '' }}>
+
+                                                                            @error('expiry_at.' . $docName) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="mb-3">
+                                                                            <label for="never_expires_{{ $docName }}" class="form-label">&nbsp;</label>
+                                                                            <div class="form-check mt-2">
+                                                                                <input class="form-check-input" type="checkbox" wire:model="never_expires.{{ $docName }}"
+                                                                                    id="never_expires_{{ $docName }}">
+                                                                                <label class="form-check-label" for="never_expires_{{ $docName }}">
+                                                                                    Never Expires
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <label for="" class="form-label">&nbsp;</label>
+                                                                        <div class="d-flex justify-content-end">
+                                                                            <button type="submit" class="btn btn-primary btn-sm"
+                                                                                wire:loading.attr="disabled"
+                                                                                wire:target="submitting.{{ $docName }}">
+                                                                                <span class="submit-text" wire:loading.class="d-none" wire:target="submitting.{{ $docName }}">
+                                                                                    <i class="ri-upload-line me-1"></i>Submit
+                                                                                </span>
+                                                                                <span class="uploading-text" style="display: none;" wire:loading.class.remove="d-none" wire:target="submitting.{{ $docName }}">
+                                                                                    <i class="ri-loader-4-line me-1"></i>Uploading...
+                                                                                </span>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <small class="text-muted">Accepted file types: JPG, PNG, PDF. Max size: 2MB.</small>
+                                                                        @error('uploads.' . $docName) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                                                    </div>
+
                                                                 </form>
+                                                                @endif
                                                             </div>
-                                                            @endif
                                                         </div>
 
                                                         @if ($uploads[$docName] ?? false)
@@ -149,9 +196,9 @@
                                                         </div>
                                                         @endif
 
-                                                        @if ($status === 'rejected' && $verification->remarks)
+                                                        @if ($status === 'rejected' && $verification->latestModeration && $verification->latestModeration->notes)
                                                         <div class="alert alert-danger mt-3 mb-0">
-                                                            <strong>Reason:</strong> {{ $verification->remarks }}
+                                                            <strong>Reason:</strong> {{ $verification->latestModeration->notes }}
                                                         </div>
                                                         @endif
                                                     </div>

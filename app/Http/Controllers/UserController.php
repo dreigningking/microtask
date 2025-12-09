@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Payment;
-use App\Models\TaskWorker;
-use App\Models\UserVerification;
+use App\Models\Booster;
 use App\Models\Country;
+use App\Models\Payment;
+use App\Models\Moderation;
+use App\Models\TaskWorker;
+use App\Models\BankAccount;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Models\CountrySetting;
+use App\Models\UserVerification;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -99,7 +104,7 @@ class UserController extends Controller
      */
     public function subscriptions(Request $request)
     {
-        $query = \App\Models\Subscription::with('user', 'booster')->localize();
+        $query = Subscription::with('user', 'booster')->localize();
 
         // Apply filters
         if ($request->filled('user_email')) {
@@ -124,7 +129,7 @@ class UserController extends Controller
         }
 
         // Get available boosters for filter
-        $boosters = \App\Models\Booster::where('is_active', 1)->get();
+        $boosters = Booster::where('is_active', 1)->get();
 
         $subscriptions = $query->orderBy('created_at', 'desc')->paginate(20);
 
@@ -134,7 +139,7 @@ class UserController extends Controller
     /**
      * Display the specified subscription.
      */
-    public function subscription_view(\App\Models\Subscription $subscription)
+    public function subscription_view(Subscription $subscription)
     {
         $subscription->load('user', 'booster');
 
@@ -159,25 +164,22 @@ class UserController extends Controller
             'tasks', // jobs posted
             'taskWorkers.task', // jobs done
             'settlements', // earnings
+            'bank_account.moderations',
+            'userVerifications.moderations',
         ]);
-
-        // Sum of earnings (settlements)
-        $totalEarnings = $user->settlements()->sum('amount');
-
+        
+        
         // Jobs posted (tasks created by user)
         $jobsPosted = $user->tasks()->withCount('taskWorkers')->get();
 
         // Jobs done (tasks user worked on)
         $jobsDone = $user->taskWorkers()->with('task')->get();
 
-        // Payments made
-        $payments = Payment::where('user_id', $user->id)->latest()->get();
-
         // Earnings (settlements)
         $earnings = $user->settlements()->with('settlementable')->latest()->get();
 
         // Subscriptions (current/active)
-        $subscriptions = \App\Models\Subscription::where('user_id', $user->id)->orderByDesc('starts_at')->get();
+        $subscriptions = Subscription::where('user_id', $user->id)->orderByDesc('starts_at')->get();
         $currentSubscription = $subscriptions->where('status', 'active')->first();
 
         // Ratings (as worker and as job poster)
@@ -192,18 +194,21 @@ class UserController extends Controller
         $wallets = $user->wallets;
         $walletFrozen = $wallets->first() && isset($wallets->first()->is_frozen) ? $wallets->first()->is_frozen : false;
 
+        // Get country settings for bank account fields
+        $countrySetting = $user->country->setting;
+        $gateway = $countrySetting ? $countrySetting->gateway : null;
+        $bankAccountFields = $gateway ? collect($gateway->banking_fields) : [];
         return view('backend.users.view', compact(
             'user',
-            'totalEarnings',
             'jobsPosted',
             'jobsDone',
-            'payments',
             'earnings',
             'subscriptions',
             'currentSubscription',
             'averageWorkerRating',
             'averagePosterRating',
-            'walletFrozen'
+            'walletFrozen',
+            'bankAccountFields'
         ));
     }
 
@@ -298,7 +303,37 @@ class UserController extends Controller
             'status' => 'rejected',
             'remarks' => $request->remarks,
         ]);
-        
+
         return back()->with('success', 'Verification rejected successfully.');
+    }
+
+    public function approveBankAccount(Request $request)
+    {
+        $bankAccount = BankAccount::where('user_id',$request->user_id)->first();
+        $bankAccount->update(['verified_at' => now()]);
+
+        // Update moderation status if exists
+        Moderation::where('moderatable_id', $bankAccount->id)
+            ->where('moderatable_type', BankAccount::class)
+            ->update(['status' => 'approved', 'moderated_at' => now()]);
+
+        return back()->with('success', 'Bank account approved successfully.');
+    }
+
+    public function rejectBankAccount(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'notes' => 'required|string|max:500'
+        ]);
+
+        $bankAccount = BankAccount::where('user_id',$request->user_id)->first();
+
+        // Update moderation status
+        Moderation::where('moderatable_id', $bankAccount->id)
+            ->where('moderatable_type', BankAccount::class)
+            ->update(['status' => 'rejected', 'notes' => $request->notes, 'moderated_at' => now()]);
+
+        return back()->with('success', 'Bank account rejected successfully.');
     }
 }

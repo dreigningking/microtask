@@ -79,18 +79,18 @@ class Moderation extends Model
     {
         $moderatable = $this->moderatable;
 
-        if ($moderatable instanceof \App\Models\Task) {
+        if ($moderatable instanceof \App\Models\Task)
             return route('explore.task', $moderatable);
-        } elseif ($moderatable instanceof \App\Models\UserVerification) {
-            return route('admin.user.verification.show', $moderatable);
-        } elseif ($moderatable instanceof \App\Models\Withdrawal) {
-            return route('admin.withdrawal.show', $moderatable);
-        } elseif ($moderatable instanceof \App\Models\Post) {
-            return route('post.show', $moderatable);
-        } elseif ($moderatable instanceof \App\Models\Comment) {
-            return route('comment.show', $moderatable);
-        }
-
+        elseif ($moderatable instanceof \App\Models\UserVerification)
+            return route('admin.users.show', $moderatable->user);
+        elseif ($moderatable instanceof \App\Models\BankAccount)
+            return route('admin.users.show', $moderatable->user);
+        elseif ($moderatable instanceof \App\Models\Post)
+            return route('blog.show', $moderatable);
+        elseif ($moderatable instanceof \App\Models\Comment)
+            return route('blog.show', $moderatable->commentable);
+        elseif ($moderatable instanceof \App\Models\Withdrawal)
+            return route('admin.withdrawals.index');
         return '#'; // fallback
     }
 }

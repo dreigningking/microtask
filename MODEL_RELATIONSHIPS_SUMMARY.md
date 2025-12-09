@@ -24,7 +24,6 @@ This document summarizes all the relationships implemented across the Laravel mo
 - `user->orders()` - User has many Orders
 - `user->payments()` - User has many Payments
 - `user->withdrawals()` - User has many Withdrawals
-- `user->bankAccounts()` - User has many BankAccounts
 - `user->taskPromotions()` - User has many TaskPromotions
 - `user->supports()` - User has many Supports
 - `user->preferredLocations()` - User has many PreferredLocations

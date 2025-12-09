@@ -46,8 +46,6 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
         });
         Route::group(['prefix' => 'withdrawals','as' => 'withdrawals.'],function(){
             Route::get('/', [EarningController::class, 'withdrawals'])->name('index');
-            Route::get('view/{withdrawal}', [EarningController::class, 'withdrawal_view'])->name('view');
-            Route::post('withdrawal/process', [EarningController::class, 'withdrawal_process'])->name('process');
             Route::post('/{id}/approve', [EarningController::class, 'approveWithdrawal'])->name('approve');
             Route::post('/{id}/disapprove', [EarningController::class, 'disapproveWithdrawal'])->name('disapprove');
             Route::post('/{id}/retry', [EarningController::class, 'retryWithdrawal'])->name('retry');
@@ -67,6 +65,10 @@ Route::group(['prefix' => 'admin','as' => 'admin.','middleware'=> ['auth','check
             Route::get('/', [UserController::class, 'verifications'])->name('index');
             Route::post('approve', [UserController::class, 'approveVerification'])->name('approve');
             Route::post('reject', [UserController::class, 'rejectVerification'])->name('reject');
+        });
+        Route::group(['prefix' => 'bank-accounts','as' => 'bank-account.'], function () {
+            Route::post('approve', [UserController::class, 'approveBankAccount'])->name('approve');
+            Route::post('reject', [UserController::class, 'rejectBankAccount'])->name('reject');
         });
         Route::group(['prefix' => 'subscriptions','as' => 'subscriptions.'], function () {
             Route::get('/', [UserController::class, 'subscriptions'])->name('index');

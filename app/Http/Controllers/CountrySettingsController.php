@@ -182,14 +182,14 @@ class CountrySettingsController extends Controller
                 'govt_id' => [
                     'file' => $fields['govt_id']['docs'] ?? [],
                     'require' => $fields['govt_id']['mode'] ?? 'one',
-                    'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
-                    'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
+                    // 'issue_date' => isset($fields['govt_id']['issue_date']) ? $fields['govt_id']['issue_date'] : true,
+                    // 'expiry_date' => isset($fields['govt_id']['expiry_date']) ? $fields['govt_id']['expiry_date'] : false,
                 ],
                 'address' => [
                     'file' => $fields['address']['docs'] ?? [],
                     'require' => $fields['address']['mode'] ?? 'one',
-                    'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
-                    'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
+                    // 'issue_date' => isset($fields['address']['issue_date']) ? $fields['address']['issue_date'] : true,
+                    // 'expiry_date' => isset($fields['address']['expiry_date']) ? $fields['address']['expiry_date'] : false,
                 ],
             ];
             $settings->verification_fields = $verificationFields;

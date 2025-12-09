@@ -52,8 +52,8 @@ class UserVerificationModerationNotification extends Notification
         $result = [];
         if ($this->receiver == 'admin') {
             $result['subject'] = 'User Verification Moderation Needed';
-            $result['body'] = $this->moderation->moderatable->document_name.' requires your moderation';
-            $result['url'] = route('admin.users.verification.index', $this->moderation->moderatable);
+            $result['body'] = 'You have a verification document that requires your moderation';
+            $result['url'] = route('admin.users.verifications.index', $this->moderation->moderatable);
         } elseif ($this->moderation->status == 'approved') {
             $result['subject'] = 'Your document is approved';
             $result['body'] = 'Your '.$this->moderation->moderatable->document_name.' document has been approved';

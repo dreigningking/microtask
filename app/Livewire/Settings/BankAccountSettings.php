@@ -169,7 +169,7 @@ class BankAccountSettings extends Component
             $selectedBank = collect($this->banks)->firstWhere('code', $details['bank_code']);
             $details['bank_name'] = $selectedBank['name'] ?? null;
         }
-        BankAccount::updateOrCreate(['user_id' => $this->user->id,'gateway_id'=> $this->gateway->id], ['details' => $details]);
+        BankAccount::updateOrCreate(['user_id' => $this->user->id,'gateway_id'=> $this->gateway->id], ['details' => $details, 'verified_at' => null]);
 
         session()->flash('status', 'Bank account details saved successfully.');
         $this->loadBankAccount();
@@ -195,7 +195,7 @@ class BankAccountSettings extends Component
             /** @var \App\Models\User $user */
             $gateway = $this->gateway ?? null;
 
-            if ($this->verifyBankAccount($gateway, $this->bank_code, $this->account_number,$this->account_name)) {
+            if ($this->verifyBankAccount($gateway->slug, $this->bank_code, $this->account_number,strtolower($this->account_name))) {
                 $this->bankAccount->update(['verified_at' => now()]);
                 session()->flash('status', 'Bank account verified successfully.');
                 $this->loadBankAccount();
