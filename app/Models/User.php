@@ -137,7 +137,7 @@ class User extends Authenticatable
     }
 
     public function preferred_platforms(){
-        return $this->belongsToMany(PreferredPlatform::class);
+        return $this->hasMany(PreferredPlatform::class);
     }
 
     public function country()

@@ -53,7 +53,7 @@ class BankAccountModerationNotification extends Notification
         if ($this->receiver == 'admin') {
             $result['subject'] = 'Bank Account Moderation Needed';
             $result['body'] = 'User bank account details requires your moderation';
-            $result['url'] = route('admin.users.show', $this->moderation->moderatable->user);
+            $result['url'] = route($this->moderation->target);
         } elseif ($this->moderation->status == 'approved') {
             $result['subject'] = 'Verified Bank account';
             $result['body'] = 'Your bank account has been verified';

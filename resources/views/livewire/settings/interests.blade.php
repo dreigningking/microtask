@@ -96,7 +96,7 @@
                                                         {{ $location->country->name }}
                                                     </span>
                                                     <button wire:click="removeLocation({{ $location->id }})" class="btn btn-sm btn-outline-danger">
-                                                        <i class="ri-delete-bin-line"></i>
+                                                        <i class="bi bi-x-circle-fill"></i>
                                                     </button>
                                                 </div>
                                                 @empty

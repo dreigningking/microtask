@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Models\LoginActivity;
 
-class Security extends Component
+class SecuritySettings extends Component
 {
     public $current_password = '';
     public $new_password = '';
@@ -75,6 +75,6 @@ class Security extends Component
 
     public function render()
     {
-        return view('livewire.settings.security');
+        return view('livewire.settings.security-settings');
     }
 }

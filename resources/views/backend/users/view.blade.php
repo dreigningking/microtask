@@ -208,7 +208,7 @@
                                                                 <i class="ri-check-line"></i> Approve
                                                             </button>
                                                         </form>
-                                                        <button class="btn btn-danger btn-sm" title="Reject" data-bs-toggle="modal" data-bs-target="#rejectBankAccount">
+                                                        <button class="btn btn-danger btn-sm" title="Reject" data-toggle="modal" data-target="#rejectBankAccount">
                                                             <i class="ri-close-line"></i> Reject
                                                         </button>
                                                     </div>
@@ -278,7 +278,7 @@
                                                                 <i class="ri-check-line"></i> Approve
                                                             </button>
                                                         </form>
-                                                        <button class="btn btn-danger btn-sm" title="Reject" data-bs-toggle="modal" data-bs-target="#rejectVerificationModal{{ $verification->id }}">
+                                                        <button class="btn btn-danger btn-sm" title="Reject" data-toggle="modal" data-target="#rejectVerificationModal{{ $verification->id }}">
                                                             <i class="ri-close-line"></i> Reject
                                                         </button>
                                                     </div>
@@ -497,7 +497,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Reject Bank Account</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-dismiss="modal"></button>
                     </div>
                     <form action="{{ route('admin.users.bank-account.reject') }}" method="POST">
                         @csrf
@@ -509,7 +509,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-danger">Reject</button>
                         </div>
                     </form>
@@ -527,7 +527,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Reject Verification</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-dismiss="modal"></button>
                     </div>
                     <form action="{{ route('admin.users.verifications.reject') }}" method="POST">
                         @csrf
@@ -535,11 +535,11 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="remarks{{ $verification->id }}" class="form-label">Rejection Reason</label>
-                                <textarea class="form-control" id="remarks{{ $verification->id }}" name="remarks" rows="3" required></textarea>
+                                <textarea class="form-control" id="remarks{{ $verification->id }}" name="notes" rows="3" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-danger">Reject</button>
                         </div>
                     </form>
@@ -554,15 +554,6 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var triggerTabList = [].slice.call(document.querySelectorAll('a[data-toggle="tab"]'));
-        triggerTabList.forEach(function(triggerEl) {
-            var tabTrigger = new bootstrap.Tab(triggerEl);
-            triggerEl.addEventListener('click', function(event) {
-                event.preventDefault();
-                tabTrigger.show();
-            });
-        });
-    });
+    
 </script>
 @endpush

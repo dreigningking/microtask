@@ -30,12 +30,14 @@ use App\Livewire\Policies\PrivacyPolicy;
 use App\Livewire\Settings\DeleteAccount;
 use App\Http\Controllers\PaymentController;
 use App\Livewire\Policies\DigitalMillenium;
+use App\Livewire\Settings\SecuritySettings;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
 use App\Livewire\Settings\BankAccountSettings;
 use App\Livewire\Settings\VerificationSettings;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
+use App\Livewire\Settings\NotificationSettings;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
@@ -95,8 +97,8 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         Route::get('profile/bank-account', BankAccountSettings::class)->name('profile.bank-account');
         Route::get('profile/verifications', VerificationSettings::class)->name('profile.verifications');
         Route::get('profile/interests', Interests::class)->name('profile.interests');
-        Route::get('profile/security', Interests::class)->name('profile.security');
-        Route::get('profile/notifications', Interests::class)->name('profile.notifications');
+        Route::get('profile/security', SecuritySettings::class)->name('profile.security');
+        Route::get('profile/notifications', NotificationSettings::class)->name('profile.notifications');
         Route::get('profile/delete', DeleteAccount::class)->name('profile.delete');
         
 

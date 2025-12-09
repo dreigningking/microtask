@@ -281,12 +281,9 @@ class UserController extends Controller
     public function approveVerification(Request $request)
     {
         $request->validate(['verification_id' => 'required|exists:user_verifications,id']);
-
-        $verification = UserVerification::findOrFail($request->verification_id);
-        $verification->update([
-            'status' => 'approved',
-            'remarks' => null,
-        ]);
+        Moderation::where('moderatable_id', $request->verification_id)
+            ->where('moderatable_type', UserVerification::class)
+            ->update(['status' => 'approved','moderated_at' => now()]);
 
         return back()->with('success', 'Verification approved successfully.');
     }
@@ -295,14 +292,11 @@ class UserController extends Controller
     {
         $request->validate([
             'verification_id' => 'required|exists:user_verifications,id',
-            'remarks' => 'required|string|max:500'
+            'notes' => 'required|string|max:500'
         ]);
-
-        $verification = UserVerification::findOrFail($request->verification_id);
-        $verification->update([
-            'status' => 'rejected',
-            'remarks' => $request->remarks,
-        ]);
+        Moderation::where('moderatable_id', $request->verification_id)
+            ->where('moderatable_type', UserVerification::class)
+            ->update(['status' => 'rejected', 'notes' => $request->notes, 'moderated_at' => now()]);
 
         return back()->with('success', 'Verification rejected successfully.');
     }
