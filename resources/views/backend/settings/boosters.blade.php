@@ -33,11 +33,11 @@
 							<thead>
 								<tr>
 									<th>Name</th>
-									
+
 									<th>Description</th>
 									<th>Mim Duration</th>
-									<th>Active</th>
-									<th>Total</th>
+									<th>Max Multiplier</th>
+									<th>Subscription</th>
 									<th>Status</th>
 									<th>Actions</th>
 								</tr>
@@ -48,21 +48,21 @@
 									<td>{{ $booster->name }}</td>
 									<td>{{ Str::limit($booster->description, 50) }}</td>
 									<td>{{ $booster->minimum_duration_days }}</td>
+
+									<td class="text-center">{{ $booster->max_multiplier}}</td>
+
 									<td class="text-center">
-										 <span class="badge bg-success">{{ $booster->subscriptions->where('starts_at','<',now())->where('expires_at','>',now())->count()}}</span>
+										<span class="badge bg-secondary">{{ $booster->subscriptions->where('starts_at','<',now())->where('expires_at','>',now())->count()}}</span>
 									</td>
-									<td class="text-center">
-										 <span class="badge bg-secondary">{{  $booster->subscriptions->count()}}</span>
-									</td>
-									
+
 									<td>
 										@if($booster->is_active)
-											<span class="badge bg-success">Active</span>
+										<span class="badge bg-success">Active</span>
 										@else
-											<span class="badge bg-danger">Inactive</span>
+										<span class="badge bg-danger">Inactive</span>
 										@endif
 									</td>
-									
+
 									<td>
 										<div class="btn-group">
 											<button type="button" class="btn btn-sm btn-primary edit-plan-btn"
@@ -72,6 +72,7 @@
 												data-name="{{ $booster->name }}"
 												data-description="{{ $booster->description }}"
 												data-minimum_duration_days="{{ $booster->minimum_duration_days }}"
+												data-max_multiplier="{{ $booster->max_multiplier }}"
 												data-status="{{ $booster->is_active }}">
 												<i class="fas fa-edit"></i>
 											</button>
@@ -110,17 +111,23 @@
 						<label class="form-label">Name <span class="text-danger">*</span></label>
 						<input type="text" class="form-control" name="name" id="create-name" required>
 					</div>
-					
+
 					<div class="mb-3">
 						<label class="form-label">Description <span class="text-danger">*</span></label>
 						<textarea class="form-control" name="description" id="create-description" rows="3" required></textarea>
 					</div>
-					<div class="mb-2">
-						<label class="form-label">Minimum Days Maximum Multiplier</label>
-						<input type="number" class="form-control" name="minimum_duration_days" id="create-minimum_duration_days" min="1" value="30">
+					<div class="mb-2 row">
+						<div class="col-md-6">
+							<label class="form-label">Minimum Days</label>
+							<input type="number" class="form-control" name="minimum_duration_days" id="create-minimum_duration_days" min="1" value="30">
+						</div>
+						<div class="col-md-6">
+							<label class="form-label">Max Multiplier X</label>
+							<input type="number" class="form-control" name="max_multiplier" id="create-max_multiplier" min="1" value="1">
+						</div>
 					</div>
-					
-					
+
+
 					<div class="mb-3">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" id="createActiveSwitch" name="is_active" value="1" checked>
@@ -156,16 +163,22 @@
 						<label class="form-label">Name <span class="text-danger">*</span></label>
 						<input type="text" class="form-control" name="name" id="edit-name" required>
 					</div>
-					
+
 					<div class="mb-3">
 						<label class="form-label">Description <span class="text-danger">*</span></label>
 						<textarea class="form-control" name="description" id="edit-description" rows="3" required></textarea>
 					</div>
-					<div class="mb-2">
-						<label class="form-label">Minimum Days Maximum Multiplier</label>
-						<input type="number" class="form-control" name="minimum_duration_days" id="edit-minimum_duration_days" min="1" value="30">
+					<div class="mb-2 row">
+						<div class="col-md-6">
+							<label class="form-label">Minimum Days</label>
+							<input type="number" class="form-control" name="minimum_duration_days" id="edit-minimum_duration_days" min="1" value="30">
+						</div>
+						<div class="col-md-6">
+							<label class="form-label">Max Multiplier X</label>
+							<input type="number" class="form-control" name="max_multiplier" id="edit-max_multiplier" min="1" value="1">
+						</div>
 					</div>
-					
+
 					<div class="mb-3">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" id="editActiveSwitch" name="is_active" value="1">
@@ -218,25 +231,27 @@
 			responsive: true
 		});
 
-		
 
-		
+
+
 
 		// Edit plan modal: populate fields
 		$('.edit-plan-btn').on('click', function() {
 			var id = $(this).data('id');
 			var name = $(this).data('name');
-			
+
 			var description = $(this).data('description');
 			var type = $(this).data('type');
 			var minimum_duration_days = $(this).data('minimum_duration_days');
+			var max_multiplier = $(this).data('max_multiplier');
 			var status = $(this).data('status') == 1;
 
 			$('#edit-id').val(id);
 			$('#edit-name').val(name);
-			
+
 			$('#edit-description').val(description);
 			$('#edit-minimum_duration_days').val(minimum_duration_days);
+			$('#edit-max_multiplier').val(max_multiplier);
 			$('#editActiveSwitch').prop('checked', status);
 		});
 

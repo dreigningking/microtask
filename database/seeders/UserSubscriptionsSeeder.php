@@ -83,7 +83,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 2500, // NGN
                 'currency' => 'NGN',
                 'multiplier' => 2,
-                'duration_months' => 1,
+                'duration_days' => 1,
                 'starts_at' => now()->subDays(15),
                 'expires_at' => now()->addDays(15),
                 'billing_cycle' => 'monthly',
@@ -95,7 +95,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 5.99, // USD
                 'currency' => 'USD',
                 'multiplier' => 3,
-                'duration_months' => 3,
+                'duration_days' => 3,
                 'starts_at' => now()->subDays(30),
                 'expires_at' => now()->addDays(60),
                 'billing_cycle' => 'monthly',
@@ -107,7 +107,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 7500, // NGN
                 'currency' => 'NGN',
                 'multiplier' => 5,
-                'duration_months' => 6,
+                'duration_days' => 6,
                 'starts_at' => now()->subDays(10),
                 'expires_at' => now()->addDays(170),
                 'billing_cycle' => 'monthly',
@@ -119,7 +119,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 12.99, // USD
                 'currency' => 'USD',
                 'multiplier' => 2,
-                'duration_months' => 1,
+                'duration_days' => 1,
                 'starts_at' => now()->subDays(5),
                 'expires_at' => now()->addDays(25),
                 'billing_cycle' => 'monthly',
@@ -131,7 +131,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 5000, // NGN
                 'currency' => 'NGN',
                 'multiplier' => 3,
-                'duration_months' => 2,
+                'duration_days' => 2,
                 'starts_at' => now()->subDays(20),
                 'expires_at' => now()->addDays(40),
                 'billing_cycle' => 'monthly',
@@ -143,7 +143,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 19.99, // USD
                 'currency' => 'USD',
                 'multiplier' => 4,
-                'duration_months' => 3,
+                'duration_days' => 3,
                 'starts_at' => now()->subDays(7),
                 'expires_at' => now()->addDays(83),
                 'billing_cycle' => 'monthly',
@@ -155,7 +155,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 3000, // NGN
                 'currency' => 'NGN',
                 'multiplier' => 2,
-                'duration_months' => 1,
+                'duration_days' => 1,
                 'starts_at' => now()->subDays(2),
                 'expires_at' => now()->addDays(28),
                 'billing_cycle' => 'monthly',
@@ -167,7 +167,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'cost' => 8.99, // USD
                 'currency' => 'USD',
                 'multiplier' => 3,
-                'duration_months' => 2,
+                'duration_days' => 2,
                 'starts_at' => now()->subDays(1),
                 'expires_at' => now()->addDays(59),
                 'billing_cycle' => 'monthly',
@@ -186,7 +186,7 @@ class UserSubscriptionsSeeder extends Seeder
                     'cost' => $subscriptionData['cost'],
                     'currency' => $subscriptionData['currency'],
                     'multiplier' => $subscriptionData['multiplier'],
-                    'duration_months' => $subscriptionData['duration_months'],
+                    'duration_days' => $subscriptionData['duration_days'],
                     'expires_at' => $subscriptionData['expires_at'],
                     'billing_cycle' => $subscriptionData['billing_cycle'],
                     'auto_renew' => $subscriptionData['auto_renew'],

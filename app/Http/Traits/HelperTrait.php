@@ -56,7 +56,13 @@ trait HelperTrait
     public function getMarkedUpRate($currency, $user)
     {
         $baseRate = $this->getExchangeRate($currency);
-        $markupPercentage = $user->country->setting->usd_exchange_rate_percentage ?? 0;
+        if(!$user || !$user->country || !$user->country->settings){
+            return $baseRate;
+        }
+        if(!isset($user->country->settings['wallet_settings']) || !isset($user->country->settings['wallet_settings']['exchange_markup_percentage'])){
+            return $baseRate;
+        }
+        $markupPercentage = $user->country->settings['wallet_settings']['exchange_markup_percentage'] ?? 0;
         $markup = ($baseRate * $markupPercentage) / 100;
         return $baseRate + $markup;
     }

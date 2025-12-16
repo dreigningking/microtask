@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subscription extends Model
 {
     protected $connection = 'mysql';
-    protected $fillable = ['user_id','booster_id', 'cost', 'currency', 'status', 'duration_months',
+    protected $fillable = ['user_id','booster_id', 'cost', 'currency', 'status', 'duration_days',
      'starts_at', 'expires_at', 'features'];
     protected $casts = ['features'=> 'array','starts_at'=>'datetime', 'expires_at'=>'datetime'];
 

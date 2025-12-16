@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Welcome;
-use App\Livewire\Boosters;
 use App\Livewire\AboutPage;
 use App\Livewire\Dashboard;
 use App\Livewire\TopEarners;
@@ -14,6 +13,7 @@ use App\Livewire\Blog\BlogIndex;
 use App\Livewire\Tasks\TaskEdit;
 use App\Livewire\Tasks\TaskList;
 use App\Livewire\Tasks\TaskShow;
+use App\Livewire\AccountBoosters;
 use App\Livewire\Blog\BlogSingle;
 use App\Livewire\Support\Tickets;
 use App\Livewire\Settings\Profile;
@@ -34,10 +34,10 @@ use App\Livewire\Settings\SecuritySettings;
 use App\Livewire\Policies\TermsAndConditions;
 use App\Livewire\Tasks\TaskSubmissionDispute;
 use App\Livewire\Settings\BankAccountSettings;
+use App\Livewire\Settings\NotificationSettings;
 use App\Livewire\Settings\VerificationSettings;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
-use App\Livewire\Settings\NotificationSettings;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         Route::get('invitees', InviteesList::class)->name('invitees');
         Route::get('transactions', Transactions::class)->name('transactions');
         Route::get('payment/callback', [PaymentController::class, 'paymentcallback'])->name('payment.callback');
-        Route::get('account-booster', Boosters::class)->name('boosters');
+        Route::get('account-booster', AccountBoosters::class)->name('boosters');
         
         Route::get('profile', Profile::class)->name('profile');
         Route::get('profile/bank-account', BankAccountSettings::class)->name('profile.bank-account');

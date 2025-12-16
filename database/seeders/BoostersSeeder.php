@@ -19,6 +19,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'task-limit-booster',
                 'description' => 'Increase your daily task application limit and maximum tasks at hand',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 3,
                 'is_active' => true,
             ],
             [
@@ -26,6 +27,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'submission-speed-booster',
                 'description' => 'Reduce the interval between multiple task submissions',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 2,
                 'is_active' => true,
             ],
             [
@@ -33,6 +35,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'feature-all-tasks',
                 'description' => 'Automatically feature all your tasks for better visibility',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 1,
                 'is_active' => true,
             ],
             [
@@ -40,6 +43,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'broadcast-all-tasks',
                 'description' => 'Automatically broadcast all your tasks to reach more workers',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 2,
                 'is_active' => true,
             ],
             [
@@ -47,6 +51,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'withdrawal-limit-booster',
                 'description' => 'Increase your maximum withdrawal limit',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 2,
                 'is_active' => true,
             ],
             [
@@ -54,6 +59,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'referral-earnings-booster',
                 'description' => 'Increase your referral earnings and invitee commission percentage',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 2,
                 'is_active' => true,
             ],
             [
@@ -61,6 +67,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'premium-support',
                 'description' => 'Get priority customer support and faster response times',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 1,
                 'is_active' => true,
             ],
             [
@@ -68,6 +75,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'task-analytics-plus',
                 'description' => 'Access detailed analytics and insights for your tasks',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 1,
                 'is_active' => true,
             ],
             [
@@ -75,6 +83,7 @@ class BoostersSeeder extends Seeder
                 'slug' => 'task-volume-booster',
                 'description' => 'Increase number of task you can hold',
                 'minimum_duration_days' => 30,
+                'max_multiplier' => 3,
                 'is_active' => true,
             ],
             

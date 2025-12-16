@@ -743,20 +743,7 @@ class User extends Authenticatable
                 }
                 break;
 
-            case 'subscription':
-                if (($conditions['has_active_subscription'] ?? false)) {
-                    $subscriptionType = $conditions['subscription_type'] ?? null;
-                    if ($subscriptionType === 'premium') {
-                        $query->premiumUsers();
-                    } elseif ($subscriptionType === 'worker') {
-                        $query->workerSubscriptionUsers();
-                    } elseif ($subscriptionType === 'creator') {
-                        $query->creatorSubscriptionUsers();
-                    }
-                } else {
-                    $query->noSubscription();
-                }
-                break;
+            
 
             case 'status':
                 if (($conditions['is_banned_from_tasks'] ?? false)) {

@@ -12,6 +12,17 @@ class Booster extends Model
 {
     use Sluggable;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'minimum_duration_days',
+        'max_multiplier',
+        'is_active',
+    ];
+
+     /**
+     * Return the sluggable configuration array for this model.
+     */
     public function sluggable(): array
     {
         return [

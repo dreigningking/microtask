@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /*  by default, multiplier is 1. 
-            user can order by selecting multiplier e.g x3
+        /*  by default, max_multiplier is 1. 
+            user can order by selecting max_multiplier e.g x3
             and selecting month - x2
         */
         Schema::create('boosters', function (Blueprint $table) {
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('slug')->nullable();
             $table->text('description')->nullable();
             $table->string('minimum_duration_days')->default(1); 
+            $table->string('max_multiplier')->default(1);
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

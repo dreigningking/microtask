@@ -77,11 +77,11 @@ class PaymentController extends Controller
                 if ($activeSubscription) {
                     // If an active subscription exists, stack the new one after it
                     $subscription->starts_at = $activeSubscription->expires_at;
-                    $subscription->expires_at = $activeSubscription->expires_at->addMonths($subscription->duration_months);
+                    $subscription->expires_at = $activeSubscription->expires_at->addDays($subscription->duration_days);
                 } else {
                     // Otherwise, the new subscription starts now
                     $subscription->starts_at = now();
-                    $subscription->expires_at = now()->addMonths($subscription->duration_months);
+                    $subscription->expires_at = now()->addDays($subscription->duration_days);
                 }
 
                 $subscription->save();

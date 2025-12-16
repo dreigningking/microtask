@@ -109,7 +109,7 @@ class CountrySettingsController extends Controller
         if($request->has('wallet_settings')){
             $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
                 'wallet_status' => $request->boolean('wallet_settings.wallet_status'),
-                'usd_exchange_rate' => $request->input('wallet_settings.usd_exchange_rate', 0),
+                'exchange_markup_percentage' => $request->input('wallet_settings.exchange_markup_percentage', 0),
             ]);
         }
 
@@ -259,7 +259,7 @@ class CountrySettingsController extends Controller
 
         // Wallet settings
         $settings->wallet_settings = array_merge($settings->wallet_settings ?? [], [
-            'usd_exchange_rate' => $request->input('usd_exchange_rate_percentage', 0),
+            'exchange_markup_percentage' => $request->input('exchange_markup_percentage', 0),
         ]);
 
         $settings->save();

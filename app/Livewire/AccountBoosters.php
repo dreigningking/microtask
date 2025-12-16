@@ -17,70 +17,28 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeoLocationTrait;
 
 
-class Boosters extends Component
+class AccountBoosters extends Component
 {
     use PaymentTrait, GeoLocationTrait;
-    
+
     public $boosters = [];
-    public $selectedType = 'worker';
-    public $filteredBoosters = [];
     public $showModal = false;
     public $selectedBooster = null;
     public $selectedDuration = 1;
+    public $selectedMultiplier = 1;
     public $totalAmount = 0;
     public $subtotal = 0;
     public $tax = 0;
     public $tax_rate = 0;
     public $location;
     public $countrySetting;
-    public $activeSubscriptionBoosterIds = [];
+    public $activeSubscriptions = [];
     public $paymentMethod = 'gateway'; // 'wallet' or 'gateway'
     public $walletBalance = 0;
 
     public function mount()
     {
        
-    }
-
-    public function getBoosterFeatures($booster)
-    {
-        $features = [];
-        if ($booster->type === 'worker') {
-            $features[] = $booster->active_tasks_per_hour . ' active tasks per hour';
-            $features[] = 'Withdrawal limit multiplier: ' . $booster->withdrawal_maximum_multiplier;
-        } else if ($booster->type === 'taskmaster') {
-            if ($booster->featured_promotion) {
-                $features[] = 'Featured job promotions';
-            }
-            if ($booster->broadcast_promotion) {
-                $features[] = 'Broadcast badge on jobs';
-            }
-        }
-        
-        if (empty($features)) {
-            $features[] = 'Standard features included.';
-        }
-        return $features;
-    }
-
-    public function switchType($type)
-    {
-        $this->selectedType = $type;
-        $this->filterBoosters();
-    }
-
-    public function filterBoosters()
-    {
-        $this->filteredBoosters = collect($this->boosters)->where('type', $this->selectedType)->values()->all();
-    }
-
-    public function chooseBooster($slug)
-    {
-        $this->selectedBooster = collect($this->boosters)->firstWhere('slug', $slug);
-        $this->selectedDuration = 1;
-        $this->paymentMethod = 'gateway';
-        $this->calculateTotal();
-        $this->showModal = true;
     }
 
     public function updatedSelectedDuration()
@@ -117,7 +75,7 @@ class Boosters extends Component
             'cost' => $this->totalAmount,
             'currency' => $this->location->currency,
             'status' => 'pending', // Becomes active after payment
-            'duration_months' => $this->selectedDuration,
+            'duration_days' => $this->selectedDuration,
             'starts_at' => null, // To be set after payment
             'expires_at' => null, // To be set after payment
             'features' => $this->selectedBooster['features'],
@@ -169,10 +127,10 @@ class Boosters extends Component
 
             if ($activeSubscription) {
                 $subscription->starts_at = $activeSubscription->expires_at;
-                $subscription->expires_at = $activeSubscription->expires_at->addMonths($subscription->duration_months);
+                $subscription->expires_at = $activeSubscription->expires_at->addMonths($subscription->duration_days);
             } else {
                 $subscription->starts_at = now();
-                $subscription->expires_at = now()->addMonths($subscription->duration_months);
+                $subscription->expires_at = now()->addMonths($subscription->duration_days);
             }
             $subscription->status = 'active';
             $subscription->save();
@@ -206,6 +164,6 @@ class Boosters extends Component
 
     public function render()
     {
-        return view('livewire.boosters');
+        return view('livewire.account-boosters');
     }
 }

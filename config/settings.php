@@ -59,7 +59,7 @@ return [
         ],
         "wallet_settings"=> [
             "wallet_status" => 'boolean', 
-            "usd_exchange_rate_percentage"=>'double'
+            "exchange_markup_percentage"=>'double'
         ],
         "referral_settings" => [
             "signup_referral_earnings_percentage"=> 'double',

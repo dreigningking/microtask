@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('cost')->default(0);
             $table->string('currency')->default('NGN');
             $table->integer('multiplier');
-            $table->integer('duration_months');
+            $table->integer('duration_days');
             $table->timestamp('starts_at');
             $table->timestamp('expires_at');
             $table->string('billing_cycle')->default('monthly'); // weekly, monthly, annual

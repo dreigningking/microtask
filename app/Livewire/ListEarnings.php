@@ -77,6 +77,7 @@ class ListEarnings extends Component
         $user = Auth::user();
         $this->toCurrency = $user->country->currency;
         $this->toCurrencySymbol = $user->country->currency_symbol;
+        $this->exchangeRate = $this->getMarkedUpRate($this->toCurrency, $user);
         // Wallet freeze logic
         $globalFreeze = Setting::firstWhere('name', 'freeze_wallets_globally')->value('value') == 1;
         $countrySetting = $user->country->setting ?? null;

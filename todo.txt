@@ -1,44 +1,50 @@
+exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
 
+if admin does not approve task: user will edit task
+    
 Refund notification & Earnings Notification sync
-if admin does not approve task,{
-    user will edit task || Funds Return to wallet? 
-} 
-Task approval
-Submission Review: Check submissions that should have been reviewed, if late, allow admin to review them
-Late Subsubmission Review Notification
 
-Broadcast Jobs: show number of emails to be sent.. let user reduce amount
-BroadcastJob Notification
+Submission Review {
+    Check submissions that should have been reviewed, if late, allow admin to review them
+    Late Subsubmission Review Notification
+    At end of job: refund taskmaster the admin-review fee is no intervention was found
+    REVIEW: review task after submission review completed
+}: 
 
-Withdrawal Complete 
-Exchange Complete 
-Blog Subscription Notification 24hours after post creation
-JobInvite notification
-Referral notification
-Verification Result notification
+Broadcast Jobs{
+    show number of emails to be sent.. let user reduce amount
+    BroadcastJob Notification
+
+}: 
+Blog{
+    Subscription Notification 24hours after post creation
+    Blog send notification to subscribers and users
+}
+
+Referral from dashboard
+
 booster Subscription Expiring/Expiry notification
-Support Notification for admin - new, closed, 
-SupportReplyNotification
+
+Support{
+    Notification for admin - new, closed, 
+}
 vpn block
 Logs of activities e.g accepted terms
-refund taskmaster the admin-review fee is no intervention was found
+
 Featured Jobs - identify places to show featured jobs"
-2factor
 where should we display flags and reports - postcommentmoderationnotification
 
 ---------------------------------------------------------
-REVIEW: review taskmaster
-Guest
------------------------------------------------------
-Top Earners
-blog subscription
 
+Guest{
+    Top Earners
+    blog subscription
+}
 -------------------------------------------------------
 ADMIN
 ---------------------------------------------------
 Admin dashboard - Show pending tasks
-Blog send notification to subscribers and users
-admin can create task, and assign to user
+
 Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
 
 ----------------------------------------------

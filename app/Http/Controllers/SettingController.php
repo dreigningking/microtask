@@ -384,12 +384,14 @@ class SettingController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'minimum_duration_days' => 'required|numeric|min:1',
+            'max_multiplier' => 'required|numeric|min:1',
         ]);
 
         $booster = new Booster();
         $booster->name = $request->name;
         $booster->description = $request->description;
         $booster->minimum_duration_days = $request->minimum_duration_days;
+        $booster->max_multiplier = $request->max_multiplier;
         $booster->is_active = $request->has('is_active') ? true : false;
         $booster->save();
 
@@ -403,12 +405,14 @@ class SettingController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'minimum_duration_days' => 'required|numeric|min:1',
+            'max_multiplier' => 'required|numeric|min:1',
         ]);
 
         $booster = Booster::findOrFail($request->id);
         $booster->name = $request->name;
         $booster->description = $request->description;
         $booster->minimum_duration_days = $request->minimum_duration_days;
+        $booster->max_multiplier = $request->max_multiplier;
         $booster->is_active = $request->has('is_active') ? true : false;
         $booster->save();
 

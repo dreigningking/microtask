@@ -217,10 +217,10 @@
                                                             <label class="form-label">USD Exchange Rate Markup</label>
                                                             <div class="input-group">
                                                                 <span class="input-group-text">$1 +</span>
-                                                                <input type="number" class="form-control" name="wallet_settings[usd_exchange_rate]" value="{{ old('wallet_settings.usd_exchange_rate', $settings->wallet_settings['usd_exchange_rate'] ?? 0) }}" step="0.0001">
+                                                                <input type="number" class="form-control" name="wallet_settings[exchange_markup_percentage]" value="{{ old('wallet_settings.exchange_markup_percentage', $settings->wallet_settings['exchange_markup_percentage'] ?? 0) }}" step="0.0001">
                                                                 <span class="input-group-text">%</span>
                                                                 @php
-                                                                $markup = old('wallet_settings.usd_exchange_rate', $settings->wallet_settings['usd_exchange_rate'] ?? 0);
+                                                                $markup = old('wallet_settings.exchange_markup_percentage', $settings->wallet_settings['exchange_markup_percentage'] ?? 0);
                                                                 $total = $exchangeRate * (1 + ($markup / 100));
                                                                 @endphp
                                                                 <span class="input-group-text">= {{ $country->currency_symbol }}{{ number_format($total,1) }}</span>

@@ -167,8 +167,8 @@
                                     <div class="exchange-rate">
                                         <h6 class="mb-2">USD Exchange Rate</h6>
                                         <div class="small">
-                                            @if($countrySetting && isset($countrySetting->wallet_settings) && isset($countrySetting->wallet_settings['usd_exchange_rate_percentage']))
-                                                <span>{{ $countrySetting->wallet_settings['usd_exchange_rate_percentage'] }}%</span>
+                                            @if($exchangeRate)
+                                                <span>{{$exchangeRate }}</span>
                                             @else
                                                 <span>Not Available</span>
                                             @endif

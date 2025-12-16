@@ -291,20 +291,15 @@ class Country extends Model
         $settings = $this->setting;
         if (!$settings) return false;
         if (!$settings->gateway_id) return false;
-
+        
         if (!$settings->banking_settings) return false;
+        
         if (!$settings->banking_fields) return false;
 
-        $bankingSettings = is_string($settings->banking_settings)
-            ? json_decode($settings->banking_settings, true)
-            : $settings->banking_settings;
+        $bankingSettings = $settings->banking_settings;
 
         if (!$bankingSettings || !is_array($bankingSettings)) return false;
-
-        // Check for required banking settings fields
-        return isset($bankingSettings['account_length'])
-            && isset($bankingSettings['bank_account_storage'])
-            && is_array($settings->banking_fields);
+        return true;
     }
 
     /**
@@ -315,12 +310,13 @@ class Country extends Model
         $settings = $this->setting;
         if (!$settings) return false;
         if (!$settings->verification_fields) return false;
+        if (!$settings->verification_settings) return false;
 
-        $verificationFields = is_string($settings->verification_fields)
-            ? json_decode($settings->verification_fields, true)
-            : $settings->verification_fields;
+        $verificationFields = $settings->verification_fields;
+        $verificationSettings = $settings->verification_settings;
 
         if (!$verificationFields || !is_array($verificationFields)) return false;
+        if (!$verificationSettings || !is_array($verificationSettings)) return false;
 
         // Must have at least one verification type (govt_id or address)
         return count($verificationFields) > 0;
