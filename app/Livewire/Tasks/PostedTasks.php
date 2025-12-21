@@ -17,9 +17,6 @@ class PostedTasks extends Component
 
     public $search = '';
     public $activeTab = 'active';
-    public $activePage = 1;
-    public $completedPage = 1;
-    public $draftsPage = 1;
     public $stats = [
         'total' => 0,
         'in_progress' => 0,
@@ -27,6 +24,11 @@ class PostedTasks extends Component
         'rejected' => 0,
         'drafts' => 0,
         'completed' => 0
+    ];
+
+    protected $queryString = [
+        'activeTab' => ['except' => 'active'],
+        'search' => ['except' => ''],
     ];
 
     public function mount()
@@ -38,38 +40,53 @@ class PostedTasks extends Component
     {
         $userId = Auth::id();
 
-        // Get all tasks for the user
-        $tasks = Task::where('user_id', $userId)->with(['taskWorkers', 'taskSubmissions', 'latestModeration'])->get();
+        // Get all tasks for the user with necessary relationships
+        $tasks = Task::where('user_id', $userId)
+            ->with(['taskWorkers', 'taskSubmissions', 'latestModeration'])
+            ->get();
 
         $this->stats['total'] = $tasks->count();
-        $this->stats['in_progress'] = $tasks->where('inProgress', true)->count();
-        $this->stats['pending_review'] = $tasks->where('isPendingReview', true)->count();
-        $this->stats['rejected'] = $tasks->where('isRejected', true)->count();
         $this->stats['drafts'] = $tasks->where('is_active', false)->count();
-        $this->stats['completed'] = $tasks->where('isCompleted', true)->count();
+
+        // Calculate stats based on moderation status and completion
+        foreach ($tasks as $task) {
+            if (!$task->is_active) {
+                // Already counted as draft
+                continue;
+            }
+
+            $moderation = $task->latestModeration;
+
+            if (!$moderation) {
+                // No moderation yet, treat as draft
+                $this->stats['drafts']++;
+                continue;
+            }
+
+            switch ($moderation->status) {
+                case 'approved':
+                    // Check if completed
+                    $acceptedSubmissions = $task->taskSubmissions->where('accepted', true)->count();
+                    if ($acceptedSubmissions >= $task->number_of_submissions) {
+                        $this->stats['completed']++;
+                    } else {
+                        $this->stats['in_progress']++;
+                    }
+                    break;
+                case 'pending':
+                    $this->stats['pending_review']++;
+                    break;
+                case 'rejected':
+                    $this->stats['rejected']++;
+                    break;
+            }
+        }
     }
 
-
-    public function getTasksQuery()
+    public function switchTab($tab)
     {
-        $query = Task::where('user_id', Auth::id())
-            ->when($this->search, function($q) {
-                $q->where('title', 'like', '%' . $this->search . '%');
-            });
-
-        switch($this->activeTab) {
-            case 'active':
-                $query->where('is_active', true)->where('inProgress', true);
-                break;
-            case 'completed':
-                $query->where('isCompleted', true);
-                break;
-            case 'drafts':
-                $query->where('is_active', false);
-                break;
-        }
-
-        return $query;
+        $this->activeTab = $tab;
+        $this->resetPage();
     }
 
     public function updatingSearch()
@@ -79,47 +96,71 @@ class PostedTasks extends Component
 
     public function render()
     {
-        $activeTasks = Task::where('user_id', Auth::id())
-            ->progressing()
+        $userId = Auth::id();
+        $baseQuery = Task::where('user_id', $userId)
             ->when($this->search, function($q) {
                 $q->where('title', 'like', '%' . $this->search . '%');
             })
-            ->with(['platform', 'taskWorkers', 'taskSubmissions'])
-            ->latest()
-            ->paginate(10, ['*'], 'activePage');
+            ->with(['platform', 'taskWorkers', 'taskSubmissions', 'latestModeration']);
 
-        $pendingReviewTasks = Task::where('user_id', Auth::id())
-            ->pendingReview()
-            ->when($this->search, function($q) {
-                $q->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->with(['platform', 'taskWorkers', 'taskSubmissions'])
-            ->latest()
-            ->paginate(10, ['*'], 'pendingPage');
+        switch($this->activeTab) {
+            case 'active':
+                $tasks = $baseQuery->where('is_active', true)
+                    ->whereHas('latestModeration', function($q) {
+                        $q->where('status', 'approved');
+                    })
+                    ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
+                    ->latest()
+                    ->paginate(10);
+                break;
 
-        $completedTasks = Task::where('user_id', Auth::id())
-            ->completed()
-            ->when($this->search, function($q) {
-                $q->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->with(['platform', 'taskWorkers', 'taskSubmissions'])
-            ->latest()
-            ->paginate(10, ['*'], 'completedPage');
+            case 'pending':
+                $tasks = $baseQuery->where('is_active', true)
+                    ->whereHas('latestModeration', function($q) {
+                        $q->where('status', 'pending');
+                    })
+                    ->latest()
+                    ->paginate(10);
+                break;
 
-        $draftTasks = Task::where('user_id', Auth::id())
-            ->where('is_active', false)
-            ->when($this->search, function($q) {
-                $q->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->with(['platform', 'taskWorkers', 'taskSubmissions'])
-            ->latest()
-            ->paginate(10, ['*'], 'draftsPage');
+            case 'completed':
+                $tasks = $baseQuery->where('is_active', true)
+                    ->whereHas('latestModeration', function($q) {
+                        $q->where('status', 'approved');
+                    })
+                    ->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
+                    ->latest()
+                    ->paginate(10);
+                break;
+
+            case 'drafts':
+                $tasks = $baseQuery->where('is_active', false)
+                    ->latest()
+                    ->paginate(10);
+                break;
+
+            case 'rejected':
+                $tasks = $baseQuery->where('is_active', true)
+                    ->whereHas('latestModeration', function($q) {
+                        $q->where('status', 'rejected');
+                    })
+                    ->with(['latestModeration']) // Ensure we load the moderation for rejection reason
+                    ->latest()
+                    ->paginate(10);
+                break;
+
+            default:
+                $tasks = $baseQuery->where('is_active', true)
+                    ->whereHas('latestModeration', function($q) {
+                        $q->where('status', 'approved');
+                    })
+                    ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
+                    ->latest()
+                    ->paginate(10);
+        }
 
         return view('livewire.tasks.posted-tasks', [
-            'activeTasks' => $activeTasks,
-            'pendingTasks' => $pendingReviewTasks,
-            'completedTasks' => $completedTasks,
-            'draftTasks' => $draftTasks
+            'tasks' => $tasks
         ]);
     }
 }

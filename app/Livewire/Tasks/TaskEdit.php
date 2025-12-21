@@ -13,11 +13,11 @@ use App\Models\Platform;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
-use App\Models\TaskTemplate;
 use App\Models\TaskPromotion;
 use Livewire\WithFileUploads;
 use App\Models\CountrySetting;
 use Livewire\Attributes\Layout;
+use App\Models\PlatformTemplate;
 use App\Http\Traits\PaymentTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -153,8 +153,8 @@ class TaskEdit extends Component
         
         // Load collections
         $this->platforms = Platform::where('is_active', true)->get();
-        $this->templates = TaskTemplate::where('is_active', true)
-            ->whereHas('prices', function($q) {
+        $this->templates = PlatformTemplate::where('is_active', true)
+            ->whereHas('countryPrices', function($q) {
                 $q->where('country_id', $this->location->country_id);
             })->get();
 
@@ -190,7 +190,7 @@ class TaskEdit extends Component
         
         // Set minimum budget per person
         if ($this->template_id) {
-            $template = TaskTemplate::find($this->template_id);
+            $template = PlatformTemplate::find($this->template_id);
             if ($template) {
                 $this->min_budget_per_submission = $template->prices->firstWhere('country_id', $this->location->country_id)->amount;
             }

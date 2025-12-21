@@ -1,4 +1,3 @@
-booster Subscription purchase
 booster subscription Expiring notification
 
 
@@ -25,7 +24,6 @@ Blog{
 }
 
 Referral from dashboard
-
 
 
 Support{
