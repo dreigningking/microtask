@@ -1,53 +1,59 @@
-<section class="jumbo-section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <span class="blog-category">Success Stories</span>
-                <h1 class="display-5 fw-bold my-3">How I Made $5,000 in My First Month on MicroTasker</h1>
-                <p class="lead mb-4">Discover the strategies that helped Sarah Johnson earn significant income while working from home</p>
-                <div class="d-flex align-items-center justify-content-center">
-                    <img src="https://placehold.co/60x60/667eea/ffffff?text=SJ" alt="Author" class="author-avatar me-3">
-                    <div class="text-start">
-                        <div class="fw-bold">Sarah Johnson</div>
-                        <div class="text-white-50">Nov 15, 2023 · 8 min read</div>
+<div>
+
+    <section class="jumbo-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <span class="blog-category">{{ $post->category->name }}</span>
+                    <h1 class="display-5 fw-bold my-3">{{ $post->title }}</h1>
+                    <p class="lead mb-4">{{ $post->excerpt }}</p>
+                    <div class="d-flex align-items-center justify-content-center">
+                        <img src="{{ $post->user->avatar ?? 'https://placehold.co/60x60/667eea/ffffff?text=' . substr($post->user->name, 0, 2) }}" alt="Author" class="author-avatar me-3">
+                        <div class="text-start">
+                            <div class="fw-bold">{{ $post->user->name }}</div>
+                            <div class="text-white-50">{{ $post->created_at->format('M j, Y') }} · {{ $post->reading_time }} min read</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Blog Content -->
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                <div class="blog-content">
-                    <img src="https://placehold.co/800x400/667eea/ffffff?text=Blog+Post+Image" class="img-fluid w-100" alt="Blog Post Image">
+    <!-- Blog Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <div class="blog-content">
+                        @if($post->featured_image)
+                        <img src="{{ $post->featured_image }}" class="img-fluid w-100" alt="Blog Post Image">
+                        @else
+                        <img src="https://placehold.co/800x400/667eea/ffffff?text=Blog+Post+Image" class="img-fluid w-100" alt="Blog Post Image">
+                        @endif
 
-                    <p>When I first heard about MicroTasker, I was skeptical. Like many people, I had tried various side hustle platforms with mixed results. But within my first month on the platform, I managed to earn over $5,000 completing micro-tasks. In this article, I'll share exactly how I did it and how you can replicate my success.</p>
-
-                    <!-- ... rest of blog content ... -->
-                </div>
-
-                <!-- Share & Tags -->
-                <div class="d-flex justify-content-between align-items-center mt-5 py-4 border-top border-bottom">
-                    <div class="share-buttons">
-                        <span class="fw-bold me-2">Share this post:</span>
-                        <button class="btn btn-outline-primary btn-sm"><i class="bi bi-twitter"></i> Twitter</button>
-                        <button class="btn btn-outline-primary btn-sm"><i class="bi bi-facebook"></i> Facebook</button>
-                        <button class="btn btn-outline-primary btn-sm"><i class="bi bi-linkedin"></i> LinkedIn</button>
-                        <button class="btn btn-outline-primary btn-sm"><i class="bi bi-link-45deg"></i> Copy Link</button>
+                        {!! $post->content !!}
                     </div>
-                    <div>
-                        <span class="badge bg-light text-dark me-1">#Earnings</span>
-                        <span class="badge bg-light text-dark me-1">#SuccessStories</span>
-                        <span class="badge bg-light text-dark">#Freelancing</span>
-                    </div>
-                </div>
 
-                <!-- Author Bio -->
+                    <!-- Share & Tags -->
+                    <div class="d-flex justify-content-between align-items-center mt-5 py-4 border-top border-bottom">
+                        <div class="share-buttons">
+                            <span class="fw-bold me-2">Share this post:</span>
+                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-twitter"></i> Twitter</button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-facebook"></i> Facebook</button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-linkedin"></i> LinkedIn</button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-link-45deg"></i> Copy Link</button>
+                        </div>
+                        <div>
+                            @if($post->tags)
+                            @foreach($post->tags as $tag)
+                            <span class="badge bg-light text-dark me-1">#{{ $tag }}</span>
+                            @endforeach
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Author Bio 
                 <div class="author-card card mt-5">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -65,143 +71,122 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>-->
 
-                <!-- Comments Section -->
-                <div class="mt-5" id="comments-section">
-                    <h3 class="section-title">Comments (3)</h3>
+                    <!-- Comments Section -->
+                    <div class="mt-5" id="comments-section">
+                        <h3 class="section-title">Comments ({{ $comments->count() }})</h3>
 
-                    <!-- Reply Indicator (hidden by default) -->
-                    <div class="comment-reply-indicator alert alert-info d-none" id="reply-indicator">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>Replying to <strong id="reply-to-user">User Name</strong></span>
-                            <button type="button" class="btn-close" id="cancel-reply"></button>
+                        @if(session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+                        @if(session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+
+                        <!-- Reply Indicator -->
+                        @if($parentId)
+                        <div class="alert alert-info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Replying to <strong>{{ $comments->where('id', $parentId)->first()->user->name }}</strong></span>
+                                <button type="button" class="btn-close" wire:click="$set('parentId', null)"></button>
+                            </div>
                         </div>
-                    </div>
+                        @endif
 
-                    <!-- Comments List -->
-                    <div class="mb-4">
-                        <!-- Comment 1 -->
-                        <div class="d-flex mb-4">
-                            <img src="https://placehold.co/50x50/10b981/ffffff?text=MC" alt="Commenter" class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">Mike Chen</h6>
-                                    <small class="text-muted">2 days ago</small>
+                        <!-- Comments List -->
+                        <div class="mb-4">
+                            @foreach($comments->whereNull('parent_id') as $comment)
+                            <div class="d-flex mb-4">
+                                <img src="{{ $comment->user->avatar ?? 'https://placehold.co/50x50/10b981/ffffff?text=' . substr($comment->user->name, 0, 2) }}" alt="Commenter" class="comment-avatar me-3">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">{{ $comment->user->name }}</h6>
+                                        <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                    </div>
+                                    <p class="mb-2">{{ $comment->body }}</p>
+                                    <button class="btn btn-outline-primary btn-sm" wire:click="setReply({{ $comment->id }})">Reply</button>
+                                    @if($comment->children)
+                                    @foreach($comment->children as $reply)
+                                    <div class="d-flex mt-3 ms-4">
+                                        <img src="{{ $reply->user->avatar ?? 'https://placehold.co/40x40/f59e0b/ffffff?text=' . substr($reply->user->name, 0, 2) }}" alt="Commenter" class="comment-avatar me-3" style="width: 30px; height: 30px;">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="mb-0">{{ $reply->user->name }}</h6>
+                                                <small class="text-muted">{{ $reply->created_at->diffForHumans() }}</small>
+                                            </div>
+                                            <p class="mb-2">{{ $reply->body }}</p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    @endif
                                 </div>
-                                <p class="mb-2">This is incredibly inspiring! I've been on the platform for two weeks and have only made $200. Your strategy of focusing on specific skills rather than applying to everything makes so much sense.</p>
-                                <button class="btn btn-outline-primary btn-sm reply-btn" data-user="Mike Chen">Reply</button>
                             </div>
+                            @endforeach
                         </div>
 
-                        <!-- Comment 2 -->
-                        <div class="d-flex mb-4">
-                            <img src="https://placehold.co/50x50/f59e0b/ffffff?text=ER" alt="Commenter" class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">Emma Rodriguez</h6>
-                                    <small class="text-muted">3 days ago</small>
+                        <!-- Comment Form -->
+                        @if(Auth::check())
+                        <form wire:submit="submitComment">
+                            <h5 class="mb-3">Leave a Comment</h5>
+                            <div class="mb-3">
+                                <textarea class="form-control" wire:model="commentBody" rows="4" placeholder="Share your thoughts..."></textarea>
+                                @error('commentBody') <div class="text-danger">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">All comments are moderated before being published</small>
+                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                            </div>
+                        </form>
+                        @else
+                        <p>Please <a href="{{ route('login') }}">login</a> to comment.</p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Popular Posts -->
+                    <div class="sidebar-card card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Popular Posts</h5>
+
+                            @foreach($popularPosts as $popularPost)
+                            <div class="popular-post">
+                                <img src="{{ $popularPost->featured_image ?? 'https://placehold.co/80x60/667eea/ffffff?text=Popular' }}" alt="Popular Post" class="popular-post-image">
+                                <div>
+                                    <h6 class="mb-1"><a href="{{ route('blog.show', $popularPost) }}" class="text-decoration-none">{{ $popularPost->title }}</a></h6>
+                                    <small class="text-muted">{{ $popularPost->created_at->format('M j, Y') }}</small>
                                 </div>
-                                <p class="mb-2">The point about building client relationships is so important. I've found that my repeat clients account for over 60% of my earnings now. Great article!</p>
-                                <button class="btn btn-outline-primary btn-sm reply-btn" data-user="Emma Rodriguez">Reply</button>
                             </div>
-                        </div>
-
-                        <!-- Comment 3 -->
-                        <div class="d-flex">
-                            <img src="https://placehold.co/50x50/3b82f6/ffffff?text=DK" alt="Commenter" class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">David Kim</h6>
-                                    <small class="text-muted">5 days ago</small>
-                                </div>
-                                <p class="mb-2">As a full-time employee, I've been using MicroTasker to supplement my income. Your tips about efficiency and systems are game-changers. Thank you for sharing!</p>
-                                <button class="btn btn-outline-primary btn-sm reply-btn" data-user="David Kim">Reply</button>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <!-- Comment Form -->
-                    <form id="comment-form">
-                        <h5 class="mb-3">Leave a Comment</h5>
-                        <div class="mb-3">
-                            <textarea class="form-control" id="comment-text" rows="4" placeholder="Share your thoughts..."></textarea>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">All comments are moderated before being published</small>
-                            <button type="submit" class="btn btn-primary">Post Comment</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Popular Posts -->
-                <div class="sidebar-card card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Popular Posts</h5>
-
-                        <div class="popular-post">
-                            <img src="https://placehold.co/80x60/667eea/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
-                            <div>
-                                <h6 class="mb-1">How to Maximize Your Earnings on MicroTasker</h6>
-                                <small class="text-muted">Oct 28, 2023</small>
-                            </div>
-                        </div>
-
-                        <div class="popular-post">
-                            <img src="https://placehold.co/80x60/10b981/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
-                            <div>
-                                <h6 class="mb-1">The Complete Guide to Task Applications</h6>
-                                <small class="text-muted">Oct 22, 2023</small>
-                            </div>
-                        </div>
-
-                        <div class="popular-post">
-                            <img src="https://placehold.co/80x60/f59e0b/ffffff?text=Popular" alt="Popular Post" class="popular-post-image">
-                            <div>
-                                <h6 class="mb-1">5 Common Mistakes New Task Posters Make</h6>
-                                <small class="text-muted">Oct 15, 2023</small>
-                            </div>
+                    <!-- Categories -->
+                    <div class="sidebar-card card mb-4" id="categories">
+                        <div class="card-body">
+                            <h5 class="card-title">Categories</h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="{{ route('blog') }}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>All Categories</span>
+                                        <span class="badge bg-primary">{{ $categories->sum(fn($cat) => $cat->posts()->published()->count()) }}</span>
+                                    </a>
+                                </li>
+                                @foreach($categories as $cat)
+                                <li class="mb-2">
+                                    <a href="{{ route('blog') }}?category={{ $cat->slug }}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span>{{ $cat->name }}</span>
+                                        <span class="badge bg-primary">{{ $cat->posts()->published()->count() }}</span>
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
-                </div>
 
-                <!-- Categories -->
-                <div class="sidebar-card card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Categories</h5>
-                        <ul class="list-unstyled mb-0">
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                    <span>Success Stories</span>
-                                    <span class="badge bg-primary">12</span>
-                                </a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                    <span>Tips & Tricks</span>
-                                    <span class="badge bg-primary">8</span>
-                                </a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                    <span>For Task Posters</span>
-                                    <span class="badge bg-primary">5</span>
-                                </a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                    <span>Product Updates</span>
-                                    <span class="badge bg-primary">4</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Newsletter -->
+                    <!-- Newsletter 
                 <div class="sidebar-card card">
                     <div class="card-body">
                         <h5 class="card-title">Subscribe to Newsletter</h5>
@@ -213,70 +198,10 @@
                         <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
                     </div>
                 </div>
+                -->
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const replyButtons = document.querySelectorAll('.reply-btn');
-        const replyIndicator = document.getElementById('reply-indicator');
-        const replyToUser = document.getElementById('reply-to-user');
-        const cancelReply = document.getElementById('cancel-reply');
-        const commentForm = document.getElementById('comment-form');
-        const commentText = document.getElementById('comment-text');
-        let replyingTo = null;
-
-        // Handle reply button clicks
-        replyButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userName = this.getAttribute('data-user');
-                replyingTo = userName;
-
-                // Update the reply indicator
-                replyToUser.textContent = userName;
-                replyIndicator.classList.remove('d-none');
-
-                // Scroll to comment form
-                commentForm.scrollIntoView({
-                    behavior: 'smooth'
-                });
-
-                // Focus on textarea and add mention
-                commentText.focus();
-                commentText.value = `@${userName} `;
-            });
-        });
-
-        // Handle cancel reply
-        cancelReply.addEventListener('click', function() {
-            replyIndicator.classList.add('d-none');
-            replyingTo = null;
-            commentText.value = '';
-        });
-
-        // Handle form submission
-        commentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const comment = commentText.value.trim();
-            if (!comment) return;
-
-            // In a real app, you would send this to your backend
-            // For demo purposes, we'll just show an alert
-            if (replyingTo) {
-                alert(`Comment posted (replying to ${replyingTo}): ${comment}`);
-            } else {
-                alert(`Comment posted: ${comment}`);
-            }
-
-            // Reset form
-            commentText.value = '';
-            replyIndicator.classList.add('d-none');
-            replyingTo = null;
-        });
-    });
-</script>
-@endpush
+</div>

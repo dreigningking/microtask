@@ -38,6 +38,11 @@ class Post extends Model
         'featured' => 'datetime',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     /**
      * Get the category this post belongs to
      */
@@ -60,14 +65,6 @@ class Post extends Model
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    /**
-     * Get tags associated with this post
-     */
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class, 'post_tag');
     }
 
     /**
@@ -137,16 +134,6 @@ class Post extends Model
     public function scopeInCategory($query, $categoryId)
     {
         return $query->where('category_id', $categoryId);
-    }
-
-    /**
-     * Scope for posts by specific tag
-     */
-    public function scopeWithTag($query, $tagName)
-    {
-        return $query->whereHas('tags', function ($q) use ($tagName) {
-            $q->where('name', $tagName);
-        });
     }
 
     /**

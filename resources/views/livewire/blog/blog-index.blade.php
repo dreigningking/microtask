@@ -116,14 +116,14 @@
                             <h5 class="card-title">Categories</h5>
                             <ul class="list-unstyled mb-0">
                                 <li class="mb-2">
-                                    <a href="#" wire:click="clearCategory" class="text-decoration-none d-flex justify-content-between align-items-center {{ !$category ? 'fw-bold text-primary' : '' }}">
+                                    <a href="{{ route('blog') }}" class="text-decoration-none d-flex justify-content-between align-items-center {{ !$category ? 'fw-bold text-primary' : '' }}">
                                         <span>All Categories</span>
                                         <span class="badge bg-primary">{{ $categories->sum(fn($cat) => $cat->posts()->published()->count()) }}</span>
                                     </a>
                                 </li>
                                 @foreach($categories as $cat)
                                 <li class="mb-2">
-                                    <a href="#" wire:click="setCategory({{ $cat->id }})" class="text-decoration-none d-flex justify-content-between align-items-center {{ $category == $cat->id ? 'fw-bold text-primary' : '' }}">
+                                    <a href="{{ route('blog') }}?category={{ $cat->slug }}" class="text-decoration-none d-flex justify-content-between align-items-center {{ $category == $cat->slug ? 'fw-bold text-primary' : '' }}">
                                         <span>{{ $cat->name }}</span>
                                         <span class="badge bg-primary">{{ $cat->posts()->published()->count() }}</span>
                                     </a>

@@ -25,20 +25,13 @@ class BlogIndex extends Component
         $this->categories = Category::where('is_help', false)->get();
     }
 
-    public function setCategory($categoryId)
-    {
-        $this->category = $categoryId;
-        $this->resetPage();
-    }
-
-    public function clearCategory()
-    {
-        $this->category = null;
-        $this->resetPage();
-    }
-
     public function render()
     {
+        $categoryModel = null;
+        if ($this->category) {
+            $categoryModel = Category::where('slug', $this->category)->first();
+        }
+
         $featuredPosts = Post::published()
             ->featured()
             ->whereHas('category', function ($q) {
@@ -57,8 +50,8 @@ class BlogIndex extends Component
             ->when($this->search, function ($query) {
                 $query->where('title', 'like', '%' . $this->search . '%');
             })
-            ->when($this->category, function ($query) {
-                $query->where('category_id', $this->category);
+            ->when($categoryModel, function ($query) use ($categoryModel) {
+                $query->where('category_id', $categoryModel->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(8);
