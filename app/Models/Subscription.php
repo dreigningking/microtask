@@ -22,6 +22,10 @@ class Subscription extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getExpiresInDaysAttribute(){
+        return ceil(now()->diffInDays($this->expires_at, false));
+    }
+
     public function scopeLocalize($query)
     {
         $user = Auth::user();

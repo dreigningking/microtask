@@ -219,12 +219,12 @@
                                         @endif
                                         <div class="d-flex justify-content-between">
                                             <span>Validity: {{ $subscription->starts_at->format('M d, Y') }} - {{ $subscription->expires_at->format('M d, Y') }}</span>
-                                            <span>Expires in {{ $subscription->expires_at->diffInDays(now()) }} days</span>
+                                            <span>Expires in {{ $subscription->expires_in_days }} days</span>
                                         </div>
                                     </div>
                                     @endforeach
                                     <div class="mt-3">
-                                        <button class="btn btn-outline-primary btn-sm" wire:click="extend({{ $boosterData['booster']->id }})">Extend</button>
+                                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#buyModal" wire:click="extend({{ $boosterData['booster']->id }})">Extend</button>
                                     </div>
                                 </div>
                             </div>

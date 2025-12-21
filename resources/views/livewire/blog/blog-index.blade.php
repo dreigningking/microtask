@@ -25,178 +25,74 @@
                 <!-- Main Content -->
                 <div class="col-lg-8">
                     <!-- Featured Posts -->
+                    @if($featuredPosts->count() > 0)
                     <div class="mb-5" id="featured">
                         <h2 class="section-title">Featured Posts</h2>
                         <div class="row">
-                            <!-- Featured Post 1 -->
+                            @foreach($featuredPosts as $post)
                             <div class="col-md-6 mb-4">
                                 <div class="blog-card card h-100">
-                                    <img src="https://placehold.co/600x400/667eea/ffffff?text=MicroTasker+Blog" class="blog-image" alt="Featured Post">
+                                    <img src="{{ $post->featured_image ?: 'https://placehold.co/600x400/667eea/ffffff?text=Blog' }}" class="blog-image" alt="{{ $post->title }}">
                                     <div class="card-body">
-                                        <span class="blog-category">Success Stories</span>
-                                        <h4 class="card-title mt-2">How I Made $5,000 in My First Month on MicroTasker</h4>
-                                        <p class="card-text text-muted">Discover the strategies that helped Sarah Johnson earn significant income while working from home...</p>
+                                        <span class="blog-category">{{ $post->category->name }}</span>
+                                        <h4 class="card-title mt-2"><a href="{{ route('blog.show', $post) }}" class="text-decoration-none">{{ $post->title }}</a></h4>
+                                        <p class="card-text text-muted">{{ $post->excerpt ?: Str::limit(strip_tags($post->content), 100) }} <a href="{{ route('blog.show', $post) }}" class="text-primary">Read More</a></p>
                                         <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/667eea/ffffff?text=SJ" alt="Author" class="comment-avatar me-2">
+                                            <img src="{{ $post->user->image ?? 'https://placehold.co/40x40/667eea/ffffff?text=' . substr($post->user->name, 0, 2) }}" alt="Author" class="comment-avatar me-2">
                                             <div>
-                                                <div class="fw-bold">Sarah Johnson</div>
-                                                <div class="read-time">Nov 15, 2023 · 8 min read</div>
+                                                <div class="fw-bold">{{ $post->user->name }}</div>
+                                                <div class="read-time">{{ $post->created_at->format('M d, Y') }} · {{ $post->reading_time ?? 5 }} min read</div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary">Read More</a>
-                                    </div>
                                 </div>
                             </div>
-
-                            <!-- Featured Post 2 -->
-                            <div class="col-md-6 mb-4">
-                                <div class="blog-card card h-100">
-                                    <img src="https://placehold.co/600x400/10b981/ffffff?text=MicroTasker+Blog" class="blog-image" alt="Featured Post">
-                                    <div class="card-body">
-                                        <span class="blog-category">Tips & Tricks</span>
-                                        <h4 class="card-title mt-2">10 Proven Ways to Get Your Task Applications Accepted</h4>
-                                        <p class="card-text text-muted">Learn the secrets to standing out from the competition and increasing your task acceptance rate...</p>
-                                        <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/10b981/ffffff?text=MC" alt="Author" class="comment-avatar me-2">
-                                            <div>
-                                                <div class="fw-bold">Mike Chen</div>
-                                                <div class="read-time">Nov 12, 2023 · 6 min read</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary">Read More</a>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
+                    @endif
 
                     <!-- Recent Posts -->
                     <div class="mb-5">
                         <h2 class="section-title">Recent Posts</h2>
 
-                        <!-- Post 1 -->
+                        @forelse($posts as $post)
                         <div class="blog-card card mb-4">
                             <div class="row g-0">
                                 <div class="col-md-4">
-                                    <img src="https://placehold.co/400x300/3b82f6/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
+                                    <img src="{{ $post->featured_image ?: 'https://placehold.co/400x300/3b82f6/ffffff?text=Blog' }}" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="{{ $post->title }}">
                                 </div>
                                 <div class="col-md-8">
                                     <div class="card-body">
-                                        <span class="blog-category">Product Updates</span>
-                                        <h4 class="card-title">New Feature: Account Boosters Now Available</h4>
-                                        <p class="card-text text-muted">We're excited to announce our new Account Boosters feature that lets you enhance your experience with temporary account features...</p>
+                                        <span class="blog-category">{{ $post->category->name }}</span>
+                                        <h4 class="card-title"><a href="{{ route('blog.show', $post) }}" class="text-decoration-none">{{ $post->title }}</a></h4>
+                                        <p class="card-text text-muted">{{ $post->excerpt ?: Str::limit(strip_tags($post->content), 150) }} <a href="{{ route('blog.show', $post) }}" class="text-primary">Read More</a></p>
                                         <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/3b82f6/ffffff?text=AD" alt="Author" class="comment-avatar me-2">
+                                            <img src="{{ $post->user->image ?? 'https://placehold.co/40x40/3b82f6/ffffff?text=' . substr($post->user->name, 0, 2) }}" alt="Author" class="comment-avatar me-2">
                                             <div>
-                                                <div class="fw-bold">Alex Davis</div>
-                                                <div class="read-time">Nov 10, 2023 · 5 min read</div>
+                                                <div class="fw-bold">{{ $post->user->name }}</div>
+                                                <div class="read-time">{{ $post->created_at->format('M d, Y') }} · {{ $post->reading_time ?? 5 }} min read</div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Post 2 -->
-                        <div class="blog-card card mb-4">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="https://placehold.co/400x300/f59e0b/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <span class="blog-category">For Task Posters</span>
-                                        <h4 class="card-title">How to Write Task Descriptions That Attract Quality Workers</h4>
-                                        <p class="card-text text-muted">A well-written task description can make the difference between finding the perfect worker and receiving low-quality submissions...</p>
-                                        <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/f59e0b/ffffff?text=ER" alt="Author" class="comment-avatar me-2">
-                                            <div>
-                                                <div class="fw-bold">Emma Rodriguez</div>
-                                                <div class="read-time">Nov 8, 2023 · 7 min read</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
-                                    </div>
-                                </div>
-                            </div>
+                        @empty
+                        <div class="text-center py-5">
+                            <i class="bi bi-journal-text display-4 text-muted mb-3"></i>
+                            <h5 class="text-muted">No posts found</h5>
+                            <p class="text-muted">Try adjusting your search or category filter.</p>
                         </div>
-
-                        <!-- Post 3 -->
-                        <div class="blog-card card mb-4">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="https://placehold.co/400x300/ef4444/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <span class="blog-category">Freelancing</span>
-                                        <h4 class="card-title">Balancing Micro-Tasks With Your Full-Time Job</h4>
-                                        <p class="card-text text-muted">Many of our top earners started while working full-time jobs. Here's how they manage their time effectively...</p>
-                                        <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/ef4444/ffffff?text=DK" alt="Author" class="comment-avatar me-2">
-                                            <div>
-                                                <div class="fw-bold">David Kim</div>
-                                                <div class="read-time">Nov 5, 2023 · 9 min read</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Post 4 -->
-                        <div class="blog-card card mb-4">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="https://placehold.co/400x300/8b5cf6/ffffff?text=MicroTasker+Blog" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Blog Post">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <span class="blog-category">Community</span>
-                                        <h4 class="card-title">Meet Our Top Earner: An Interview With Sarah Davis</h4>
-                                        <p class="card-text text-muted">We sat down with Sarah Davis, who has earned over $25,000 on MicroTasker, to learn about her journey and strategies...</p>
-                                        <div class="d-flex align-items-center mt-3">
-                                            <img src="https://placehold.co/40x40/8b5cf6/ffffff?text=PS" alt="Author" class="comment-avatar me-2">
-                                            <div>
-                                                <div class="fw-bold">Priya Sharma</div>
-                                                <div class="read-time">Nov 2, 2023 · 10 min read</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <a href="blog-post.html" class="btn btn-outline-primary btn-sm">Read More</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
 
                     <!-- Pagination -->
+                    @if($posts->hasPages())
                     <nav aria-label="Blog pagination">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
+                        {{ $posts->links() }}
                     </nav>
+                    @endif
                 </div>
 
                 <!-- Sidebar -->
@@ -206,7 +102,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Search Blog</h5>
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search articles...">
+                                <input type="text" wire:model.live="search" class="form-control" placeholder="Search articles...">
                                 <button class="btn btn-primary" type="button">
                                     <i class="bi bi-search"></i>
                                 </button>
@@ -220,41 +116,19 @@
                             <h5 class="card-title">Categories</h5>
                             <ul class="list-unstyled mb-0">
                                 <li class="mb-2">
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>Success Stories</span>
-                                        <span class="badge bg-primary">12</span>
+                                    <a href="#" wire:click="clearCategory" class="text-decoration-none d-flex justify-content-between align-items-center {{ !$category ? 'fw-bold text-primary' : '' }}">
+                                        <span>All Categories</span>
+                                        <span class="badge bg-primary">{{ $categories->sum(fn($cat) => $cat->posts()->published()->count()) }}</span>
                                     </a>
                                 </li>
+                                @foreach($categories as $cat)
                                 <li class="mb-2">
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>Tips & Tricks</span>
-                                        <span class="badge bg-primary">8</span>
+                                    <a href="#" wire:click="setCategory({{ $cat->id }})" class="text-decoration-none d-flex justify-content-between align-items-center {{ $category == $cat->id ? 'fw-bold text-primary' : '' }}">
+                                        <span>{{ $cat->name }}</span>
+                                        <span class="badge bg-primary">{{ $cat->posts()->published()->count() }}</span>
                                     </a>
                                 </li>
-                                <li class="mb-2">
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>For Task Posters</span>
-                                        <span class="badge bg-primary">5</span>
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>Product Updates</span>
-                                        <span class="badge bg-primary">4</span>
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>Freelancing</span>
-                                        <span class="badge bg-primary">7</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                        <span>Community</span>
-                                        <span class="badge bg-primary">3</span>
-                                    </a>
-                                </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -290,7 +164,7 @@
                         </div>
                     </div>
 
-                    <!-- Tags -->
+                    <!-- Tags 
                     <div class="sidebar-card card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Popular Tags</h5>
@@ -307,7 +181,7 @@
                         </div>
                     </div>
 
-                    <!-- Newsletter -->
+                    Newsletter 
                     <div class="sidebar-card card">
                         <div class="card-body">
                             <h5 class="card-title">Subscribe to Newsletter</h5>
@@ -318,7 +192,7 @@
                             </div>
                             <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>

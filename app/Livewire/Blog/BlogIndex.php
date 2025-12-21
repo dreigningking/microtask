@@ -17,21 +17,52 @@ class BlogIndex extends Component
     public $meta_description = 'Read the latest articles, tips, and platform updates from the Wonegig team.';
     public $categories = [];
     public $category;
+    public $search = '';
 
     public function mount()
     {
         $this->category = request()->get('category');
-        $this->categories = Category::all();
+        $this->categories = Category::where('is_help', false)->get();
+    }
+
+    public function setCategory($categoryId)
+    {
+        $this->category = $categoryId;
+        $this->resetPage();
+    }
+
+    public function clearCategory()
+    {
+        $this->category = null;
+        $this->resetPage();
     }
 
     public function render()
     {
-        $query = Post::with('user')->orderBy('created_at', 'desc');
-        if (!empty($this->category)) {
-            $query->where('category_id', $this->category);
-        }
-        $posts = $query->paginate(8);
+        $featuredPosts = Post::published()
+            ->featured()
+            ->whereHas('category', function ($q) {
+                $q->where('is_help', false);
+            })
+            ->with(['user', 'category'])
+            ->orderBy('featured', 'desc')
+            ->take(2)
+            ->get();
 
-        return view('livewire.blog.blog-index', compact('posts'));
+        $posts = Post::published()
+            ->whereHas('category', function ($q) {
+                $q->where('is_help', false);
+            })
+            ->with(['user', 'category'])
+            ->when($this->search, function ($query) {
+                $query->where('title', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->category, function ($query) {
+                $query->where('category_id', $this->category);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(8);
+
+        return view('livewire.blog.blog-index', compact('posts', 'featuredPosts'));
     }
 }

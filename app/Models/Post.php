@@ -35,7 +35,7 @@ class Post extends Model
         'tags' => 'array',
         'is_active' => 'boolean',
         'allow_comments' => 'boolean',
-        'featured' => 'boolean',
+        'featured' => 'datetime',
     ];
 
     /**
@@ -96,7 +96,7 @@ class Post extends Model
      */
     public function isFeatured(): bool
     {
-        return $this->featured;
+        return $this->featured !== null;
     }
 
     /**
@@ -128,7 +128,7 @@ class Post extends Model
      */
     public function scopeFeatured($query)
     {
-        return $query->where('featured', true);
+        return $query->where('featured', '!=', null);
     }
 
     /**

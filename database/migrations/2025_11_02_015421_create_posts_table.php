@@ -37,7 +37,7 @@ return new class extends Migration
             $table->integer('reading_time')->nullable(); // in minutes
             // Social sharing
             $table->boolean('allow_comments')->default(true);
-            $table->boolean('featured')->default(false);
+            $table->timestamp('featured')->nullable(); // When the post was featured
             // Timestamps
             $table->timestamps();
             

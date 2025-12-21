@@ -39,7 +39,7 @@ class BlogController extends Controller
         }
 
         if ($request->filled('featured')) {
-            $query->where('featured', $request->featured === 'yes');
+            $query->where('featured', '!=', null);
         }
 
         if ($request->filled('published_date')) {
@@ -108,7 +108,7 @@ class BlogController extends Controller
         }
 
         // Handle checkboxes
-        $data['featured'] = $request->has('featured');
+        $data['featured'] = $request->has('featured') ? now() : null;
         $data['allow_comments'] = $request->has('allow_comments');
 
         // Set user_id automatically
@@ -200,7 +200,7 @@ class BlogController extends Controller
         }
 
         // Handle checkboxes
-        $data['featured'] = $request->has('featured');
+        $data['featured'] = $request->has('featured') ? now() : null;
         $data['allow_comments'] = $request->has('allow_comments');
 
         // Set default meta fields if empty
