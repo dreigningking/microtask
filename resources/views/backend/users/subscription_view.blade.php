@@ -61,9 +61,7 @@
                                     @endif
                                 </div>
                                 @endif
-                                <div class="mb-2">
-                                    <strong>Auto Renew:</strong> {{ $subscription->auto_renew ? 'Yes' : 'No' }}
-                                </div>
+                                
                                 <div class="mb-2">
                                     <strong>Created:</strong> {{ $subscription->created_at->format('M d, Y H:i') }}
                                 </div>
@@ -118,7 +116,6 @@
                                     <li class="list-group-item"><strong>Currency:</strong> {{ $subscription->currency }}</li>
                                     <li class="list-group-item"><strong>Billing Cycle:</strong> {{ ucfirst($subscription->billing_cycle) }}</li>
                                     <li class="list-group-item"><strong>Duration:</strong> {{ $subscription->duration_days }} days</li>
-                                    <li class="list-group-item"><strong>Auto Renew:</strong> {{ $subscription->auto_renew ? 'Yes' : 'No' }}</li>
                                     @if($subscription->starts_at)
                                     <li class="list-group-item"><strong>Started At:</strong> {{ $subscription->starts_at->format('M d, Y H:i') }}</li>
                                     @endif

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('currency');
             $table->double('amount', null, 0)->default(0);
             $table->double('vat_value')->default(0);
-            $table->string('gateway')->nullable();
+            $table->integer('gateway_id');
             $table->string('status')->default('pending');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

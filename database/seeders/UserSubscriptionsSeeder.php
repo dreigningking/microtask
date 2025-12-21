@@ -87,7 +87,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(15),
                 'expires_at' => now()->addDays(15),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => true,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -99,7 +99,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(30),
                 'expires_at' => now()->addDays(60),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => false,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -111,7 +111,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(10),
                 'expires_at' => now()->addDays(170),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => true,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -123,7 +123,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(5),
                 'expires_at' => now()->addDays(25),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => true,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -135,7 +135,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(20),
                 'expires_at' => now()->addDays(40),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => false,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -147,7 +147,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(7),
                 'expires_at' => now()->addDays(83),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => true,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -159,7 +159,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(2),
                 'expires_at' => now()->addDays(28),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => true,
+                
             ],
             [
                 'user_id' => $users->isNotEmpty() ? $users->random()->id : 1,
@@ -171,7 +171,7 @@ class UserSubscriptionsSeeder extends Seeder
                 'starts_at' => now()->subDays(1),
                 'expires_at' => now()->addDays(59),
                 'billing_cycle' => 'monthly',
-                'auto_renew' => false,
+                
             ],
         ];
 
@@ -189,7 +189,6 @@ class UserSubscriptionsSeeder extends Seeder
                     'duration_days' => $subscriptionData['duration_days'],
                     'expires_at' => $subscriptionData['expires_at'],
                     'billing_cycle' => $subscriptionData['billing_cycle'],
-                    'auto_renew' => $subscriptionData['auto_renew'],
                 ]
             );
         }

@@ -431,7 +431,7 @@
                                             <th>Status</th>
                                             <th>Started</th>
                                             <th>Expires</th>
-                                            <th>Auto Renew</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -441,7 +441,6 @@
                                             <td>{{ ucfirst($sub->status) }}</td>
                                             <td>{{ $sub->starts_at ? $sub->starts_at->format('M d, Y') : '-' }}</td>
                                             <td>{{ $sub->expires_at ? $sub->expires_at->format('M d, Y') : '-' }}</td>
-                                            <td>{{ $sub->auto_renew ? 'Yes' : 'No' }}</td>
                                         </tr>
                                         @empty
                                         <tr>

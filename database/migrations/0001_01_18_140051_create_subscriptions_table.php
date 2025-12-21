@@ -19,10 +19,9 @@ return new class extends Migration
             $table->string('currency')->default('NGN');
             $table->integer('multiplier');
             $table->integer('duration_days');
-            $table->timestamp('starts_at');
-            $table->timestamp('expires_at');
+            $table->timestamp('starts_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->string('billing_cycle')->default('monthly'); // weekly, monthly, annual
-            $table->boolean('auto_renew')->default(true);
             $table->timestamps();
         });
     }

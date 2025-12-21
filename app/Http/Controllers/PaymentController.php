@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Payout;
 use App\Models\Payment;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\Http\Traits\PaymentTrait;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -22,7 +24,7 @@ class PaymentController extends Controller
     // }
 
     public function paymentcallback(){       
-        $user = auth()->user();
+        $user = Auth::user();
         //dd(request()->query());
         if(!request()->reference){
             return response()->json([
@@ -67,7 +69,7 @@ class PaymentController extends Controller
                 $subscription = $item->orderable;
 
                 // Check for an existing active subscription for the same booster
-                $activeSubscription = $user->subscriptions()
+                $activeSubscription = Subscription::where('user_id',$user->id)
                     ->where('booster_id', $subscription->booster_id)
                     ->where('id', '!=', $subscription->id)
                     ->where('expires_at', '>', now())

@@ -1,4 +1,6 @@
-exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
+booster Subscription purchase
+booster subscription Expiring notification
+
 
 if admin does not approve task: user will edit task
     
@@ -10,6 +12,7 @@ Submission Review {
     At end of job: refund taskmaster the admin-review fee is no intervention was found
     REVIEW: review task after submission review completed
 }: 
+exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
 
 Broadcast Jobs{
     show number of emails to be sent.. let user reduce amount
@@ -23,7 +26,7 @@ Blog{
 
 Referral from dashboard
 
-booster Subscription Expiring/Expiry notification
+
 
 Support{
     Notification for admin - new, closed, 
