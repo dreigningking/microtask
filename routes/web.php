@@ -108,7 +108,6 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         Route::get('support/ticket/{support}', TicketView::class)->name('support.ticket');
         Route::get('support/articles', SupportArticles::class)->name('support.articles');
         Route::get('support/articles/{post}', SupportPost::class)->name('support.articles.post');
-        
     });
 });
 
