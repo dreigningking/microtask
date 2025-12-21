@@ -12,7 +12,7 @@ class TicketView extends Component
 {
     use WithFileUploads;
 
-    public Support $ticket;
+    public Support $support;
     public $newComment = '';
     public $attachments = [];
 
@@ -25,21 +25,21 @@ class TicketView extends Component
         'newComment.min' => 'Comment must be at least 5 characters',
     ];
 
-    public function mount($ticket)
+    public function mount(Support $support)
     {
-        $this->ticket = $ticket->load(['user', 'comments.user']);
+        $this->support = $support->load(['user', 'comments.user']);
     }
 
     public function markInProgress()
     {
         // Only admins can mark tickets in progress
-        if (!Auth::user()->hasRole(['admin', 'super_admin'])) {
+        if (!Auth::user()->role_id) {
             session()->flash('error', 'You do not have permission to perform this action.');
             return;
         }
 
-        $this->ticket->update(['status' => 'in_progress']);
-        $this->ticket->refresh();
+        $this->support->update(['status' => 'in_progress']);
+        $this->support->refresh();
         
         session()->flash('success', 'Ticket marked as in progress.');
     }
@@ -47,13 +47,13 @@ class TicketView extends Component
     public function closeTicket()
     {
         // Users can only close their own tickets, admins can close any ticket
-        if (Auth::id() !== $this->ticket->user_id && !Auth::user()->hasRole(['admin', 'super_admin'])) {
+        if (Auth::id() !== $this->support->user_id && !Auth::user()->role_id) {
             session()->flash('error', 'You can only close your own tickets.');
             return;
         }
 
-        $this->ticket->update(['status' => 'closed']);
-        $this->ticket->refresh();
+        $this->support->update(['status' => 'closed']);
+        $this->support->refresh();
         
         session()->flash('success', 'Ticket closed successfully.');
     }
@@ -95,7 +95,7 @@ class TicketView extends Component
             }
         }
 
-        $comment = $this->ticket->comments()->create($commentData);
+        $comment = $this->support->comments()->create($commentData);
 
         // Reset form
         $this->newComment = '';
@@ -103,7 +103,7 @@ class TicketView extends Component
         $this->resetErrorBag();
 
         // Refresh ticket data
-        $this->ticket->refresh();
+        $this->support->refresh();
         
         session()->flash('success', 'Comment added successfully!');
     }

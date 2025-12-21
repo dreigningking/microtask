@@ -38,6 +38,8 @@ use App\Livewire\Settings\NotificationSettings;
 use App\Livewire\Settings\VerificationSettings;
 use App\Livewire\Notifications\ListNotifications;
 use App\Livewire\Policies\PaymentDisputeChargebacks;
+use App\Livewire\Support\Articles\SupportArticles;
+use App\Livewire\Support\Articles\SupportPost;
 
 Route::get('run', function () {
     $countries = \App\Models\CountrySetting::all();
@@ -103,7 +105,10 @@ Route::group(['middleware' => ['auth', 'check_user_active']], function () {
         
 
         Route::get('support', Tickets::class)->name('support');
-        Route::get('support/ticket/{ticket}', TicketView::class)->name('support.ticket');
+        Route::get('support/ticket/{support}', TicketView::class)->name('support.ticket');
+        Route::get('support/articles', SupportArticles::class)->name('support.articles');
+        Route::get('support/articles/{post}', SupportPost::class)->name('support.articles.post');
+        
     });
 });
 

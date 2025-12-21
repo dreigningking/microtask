@@ -24,7 +24,7 @@ class SupportCommentNotification extends Notification
     public function toMail($notifiable)
     {
         $url = $notifiable->role_id ? 
-                route('support.tickets.show',$this->comment->commentable) :
+                route('admin.support.tickets.show',$this->comment->commentable) :
                 route('support.ticket',$this->comment->commentable);
 
         return (new MailMessage)
