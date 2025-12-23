@@ -61,7 +61,9 @@ class TaskSubmissionObserver
             // if this is the last accepted submission, mark the task as completed
             if($taskSubmission->task->taskSubmissions->where('accepted', true)->count() == $taskSubmission->task->number_of_submissions) {
                 $taskSubmission->task->update(['completed_at' => now()]);
-                $this->refundTaskPayment($taskSubmission->task);
+                if($taskSubmission->task->submission_review_type == 'self_review') {
+                    $this->refundTaskPayment($taskSubmission->task);
+                }
             }
         }
     }
@@ -179,6 +181,48 @@ class TaskSubmissionObserver
     public function refundTaskPayment(Task $task): void
     {
         // Logic to refund the task payment to the task creator
+        $refund_total = $task->budget_per_submission * $task->number_of_submissions;
+        $number_of_admin_revision = $task->taskSubmissions()->where('reviewed_by', '!=', $task->user_id)->count();
+        $deductible_amount = $number_of_admin_revision * $task->budget_per_submission;
+        $final_refund_amount = $refund_total - $deductible_amount;
+        if($final_refund_amount <= 0) {
+            return;
+        }
+        DB::beginTransaction();
+        try {
+            $wallet = Wallet::where('user_id', $task->user_id)
+                ->where('currency', $task->user->country->currency)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$wallet) {
+                $wallet = new Wallet([
+                    'user_id' => $task->user_id,
+                    'currency' => $task->user->country->currency,
+                    'balance' => 0
+                ]);
+            }
+
+            $wallet->balance += $final_refund_amount;
+            $wallet->save();
+
+            Settlement::create([
+                'user_id' => $task->user_id,
+                'description' => 'Task Review refund',
+                'amount' => $final_refund_amount,
+                'currency' => $task->user->country->currency,
+                'status' => 'paid',
+                'settlementable_id' => $task->id,
+                'settlementable_type' => Task::class
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+                
+        // Refund logic here
     }
 
     /**

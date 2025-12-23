@@ -3,7 +3,7 @@ booster subscription Expiring notification
 Submission Review {
     Check submissions that should have been reviewed, if late, allow admin to review them
     Late Subsubmission Review Notification
-    At end of job: refund taskmaster the admin-review fee is no intervention was found
+    
     REVIEW: review task after submission review completed
 }
 
