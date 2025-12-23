@@ -77,16 +77,7 @@ class UserController extends Controller
 
             // Jobs completed: Tasks posted by user where all required workers have completed
             $jobsPosted = $user->tasks()->count();
-            $jobsCompleted = $user->tasks()->whereHas('taskWorkers', function($q) {
-                $q->whereHas('taskSubmissions', function($subQ) {
-                    $subQ->whereNotNull('paid_at');
-                });
-            })->get()->filter(function($task) {
-                // A job is completed if number of workers with completed submissions >= number_of_submissions
-                return $task->taskWorkers()->whereHas('taskSubmissions', function($q) {
-                    $q->whereNotNull('paid_at');
-                })->count() >= $task->number_of_submissions;
-            })->count();
+            $jobsCompleted = $user->tasks()->where('completed_at', '!=', null)->count();
             $user->jobs_completed = $jobsCompleted;
             $user->jobs_posted = $jobsPosted;
         }

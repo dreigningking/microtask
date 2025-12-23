@@ -1,38 +1,29 @@
 booster subscription Expiring notification
 
-
-if admin does not approve task: user will edit task
-    
-Refund notification & Earnings Notification sync
-
 Submission Review {
     Check submissions that should have been reviewed, if late, allow admin to review them
     Late Subsubmission Review Notification
     At end of job: refund taskmaster the admin-review fee is no intervention was found
     REVIEW: review task after submission review completed
-}: 
+}
+
+Refund notification & Earnings Notification sync
+
 exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
 
 Broadcast Jobs{
     show number of emails to be sent.. let user reduce amount
     BroadcastJob Notification
-
 }: 
-Blog{
-    Subscription Notification 24hours after post creation
-    Blog send notification to subscribers and users
-}
 
 Referral from dashboard
 
-
-Support{
-    Notification for admin - new, closed, 
-}
 vpn block
+
 Logs of activities e.g accepted terms
 
 Featured Jobs - identify places to show featured jobs"
+
 where should we display flags and reports - postcommentmoderationnotification
 
 ---------------------------------------------------------

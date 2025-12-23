@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Task;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Referral;
@@ -38,70 +39,14 @@ class TaskSubmissionObserver
 
             $user = $taskSubmission->user;
             $isFirstTask = TaskSubmission::where('user_id', $user->id)->where('accepted', true)->count() == 1;
-
             // Check invitations for signup referral bonus
             $invitation = Invitation::where('email', $user->email)
                 ->where('status', 'registered')
                 ->where('expire_at', '>', now())
                 ->first();
 
-            if ($invitation) {
-                if ($isFirstTask) {
-                    // Award signup referral commission to inviter
-                    $countrySettings = CountrySetting::where('country_id', $taskSubmission->task->user->country_id)->first();
-
-                    if ($countrySettings && isset($countrySettings->referral_settings['signup_referral_commission_percentage'])) {
-                        $commissionRate = $countrySettings->referral_settings['signup_referral_commission_percentage'];
-
-                        if ($commissionRate > 0) {
-                            $commission = ($taskSubmission->task->budget_per_submission * $commissionRate) / 100;
-
-                            DB::beginTransaction();
-                            try {
-                                $wallet = Wallet::where('user_id', $invitation->user_id)
-                                    ->where('currency', $taskSubmission->task->user->country->currency)
-                                    ->lockForUpdate()
-                                    ->first();
-
-                                if (!$wallet) {
-                                    $wallet = new Wallet([
-                                        'user_id' => $invitation->user_id,
-                                        'currency' => $taskSubmission->task->user->country->currency,
-                                        'balance' => 0
-                                    ]);
-                                }
-
-                                $wallet->balance += $commission;
-                                $wallet->save();
-
-                                Settlement::create([
-                                    'user_id' => $invitation->user_id,
-                                    'description' => 'Signup referral earning',
-                                    'amount' => $commission,
-                                    'currency' => $taskSubmission->task->user->country->currency,
-                                    'status' => 'paid',
-                                    'settlementable_id' => $invitation->id,
-                                    'settlementable_type' => Invitation::class
-                                ]);
-
-                                $invitation->status = 'completed';
-                                $invitation->save();
-
-                                DB::commit();
-                            } catch (\Exception $e) {
-                                DB::rollBack();
-                                throw $e;
-                            }
-                        }
-                    }
-
-                    // Delete conflicting referral record
-                    Referral::where('task_id', $taskSubmission->task_id)
-                        ->where('user_id', $invitation->user_id)
-                        ->where('referree_id', $user->id)
-                        ->delete();
-
-                }
+            if ($isFirstTask && $invitation) {
+                $this->makeInvitation($user, $isFirstTask, $invitation, $taskSubmission);
             } else {
                 // Check referrals for task referral bonus
                 $referral = Referral::where('user_id', $taskSubmission->user_id)
@@ -110,57 +55,130 @@ class TaskSubmissionObserver
                     ->first();
 
                 if ($referral) {
-                    // Award task referral commission to referrer
-                    $countrySettings = CountrySetting::where('country_id', $taskSubmission->task->user->country_id)->first();
+                    $this->makeReferral($referral, $taskSubmission);
+                }
+            }
+            // if this is the last accepted submission, mark the task as completed
+            if($taskSubmission->task->taskSubmissions->where('accepted', true)->count() == $taskSubmission->task->number_of_submissions) {
+                $taskSubmission->task->update(['completed_at' => now()]);
+                $this->refundTaskPayment($taskSubmission->task);
+            }
+        }
+    }
 
-                    if ($countrySettings && isset($countrySettings->referral_settings['task_referral_commission_percentage'])) {
-                        $commissionRate = $countrySettings->referral_settings['task_referral_commission_percentage'];
+    public function makeInvitation(User $user, bool $isFirstTask, Invitation $invitation, TaskSubmission $taskSubmission): void
+    {
+        if ($isFirstTask) {
+            // Award signup referral commission to inviter
+            $countrySettings = CountrySetting::where('country_id', $taskSubmission->task->user->country_id)->first();
 
-                        if ($commissionRate > 0) {
-                            $commission = ($taskSubmission->task->budget_per_submission * $commissionRate) / 100;
+            if ($countrySettings && isset($countrySettings->referral_settings['signup_referral_commission_percentage'])) {
+                $commissionRate = $countrySettings->referral_settings['signup_referral_commission_percentage'];
 
-                            DB::beginTransaction();
-                            try {
-                                $wallet = Wallet::where('user_id', $referral->user_id)
-                                    ->where('currency', $taskSubmission->task->user->country->currency)
-                                    ->lockForUpdate()
-                                    ->first();
+                if ($commissionRate > 0) {
+                    $commission = ($taskSubmission->task->budget_per_submission * $commissionRate) / 100;
 
-                                if (!$wallet) {
-                                    $wallet = new Wallet([
-                                        'user_id' => $referral->user_id,
-                                        'currency' => $taskSubmission->task->user->country->currency,
-                                        'balance' => 0
-                                    ]);
-                                }
+                    DB::beginTransaction();
+                    try {
+                        $wallet = Wallet::where('user_id', $invitation->user_id)
+                            ->where('currency', $taskSubmission->task->user->country->currency)
+                            ->lockForUpdate()
+                            ->first();
 
-                                $wallet->balance += $commission;
-                                $wallet->save();
-
-                                Settlement::create([
-                                    'user_id' => $referral->user_id,
-                                    'description' => 'Task referral earning',
-                                    'amount' => $commission,
-                                    'currency' => $taskSubmission->task->user->country->currency,
-                                    'status' => 'paid',
-                                    'settlementable_id' => $referral->id,
-                                    'settlementable_type' => Referral::class,
-                                ]);
-
-                                // Update referral status to completed
-                                $referral->status = 'completed';
-                                $referral->save();
-
-                                DB::commit();
-                            } catch (\Exception $e) {
-                                DB::rollBack();
-                                throw $e;
-                            }
+                        if (!$wallet) {
+                            $wallet = new Wallet([
+                                'user_id' => $invitation->user_id,
+                                'currency' => $taskSubmission->task->user->country->currency,
+                                'balance' => 0
+                            ]);
                         }
+
+                        $wallet->balance += $commission;
+                        $wallet->save();
+
+                        Settlement::create([
+                            'user_id' => $invitation->user_id,
+                            'description' => 'Signup referral earning',
+                            'amount' => $commission,
+                            'currency' => $taskSubmission->task->user->country->currency,
+                            'status' => 'paid',
+                            'settlementable_id' => $invitation->id,
+                            'settlementable_type' => Invitation::class
+                        ]);
+
+                        $invitation->status = 'completed';
+                        $invitation->save();
+
+                        DB::commit();
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        throw $e;
                     }
                 }
             }
+
+            // Delete conflicting referral record
+            Referral::where('task_id', $taskSubmission->task_id)
+                ->where('user_id', $invitation->user_id)
+                ->where('referree_id', $user->id)
+                ->delete();
         }
+    }
+
+    public function makeReferral(Referral $referral, TaskSubmission $taskSubmission): void
+    {
+        $countrySettings = CountrySetting::where('country_id', $taskSubmission->task->user->country_id)->first();
+
+        if ($countrySettings && isset($countrySettings->referral_settings['task_referral_commission_percentage'])) {
+            $commissionRate = $countrySettings->referral_settings['task_referral_commission_percentage'];
+
+            if ($commissionRate > 0) {
+                $commission = ($taskSubmission->task->budget_per_submission * $commissionRate) / 100;
+
+                DB::beginTransaction();
+                try {
+                    $wallet = Wallet::where('user_id', $referral->user_id)
+                        ->where('currency', $taskSubmission->task->user->country->currency)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$wallet) {
+                        $wallet = new Wallet([
+                            'user_id' => $referral->user_id,
+                            'currency' => $taskSubmission->task->user->country->currency,
+                            'balance' => 0
+                        ]);
+                    }
+
+                    $wallet->balance += $commission;
+                    $wallet->save();
+
+                    Settlement::create([
+                        'user_id' => $referral->user_id,
+                        'description' => 'Task referral earning',
+                        'amount' => $commission,
+                        'currency' => $taskSubmission->task->user->country->currency,
+                        'status' => 'paid',
+                        'settlementable_id' => $referral->id,
+                        'settlementable_type' => Referral::class,
+                    ]);
+
+                    // Update referral status to completed
+                    $referral->status = 'completed';
+                    $referral->save();
+
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function refundTaskPayment(Task $task): void
+    {
+        // Logic to refund the task payment to the task creator
     }
 
     /**

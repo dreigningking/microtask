@@ -27,6 +27,7 @@ return new class extends Migration
             $table->json('task_countries')->nullable();
             $table->string('expected_budget')->nullable();
             $table->timestamp('expiry_date')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->boolean('allow_multiple_submissions')->default(0);
             $table->integer('number_of_submissions')->default(1);
             $table->string('budget_per_submission')->default(0);

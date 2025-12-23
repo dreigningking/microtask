@@ -164,6 +164,7 @@ class TaskSubmissionDispute extends Component
 
             $this->taskSubmission->accepted = true;
             $this->taskSubmission->reviewed_at = now();
+            $this->taskSubmission->reviewed_by = Auth::id();
             $this->taskSubmission->paid_at = now();
             $this->taskSubmission->review_body = $this->resolutionDetails;
             $this->taskSubmission->save();

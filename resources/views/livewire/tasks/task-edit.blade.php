@@ -1,646 +1,651 @@
-<div class="content-wrapper">
-    @if($serviceUnavailable)
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-8">
-            <div class="alert alert-danger text-center p-4">
-                <div class="mb-2">
-                    <i class="ri-error-warning-line display-4 text-danger"></i>
+<div>
+    <!-- Page Header -->
+    <section class="task-header py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h2 mb-2">Edit Task</h1>
+                    <p class="mb-0">Update your task details and proceed to payment.</p>
                 </div>
-                <h2 class="h5 fw-bold mb-2">Service Unavailable</h2>
-                <p class="mb-1">Sorry, our job posting service is not available in {{ $unavailableCountryName ?? 'your country' }} at this time.</p>
-                <p class="small text-danger">Please check back later or contact support for more information.</p>
-            </div>
-        </div>
-    </div>
-    @else
-    <div class="mb-4">
-        <h1 class="h3 fw-bold mb-2">Edit Job</h1>
-        <p class="text-muted mb-3">Update your job details and proceed to payment.</p>
-    </div>
-
-    @if(!$canEdit)
-    <div class="alert alert-warning mb-4">
-        <div class="d-flex align-items-center">
-            <i class="ri-error-warning-line me-2"></i>
-            <div>
-                <strong class="fw-bold">This job cannot be edited.</strong>
-                <span class="d-block">This job has already been paid for and cannot be modified.</span>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <form wire:submit.prevent="submitJob" class="space-y-4">
-        @if(session()->has('success'))
-        <div class="alert alert-success">
-            <i class="ri-check-line me-2"></i>
-            {{ session('success') }}
-        </div>
-        @endif
-        
-        @if(session()->has('error'))
-        <div class="alert alert-danger">
-            <i class="ri-error-warning-line me-2"></i>
-            {{ session('error') }}
-        </div>
-        @endif
-        <!-- Basic Information -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-information-line me-2 text-primary"></i>
-                    Basic Information
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="title" class="form-label fw-medium mb-1">Job Title <span class="text-danger">*</span></label>
-                        <input type="text" id="title" wire:model="title" class="form-control {{ $errors->has('title') ? 'is-invalid' : '' }}" placeholder="e.g. Create content for social media" required @if(!$canEdit) readonly disabled @endif>
-                        @error('title') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label for="platform_id" class="form-label fw-medium mb-1">Platform</label>
-                        <input type="text" value="{{ $task->platform->name ?? 'N/A' }}" class="form-control bg-light" readonly>
-                        <div class="form-text">Platform cannot be changed</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="template_id" class="form-label fw-medium mb-1">Task Template</label>
-                        <input type="text" value="{{ $task->platformTemplate->name ?? 'N/A' }}" class="form-control bg-light" readonly>
-                        <div class="form-text">Template cannot be changed</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="expected_completion_minutes" class="form-label fw-medium mb-1">Expected Completion Time <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <input type="number" id="expected_completion_minutes" wire:model="expected_completion_minutes" min="1" class="form-control {{ $errors->has('expected_completion_minutes') ? 'is-invalid' : '' }}" placeholder="e.g. 3" required @if(!$canEdit) readonly disabled @endif>
-                            <select id="time_unit" wire:model="time_unit" class="form-select {{ $errors->has('time_unit') ? 'is-invalid' : '' }}" style="max-width: 120px;" @if(!$canEdit) disabled @endif>
-                                <option value="minutes" selected>Minutes</option>
-                                <option value="hours">Hours</option>
-                                <option value="days">Days</option>
-                                <option value="weeks">Weeks</option>
-                            </select>
-                        </div>
-                        @error('expected_completion_minutes') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label for="expiry_date" class="form-label fw-medium mb-1">Job Expiry Date</label>
-                        <input type="date" id="expiry_date" wire:model="expiry_date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" min="{{ now()->addDay()->format('Y-m-d') }}" @if(!$canEdit) readonly disabled @endif>
-                        @error('expiry_date') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                        <div class="form-text">Optional. The date this job will no longer be visible to workers.</div>
-                    </div>
+                <div class="col-md-6 d-flex justify-content-md-end">
+                    <nav class="mt-2 mt-md-0" aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{route('tasks.posted')}}">Posted Tasks</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Task</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Job Description -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-file-text-line me-2 text-primary"></i>
-                    Job Description
-                </h5>
-            </div>
-            <div class="card-body">
-                <label for="description" class="form-label fw-medium mb-1">Write step by step instructions on what to do<span class="text-danger">*</span></label>
-                <textarea id="description" wire:model="description" rows="4" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" placeholder="Provide a detailed description of the job. Include specific tasks, goals, and any special instructions." required @if(!$canEdit) readonly disabled @endif></textarea>
-                @error('description') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-            </div>
-        </div>
-        
-        <!-- Template Fields -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-list-check me-2 text-primary"></i>
-                    Template Fields
-                </h5>
-            </div>
-            <div class="card-body">
-                @livewire('tasks.task-template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
-            </div>
-        </div>
-
-        <!-- Requirements -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-tools-line me-2 text-primary"></i>
-                    Required Tools
-                </h5>
-            </div>
-            <div class="card-body">
-                <div wire:ignore>
-                    <label for="requirements" class="form-label fw-medium mb-1">Required Tools <span class="text-danger">*</span></label>
-                    <select id="requirements" class="form-control select2 {{ $errors->has('requirements') ? 'is-invalid' : '' }}" multiple @if(!$canEdit) disabled @endif>
-                        @foreach($requirements as $tool)
-                        <option value="{{ $tool }}" selected>{{ $tool }}</option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Add tools or software required for this job</div>
-                    @error('requirements') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                </div>
-            </div>
-        </div>
-        
-        <!-- Restricted Countries -->
-        <div class="card mb-4 border-warning">
-            <div class="card-header bg-warning bg-opacity-10 border-warning">
-                <h5 class="mb-0 fw-semibold text-warning">
-                    <i class="ri-global-line me-2"></i>
-                    Restricted Countries
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted mb-3">Optionally, you can restrict workers from specific countries from applying to this job.</p>
-                <div wire:ignore>
-                    <select id="restricted_countries" class="form-control select2 {{ $errors->has('restricted_countries') ? 'is-invalid' : '' }}" multiple @if(!$canEdit) disabled @endif>
-                        @foreach($countries as $country)
-                        <option value="{{ $country->id }}" {{ in_array($country->id, $restricted_countries) ? 'selected' : '' }}>{{ $country->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('restricted_countries') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                </div>
-            </div>
-        </div>
-
-        <!-- Review Preferences -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-shield-check-line me-2 text-primary"></i>
-                    Review Preferences
-                </h5>
-            </div>
-            <div class="card-body">
-                <label class="form-label fw-medium mb-3">Review Type <span class="text-danger">*</span></label>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="radio" id="selfMonitored" wire:model="review_type" wire:change="updateTotals" value="self_review" class="form-check-input" {{ $review_type === 'self_review' ? 'checked' : '' }} @if(!$canEdit) disabled @endif>
-                            <label for="selfMonitored" class="form-check-label">
-                                <div class="d-flex align-items-center">
-                                    <i class="ri-user-settings-line me-2 text-primary"></i>
-                                    <div>
-                                        <div class="fw-medium">Self-Monitored</div>
-                                        <small class="text-muted">You'll review and approve all work</small>
-                                        <div class="badge bg-warning mt-1">{{ $currency_symbol }}{{ number_format($countrySetting->admin_review_cost ?? 0, 2) }}</div>
-                                        <small class="text-success d-block">
-                                            <i class="ri-refund-line me-1"></i>Refunded if no admin intervention needed
-                                        </small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="radio" id="adminMonitored" wire:model="review_type" wire:change="updateTotals" value="admin_review" class="form-check-input" {{ $review_type === 'admin_review' ? 'checked' : '' }} @if(!$canEdit) disabled @endif>
-                            <label for="adminMonitored" class="form-check-label">
-                                <div class="d-flex align-items-center">
-                                    <i class="ri-admin-line me-2 text-primary"></i>
-                                    <div>
-                                        <div class="fw-medium">Admin-Monitored</div>
-                                        <small class="text-muted">Our team will review work quality</small>
-                                        <div class="badge bg-warning mt-1">{{ $currency_symbol }}{{ number_format($countrySetting->admin_review_cost ?? 0, 2) }}</div>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    @if($enable_system_review)
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="radio" id="systemMonitored" wire:model="review_type" wire:change="updateTotals" value="system_review" class="form-check-input" {{ $review_type === 'system_review' ? 'checked' : '' }} @if(!$canEdit) disabled @endif>
-                            <label for="systemMonitored" class="form-check-label">
-                                <div class="d-flex align-items-center">
-                                    <i class="ri-robot-2-line me-2 text-primary"></i>
-                                    <div>
-                                        <div class="fw-medium">System-Automated</div>
-                                        <small class="text-muted">Automated checks for task completion</small>
-                                        <div class="badge bg-info mt-1">{{ $currency_symbol }}{{ number_format($countrySetting->system_review_cost ?? 0, 2) }}</div>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-                @error('review_type') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-            </div>
-        </div>
-
-        <!-- Budget & Promotion Options -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="ri-money-dollar-circle-line me-2 text-primary"></i>
-                    Budget & Promotion Options
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-4">
-                    <!-- Budget & Capacity Column -->
-                    <div class="col-md-6">
-                        <h6 class="fw-semibold mb-3">Budget & Capacity</h6>
-                        
-                        <!-- Budget Per Person -->
-                        <div class="mb-3">
-                            <label for="budget_per_submission" class="form-label fw-medium mb-1">Budget Per Submission <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">{{ $currency_symbol }}</span>
-                                <input type="number" id="budget_per_submission" wire:model="budget_per_submission" wire:input="updateTotals" min="{{ $min_budget_per_submission }}" step="0.01" class="form-control {{ $errors->has('budget_per_submission') ? 'is-invalid' : '' }}" placeholder="0.00" required @if(!$canEdit) readonly disabled @endif>
-                            </div>
-                            @error('budget_per_submission') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                        </div>
-                        
-                        <!-- Number of People -->
-                        <div class="mb-3">
-                            <label for="number_of_submissions" class="form-label fw-medium mb-1">Number of Submissions <span class="text-danger">*</span></label>
-                            <div class="input-group" style="max-width: 200px;">
-                                <button type="button" wire:click="decreaseSubmissions" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
-                                    <i class="ri-subtract-line"></i>
-                                </button>
-                                <input type="number" id="number_of_submissions" wire:model="number_of_submissions" wire:input="updateTotals" min="1" class="form-control text-center" style="width: 80px;" @if(!$canEdit) readonly disabled @endif>
-                                <button type="button" wire:click="increaseSubmissions" class="btn btn-outline-secondary" @if(!$canEdit) disabled @endif>
-                                    <i class="ri-add-line"></i>
-                                </button>
-                            </div>
-                            <div class="form-text">Total number of submissions needed to complete this job</div>
-                            @error('number_of_submissions') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                        </div>
-                        
-                        <!-- Allow Multiple Submissions from Single User -->
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input type="checkbox" id="allow_multiple_submissions" wire:model="allow_multiple_submissions" class="form-check-input" @if(!$canEdit) disabled @endif>
-                                <label for="allow_multiple_submissions" class="form-check-label fw-medium">
-                                    Allow multiple submissions from single user
-                                </label>
-                            </div>
-                            <div class="form-text">If checked, a single worker can submit multiple times for this job</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Promotion Options Column -->
-                    <div class="col-md-6">
-                        <h6 class="fw-semibold mb-3">Promotion Options</h6>
-                        
-                        <!-- Featured Job Option -->
-                        <div class="card mb-3 border-light">
-                            <div class="card-body">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check me-3">
-                                        <input id="featured" type="checkbox" wire:model="featured" wire:change="updateTotals" class="form-check-input" @if(!$canEdit) disabled @endif>
-                                        <label for="featured" class="form-check-label fw-medium">Featured Job</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="small text-muted mb-2">Display prominently in search results</p>
-                                        @if($featured)
-                                        <div class="d-flex align-items-center">
-                                            <input type="number" wire:model="featured_days" wire:input="updateTotals" min="1" class="form-control form-control-sm" style="width: 80px;" placeholder="Days" @if(!$canEdit) disabled @endif>
-                                            <span class="small text-muted ms-2">days</span>
-                                        </div>
-                                        @endif
-                                        <small class="text-muted">
-                                            @if($featuredPrice == 0)
-                                            <i class="ri-check-line text-success me-1"></i>Included in your subscription
-                                            @else
-                                            <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($featuredPrice, 2) }} per day
-                                            @endif
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Broadcast Badge Option -->
-                        <div class="card border-light">
-                            <div class="card-body">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check me-3">
-                                        <input id="broadcast" type="checkbox" wire:model="broadcast" wire:change="updateTotals" class="form-check-input" @if(!$canEdit) disabled @endif>
-                                        <label for="broadcast" class="form-check-label fw-medium">Broadcast Badge</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="small text-muted mb-2">Add badge to attract immediate attention</p>
-                                        <small class="text-muted">
-                                            @if($broadcastPrice == 0)
-                                            <i class="ri-check-line text-success me-1"></i>Included in your subscription
-                                            @else
-                                            <i class="ri-money-dollar-circle-line me-1"></i>{{ $currency_symbol }}{{ number_format($broadcastPrice, 2) }} per submission
-                                            @endif
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pricing Summary -->
-        <div class="card mb-4 border-primary">
-            <div class="card-header bg-primary bg-opacity-10 border-primary">
-                <h5 class="mb-0 fw-semibold text-primary">
-                    <i class="ri-calculator-line me-2"></i>
-                    Pricing Summary
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <!-- Total Budget Summary -->
-                    <div class="col-md-6">
-                        <div class="text-center p-3 bg-light rounded">
-                            <h6 class="text-muted mb-1">Total Budget</h6>
-                            <div class="fw-bold text-primary fs-3">
-                                {{ $currency_symbol }} {{ number_format($total, 2) }}
-                            </div>
-                            <p class="small text-muted mb-0">For {{ $number_of_submissions }} submission{{ $number_of_submissions > 1 ? 's' : '' }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Pricing Breakdown -->
-                    <div class="col-md-6">
-                        <h6 class="fw-semibold mb-2">Cost Breakdown</h6>
-                        <div class="d-flex flex-column gap-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Job Budget:</span>
-                                <span class="small fw-medium">{{ $currency_symbol }} {{ number_format($expected_budget, 2) }}</span>
-                            </div>
-                            @if($featured)
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Featured Promotion:</span>
-                                <span class="small fw-medium">
-                                    @if($featuredPrice == 0) 
-                                    <span class="text-success">Included</span>
-                                    @else 
-                                    {{ $currency_symbol }} {{ number_format($featuredPrice * $featured_days, 2) }}
-                                    @endif
-                                </span>
-                            </div>
-                            @endif
-                            @if($broadcast)
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Broadcast Promotion:</span>
-                                <span class="small fw-medium">
-                                    @if($broadcastPrice == 0) 
-                                    <span class="text-success">Included</span>
-                                    @else 
-                                    {{ $currency_symbol }} {{ number_format($broadcastPrice * $number_of_submissions, 2) }}
-                                    @endif
-                                </span>
-                            </div>
-                            @endif
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Platform Service Charge:</span>
-                                <span class="small fw-medium">{{ $currency_symbol }} {{ number_format($serviceFee, 2) }}</span>
-                            </div>
-                            @if($review_fee > 0)
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Review Fee:</span>
-                                <span class="small fw-medium">{{ $currency_symbol }} {{ number_format($review_fee, 2) }}</span>
-                            </div>
-                            @if($showSystemReviewRefundNote)
-                            <div class="small text-primary mt-1 ms-2">
-                                <i class="ri-information-line me-1"></i>This fee will be refunded if no admin intervention is required
-                            </div>
-                            @endif
-                            @endif
-                            <hr class="my-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold">Subtotal:</span>
-                                <span class="fw-bold text-primary">{{ $currency_symbol }} {{ number_format($subtotal, 2) }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-muted">Tax ({{ $tax_rate }}%):</span>
-                                <span class="small fw-medium">{{ $currency_symbol }} {{ number_format($tax, 2) }}</span>
-                            </div>
-                            <hr class="my-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold">Total:</span>
-                                <span class="fw-bold text-primary fs-5">{{ $currency_symbol }} {{ number_format($total, 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Terms & Conditions -->
-        <div class="card mb-4 border-info">
-            <div class="card-header bg-info bg-opacity-10 border-info">
-                <h5 class="mb-0 fw-semibold text-info">
-                    <i class="ri-file-text-line me-2"></i>
-                    Terms & Conditions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="form-check">
-                    <input type="checkbox" id="terms" wire:model="terms" class="form-check-input {{ $errors->has('terms') ? 'is-invalid' : '' }}" @if(!$canEdit) disabled @endif>
-                    <label for="terms" class="form-check-label">
-                        I agree to the <a href="{{ route('legal.terms-conditions') }}" target="_blank" class="text-primary text-decoration-underline">Terms and Conditions</a> and <a href="{{ route('legal.privacy-policy') }}" target="_blank" class="text-primary text-decoration-underline">Privacy Policy</a>
-                    </label>
-                    @error('terms') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                </div>
-            </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="d-flex justify-content-end">
-            @if($canEdit)
-            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
-                <i class="ri-secure-payment-line me-2"></i>
-                Update Job
-            </button>
-            @else
-            <div class="alert alert-info mb-0">
-                <i class="ri-information-line me-2"></i>
-                This job has been paid for and cannot be modified.
+    <section class="py-4">
+        <div class="container">
+            @if(session()->has('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif
+
+            @if(session()->has('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
+
+            @if($hasWorkers)
+            <div class="alert alert-danger mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <div>
+                        <strong class="fw-bold">This task cannot be edited.</strong>
+                        <span class="d-block">This task already has workers assigned and cannot be modified.</span>
+                    </div>
+                </div>
+            </div>
+            @elseif($isPaid)
+            <div class="alert alert-warning mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <div>
+                        <strong class="fw-bold">Limited editing available.</strong>
+                        <span class="d-block">This task has been paid for. You can only edit basic details, not budget or preferences.</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <div class="row">
+                <!-- Task Form -->
+                <div class="col-lg-8">
+                    <form wire:submit.prevent="submitJob">
+                        <!-- Step 1: Task Details & Template -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="bi bi-info-circle me-2 text-primary"></i>
+                                    Task Details & Template
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Task Title -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Task Title *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 px-3">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                        <input type="text" id="taskTitle"
+                                            class="form-control {{ $errors->has('title') ? 'is-invalid' : '' }}"
+                                            placeholder="e.g. Create social media posts for my business"
+                                            wire:model.live="title"
+                                            required @if(!$canEdit) readonly disabled @endif>
+                                    </div>
+                                    <div class="form-text">Be specific about what you need done</div>
+                                    @error('title') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+
+                                <!-- Job Description -->
+                                <div class="mb-4">
+                                    <label for="description-editor" class="form-label fw-bold">Job Description *</label>
+                                    <textarea id="description-editor" rows="4" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" placeholder="Write step by step/line by line instructions on what the user should do" wire:model="description" required @if(!$canEdit) readonly disabled @endif>{{ $description }}</textarea>
+                                    @error('description') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+
+                                <!-- Select Template -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Select Template *</label>
+                                    @if($isPaid)
+                                        <!-- For paid tasks, show read-only template info -->
+                                        <div class="form-control-plaintext bg-light p-2 rounded border">
+                                            @php $selectedTemplate = \App\Models\PlatformTemplate::find($template_id); @endphp
+                                            <strong>{{ $selectedTemplate ? $selectedTemplate->name : 'Unknown Template' }}</strong>
+                                            <br><small class="text-muted">Platform cannot be changed for paid tasks</small>
+                                        </div>
+                                        <!-- Hidden input to maintain the value -->
+                                        <input type="hidden" wire:model="template_id" value="{{ $template_id }}">
+                                    @else
+                                        <!-- For unpaid tasks, show editable select -->
+                                        <div wire:ignore>
+                                            <select id="templateSelect" class="form-select" wire:model="template_id" required @if(!$canEdit) disabled @endif>
+                                                <option value="">Choose a template...</option>
+                                                @foreach($platforms as $platform)
+                                                <optgroup label="{{ $platform->name }}">
+                                                    @foreach($platform->templates as $template)
+                                                    <option value="{{ $template->id }}"
+                                                        {{ $template_id == $template->id ? 'selected' : '' }}
+                                                        data-platform-id="{{ $platform->id }}"
+                                                        data-icon="{{ $platform->image ? 'bi-image' : 'bi-file-earmark' }}">
+                                                        {{ $template->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </optgroup>
+                                                @endforeach
+                                            </select>
+                                            <div class="form-text">Choose a template that best matches your task</div>
+                                        </div>
+                                    @endif
+                                    @error('template_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+
+                                <!-- Template Fields -->
+                                <div id="templateFields" class="mt-4 @if(!$template_id) d-none @endif">
+                                    <h6 class="border-bottom pb-2">Template Fields</h6>
+                                    @if($template_id)
+                                        @livewire('tasks.task-template-fields', ['templateId' => $template_id, 'templateData' => $templateData])
+                                    @else
+                                        <p class="text-muted">Select a template to view fields.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Additional Details -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="bi bi-gear me-2 text-primary"></i>
+                                    Additional Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Tools Required -->
+                                <div wire:ignore class="mb-4">
+                                    <label for="toolsSelect" class="form-label fw-bold">Tools Required</label>
+                                    <input type="text" name="" value="abc,xyz" class="form-control {{ $errors->has('requirements') ? 'is-invalid' : '' }}" id="toolsSelect" @if(!$canEdit) disabled @endif>
+                                    <div class="form-text">Add tools or software required for this job</div>
+                                    @error('requirements') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+
+                                <!-- Average Completion Time, Expiry Date, Privacy -->
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Average Completion Time</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control {{ $errors->has('average_completion_minutes') ? 'is-invalid' : '' }}" min="1" wire:model="average_completion_minutes" @if(!$canEdit) readonly disabled @endif>
+                                                <select class="form-select" style="max-width: 120px;" wire:model="time_unit" @if(!$canEdit) disabled @endif>
+                                                    <option value="minutes">Minutes</option>
+                                                    <option value="hours">Hours</option>
+                                                    <option value="days" selected>Days</option>
+                                                    <option value="weeks">Weeks</option>
+                                                </select>
+                                            </div>
+                                            @error('average_completion_minutes') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Expiry Date *</label>
+                                            <input type="date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" wire:model="expiry_date" required @if(!$canEdit) readonly disabled @endif>
+                                            <div class="form-text">When should applications close?</div>
+                                            @error('expiry_date') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Privacy *</label>
+                                            <select class="form-select {{ $errors->has('visibility') ? 'is-invalid' : '' }}" id="taskPrivacy" wire:model="visibility" @if(!$canEdit) disabled @endif>
+                                                <option value="public">Public</option>
+                                                <option value="private">Private</option>
+                                            </select>
+                                            <div class="form-text">Who can find your task</div>
+                                            @error('visibility') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Geographical Restriction -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Geographical Restriction</label>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input restriction" type="radio" name="restriction" id="allow_all_countries" value="all" wire:model.live="restriction" @if(!$canEdit) disabled @endif>
+                                                <label class="form-check-label d-flex align-items-center" for="allow_all_countries">
+                                                    <i class="bi bi-globe me-2"></i>Allow All Countries
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input restriction" type="radio" name="restriction" id="allow_selected_countries" value="allow" wire:model.live="restriction" @if(!$canEdit) disabled @endif>
+                                                <label class="form-check-label d-flex align-items-center" for="allow_selected_countries">
+                                                    <i class="bi bi-check-circle me-2"></i>Allow Selected
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input restriction" type="radio" name="restriction" id="deny_selected_countries" value="deny" wire:model.live="restriction" @if(!$canEdit) disabled @endif>
+                                                <label class="form-check-label d-flex align-items-center" for="deny_selected_countries">
+                                                    <i class="bi bi-x-circle me-2"></i>Deny Selected
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div wire:ignore class="my-3 @if($restriction == 'all') d-none @else d-block @endif" id="countriesContainer">
+                                        <select name="" class="form-select {{ $errors->has('task_countries') ? 'is-invalid' : '' }}" id="countries" multiple @if(!$canEdit) disabled @endif>
+                                            @foreach($countries as $country)
+                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('task_countries') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Budget & Preferences -->
+                        @if(!$isPaid)
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="bi bi-cash me-2 text-primary"></i>
+                                    Budget & Preferences
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                        @else
+                        <div class="card mb-4 border-secondary">
+                            <div class="card-header bg-secondary bg-opacity-10 border-secondary">
+                                <h5 class="mb-0 fw-semibold text-secondary">
+                                    <i class="bi bi-cash me-2"></i>
+                                    Budget & Preferences
+                                    <small class="text-muted">(Not editable for paid tasks)</small>
+                                </h5>
+                            </div>
+                            <div class="card-body opacity-50">
+                        @endif
+                                <!-- Review Preference -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Review Preference</label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="promotion-card">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="review_type" id="autoReview" value="system_review" wire:model="review_type" @if(!$canEdit) disabled @endif>
+                                                    <label class="form-check-label fw-bold" for="autoReview">
+                                                        Automatic Review
+                                                    </label>
+                                                </div>
+                                                <p class="small text-muted mb-0">System automatically checks submissions for quality</p>
+                                                <div class="mt-2">
+                                                    <strong>Cost: {{ $currency_symbol }}{{ number_format($systemReviewCost ?? 0, 2) }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @if($enable_system_review)
+                                        <div class="col-md-4">
+                                            <div class="promotion-card">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="review_type" id="adminReview" value="admin_review" wire:model="review_type" @if(!$canEdit) disabled @endif>
+                                                    <label class="form-check-label fw-bold" for="adminReview">
+                                                        Admin Review
+                                                    </label>
+                                                </div>
+                                                <p class="small text-muted mb-0">Admin will review and approve each submission</p>
+                                                <div class="mt-2">
+                                                    <strong>Cost: {{ $currency_symbol }}{{ number_format($adminReviewCost ?? 0, 2) }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="col-md-4">
+                                            <div class="promotion-card">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="review_type" id="selfReview" value="self_review" wire:model="review_type" @if(!$canEdit) disabled @endif>
+                                                    <label class="form-check-label fw-bold" for="selfReview">
+                                                        Self Review
+                                                    </label>
+                                                </div>
+                                                <p class="small text-muted mb-0">You review and approve each submission</p>
+                                                <div class="mt-2">
+                                                    <strong>Cost: {{ $currency_symbol }}{{ number_format($adminReviewCost ?? 0, 2) }}</strong> (Refundable)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Number of Submissions & Budget -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Number of Submissions</label>
+                                        <input type="number" class="form-control {{ $errors->has('number_of_submissions') ? 'is-invalid' : '' }}" min="1" wire:model="number_of_submissions" wire:change="updateTotals" @if(!$canEdit) readonly disabled @endif>
+                                        <div class="form-text">How many workers can work on this task?</div>
+                                        @error('number_of_submissions') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Budget per Submission (Min: {{ $currency_symbol.$min_budget_per_submission  }})</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                {{ $currency_symbol }}
+                                            </span>
+                                            <input type="number" class="form-control {{ $errors->has('budget_per_submission') ? 'is-invalid' : '' }}" min="{{ $min_budget_per_submission }}" step="0.01" wire:model="budget_per_submission" wire:change="updateTotals" @if(!$canEdit) readonly disabled @endif>
+                                        </div>
+                                        <div class="form-text">Amount paid for each completed submission</div>
+                                        @error('budget_per_submission') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Allow Multiple Submissions -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="allowMultiple" wire:model="allow_multiple_submissions" @if(!$canEdit) disabled @endif>
+                                        <label class="form-check-label fw-bold" for="allowMultiple">
+                                            Allow Multiple Submissions per Worker
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Workers can submit multiple times for this task</div>
+                                </div>
+
+                                <!-- Featured Job -->
+                                <div class="row mt-2 align-items-center mb-4">
+                                    <div class="col-md-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="featuredJob" wire:model="featured" wire:change="updateTotals" {{ $hasFeaturedSubscription ? 'checked disabled' : '' }} @if(!$canEdit) disabled @endif>
+                                            <label class="form-check-label fw-bold" for="featuredJob">
+                                                Featured Promotion {{ $hasFeaturedSubscription ? '(Active Subscription)' : '' }}
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            @if($hasFeaturedSubscription)
+                                            Your subscription covers featured promotion for {{ $featuredSubscriptionDaysRemaining ?? 0 }} days
+                                            @else
+                                            Advertise to different pages
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-2 @if(!$featured) d-none @endif" id="featuredDays">
+                                        <label class="form-label">Number of Days</label>
+                                        <input type="number" class="form-control" min="1" wire:model="featured_days" wire:change="updateTotals" {{ $hasFeaturedSubscription ? 'readonly' : '' }} @if(!$canEdit) disabled @endif>
+                                        <div class="form-text">
+                                            @if($hasFeaturedSubscription)
+                                            Days covered by your subscription
+                                            @else
+                                            Your task will be featured for {{ $currency_symbol }}{{ $featuredPrice }}/day
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Broadcast Badge -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="broadcastBadge" wire:model="broadcast" wire:change="updateTotals" {{ $hasBroadcastSubscription ? 'checked disabled' : '' }} @if(!$canEdit) disabled @endif>
+                                        <label class="form-check-label fw-bold" for="broadcastBadge">
+                                            Broadcast Task {{ $hasBroadcastSubscription ? '(Active Subscription)' : '' }}
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        @if($hasBroadcastSubscription)
+                                        Your subscription covers broadcast promotion
+                                        @else
+                                        Broadcast task to all who are fit for this task for {{ $currency_symbol }}{{ $broadcastPrice }}
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Cost Summary -->
+                                <div class="card bg-light mb-4">
+                                    <div class="card-body">
+                                        <h6>Cost Summary</h6>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Task Budget:</span>
+                                            <strong>{{ $currency_symbol }}{{ number_format($expected_budget ?: 0, 2) }}</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Platform Fee:</span>
+                                            <strong>{{ $currency_symbol }}{{ number_format($serviceFee ?: 0, 2) }}</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Promotions:</span>
+                                            <strong>{{ $currency_symbol }}{{ number_format(($featured ? $featuredPrice * ($featured_days ?: 0) : 0) + ($broadcast ? $broadcastPrice * ($number_of_submissions ?: 0) : 0), 2) }}</strong>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <span>Total:</span>
+                                            <strong>{{ $currency_symbol }}{{ number_format($total ?: 0, 2) }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Preview & Actions -->
+                <div class="col-lg-4">
+                    <!-- Review & Submit -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="bi bi-check-circle me-2 text-primary"></i>
+                                Review & Submit
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info small">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Review your task details and submit for payment.
+                            </div>
+
+                            <!-- Task Summary -->
+                            <div class="mb-3">
+                                <h6 class="border-bottom pb-2">Task Summary</h6>
+                                <div class="small">
+                                    <div class="mb-2"><strong>Title:</strong> {{ Str::limit($title ?: 'No title', 30) }}</div>
+                                    <div class="mb-2"><strong>Budget:</strong> {{ $currency_symbol }}{{ number_format($budget_per_submission ?: 0, 2) }}/submission</div>
+                                    <div class="mb-2"><strong>Submissions:</strong> {{ $number_of_submissions ?: 1 }}</div>
+                                    <div class="mb-2"><strong>Total:</strong> {{ $currency_symbol }}{{ number_format($total ?: 0, 2) }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                @if(!$hasWorkers)
+                                <button type="button" wire:click="saveAsDraft" class="btn btn-outline-secondary">
+                                    <i class="bi bi-save me-1"></i>
+                                    Save as Draft
+                                </button>
+                                @endif
+
+                                @if(!$isPaid)
+                                <!-- Terms & Conditions for unpaid tasks -->
+                                <div class="mb-3">
+                                    <div class="form-check small">
+                                        <input type="checkbox" id="terms" wire:model="terms" class="form-check-input {{ $errors->has('terms') ? 'is-invalid' : '' }}" @if(!$canEdit) disabled @endif>
+                                        <label for="terms" class="form-check-label">
+                                            I agree to <a href="{{ route('legal.terms-conditions') }}" target="_blank" class="text-decoration-underline">Terms</a>
+                                        </label>
+                                        @error('terms') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+
+                                <button type="button" wire:click="submitJob" wire:target="submitJob" wire:loading.attr="disabled" wire:loading.class="btn-loading" class="btn btn-primary" @if(!$canEdit || !$terms) disabled @endif>
+                                    <span wire:loading.class="d-none" wire:target="submitJob">
+                                        <i class="bi bi-credit-card me-1"></i>
+                                        Proceed to Payment
+                                    </span>
+                                    <span wire:loading.class="d-inline-flex" wire:target="submitJob" style="display: none;">
+                                        <i class="bi bi-arrow-repeat me-1"></i>
+                                        Processing...
+                                    </span>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Preview -->
+                    <div class="preview-card card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h6 class="mb-0">Task Preview</h6>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted small">How your task will appear to workers:</h6>
+                            <div class="task-card card h-100 mt-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <span class="badge bg-info">{{ $task->platform->name ?? 'Platform' }}</span>
+                                        <span class="price-tag">{{ $currency_symbol ?? '$' }}{{ number_format($budget_per_submission ?: 0, 2) }}</span>
+                                    </div>
+                                    <h5 class="card-title">
+                                        {{ $title ?: 'Task Title Will Appear Here' }}
+                                    </h5>
+                                    <p class="card-text text-muted">{{ Str::words($description ?: 'Task description preview...', 10, '...') }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> {{ $expiry_date ? \Carbon\Carbon::parse($expiry_date)->diffForHumans() : 'Deadline' }}</small>
+                                        <small class="text-muted"><i class="bi bi-person"></i> 0/{{ $number_of_submissions ?: 1 }} submissions</small>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn apply-btn w-100" disabled>Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="card">
+                        <div class="card-header bg-transparent">
+                            <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Tips for Better Tasks</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="small">
+                                <li class="mb-2"><strong>Be specific</strong> about requirements and deliverables</li>
+                                <li class="mb-2"><strong>Set a realistic budget</strong> based on task complexity</li>
+                                <li class="mb-2"><strong>Include clear deadlines</strong> for timely completion</li>
+                                <li class="mb-2"><strong>Provide examples</strong> of what you're looking for</li>
+                                <li class="mb-2"><strong>Be available</strong> to answer worker questions</li>
+                                <li><strong>Review applications</strong> carefully before selecting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-    @endif
+    </section>
 </div>
-
-@push('styles')
-<link href="{{asset('frontend/css/select2.min.css')}}" rel="stylesheet" />
-<style>
-    .cursor-pointer {
-        cursor: pointer;
-    }
-    
-    .w-5 {
-        width: 1.25rem;
-    }
-    
-    .h-5 {
-        height: 1.25rem;
-    }
-    
-    .w-10 {
-        width: 2.5rem;
-    }
-    
-    .h-10 {
-        height: 2.5rem;
-    }
-    
-    .w-20 {
-        width: 5rem;
-    }
-    
-    .min-w-100 {
-        min-width: 100px;
-    }
-    
-    .bg-opacity-10 {
-        background-color: rgba(13, 110, 253, 0.1) !important;
-    }
-    
-    .text-opacity-10 {
-        color: rgba(13, 110, 253, 0.1) !important;
-    }
-    
-    .border-opacity-10 {
-        border-color: rgba(13, 110, 253, 0.1) !important;
-    }
-    
-    /* Promotion Options Styling */
-    .card.border-light {
-        transition: all 0.2s ease;
-    }
-    
-    .card.border-light:hover {
-        border-color: #0d6efd !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .form-check-input:checked {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-    
-    /* Select2 Custom Styling */
-    .select2-container .select2-selection--single {
-        height: 40px !important;
-        border-radius: 8px !important;
-        border: 1px solid #d1d5db !important;
-    }
-
-    .select2-container .select2-selection--single .select2-selection__rendered {
-        line-height: 40px !important;
-    }
-
-    .select2-container .select2-selection--single .select2-selection__arrow {
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__placeholder {
-        line-height: 40px !important;
-    }
-
-    .select2-container--default .select2-selection--multiple {
-        border-color: #e5e7eb;
-        border-radius: 0.375rem;
-        min-height: 42px;
-        padding: 2px 8px;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        font-size: 14px;
-        border-radius: 9999px;
-        padding: 2px 8px;
-        margin-top: 4px;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #0d6efd;
-        margin-right: 5px;
-        border: none !important;
-    }
-</style>
-@endpush
-
 @push('scripts')
-<script src="{{asset('frontend/js/select2.min.js')}}"></script>
+<script src="{{ asset('frontend/js/choices.min.js') }}"></script>
 <script>
-    $(document).ready(function(){
-        initializeSelect2();
-    });
-    
-    function initializeSelect2() {
-        if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
-            // Safely destroy existing Select2 instances first
-            try {
-                if (jQuery('#requirements').hasClass('select2-hidden-accessible')) {
-                    jQuery('#requirements').select2('destroy');
-                }
-                if (jQuery('#restricted_countries').hasClass('select2-hidden-accessible')) {
-                    jQuery('#restricted_countries').select2('destroy');
-                }
-            } catch (e) {
-                console.log('Select2 destroy error:', e);
-            }
-            
-            // Initialize requirements select2
-            if (jQuery('#requirements').length) {
-                jQuery('#requirements').select2({
-                    placeholder: "Select required tools",
-                    allowClear: true,
-                    width: '100%'
-                }).on('change', function(e) {
-                    // Get selected data
-                    let data = jQuery(this).val();
-                    window.Livewire.dispatch('updateSelect2', {
-                        data: data,
-                        element: 'requirements'
-                    });
-                });
-            }
+    // Initialize Choices.js for template select
+    let templateSelectInstance = null;
+    let toolsSelectInstance = null;
 
-            // Initialize restricted countries select2
-            if (jQuery('#restricted_countries').length) {
-                jQuery('#restricted_countries').select2({
-                    placeholder: "Select countries to restrict",
-                    allowClear: true,
-                    width: '100%'
-                }).on('change', function(e) {
-                    // Get selected data
-                    let data = jQuery(this).val();
-                    window.Livewire.dispatch('updateSelect2', {
-                        data: data,
-                        element: 'restricted_countries'
-                    });
-                });
-            }
+    function initializeTemplateSelect() {
+        const templateSelect = document.getElementById('templateSelect');
+        if (templateSelect && !templateSelect.choicesInstance && !templateSelect.hasAttribute('disabled')) {
+            // Only initialize Choices.js for editable selects (unpaid tasks)
+            templateSelectInstance = new Choices('#templateSelect', {
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Search and select a template...',
+                searchPlaceholderValue: 'Search templates...',
+                itemSelectText: '',
+                shouldSort: false, // Keep original order
+                item: (item) => {
+                    const icon = item.element.getAttribute('data-icon');
+                    if (icon) {
+                        return `<div class="d-flex align-items-center">
+                            <i class="${icon} me-2"></i>
+                            <span>${item.label}</span>
+                        </div>`;
+                    }
+                    return item.label;
+                },
+                choice: (item) => {
+                    const icon = item.element.getAttribute('data-icon');
+                    if (icon) {
+                        return `<div class="d-flex align-items-center">
+                            <i class="${icon} me-2"></i>
+                            <span>${item.label}</span>
+                        </div>`;
+                    }
+                    return item.label;
+                }
+            });
+
+            // Listen for template selection changes
+            templateSelect.addEventListener('change', function(event) {
+                const selectedValue = event.target.value;
+                if (selectedValue) {
+                    // Show template fields
+                    document.getElementById('templateFields').classList.remove('d-none');
+                } else {
+                    // Hide template fields
+                    document.getElementById('templateFields').classList.add('d-none');
+                }
+            });
         }
     }
-    
-    // Listen for Livewire load event to reinitialize Select2 after component updates
-    document.addEventListener('livewire:initialized', function() {
-        // Small delay to ensure DOM is ready
-        setTimeout(function() {
-            initializeSelect2();
-        }, 100);
+
+    // Initialize tools select
+    function initializeToolsSelect() {
+        const toolsSelect = document.getElementById('toolsSelect');
+        if (toolsSelect && !toolsSelect.choicesInstance && !toolsSelect.hasAttribute('disabled')) {
+            toolsSelectInstance = new Choices('#toolsSelect', {
+                addItems: true,
+                allowHtml:true,
+                delimiter: ',',
+                editItems: true,
+                maxItemCount: 5,
+                removeItemButton: true,
+                placeholder: true,
+                placeholderValue: 'Add tools (e.g., Photoshop, Excel)',
+            });
+
+            // Set initial values if requirements exist
+            const initialRequirements = {{ json_encode($requirements) }};
+            if (initialRequirements && Array.isArray(initialRequirements)) {
+                initialRequirements.forEach(function(item) {
+                    toolsSelectInstance.setChoiceByValue(item);
+                });
+            }
+
+            // Sync Choices.js selections with Livewire
+            toolsSelect.addEventListener('change', function(event) {
+                const values = toolsSelectInstance.getValue(true);
+                // Dispatch Livewire event
+                Livewire.dispatch('choiceSelected', {
+                    id: 'toolsSelect',
+                    values: values
+                });
+            });
+        }
+    }
+
+    // Show template fields if template is already selected
+    function showTemplateFieldsIfNeeded() {
+        const templateSelect = document.getElementById('templateSelect');
+        if (templateSelect && templateSelect.value) {
+            document.getElementById('templateFields').classList.remove('d-none');
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('livewire:init', function() {
+        initializeTemplateSelect();
+        initializeToolsSelect();
+        showTemplateFieldsIfNeeded();
     });
-    
-    // Listen for Livewire updates to reinitialize Select2
+
+    // Re-initialize when Livewire updates
     document.addEventListener('livewire:updated', function() {
-        // Small delay to ensure DOM is ready
-        setTimeout(function() {
-            initializeSelect2();
-        }, 100);
-    });
-    
-    // Listen for Livewire navigation to reinitialize Select2
-    document.addEventListener('livewire:navigated', function() {
-        // Small delay to ensure DOM is ready
-        setTimeout(function() {
-            initializeSelect2();
-        }, 100);
+        initializeTemplateSelect();
+        initializeToolsSelect();
+        showTemplateFieldsIfNeeded();
     });
 </script>
+@endpush
+@push('styles')
+<link href="{{ asset('frontend/css/choices.min.css') }}" rel="stylesheet" />
 @endpush

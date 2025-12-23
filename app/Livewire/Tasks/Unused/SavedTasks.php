@@ -74,12 +74,12 @@ class SavedTasks extends Component
                 break;
             case 'submitted':
                 $query->whereHas('taskSubmissions')->whereDoesntHave('taskSubmissions', function($q) {
-                    $q->whereNotNull('completed_at');
+                    $q->whereNull('reviewed_at');
                 });
                 break;
             case 'completed':
                 $query->whereHas('taskSubmissions', function($q) {
-                    $q->whereNotNull('completed_at');
+                    $q->whereNotNull('paid_at');
                 });
                 break;
             case 'cancelled':

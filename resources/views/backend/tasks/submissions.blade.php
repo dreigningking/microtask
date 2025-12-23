@@ -431,7 +431,7 @@
 									@php
 										$deadlineHours = \App\Models\Setting::where('name', 'submission_review_deadline')->value('value') ?? 24;
 										$deadlineHours = intval($deadlineHours);
-										$isOverdue = !$submission->reviewed_at && !$submission->completed_at &&
+										$isOverdue = !$submission->reviewed_at && !$submission->paid_at &&
 													 $submission->created_at->addHours($deadlineHours)->isPast();
 									@endphp
 									<tr>
@@ -467,7 +467,7 @@
 											</div>
 										</td>
 										<td>
-											@if($submission->completed_at)
+											@if($submission->paid_at)
 												<span class="badge bg-success">
 													<i class="ri-check-line me-1"></i>Completed
 												</span>
@@ -481,10 +481,7 @@
 														<i class="ri-error-warning-line me-1"></i>Disputed
 													</span>
 												@endif
-											@elseif($submission->paid_at)
-												<span class="badge bg-primary">
-													<i class="ri-money-dollar-circle-line me-1"></i>Paid
-												</span>
+											
 											@elseif($submission->reviewed_at)
 												<span class="badge bg-info">
 													<i class="ri-eye-line me-1"></i>Reviewed

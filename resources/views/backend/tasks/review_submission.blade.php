@@ -199,7 +199,7 @@
 								</div>
 							@endif
 
-							@if(!$submission->paid_at && $submission->completed_at)
+							@if(!$submission->paid_at && $submission->reviewed_at)
 								<hr>
 								<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentModal">
 									<i class="ri-money-dollar-circle-line me-1"></i> Process Payment

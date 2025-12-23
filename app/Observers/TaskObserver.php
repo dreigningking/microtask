@@ -23,6 +23,7 @@ class TaskObserver
     {
         Moderation::create(['moderatable_type'=> get_class($task),'moderatable_id'=> $task->id,
         'purpose'=> 'updated_task','status'=> 'pending']);
+        
     }
 
     /**

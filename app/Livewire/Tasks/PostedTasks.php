@@ -66,8 +66,7 @@ class PostedTasks extends Component
             switch ($moderation->status) {
                 case 'approved':
                     // Check if completed
-                    $acceptedSubmissions = $task->taskSubmissions->where('accepted', true)->count();
-                    if ($acceptedSubmissions >= $task->number_of_submissions) {
+                    if ($task->completed_at !== null) {
                         $this->stats['completed']++;
                     } else {
                         $this->stats['in_progress']++;
@@ -105,11 +104,10 @@ class PostedTasks extends Component
 
         switch($this->activeTab) {
             case 'active':
-                $tasks = $baseQuery->where('is_active', true)
+                $tasks = $baseQuery->where('is_active', true)->where('completed_at', null)
                     ->whereHas('latestModeration', function($q) {
                         $q->where('status', 'approved');
                     })
-                    ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
                     ->latest()
                     ->paginate(10);
                 break;
@@ -124,12 +122,10 @@ class PostedTasks extends Component
                 break;
 
             case 'completed':
-                $tasks = $baseQuery->where('is_active', true)
+                $tasks = $baseQuery->where('is_active', true)->whereNotNull('completed_at')
                     ->whereHas('latestModeration', function($q) {
                         $q->where('status', 'approved');
-                    })
-                    ->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
-                    ->latest()
+                    })->latest()
                     ->paginate(10);
                 break;
 
@@ -150,11 +146,10 @@ class PostedTasks extends Component
                 break;
 
             default:
-                $tasks = $baseQuery->where('is_active', true)
+                $tasks = $baseQuery->where('is_active', true)->whereNotNull('completed_at')
                     ->whereHas('latestModeration', function($q) {
                         $q->where('status', 'approved');
                     })
-                    ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
                     ->latest()
                     ->paginate(10);
         }

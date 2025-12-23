@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('accepted')->default(0);
             $table->integer('review_rating')->nullable();
             $table->timestamp('reviewed_at')->nullable();
+            $table->unsignedBigInteger('reviewed_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

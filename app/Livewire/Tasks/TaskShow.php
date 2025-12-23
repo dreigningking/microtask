@@ -187,8 +187,7 @@ class TaskShow extends Component
         }
         
         // Check completion status
-        $acceptedSubmissions = $this->task->taskSubmissions()->where('accepted', true)->count();
-        if ($acceptedSubmissions >= $this->task->number_of_submissions) {
+        if ($this->task->completed_at !== null) {
             $reasons[] = 'Task has been completed (all required submissions received)';
         }
         
@@ -213,7 +212,7 @@ class TaskShow extends Component
             return;
         }
 
-        if ($this->task->taskSubmissions->count() >= $this->task->number_of_submissions) {
+        if ($this->task->completed_at !== null) {
             session()->flash('error', 'This task is full and cannot be started.');
             return;
         }

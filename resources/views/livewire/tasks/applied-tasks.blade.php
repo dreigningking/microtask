@@ -64,23 +64,25 @@
 
                         </div>
                         <div class="col-md-2 mb-2">
-                            <select name="" class="form-select">
+                            <select wire:model.live="filterSubmissions" class="form-select">
                                 <option value="">Filter Submissions</option>
-                                <option value="">No Submissions</option>
-                                <option value="">Have Submissions</option>
+                                <option value="no_submissions">No Submissions</option>
+                                <option value="have_submissions">Have Submissions</option>
                             </select>
                         </div>
                         <div class="col-md-2 mb-2">
-                            <select name="" class="form-select">
+                            <select wire:model.live="filterPlatforms" class="form-select">
                                 <option value="">Filter Platforms</option>
-                                <option value="">Have Submissions</option>
+                                @foreach($platforms as $platform)
+                                <option value="{{ $platform->id }}">{{ $platform->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <select name="" class="form-select">
+                            <select wire:model.live="filterStatus" class="form-select">
                                 <option value="">Filter Status</option>
-                                <option value="">Ongoing</option>
-                                <option value="">Completed</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="completed">Completed</option>
                             </select>
                         </div>
                     </div>
@@ -89,15 +91,11 @@
 
             <div class="row g-4">
                 @forelse ($tasks as $task)
-
-                
-
                 <div class="col-12">
                     <div class="task-card card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
-                                    <!-- <span class="badge bg-info status-badge">Under Review</span> -->
                                     <span class="badge bg-warning">{{ $task->platform->name ?? 'N/A' }}</span>
                                 </div>
                                 <div class="text-end">
@@ -105,7 +103,7 @@
                                     <small class="text-muted">Potential Earnings</small>
                                 </div>
                             </div>
-                            <h5 class="card-title">{{ $task->title }}p</h5>
+                            <h5 class="card-title">{{ $task->title }}</h5>
                             <p class="card-text text-muted">{{ $task->description }}</p>
 
                             <div class="row mb-3">
@@ -128,111 +126,25 @@
                                     <a href="{{ route('explore.task',$task) }}" class="btn btn-sm btn-outline-primary">
                                         View Task
                                     </a>
-
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="col-12">
-
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-clipboard-x display-4 text-muted mb-3"></i>
+                    <h5 class="text-muted">No applied tasks found</h5>
+                    <p class="text-muted">You haven't applied to any tasks yet. Start exploring and applying to tasks to see them here.</p>
                 </div>
                 @endforelse
 
             </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4">
+                {{ $tasks->links() }}
+            </div>
         </div>
     </section>
 </div>
-{{--
-<div class="content-wrapper">
-    <!-- Header -->
-    
-
-    <!-- Stats Cards -->
-    
-
-    
-
-    <!-- Search and Filter Controls -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Search tasks by title or description...">
-                        <span class="input-group-text"><i class="ri-search-line"></i></span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <select wire:model.live="sortBy" class="form-select">
-                        <option value="latest">Latest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="budget_desc">Budget (High to Low)</option>
-                        <option value="budget_asc">Budget (Low to High)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tasks List -->
-    <div class="card">
-        <div class="card-body">
-            <!-- Mobile Cards View -->
-            <div class="d-md-none">
-                <div class="row g-3">
-                    @forelse($tasks as $taskWorker)
-                    <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-1"></h5>
-                                        <div class="text-muted small">{{ $taskWorker->task->platform->name ?? 'N/A' }}</div>
-                                        @if($taskWorker->accepted_at && !$taskWorker->submitted_at && !$taskWorker->completed_at && !$taskWorker->cancelled_at)
-                                        <span class="badge bg-primary">Ongoing</span>
-
-                                        @elseif($taskWorker->submitted_at && !$taskWorker->completed_at && !$taskWorker->cancelled_at)
-                                        <span class="badge bg-purple">Submitted</span>
-                                        @elseif($taskWorker->completed_at)
-                                        <span class="badge bg-success">Completed</span>
-                                        @elseif($taskWorker->cancelled_at)
-                                        <span class="badge bg-danger">Cancelled</span>
-                                        @else
-                                        <span class="badge bg-secondary">Pending</span>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-6 small">
-                                        <span class="text-muted">Budget:</span> <span class="fw-semibold">
-                                        {{ $taskWorker->task->user->country->currency_symbol ?? '$' }}
-                                        {{ number_format($taskWorker->task->budget_per_submission, 2) }}
-                                        </span>
-                                    </div>
-                                    <div class="col-6 small"><span class="text-muted">Signed Up:</span> <span class="fw-semibold">{{ $taskWorker->created_at->format('M d, Y') }}</span></div>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('tasks.view', $taskWorker->task) }}" class="btn btn-primary btn-sm flex-fill"><i class="ri-eye-line me-1"></i> View</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-12 text-center text-muted py-4">
-                        <i class="ri-task-line display-4 mb-2"></i>
-                        <p>No tasks found</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-
-            
-        </div>
-    </div>
-</div>
---}}

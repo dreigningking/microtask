@@ -134,6 +134,7 @@ class TaskSubmissionReview extends Component
             ]);
             $this->selectedSubmission->accepted = true;
             $this->selectedSubmission->reviewed_at = now();
+            $this->selectedSubmission->reviewed_by = Auth::id();
             $this->selectedSubmission->paid_at = now();
             $this->selectedSubmission->review_body = $this->reviewText;
             $this->selectedSubmission->save();
@@ -158,6 +159,7 @@ class TaskSubmissionReview extends Component
             $this->selectedSubmission->update([
                 'accepted' => false,
                 'reviewed_at' => now(),
+                'reviewed_by' => Auth::id(),
                 'review_body' => $this->reviewText,
             ]);
 

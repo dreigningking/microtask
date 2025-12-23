@@ -31,38 +31,48 @@ class TaskTemplateFields extends Component
     public function loadTemplateFields($templateId)
     {
         $this->templateId = $templateId;
-        
+
         // Reset template fields
         $this->templateFields = [];
-        $this->templateData = [];
         $this->validationErrors = [];
-        
+
         if (!empty($templateId)) {
             $template = PlatformTemplate::find($templateId);
-            
+
             if ($template && !empty($template->task_fields)) {
                 $taskFields = $template->task_fields;
                 if ($taskFields) {
                     // Store template fields for rendering in the view
                     $this->templateFields = $taskFields;
-                    // Initialize field values
+                    // Initialize or merge field values
                     foreach ($taskFields as $field) {
                         Log::info($field);
                         if (isset($field['title'])) {
-                            $this->templateData[$field['slug']] = [
-                                'value' => '',
-                                'slug' => $field['slug'],
-                                'required' => $field['required'] ?? false,
-                                'title' => $field['title'],
-                                'type' => $field['type'] ?? 'text'
-                            ];
+                            if (!isset($this->templateData[$field['slug']])) {
+                                $this->templateData[$field['slug']] = [
+                                    'value' => '',
+                                    'slug' => $field['slug'],
+                                    'required' => $field['required'] ?? false,
+                                    'title' => $field['title'],
+                                    'type' => $field['type'] ?? 'text'
+                                ];
+                            } else {
+                                // Ensure the structure is correct, merge with defaults
+                                $this->templateData[$field['slug']] = array_merge([
+                                    'value' => '',
+                                    'slug' => $field['slug'],
+                                    'required' => $field['required'] ?? false,
+                                    'title' => $field['title'],
+                                    'type' => $field['type'] ?? 'text'
+                                ], $this->templateData[$field['slug']]);
+                            }
                         }
                     }
                 }
             }
         }
         // Always dispatch the full templateData array, even if empty
-        $this->dispatch('templateFieldsAreLoaded', $this->templateData)->to(TaskCreate::class);
+        $this->dispatch('templateFieldsAreLoaded', $this->templateData);
     }
     
     /**
@@ -108,7 +118,7 @@ class TaskTemplateFields extends Component
                 'value' => $this->templateData[$key]['value'],
                 'full_template_data' => $this->templateData
             ]);
-            $this->dispatch('templateFieldUpdated', $key, $this->templateData[$key]['value'], $this->templateData)->to(TaskCreate::class);
+            $this->dispatch('templateFieldUpdated', $key, $this->templateData[$key]['value'], $this->templateData);
         }
     }
 
@@ -154,7 +164,7 @@ class TaskTemplateFields extends Component
                     }
                     
                     // Dispatch event to notify parent component with permanent path
-                    $this->dispatch('templateFieldUpdated', $fieldKey, $permanentPath, $this->templateData)->to(TaskCreate::class);
+                    $this->dispatch('templateFieldUpdated', $fieldKey, $permanentPath, $this->templateData);
                     
                 } catch (\Exception $e) {
                     Log::error("File upload failed for field {$fieldKey}: " . $e->getMessage());
@@ -207,7 +217,7 @@ class TaskTemplateFields extends Component
                         }
                         
                         // Dispatch event to notify parent component
-                        $this->dispatch('templateFieldUpdated', $fieldKey, $this->templateData[$fieldKey]['value'], $this->templateData)->to(TaskCreate::class);
+                        $this->dispatch('templateFieldUpdated', $fieldKey, $this->templateData[$fieldKey]['value'], $this->templateData);
                     } catch (\Exception $e) {
                         Log::error("File upload failed: " . $e->getMessage());
                         $this->addError("templateData.$fieldKey.value", "Failed to upload file: " . $e->getMessage());

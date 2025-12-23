@@ -162,11 +162,7 @@ class Dashboard extends Component
             
         // Get job statistics
         $totalJobs = Task::where('user_id', $user->id)->count();
-        $completedJobs = Task::where('user_id', $user->id)
-            ->whereHas('taskSubmissions', function($query) {
-                $query->whereNotNull('paid_at');
-            }, '>=', DB::raw('number_of_submissions'))
-            ->count();
+        $completedJobs = Task::where('user_id', $user->id)->where('completed_at', '!=', null)->count();
         
         // Calculate average rating from TaskWorker reviews
         $averageRating = TaskSubmission::where('user_id', $user->id)
@@ -180,12 +176,8 @@ class Dashboard extends Component
         
         // Get active jobs count (jobs with accepted workers but not completed)
         $activeJobs = Task::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->has('taskWorkers')
-            ->whereDoesntHave('taskSubmissions', function($query) {
-                $query->whereNotNull('paid_at');
-            }, '>=', DB::raw('number_of_submissions'))
-            ->count();
+            ->where('is_active', true)->whereNotNull('completed_at', null)
+            ->has('taskWorkers')->count();
         
         // Get total workers count (workers who have accepted the task)
         $totalWorkers = TaskWorker::whereHas('task', function($query) use ($user) {

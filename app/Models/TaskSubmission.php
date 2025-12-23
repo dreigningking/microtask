@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\TaskWorker;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\TaskSubmissionObserver;
+use function Symfony\Component\Clock\now;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
@@ -25,6 +28,7 @@ class TaskSubmission extends Model
         'submission_details',
         'review_body',
         'reviewed_at',
+        'reviewed_by',
     ];
 
     protected $casts = [
@@ -37,9 +41,6 @@ class TaskSubmission extends Model
 
     public function getStatusAttribute(){
         $hours = Setting::getValue('submission_review_deadline');
-        if ($this->completed_at) {
-            return 'completed at ' . $this->completed_at->format('M d, Y H:i');
-        }
         if ($this->dispute) {
             if ($this->dispute->resolved_at) {
                 return 'dispute resolved at ' . $this->dispute->resolved_at->format('M d, Y H:i');
@@ -50,7 +51,8 @@ class TaskSubmission extends Model
         if ($this->paid_at) {
             return 'paid at ' . $this->paid_at->format('M d, Y H:i');
         }
-        if ($this->created_at->diffInHours($this->completed_at) > $hours) {
+        $hoursDifference = abs(Carbon::now()->diffInHours($this->created_at));
+        if ($hoursDifference > $hours) {
             return 'overdue review';
         }
         
@@ -65,6 +67,11 @@ class TaskSubmission extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
     public function taskWorker(): BelongsTo

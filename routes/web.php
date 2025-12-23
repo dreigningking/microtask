@@ -42,8 +42,10 @@ use App\Livewire\Support\Articles\SupportArticles;
 use App\Livewire\Support\Articles\SupportPost;
 
 Route::get('run', function () {
-    $countries = \App\Models\CountrySetting::all();
-    
+    $submissions = \App\Models\TaskSubmission::whereNotNull('reviewed_at')->get();
+    foreach($submissions as $submission) {
+        $submission->update(['reviewed_by' => $submission->task->user_id]);
+    }
     return 'done';
 });
 // Route::get('payment/test', [PaymentController::class, 'test']);

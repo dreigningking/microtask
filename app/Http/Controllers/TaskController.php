@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\Country;
 use App\Models\Setting;
 use App\Models\Platform;
+use App\Models\Settlement;
 use Illuminate\Http\Request;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\DB;
@@ -427,6 +428,7 @@ class TaskController extends Controller
     public function resetSubmissionForRevision(Request $request, \App\Models\TaskSubmission $submission)
     {
         $submission->reviewed_at = null;
+        $submission->reviewed_by = null;
         $submission->review_reason = null;
         $submission->review = null;
         $submission->save();
@@ -451,7 +453,7 @@ class TaskController extends Controller
         DB::beginTransaction();
         try {
             // Create settlement record
-            $settlement = \App\Models\Settlement::create([
+            $settlement = Settlement::create([
                 'user_id' => $submission->user_id,
                 'task_id' => $submission->task_id,
                 'task_submission_id' => $submission->id,

@@ -23,7 +23,7 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
-        'status',
+        'completed_at',
         'allow_multiple_submissions',
         'created_at',
         'updated_at'
@@ -38,7 +38,8 @@ class Task extends Model
         'template_data' => 'array',
         'task_countries' => 'array',
         'approved_at' => 'datetime',
-        'expiry_date' => 'datetime'
+        'expiry_date' => 'datetime',
+        'completed_at' => 'datetime'
     ];
 
     public function sluggable(): array
@@ -121,7 +122,7 @@ class Task extends Model
 
     public function scopeCompleted($query)
     {
-        return $query->whereRaw('number_of_submissions <= (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
+        return $query->whereNotNull('completed_at');
     }
 
     public function scopeProgressing($query)
@@ -133,7 +134,7 @@ class Task extends Model
         ->where(function ($q) {
                 $q->where('expiry_date', '>', now())->orWhereNull('expiry_date');
             })
-        ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)');
+        ->where('completed_at', null);
     }
 
     public function scopePendingReview($query)
@@ -148,7 +149,7 @@ class Task extends Model
     {
         if($this->is_active &&
             (!$this->expiry_date || $this->expiry_date >= now()) &&
-            $this->taskSubmissions->where('accepted',true)->count() < $this->number_of_submissions && 
+            !$this->completed_at && 
             $this->latestModeration && $this->latestModeration->status === 'approved'
         )
         return true;
@@ -157,9 +158,7 @@ class Task extends Model
     
     public function getIsCompletedAttribute()
     {
-        if($this->is_active &&
-            $this->taskSubmissions->count() >= $this->number_of_submissions
-        )
+        if($this->completed_at !== null)
         return true;
         return false;
     }
@@ -207,7 +206,7 @@ class Task extends Model
                 $q->where('is_banned_from_tasks', false)
                     ->orWhereNull('is_banned_from_tasks');
             })
-            ->whereRaw('number_of_submissions > (SELECT COUNT(*) FROM task_submissions WHERE task_submissions.task_id = tasks.id AND accepted = true)')
+            ->where('completed_at', null)
             ->whereDoesntHave('user.blockedByUsers', function ($q) {
                 if (Auth::check()) {
                     $q->where('users.id', Auth::id());
@@ -229,9 +228,8 @@ class Task extends Model
         if ($this->expiry_date && $this->expiry_date < now())
             return false;
 
-        // 5. Task is not yet completed - number of paid submissions is less than task->number_of_submissions
-        $acceptedSubmissions = $this->taskSubmissions()->where('accepted', true)->count();
-        if ($acceptedSubmissions >= $this->number_of_submissions)
+        // 5. Task is not yet completed
+        if ($this->completed_at)
             return false;
 
         // 6. User is not logged in or user is logged in and he has not blocked the task creator or the task creator has not blocked him

@@ -162,8 +162,8 @@
                             </div>
                         </div>
                         @php
-                            $completedWorkers = $task->taskWorkers->filter(function($worker) {
-                                return $worker->completed_at !== null;
+                            $completedWorkers = $task->taskSubmissions->filter(function($submission) {
+                                return $submission->paid_at !== null;
                             })->count();
                             
                             $completionRate = $task->taskWorkers->count() > 0 
@@ -415,10 +415,7 @@
                                                                 <li><a class="dropdown-item" href="#">Approve Submission</a></li>
                                                                 <li><a class="dropdown-item" href="#">Request Changes</a></li>
                                                                 @endif
-                                                                @if(!$worker->completed_at)
-                                                                <li><hr class="dropdown-divider"></li>
-                                                                <li><a class="dropdown-item text-danger" href="#">Remove Worker</a></li>
-                                                                @endif
+                                                                
                                                             </ul>
                                                         </div>
                                                     </td>
