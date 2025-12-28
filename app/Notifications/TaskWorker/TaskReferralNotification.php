@@ -40,7 +40,7 @@ class TaskReferralNotification extends Notification
     {
         $url = route('explore.task', $this->task);
         $referrerName = $this->task->user->name ?? 'A user';
-        $reward = ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2);
+        $reward = ($this->task->user->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2);
 
         return (new MailMessage)
             ->subject("A Task has been recommended to you: " . $this->task->title)

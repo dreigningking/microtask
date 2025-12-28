@@ -35,7 +35,7 @@ class Settlement extends Model
 
     public function scopeLocalize($query)
     {
-        if (Auth::check() && Auth::user()->role && Auth::user()->role->name == 'super-admin') {
+        if (Auth::check() && Auth::user()->role && Auth::user()->role->slug == 'super-admin') {
             return $query;
         }
 

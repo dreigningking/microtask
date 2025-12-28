@@ -54,13 +54,13 @@ class UserController extends Controller
         }
 
         // Country filter for super-admin users
-        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->slug === 'super-admin' && $request->filled('country_id')) {
             $query->where('country_id', $request->country_id);
         }
 
         // Get countries for super-admin filter
         $countries = null;
-        if (Auth::user()->role->name === 'super-admin') {
+        if (Auth::user()->role->slug === 'super-admin') {
             $countries = Country::orderBy('name')->get();
         }
 

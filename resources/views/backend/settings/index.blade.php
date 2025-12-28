@@ -509,7 +509,7 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $user->email }}</td>
-                                                <td>{{ $user->role->name ?? '-' }}</td>
+                                                <td>{{ $user->role->slug ?? '-' }}</td>
                                                 <td>
                                                     @if($user->role && $user->role->id == 1)
                                                     Global

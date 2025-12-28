@@ -81,6 +81,8 @@ class Moderation extends Model
 
         if ($moderatable instanceof \App\Models\Task)
             return route('explore.task', $moderatable);
+        elseif ($moderatable instanceof \App\Models\TaskSubmission)
+            return route('admin.tasks.review_submission', $moderatable);
         elseif ($moderatable instanceof \App\Models\UserVerification)
             return route('admin.users.show', $moderatable->user);
         elseif ($moderatable instanceof \App\Models\BankAccount)

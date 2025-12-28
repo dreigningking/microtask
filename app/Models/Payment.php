@@ -126,7 +126,7 @@ class Payment extends Model
 
     public function scopeLocalize($query)
     {
-        if (Auth::user()->role->name == 'super-admin') {
+        if (Auth::user()->role->slug == 'super-admin') {
             return $query;
         }
 

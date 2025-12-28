@@ -86,10 +86,10 @@
 								
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->role->name === 'super-admin')
-								<div class="col-md-3">
+								
+								<div class="col-md-3 mb-2">
 									<label for="country_id" class="form-label">Country</label>
-									<select class="form-select" id="country_id" name="country_id">
+									<select class="form-control form-select" id="country_id" name="country_id">
 										<option value="">All Countries</option>
 										@foreach($countries as $country)
 											<option value="{{ $country->id }}" {{ request('country_id') == $country->id ? 'selected' : '' }}>
@@ -98,12 +98,12 @@
 										@endforeach
 									</select>
 								</div>
-								@endif
+								
 
 								
 
 								<!-- Moderation Type Filter -->
-								<div class="col-md-3">
+								<div class="col-md-3 mb-2">
 									<label for="moderation_type" class="form-label">Moderation Type</label>
 									<select class="form-control form-select" id="moderation_type" name="moderation_type">
 										<option value="">All Types</option>
@@ -116,7 +116,7 @@
 								</div>
 
 								<!-- Status Filter -->
-								<div class="col-md-3">
+								<div class="col-md-3 mb-2">
 									<label for="status" class="form-label">Status</label>
 									<select class="form-control form-select" id="status" name="status">
 										<option value="">All Statuses</option>
@@ -128,13 +128,13 @@
 								</div>
 
 								<!-- Date Range Filters -->
-								<div class="col-md-3">
+								<div class="col-md-3 mb-2">
 									<label for="date_from" class="form-label">Date From</label>
 									<input type="date" class="form-control" id="date_from" name="date_from" 
 										   value="{{ request('date_from') }}">
 								</div>
 
-								<div class="col-md-3">
+								<div class="col-md-3 mb-2">
 									<label for="date_to" class="form-label">Date To</label>
 									<input type="date" class="form-control" id="date_to" name="date_to" 
 										   value="{{ request('date_to') }}">
@@ -142,9 +142,9 @@
 
 
 								<!-- Action Buttons -->
-								<div class="col-12 mt-3">
-									<div class="d-flex gap-2">
-										<button type="submit" class="btn btn-primary" id="applyFiltersBtn">
+								<div class="col-12">
+									<div class="d-flex">
+										<button type="submit" class="btn btn-primary mr-2" id="applyFiltersBtn">
 											<i class="ri-search-line me-1"></i>Apply Filters
 										</button>
 										<a href="{{ route('admin.moderations') }}" class="btn btn-secondary">
@@ -169,7 +169,7 @@
 							<small class="text-muted me-2">Active Filters:</small>
 							
 
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 								<a href="{{ route('admin.moderations', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
@@ -221,7 +221,7 @@
 						<div class="alert alert-info mb-3">
 							<strong>Filtered Results:</strong>
 							Showing {{ $moderations->total() }} moderation(s) matching your criteria
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 								• Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 							@endif
 							@if(request('moderation_type'))

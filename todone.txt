@@ -1,10 +1,9 @@
-dynamic settings
-
-select type, e.g text
-default value
-placeholder
-max-length
-options
-title
+ADMIN
 
 
+USER
+- Register
+- Create task
+- Manage task
+- Manage Submissions
+- Manage R

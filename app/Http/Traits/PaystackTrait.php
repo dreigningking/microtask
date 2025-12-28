@@ -6,6 +6,7 @@ use App\Models\Payout;
 use App\Models\Payment;
 use App\Models\Settlement;
 use Ixudra\Curl\Facades\Curl;
+use Illuminate\Support\Facades\Auth;
 
 
 trait PaystackTrait
@@ -53,21 +54,18 @@ trait PaystackTrait
   protected function createRecipient($bank_code, $account_number)
   {
     /** @var \App\Models\User $user */
-    $user = auth()->user();
+    $user = Auth::user();
     $type = '';
-    $currency = '';
+    $currency = $user->currency;
     switch ($user->country->iso) {
       case 'NG':
         $type = 'nuban';
-        $currency = $user->country->currency->iso;
         break;
       case 'GH':
         $type = 'mobile_money';
-        $currency = $user->country->currency->iso;
         break;
       case 'ZAR':
         $type = 'basa';
-        $currency = $user->country->currency->iso;
         break;
     }
     $response = Curl::to('https://api.paystack.co/transferrecipient')

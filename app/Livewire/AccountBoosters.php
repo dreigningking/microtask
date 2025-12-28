@@ -45,7 +45,7 @@ class AccountBoosters extends Component
         $this->user = Auth::user();
         $this->countrySetting = CountrySetting::where('country_id', $this->user->country_id)->first();
         $this->tax_rate = $this->countrySetting ? $this->countrySetting->tax_rate : 0;
-        $this->walletBalance = $this->user->wallets()->where('currency', $this->user->country->currency)->first()->balance ?? 0;
+        $this->walletBalance = $this->user->wallets()->where('currency', $this->user->currency)->first()->balance ?? 0;
         $this->boosters = Booster::where('is_active', 1)->get()->map(function($booster) {
             $price = $booster->prices()->where('country_id', $this->user->country->id)->first();
             $icon = 'bi-lightning-charge';
@@ -134,7 +134,7 @@ class AccountBoosters extends Component
             'user_id' => $this->user->id,
             'booster_id' => $this->selectedBooster['id'],
             'cost' => $this->totalAmount,
-            'currency' => $this->user->country->currency,
+            'currency' => $this->user->currency,
             'multiplier' => $this->selectedMultiplier,
             'duration_days' => $this->selectedDuration,
             'starts_at' => null, // To be set after payment
@@ -154,7 +154,7 @@ class AccountBoosters extends Component
 
         if ($this->paymentMethod === 'wallet') {
             // WALLET PAYMENT
-            $wallet = $this->user->wallets()->where('currency', $this->user->country->currency)->first();
+            $wallet = $this->user->wallets()->where('currency', $this->user->currency)->first();
             if (!$wallet || $wallet->balance < $this->totalAmount) {
                 session()->flash('error', 'Insufficient wallet balance.');
                 return;
@@ -165,7 +165,7 @@ class AccountBoosters extends Component
                 'user_id' => $this->user->id,
                 'order_id' => $order->id,
                 'reference' => 'SUB-' . Str::random(10) . '-' . time(),
-                'currency' => $this->user->country->currency,
+                'currency' => $this->user->currency,
                 'amount' => $this->totalAmount,
                 'vat_value' => $this->tax,
                 'gateway' => 'wallet',
@@ -201,7 +201,7 @@ class AccountBoosters extends Component
                 'user_id' => $this->user->id,
                 'order_id' => $order->id,
                 'reference' => 'SUB-' . Str::random(10) . '-' . time(),
-                'currency' => $this->user->country->currency,
+                'currency' => $this->user->currency,
                 'amount' => $this->totalAmount,
                 'vat_value' => $this->tax,
                 'gateway_id' => $this->countrySetting->gateway_id,

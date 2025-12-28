@@ -9,6 +9,7 @@ use App\Models\Referral;
 use App\Models\Invitation;
 use App\Models\Settlement;
 use App\Models\CountrySetting;
+use App\Models\Moderation;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\TaskMaster\TaskSubmissionNotification;
@@ -23,6 +24,14 @@ class TaskSubmissionObserver
     {
         if ($taskSubmission->task->submission_review_type == 'self_review') {
             $taskSubmission->task->user->notify(new TaskSubmissionNotification($taskSubmission));
+        }else{
+            // Notify admins for review
+            Moderation::create([
+                'moderatable_type' => get_class($taskSubmission),
+                'moderatable_id' => $taskSubmission->id,
+                'purpose' => 'admin_review_submission',
+                'status' => 'pending',
+            ]);
         }
     }
 
@@ -83,14 +92,14 @@ class TaskSubmissionObserver
                     DB::beginTransaction();
                     try {
                         $wallet = Wallet::where('user_id', $invitation->user_id)
-                            ->where('currency', $taskSubmission->task->user->country->currency)
+                            ->where('currency', $taskSubmission->task->user->currency)
                             ->lockForUpdate()
                             ->first();
 
                         if (!$wallet) {
                             $wallet = new Wallet([
                                 'user_id' => $invitation->user_id,
-                                'currency' => $taskSubmission->task->user->country->currency,
+                                'currency' => $taskSubmission->task->user->currency,
                                 'balance' => 0
                             ]);
                         }
@@ -102,7 +111,7 @@ class TaskSubmissionObserver
                             'user_id' => $invitation->user_id,
                             'description' => 'Signup referral earning',
                             'amount' => $commission,
-                            'currency' => $taskSubmission->task->user->country->currency,
+                            'currency' => $taskSubmission->task->user->currency,
                             'status' => 'paid',
                             'settlementable_id' => $invitation->id,
                             'settlementable_type' => Invitation::class
@@ -140,14 +149,14 @@ class TaskSubmissionObserver
                 DB::beginTransaction();
                 try {
                     $wallet = Wallet::where('user_id', $referral->user_id)
-                        ->where('currency', $taskSubmission->task->user->country->currency)
+                        ->where('currency', $taskSubmission->task->user->currency)
                         ->lockForUpdate()
                         ->first();
 
                     if (!$wallet) {
                         $wallet = new Wallet([
                             'user_id' => $referral->user_id,
-                            'currency' => $taskSubmission->task->user->country->currency,
+                            'currency' => $taskSubmission->task->user->currency,
                             'balance' => 0
                         ]);
                     }
@@ -159,7 +168,7 @@ class TaskSubmissionObserver
                         'user_id' => $referral->user_id,
                         'description' => 'Task referral earning',
                         'amount' => $commission,
-                        'currency' => $taskSubmission->task->user->country->currency,
+                        'currency' => $taskSubmission->task->user->currency,
                         'status' => 'paid',
                         'settlementable_id' => $referral->id,
                         'settlementable_type' => Referral::class,
@@ -191,14 +200,14 @@ class TaskSubmissionObserver
         DB::beginTransaction();
         try {
             $wallet = Wallet::where('user_id', $task->user_id)
-                ->where('currency', $task->user->country->currency)
+                ->where('currency', $task->user->currency)
                 ->lockForUpdate()
                 ->first();
 
             if (!$wallet) {
                 $wallet = new Wallet([
                     'user_id' => $task->user_id,
-                    'currency' => $task->user->country->currency,
+                    'currency' => $task->user->currency,
                     'balance' => 0
                 ]);
             }
@@ -210,7 +219,7 @@ class TaskSubmissionObserver
                 'user_id' => $task->user_id,
                 'description' => 'Task Review refund',
                 'amount' => $final_refund_amount,
-                'currency' => $task->user->country->currency,
+                'currency' => $task->user->currency,
                 'status' => 'paid',
                 'settlementable_id' => $task->id,
                 'settlementable_type' => Task::class

@@ -75,8 +75,8 @@ class ListEarnings extends Component
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $this->toCurrency = $user->country->currency;
-        $this->toCurrencySymbol = $user->country->currency_symbol;
+        $this->toCurrency = $user->currency;
+        $this->toCurrencySymbol = $user->currency_symbol;
         $this->exchangeRate = $this->getMarkedUpRate($this->toCurrency, $user);
         // Wallet freeze logic
         $globalFreeze = Setting::firstWhere('name', 'freeze_wallets_globally')->value('value') == 1;
@@ -288,7 +288,7 @@ class ListEarnings extends Component
         $user = Auth::user();
         
         // Ensure user can only exchange to their home currency
-        if ($this->toCurrency !== $user->country->currency) {
+        if ($this->toCurrency !== $user->currency) {
             session()->flash('error', 'You can only exchange to your home currency.');
             return;
         }

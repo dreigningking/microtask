@@ -1,43 +1,44 @@
-booster subscription Expiring notification
+-------------------------------------------------------
+ADMIN
+---------------------------------------------------
+Admin dashboard - 
+Show table of pending moderations: Type | Count
+e.g of Types: task, task submissions, user verifications, withdrawal etc
 
-Submission Review {
-    Check submissions that should have been reviewed, if late, allow admin to review them
-    Late Subsubmission Review Notification
-    
-    REVIEW: review task after submission review completed
-}
+Show table of country | users | tasks | booster subscription count
+Show table of currency | wallets total
+Show table of currency | payments | revenue
 
-Refund notification & Earnings Notification sync
+Show active featured subscriptions count
+Show total task vs total completed, total draft, total ongoing
+Show total blog posts, total views, total comments
+Show total open support tickets vs ticket without comments (pending)
+Show total platforms and templates
+Show total countries vs total isReadyForProduction
 
-exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
-
+--------------------------------------------------
+admin cannot review unless timeline is passed
+if task that requested approval is put on draft.. delete the last moderation pending? 
+where should we display flags and reports - postcommentmoderationnotification
+--------------------------------------------------
+Featured Jobs - identify places to show featured jobs"
 Broadcast Jobs{
     show number of emails to be sent.. let user reduce amount
     BroadcastJob Notification
 }: 
-
-Referral from dashboard
-
-vpn block
-
-Logs of activities e.g accepted terms
-
-Featured Jobs - identify places to show featured jobs"
-
-where should we display flags and reports - postcommentmoderationnotification
-
----------------------------------------------------------
-
+--------------------------------------------------
 Guest{
     Top Earners
     blog subscription
 }
--------------------------------------------------------
-ADMIN
----------------------------------------------------
-Admin dashboard - Show pending tasks
-
-Admin Monitor Submissions - Admin job show - review job posted, monitor submissions"
+Referral from user dashboard
+----------------------------------------------------
+vpn block: https://www.ipqualityscore.com/user/dashboard
+Logs of activities e.g accepted terms
+---------------------------------------------------------
+TESTING
+booster subscription Expiring notification
+exchange rate correct + exchange & withdraw- Withdrawal Complete Exchange Complete 
 
 ----------------------------------------------
 New FEATURES
@@ -46,6 +47,3 @@ Add Raffle Draw
 Google adsense
 System Review - Implement system review strategies"
 automatic verifications ?
-can verifications expire?
-
-https://www.ipqualityscore.com/user/dashboard

@@ -43,7 +43,7 @@ class BroadcastTaskPromotionNotification extends Notification
             ->greeting('Task Alert!')
             ->line('A new task has just been posted on the platform that matches your interests and location.')
             ->line('**Task:** ' . $this->task->title)
-            ->line('**Budget:** ' . ($this->task->user->country->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2))
+            ->line('**Budget:** ' . ($this->task->user->currency_symbol ?? '$') . number_format($this->task->budget_per_submission, 2))
             ->line('**Description:** ')
             ->line(substr(strip_tags($this->task->description), 0, 200) . (strlen($this->task->description) > 200 ? '...' : ''))
             ->action('View Task & Apply Now', $showUrl)

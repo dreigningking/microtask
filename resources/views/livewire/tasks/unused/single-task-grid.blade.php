@@ -6,7 +6,7 @@
                 <span class="badge bg-light text-secondary mb-2">{{ $task->platform ?? 'Uncategorized' }}</span>
                 <h5 class="fw-semibold mb-1">{{ $task->title }}</h5>
             </div>
-            <span class="h5 fw-bold text-primary">{{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
+            <span class="h5 fw-bold text-primary">{{ $task->user->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
         </div>
         <p class="text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $task->description }}</p>
         <div class="d-flex justify-content-between text-muted small mb-3">
@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="col-md-2 text-end">
-                <span class="job-type fulltime">{{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
+                <span class="job-type fulltime">{{ $task->user->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
             </div>
         </div>
     </a>

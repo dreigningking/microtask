@@ -68,7 +68,7 @@
         
         @if($submission->reviewed_at && $submission->accepted)
         <div class="alert alert-success">
-            <i class="bi bi-check-circle"></i> You approved this submission and paid {{ $submission->task->user->country->currency_symbol.number_format($submission->task->budget_per_submission,2) }} to Emily Davis.
+            <i class="bi bi-check-circle"></i> You approved this submission and paid {{ $submission->task->user->currency_symbol.number_format($submission->task->budget_per_submission,2) }} to Emily Davis.
             
             <div class="mt-1">
                 <strong>Your Review:</strong> {{ $submission->review_body }}

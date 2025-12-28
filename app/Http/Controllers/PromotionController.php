@@ -64,7 +64,7 @@ class PromotionController extends Controller
         }
 
         // Filter by country (super admin only)
-        if ($request->filled('country_id') && Auth::check() && Auth::user()->role && Auth::user()->role->name === 'super-admin') {
+        if ($request->filled('country_id') && Auth::check() && Auth::user()->role && Auth::user()->role->slug === 'super-admin') {
             $countryId = $request->country_id;
             
             // Handle case where country_id might be an array

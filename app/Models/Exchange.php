@@ -27,7 +27,7 @@ class Exchange extends Model
 
     public function scopeLocalize($query)
     {
-        if (auth()->user()->role->name == 'super-admin') {
+        if (auth()->user()->role->slug == 'super-admin') {
             return $query;
         }
 

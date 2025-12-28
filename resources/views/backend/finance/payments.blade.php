@@ -95,7 +95,7 @@
 								</div>
 							</div>
 							
-							@if(auth()->user()->role->name === 'super-admin' && $countries && $countries->count() > 0)
+							@if(auth()->user()->role->slug === 'super-admin' && $countries && $countries->count() > 0)
 							<div class="row">
 								<div class="col-md-3 mb-3">
 									<label for="country_id" class="form-label">Country</label>

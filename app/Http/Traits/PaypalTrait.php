@@ -42,7 +42,7 @@ trait PaypalTrait
                         "items" => [
                             [
                                 "name" => "Payment on Wonegig",
-                                "description" => "Payment for ".($user->role->name == 'shopper' ? 'Orders':'Subscription/Adverts'),
+                                "description" => "Payment for ".($user->role->slug == 'shopper' ? 'Orders':'Subscription/Adverts'),
                                 "quantity" => "1",
                                 "unit_amount" => [
                                     "currency_code" => $payment->currency->iso,

@@ -114,7 +114,7 @@ class TaskSubmissionReview extends Component
             $wallet = Wallet::firstOrNew(
                 [
                     'user_id' => $this->selectedSubmission->user_id,
-                    'currency' => $this->task->user->country->currency
+                    'currency' => $this->task->user->currency
                 ]
             );
             if ($wallet) {
@@ -129,7 +129,7 @@ class TaskSubmissionReview extends Component
                 'settlementable_type' => get_class($this->selectedSubmission),
                 'amount' => $this->task->budget_per_submission,
                 'description' => 'Task Submission Reward',
-                'currency' => $this->task->user->country->currency,
+                'currency' => $this->task->user->currency,
                 'status' => 'paid'
             ]);
             $this->selectedSubmission->accepted = true;

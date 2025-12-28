@@ -109,7 +109,7 @@ class BankAccountSettings extends Component
         if ($gateway) {
             $allBanks = $this->listBanks($gateway->slug, $countryName);
             if(is_array($allBanks)) {
-                $userCurrency = $this->user->country->currency;
+                $userCurrency = $this->user->currency;
                 $this->banks = collect($allBanks)->where('currency', $userCurrency)->all();
             }
         }

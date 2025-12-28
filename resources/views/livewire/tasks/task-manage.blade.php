@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="col-md-4 text-md-end">
-                    <div class="h2 d-inline d-md-block text-warning mb-1">{{ $task->user->country->currency_symbol.number_format($task->budget_per_submission,2) }}</div>
+                    <div class="h2 d-inline d-md-block text-warning mb-1">{{ $task->user->currency_symbol.number_format($task->budget_per_submission,2) }}</div>
                     <small class="text-white-50">Per approved submission</small>
                     <div class="d-flex justify-content-md-end">
                         <nav class="mt-2 mt-md-0" aria-label="breadcrumb">
@@ -127,16 +127,16 @@
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span>Budget per submission</span>
-                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</strong>
+                                    <strong>{{ $task->user->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</strong>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span>Amount Disbursed</span>
-                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</strong>
+                                    <strong>{{ $task->user->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between">
                                     <span>Total Budget:</span>
-                                    <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission * $task->number_of_submissions, 2) }}</strong>
+                                    <strong>{{ $task->user->currency_symbol }}{{ number_format($task->budget_per_submission * $task->number_of_submissions, 2) }}</strong>
                                 </div>
                             </div>
 

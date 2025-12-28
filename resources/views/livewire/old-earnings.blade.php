@@ -54,14 +54,14 @@
                         </div>
                         <div class="d-flex gap-1">
                             @if($wallet->balance > 0)
-                            @if($wallet->currency === Auth::user()->country->currency)
+                            @if($wallet->currency === Auth::user()->currency)
                             <button wire:click="openWithdrawModal('{{ $wallet->currency }}')"
                                 class="btn btn-outline-secondary btn-sm"
                                 @if($walletsAreFrozen || $wallet->is_frozen) disabled @endif>
                                 <i class="ri-bank-card-line me-1"></i> Withdraw
                             </button>
                             @endif
-                            @if(count($wallets) > 1 && $wallet->currency !== Auth::user()->country->currency)
+                            @if(count($wallets) > 1 && $wallet->currency !== Auth::user()->currency)
                             <button wire:click="openExchangeModal('{{ $wallet->currency }}')"
                                 class="btn btn-outline-primary btn-sm"
                                 @if($walletsAreFrozen || $wallet->is_frozen) disabled @endif>

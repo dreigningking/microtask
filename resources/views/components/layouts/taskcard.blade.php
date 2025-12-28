@@ -2,7 +2,7 @@
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-3">
             <span class="badge bg-info">{{ $task->platform->name }}</span>
-            <span class="price-tag">{{ $task->user->country->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
+            <span class="price-tag">{{ $task->user->currency_symbol ?? '$' }}{{ $task->budget_per_submission }}</span>
         </div>
         <h5 class="card-title">
              <a href="{{ route('explore.task',$task) }}">{{ $task->title }}</a>  

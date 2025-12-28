@@ -180,7 +180,7 @@
                                             <label for="fromCurrency" class="form-label">From Currency</label>
                                             <select class="form-select" wire:model="fromCurrency" id="fromCurrency" required>
                                                 <option value="">Select currency</option>
-                                                @foreach($wallets->where('is_frozen', false)->where('currency', '!=', Auth::user()->country->currency) as $wallet)
+                                                @foreach($wallets->where('is_frozen', false)->where('currency', '!=', Auth::user()->currency) as $wallet)
                                                 <option value="{{ $wallet->currency }}">{{ $wallet->currency }} ({{ number_format($wallet->balance, 2) }})</option>
                                                 @endforeach
                                             </select>
@@ -190,7 +190,7 @@
                                         <div class="mb-3">
                                             <label for="toCurrency" class="form-label">To Currency</label>
                                             <select class="form-select" wire:model.live="toCurrency" id="toCurrency" required disabled>
-                                                <option value="{{ Auth::user()->country->currency }}">{{ Auth::user()->country->currency }}</option>
+                                                <option value="{{ Auth::user()->currency }}">{{ Auth::user()->currency }}</option>
                                             </select>
                                             @error('toCurrency') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                         </div>

@@ -143,7 +143,7 @@ class TaskSubmissionDispute extends Component
 
             $wallet = Wallet::firstOrNew([
                 'user_id' => $this->taskSubmission->user_id,
-                'currency' => $this->task->user->country->currency
+                'currency' => $this->task->user->currency
             ]);
             if ($wallet) {
                 $old_balance = $wallet->balance ?? 0;
@@ -158,7 +158,7 @@ class TaskSubmissionDispute extends Component
                 'settlementable_type' => get_class($this->taskSubmission),
                 'amount' => $amount,
                 'description' => 'Task Submission Reward',
-                'currency' => $this->task->user->country->currency,
+                'currency' => $this->task->user->currency,
                 'status' => 'paid'
             ]);
 

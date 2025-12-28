@@ -155,7 +155,7 @@
 								</div>
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->role->name === 'super-admin')
+								@if(auth()->user()->role->slug === 'super-admin')
 								<div class="col-md-3">
 									<label for="country_id" class="form-label">Country</label>
 									<select class="form-select" id="country_id" name="country_id">
@@ -264,7 +264,7 @@
 							</span>
 							@endif
 
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 								<a href="{{ route('admin.tasks.submissions', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
@@ -335,7 +335,7 @@
 							@if(request('search'))
 								• Search: "{{ request('search') }}"
 							@endif
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 								• Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 							@endif
 							@if(request('platform_id'))
@@ -457,12 +457,12 @@
 												<span class="text-muted">-</span>
 											@endif
 											<div class="text-muted small mt-1">
-												@if($submission->task->review_type === 'self_review')
-													<i class="ri-user-line me-1"></i>Self
-												@elseif($submission->task->review_type === 'admin_review')
-													<i class="ri-shield-user-line me-1"></i>Admin
+												@if($submission->task->submission_review_type === 'self_review')
+													<i class="ri-user-line me-1"></i>Self Review
+												@elseif($submission->task->submission_review_type === 'admin_review')
+													<i class="ri-shield-user-line me-1"></i>Admin Review
 												@else
-													<span class="badge bg-info">System</span>
+													<span class="badge bg-info">System Review</span>
 												@endif
 											</div>
 										</td>
@@ -498,8 +498,8 @@
 										</td>
 										<td>
 											<div class="text-center">
-												<div class="fw-bold">{{ $submission->created_at->format('M d') }}</div>
-												<div class="text-muted small">{{ $submission->created_at->format('Y') }}</div>
+												<div class="fw-bold small">{{ $submission->created_at->format('M d, Y') }}</div>
+												
 												<div class="text-muted small">{{$submission->created_at->format('H:i')}}</div>
 											</div>
 										</td>
@@ -538,14 +538,9 @@
 										</td>
 										<td>
 											<div class="d-flex flex-column gap-1">
-												<a href="{{ route('admin.tasks.show', $submission->task) }}?submission={{ $submission->id }}" class="btn btn-primary btn-sm">
-													<i class="ri-eye-line me-1"></i>View
+												<a href="{{ route('admin.tasks.review_submission', $submission) }}" class="btn btn-warning btn-sm">
+													<i class="ri-shield-check-line me-1"></i>Review
 												</a>
-												@if(!$submission->reviewed_at && ($submission->task->review_type === 'admin_review' || $isOverdue))
-													<a href="{{ route('admin.tasks.review_submission', $submission) }}" class="btn btn-warning btn-sm">
-														<i class="ri-shield-check-line me-1"></i>Review
-													</a>
-												@endif
 											</div>
 										</td>
 									</tr>

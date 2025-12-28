@@ -29,7 +29,7 @@ class Subscription extends Model
     public function scopeLocalize($query)
     {
         $user = Auth::user();
-        if ($user->role->name == 'super-admin') {
+        if ($user->role->slug == 'super-admin') {
             return $query;
         }
 

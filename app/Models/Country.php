@@ -270,7 +270,7 @@ class Country extends Model
     }
 
     public function users(){
-        return $this->hasMany(User::class);
+        return $this->setConnection('mysql')->hasMany(User::class);
     } 
 
     /**

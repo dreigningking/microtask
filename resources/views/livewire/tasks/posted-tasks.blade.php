@@ -115,10 +115,10 @@
                                         </div>
                                         <div class="text-end">
                                             @if($activeTab === 'completed')
-                                                <h4 class="text-success mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
+                                                <h4 class="text-success mb-0">{{ Auth::user()->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
                                                 <small class="text-muted">Total Budget</small>
                                             @else
-                                                <h4 class="text-{{ $activeTab === 'drafts' || $activeTab === 'rejected' ? 'muted' : 'success' }} mb-0">{{ Auth::user()->country->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
+                                                <h4 class="text-{{ $activeTab === 'drafts' || $activeTab === 'rejected' ? 'muted' : 'success' }} mb-0">{{ Auth::user()->currency_symbol }}{{ number_format($task->expected_budget, 2) }}</h4>
                                                 <small class="text-muted">Budget</small>
                                             @endif
                                         </div>
@@ -152,10 +152,10 @@
                                                 <small class="text-muted"><i class="bi bi-file-earmark-check"></i> Submissions: {{ $task->taskSubmissions->where('accepted', true)->count() }}</small>
                                             </div>
                                             <div class="col-md-3">
-                                                <small class="text-muted"><i class="bi bi-cash"></i> Paid Out: {{ Auth::user()->country->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</small>
+                                                <small class="text-muted"><i class="bi bi-cash"></i> Paid Out: {{ Auth::user()->currency_symbol }}{{ number_format($task->taskSubmissions->where('accepted', true)->count() * $task->budget_per_submission, 2) }}</small>
                                             </div>
                                             <div class="col-md-3">
-                                                <small class="text-muted"><i class="bi bi-arrow-counterclockwise"></i> Refund: {{ Auth::user()->country->currency_symbol }}{{ number_format(($task->number_of_submissions - $task->taskSubmissions->where('accepted', true)->count()) * $task->budget_per_submission, 2) }}</small>
+                                                <small class="text-muted"><i class="bi bi-arrow-counterclockwise"></i> Refund: {{ Auth::user()->currency_symbol }}{{ number_format(($task->number_of_submissions - $task->taskSubmissions->where('accepted', true)->count()) * $task->budget_per_submission, 2) }}</small>
                                             </div>
                                             <div class="col-md-3">
                                                 <small class="text-muted"><i class="bi bi-check-circle"></i> Reviewed: {{ $task->taskSubmissions->whereNotNull('reviewed_at')->count() }}</small>

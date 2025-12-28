@@ -17,7 +17,7 @@ class TopEarners extends Component
         // Get current user's currency
         $currency = 'USD'; // default
         if (Auth::check()) {
-            $currency = Auth::user()->country->currency ?? 'USD';
+            $currency = Auth::user()->currency ?? 'USD';
         }
 
         // Get top 7 earners with wallets in the currency

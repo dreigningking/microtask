@@ -9,6 +9,7 @@ use App\Notifications\General\Moderation\PostModerationNotification;
 use App\Notifications\General\Moderation\TaskModerationNotification;
 use App\Notifications\General\Moderation\BankAccountModerationNotification;
 use App\Notifications\General\Moderation\PostCommentModerationNotification;
+use App\Notifications\General\Moderation\TaskSubmissionModerationNotification;
 use App\Notifications\General\Moderation\UserVerificationModerationNotification;
 
 
@@ -34,6 +35,9 @@ class ModerationObserver
             break;
             case('App\Models\BankAccount'):
                 $this->getAdmin()->notify(new BankAccountModerationNotification($moderation,'admin'));
+            break;
+            case('App\Models\TaskSubmission'):
+                $this->getAdmin()->notify(new TaskSubmissionModerationNotification($moderation));
             break;
         }
     }
@@ -68,6 +72,8 @@ class ModerationObserver
                 case('App\Models\BankAccount'):
                         $moderation->moderatable->user->notify(new BankAccountModerationNotification($moderation,'author'));
                     break;
+                default:
+                break;
             }
         }
     }

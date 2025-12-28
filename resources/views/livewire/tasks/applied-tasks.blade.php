@@ -99,7 +99,7 @@
                                     <span class="badge bg-warning">{{ $task->platform->name ?? 'N/A' }}</span>
                                 </div>
                                 <div class="text-end">
-                                    <h4 class="text-success mb-0">{{ $task->user->country->currency_symbol ?? '$' }}{{ number_format($task->budget_per_submission, 2) }}</h4>
+                                    <h4 class="text-success mb-0">{{ $task->user->currency_symbol ?? '$' }}{{ number_format($task->budget_per_submission, 2) }}</h4>
                                     <small class="text-muted">Potential Earnings</small>
                                 </div>
                             </div>
@@ -120,7 +120,7 @@
                                     <small class="text-muted"><i class="bi bi-calendar"></i> You submitted: {{ $task->taskSubmissions->where('user_id',$user->id)->count()}}</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <small class="text-muted"><i class="bi bi-calendar"></i> Earnings: {{ $task->user->country->currency_symbol ?? '$' }}{{ $task->taskSubmissions->where('user_id',$user->id)->where('paid_at','!=',null)->count() * $task->budget_per_submission}}</small>
+                                    <small class="text-muted"><i class="bi bi-calendar"></i> Earnings: {{ $task->user->currency_symbol ?? '$' }}{{ $task->taskSubmissions->where('user_id',$user->id)->where('paid_at','!=',null)->count() * $task->budget_per_submission}}</small>
                                 </div>
                                 <div class="col-md-2 text-md-end mt-2 mt-md-0">
                                     <a href="{{ route('explore.task',$task) }}" class="btn btn-sm btn-outline-primary">

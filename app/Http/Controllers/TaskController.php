@@ -39,7 +39,7 @@ class TaskController extends Controller
         }
 
         // Country filter (only for super admins)
-        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->slug === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
@@ -243,7 +243,7 @@ class TaskController extends Controller
             });
         }
 
-        if (Auth::user()->role->name === 'super-admin' && $request->filled('country_id')) {
+        if (Auth::user()->role->slug === 'super-admin' && $request->filled('country_id')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });

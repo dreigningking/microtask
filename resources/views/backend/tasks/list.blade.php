@@ -146,7 +146,7 @@
 								</div>
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->role->name === 'super-admin')
+								@if(auth()->user()->role->slug === 'super-admin')
 								<div class="col-md-3">
 									<label for="country_id" class="form-label">Country</label>
 									<select class="form-select" id="country_id" name="country_id">
@@ -282,7 +282,7 @@
 							</span>
 							@endif
 
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 							<span class="badge bg-info d-flex align-items-center gap-1 quick-filter-badge">
 								Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 								<a href="{{ route('admin.tasks.index', request()->except('country_id')) }}" class="text-white text-decoration-none ms-1">
@@ -362,7 +362,7 @@
 							@if(request('search'))
 								• Search: "{{ request('search') }}"
 							@endif
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 								• Country: {{ $countries->firstWhere('id', request('country_id'))->name ?? 'Unknown' }}
 							@endif
 							@if(request('platform_id'))
@@ -523,7 +523,7 @@
 											<div class="d-flex flex-column">
 												<div class="fw-bold">{{ $task->user->name ?? 'N/A' }}</div>
 												<div class="text-muted small">
-													@if(auth()->user()->role->name === 'super-admin' && $task->user)
+													@if(auth()->user()->role->slug === 'super-admin' && $task->user)
 														{{ $task->user->country->name ?? 'Unknown Country' }}
 													@endif
 												</div>

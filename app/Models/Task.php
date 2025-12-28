@@ -267,7 +267,7 @@ class Task extends Model
 
     public function scopeLocalize($query)
     {
-        if (Auth::user()->role->name == 'super-admin') {
+        if (Auth::user()->role->slug == 'super-admin') {
             return $query;
         }
 
@@ -299,5 +299,15 @@ class Task extends Model
         } else {
             return $months . ' month' . ($months > 1 ? 's' : '');
         }
+    }
+
+    public function getCurrencyAttribute()
+    {
+        return $this->user->currency;
+    }
+
+    public function getCurrencySymbolAttribute()
+    {
+        return $this->user->currency_symbol;
     }
 }

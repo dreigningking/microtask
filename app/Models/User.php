@@ -29,7 +29,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    
+    protected $connection = 'mysql';
     protected $fillable = [
         'name',
         'username',
@@ -570,7 +570,7 @@ class User extends Authenticatable
 
     public function scopeLocalize($query)
     {
-        if (Auth::user()->role->name == 'super-admin') {
+        if (Auth::user()->role->slug == 'super-admin') {
             return $query;
         }
 
@@ -821,4 +821,16 @@ class User extends Authenticatable
         $segments = config('settings.announcement_segments');
         return $segments[$segment]['description'] ?? '';
     }
+
+    public function getCurrencyAttribute()
+    {
+        return $this->country->currency;
+    }
+
+    public function getCurrencySymbolAttribute()
+    {
+        return $this->country->currency_symbol;
+    }
+
+
 }

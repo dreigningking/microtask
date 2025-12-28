@@ -5,13 +5,16 @@ namespace App\Models;
 use Carbon\Carbon;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Moderation;
 use App\Models\TaskWorker;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\TaskSubmissionObserver;
 use function Symfony\Component\Clock\now;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
 #[ObservedBy([TaskSubmissionObserver::class])]
@@ -59,6 +62,10 @@ class TaskSubmission extends Model
         return 'pending review since ' . $this->created_at->format('M d, Y H:i');
     }
 
+    public function getOverdueByHoursAttribute(){
+        return ceil(abs(Carbon::now()->diffInHours($this->created_at, false)));
+    }
+
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
@@ -85,6 +92,16 @@ class TaskSubmission extends Model
     public function dispute()
     {
         return $this->hasOne(TaskDispute::class);
+    }
+
+    public function moderations(): MorphMany
+    {
+        return $this->morphMany(Moderation::class, 'moderatable');
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     /**

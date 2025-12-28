@@ -89,7 +89,7 @@
 								</div>
 
 								<!-- Country Filter (Super Admin Only) -->
-								@if(auth()->user()->role->name === 'super-admin')
+								@if(auth()->user()->role->slug === 'super-admin')
 								<div class="col-md-3">
 									<label for="country_id" class="form-label">Country</label>
 									<select class="form-select" id="country_id" name="country_id">
@@ -215,7 +215,7 @@
 								@endif
 							@endif
 
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 								@php
 									$countryIdValue = is_array(request('country_id')) ? (request('country_id')[0] ?? '') : request('country_id');
 								@endphp
@@ -306,7 +306,7 @@
 								• Search: "{{ $searchValue }}"
 								@endif
 							@endif
-							@if(request('country_id') && auth()->user()->role->name === 'super-admin')
+							@if(request('country_id') && auth()->user()->role->slug === 'super-admin')
 								@php
 									$countryIdValue = is_array(request('country_id')) ? (request('country_id')[0] ?? '') : request('country_id');
 								@endphp
@@ -439,7 +439,7 @@
 											<div class="d-flex flex-column">
 												<div class="fw-bold">{{ $promotion->user->name ?? 'N/A' }}</div>
 												<div class="text-muted small">
-													@if(auth()->user()->role->name === 'super-admin' && $promotion->user && $promotion->user->country)
+													@if(auth()->user()->role->slug === 'super-admin' && $promotion->user && $promotion->user->country)
 													{{ $promotion->user->country->name ?? 'Unknown Country' }}
 													@endif
 												</div>

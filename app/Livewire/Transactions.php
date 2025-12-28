@@ -34,7 +34,7 @@ class Transactions extends Component
     public function mount()
     {
         $user = Auth::user();
-        $this->currencySymbol = $user->country->currency_symbol ?? '$';
+        $this->currencySymbol = $user->currency_symbol ?? '$';
     }
 
     public function updatedSearch()

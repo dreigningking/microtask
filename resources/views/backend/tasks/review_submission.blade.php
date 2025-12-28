@@ -54,8 +54,8 @@
 			<div class="col-lg-8">
 				<!-- Task Information Card -->
 				<div class="card mb-4">
-					<div class="card-header bg-primary text-white">
-						<h5 class="card-title mb-0">
+					<div class="card-header bg-primary">
+						<h5 class="card-title mb-0 text-white">
 							<i class="ri-file-list-line me-2"></i>
 							Task: {{ $submission->task->title }}
 						</h5>
@@ -74,13 +74,43 @@
 
 								<p class="mb-2">
 									<strong>Budget per Person:</strong>
-									{{ $submission->task->currency }} {{ number_format($submission->task->budget_per_submission, 2) }}
+									{{ $submission->task->currency_symbol }} {{ number_format($submission->task->budget_per_submission, 2) }}
 								</p>
 
 								<p class="mb-0">
 									<strong>Review Type:</strong>
-									{{ ucfirst(str_replace('_', ' ', $submission->task->review_type)) }}
+									{{ ucfirst(str_replace('_', ' ', $submission->task->submission_review_type)) }}
 								</p>
+
+								@if($submission->task->template_data && is_array($submission->task->template_data) && count($submission->task->template_data))
+								<div class="mt-4">
+									<h6>Template Data</h6>
+									@foreach($submission->task->template_data as $field)
+									<p class="">
+									<h6 class="fw-medium mb-2">{{ $field['title'] ?? 'Field' }}</h6>
+									@if(isset($field['type']) && $field['type'] === 'file')
+									@if(!empty($field['value']))
+									<a href="{{ asset('storage/' . $field['value']) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+										<i class="bi bi-download me-1"></i> {{ basename($field['value']) }}
+									</a>
+									@else
+									<span class="text-muted small">No file uploaded</span>
+									@endif
+									@else
+									@if(is_array($field['value'] ?? null))
+									<div class="d-flex flex-wrap gap-1">
+										@foreach($field['value'] as $item)
+										<span class="badge bg-light text-dark">{{ $item }}</span>
+										@endforeach
+									</div>
+									@else
+									<p class="mb-0 small">{{ $field['value'] ?? 'Not provided' }}</p>
+									@endif
+									@endif
+									</p>
+									@endforeach
+								</div>
+								@endif
 							</div>
 							<div class="col-md-6">
 								<h6 class="text-muted mb-2">Submission Info</h6>
@@ -122,33 +152,65 @@
 						<h5 class="card-title mb-0">Submission Data</h5>
 					</div>
 					<div class="card-body">
-						@if($submission->submissions && is_array($submission->submissions))
+						@if($submission->submission_details && is_array($submission->submission_details))
 							<div class="row g-3">
-								@foreach($submission->submissions as $field => $value)
+								@foreach($submission->submission_details as $detail)
 								<div class="col-12">
-									<h6 class="fw-medium mb-2">{{ ucfirst(str_replace('_', ' ', $field)) }}</h6>
-									@if(is_array($value))
-										<div class="d-flex flex-wrap gap-2">
-											@foreach($value as $item)
-											<span class="badge bg-light text-dark">{{ $item }}</span>
-											@endforeach
-										</div>
-									@elseif(str_starts_with($value, 'storage/') || str_starts_with($value, 'public/uploads/'))
-										<div class="border rounded p-3 bg-light">
-											<div class="d-flex align-items-center">
-												<i class="ri-file-line fs-3 text-primary me-3"></i>
-												<div class="flex-grow-1">
-													<strong>{{ basename($value) }}</strong>
-													<div class="text-muted small">Submitted file</div>
+									<h6 class="fw-medium mb-2">{{ $detail['title'] }}</h6>
+									@php
+										$value = $detail['value'];
+										$type = $detail['type'];
+									@endphp
+									@if($type === 'file')
+										@if(is_array($value))
+											<div class="d-flex flex-wrap gap-2">
+												@foreach($value as $file)
+												<div class="border rounded p-3 bg-light">
+													<div class="d-flex align-items-center">
+														<i class="ri-file-line fs-3 text-primary me-3"></i>
+														<div class="flex-grow-1">
+															<strong>{{ basename($file) }}</strong>
+															<div class="text-muted small">Submitted file</div>
+														</div>
+														<a href="{{ Storage::url(str_replace(['storage/', 'public/uploads/'], '', $file)) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+															<i class="ri-eye-line me-1"></i> View File
+														</a>
+													</div>
 												</div>
-												<a href="{{ Storage::url(str_replace(['storage/', 'public/uploads/'], '', $value)) }}"
-												   target="_blank" class="btn btn-outline-primary btn-sm">
-													<i class="ri-eye-line me-1"></i> View File
-												</a>
+												@endforeach
 											</div>
+										@else
+											<div class="border rounded p-3 bg-light">
+												<div class="d-flex align-items-center">
+													<i class="ri-file-line fs-3 text-primary me-3"></i>
+													<div class="flex-grow-1">
+														<strong>{{ basename($value) }}</strong>
+														<div class="text-muted small">Submitted file</div>
+													</div>
+													<a href="{{ Storage::url(str_replace(['storage/', 'public/uploads/'], '', $value)) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+														<i class="ri-eye-line me-1"></i> View File
+													</a>
+												</div>
+											</div>
+										@endif
+									@elseif($type === 'url')
+										<div class="p-3 bg-light rounded">
+											<a href="{{ $value }}" target="_blank" class="text-decoration-none">
+												{{ $value }} <i class="ri-external-link-line ms-1"></i>
+											</a>
 										</div>
+									@elseif($type === 'date')
+										<div class="p-3 bg-light rounded">{{ \Carbon\Carbon::parse($value)->format('M d, Y') }}</div>
 									@else
-										<div class="p-3 bg-light rounded">{{ $value }}</div>
+										@if(is_array($value))
+											<div class="d-flex flex-wrap gap-2">
+												@foreach($value as $item)
+												<span class="badge bg-light text-dark">{{ $item }}</span>
+												@endforeach
+											</div>
+										@else
+											<div class="p-3 bg-light rounded">{{ $value }}</div>
+										@endif
 									@endif
 								</div>
 								@endforeach
@@ -171,8 +233,8 @@
 					</div>
 					<div class="card-body">
 						<div class="d-grid gap-2">
-							<a href="{{ route('admin.tasks.submissions') }}" class="btn btn-outline-secondary">
-								<i class="ri-arrow-left-line me-1"></i> Back to Submissions
+							<a href="{{ route('admin.tasks.show', $submission->task) }}" class="btn btn-outline-secondary mb-2">
+								<i class="ri-arrow-left-line me-1"></i> View Task
 							</a>
 							@if(!$submission->reviewed_at)
 								<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
@@ -185,11 +247,11 @@
 									<i class="ri-close-line me-1"></i> Reject Submission
 								</button>
 							@else
-								<div class="alert alert-success">
+								<div class="alert alert-success px-2">
 									<i class="ri-check-circle-line me-2"></i>
-									<strong>Already Reviewed</strong>
-									<div class="small mb-2">
-										Reviewed on {{ $submission->reviewed_at->format('M d, Y') }}
+									
+									<div class="my-2">
+										<strong>Already Reviewed</strong> on {{ $submission->reviewed_at->format('M d, Y') }}
 									</div>
 									@if($submission->review_reason == 2)
 										<button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#resetModal">

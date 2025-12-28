@@ -328,7 +328,7 @@
                                                     @if($walletBalance < $totalAmount) disabled @endif />
                                                 <label class="form-check-label" for="payment_wallet">
                                                     <i class="ri-wallet-line me-2"></i>
-                                                    Wallet ({{ auth()->user()->country->currency_symbol }} {{ number_format($walletBalance, 2) }})
+                                                    Wallet ({{ auth()->user()->currency_symbol }} {{ number_format($walletBalance, 2) }})
                                                     @if($walletBalance < $totalAmount)
                                                         <span class="badge bg-danger ms-1">Insufficient balance</span>
                                                         @endif
@@ -372,16 +372,16 @@
                             <div class="col-md-8">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span>Subtotal:</span>
-                                    <span>{{ auth()->user()->country->currency_symbol }} {{ number_format($subtotal, 2) }}</span>
+                                    <span>{{ auth()->user()->currency_symbol }} {{ number_format($subtotal, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span>Tax ({{ $tax_rate }}%):</span>
-                                    <span>{{ auth()->user()->country->currency_symbol }} {{ number_format($tax, 2) }}</span>
+                                    <span>{{ auth()->user()->currency_symbol }} {{ number_format($tax, 2) }}</span>
                                 </div>
                                 <hr>
                                 <div class="d-flex justify-content-between fw-bold">
                                     <span>Total:</span>
-                                    <span class="text-primary">{{ auth()->user()->country->currency_symbol }} {{ number_format($totalAmount, 2) }}</span>
+                                    <span class="text-primary">{{ auth()->user()->currency_symbol }} {{ number_format($totalAmount, 2) }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4 d-flex align-items-center">

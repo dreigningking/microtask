@@ -16,7 +16,7 @@
                         <div class="card mb-3">
                             <div class="card-body">
 
-                                <p>Are you sure you want to approve this submission and release payment of <strong>{{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</strong> to <strong>{{ $selectedWorker->user->username ?? '' }}</strong>?</p>
+                                <p>Are you sure you want to approve this submission and release payment of <strong>{{ $task->user->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</strong> to <strong>{{ $selectedWorker->user->username ?? '' }}</strong>?</p>
 
                                 <div class="mb-3">
                                     <label class="form-label">Enter your password to continue</label>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="d-flex justify-content-end gap-3">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success">Approve & Pay {{ $task->user->country->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</button>
+                            <button type="submit" class="btn btn-success">Approve & Pay {{ $task->user->currency_symbol }}{{ number_format($task->budget_per_submission, 2) }}</button>
                         </div>
                     </form>
                 </div>
