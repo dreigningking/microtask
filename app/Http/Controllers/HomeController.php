@@ -66,6 +66,8 @@ class HomeController extends Controller
                 'tasks' => $tasksCount,
                 'booster_subscriptions' => $boosterSubscriptionsCount
             ];
+        })->filter(function ($stat) {
+            return $stat['users'] > 0;
         });
 
         // Currency Wallets Total
