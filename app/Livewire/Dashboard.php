@@ -176,7 +176,7 @@ class Dashboard extends Component
         
         // Get active jobs count (jobs with accepted workers but not completed)
         $activeJobs = Task::where('user_id', $user->id)
-            ->where('is_active', true)->whereNotNull('completed_at', null)
+            ->where('is_active', true)->whereNotNull('completed_at')
             ->has('taskWorkers')->count();
         
         // Get total workers count (workers who have accepted the task)
